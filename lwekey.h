@@ -10,14 +10,18 @@ struct LWEKey {
    int* key;
 };
 
+//allocate memory space for a LWEKey
+LWEKey* alloc_LWEKey();
+
+//free memory space for a LWEKey
+void free_LWEKey(LWEKey* ptr);
+
 //initialize the key structure and allocate the space for the key bits
-void initLWEKey(LWEKey* obj, const LWEParams* params) {
-   obj->params = params; 
-   obj->key = new int[params.n];
-}
+//(equivalent of the C++ constructor)
+void init_LWEKey(LWEKey* obj, const LWEParams* params);
 
-void destroyLWEKey(LWEKey* obj) {
-   delete[] obj->key;
-}
+//initialize the key structure and free the space for the key bits
+//(equivalent of the C++ destructor)
+void destroy_LWEKey(LWEKey* obj);
 
-#endif;
+#endif //LWEKEY_H
