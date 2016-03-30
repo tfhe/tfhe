@@ -8,4 +8,4 @@ clean:
 
 
 %.o: %.cpp
-	g++ -Wall -Werror -O0 -g3 -c -o $@ $<
+	g++ -std=c++11 -Wall -Werror -O0 -g3 -c -o $@ $<
