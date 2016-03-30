@@ -25,7 +25,12 @@ struct RingGSWSample;
 
 struct LWEBootstrappingKey;
 
-EXPORT void lweKeyGen(LWEKey* result, const LWEParams* params);
+/**
+ * This function generates a random LWE key for the given parameters.
+ * The LWE key for the result must be allocated and initialized
+ * (this means that the parameters are already in the result)
+ */
+EXPORT void lweKeyGen(LWEKey* result);
 EXPORT void lweSymEncrypt(LWESample* result, double message, const LWEKey* key);
 EXPORT double lweSymDecrypt(const LWESample* sample, const LWEKey* key);
 
