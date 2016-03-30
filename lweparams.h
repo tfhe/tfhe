@@ -12,13 +12,9 @@ struct LWEParams {
 
         //since all members are declared constant, a constructor is 
         //required in the structure.
-	LWEParams(int n, double alpha, int log_alpha);
+	LWEParams(int n, double alpha);
+	LWEParams(const LWEParams&) = delete; //forbidden
+	LWEParams& operator=(const LWEParams& ) = delete; //forbidden
 };
-
-//allocates and initialize lweParams
-LWEParams* new_lweParams(int n, double alpha);
-
-//destructs and frees a lweParams structure
-void delete_lweParams(LWEParams* ptr);
 
 #endif //LWEPARAMS_H
