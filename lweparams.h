@@ -12,9 +12,12 @@ struct LWEParams {
 
         //since all members are declared constant, a constructor is 
         //required in the structure.
+#ifdef __cplusplus
 	LWEParams(int n, double alpha);
+	~LWEParams();
 	LWEParams(const LWEParams&) = delete; //forbidden
 	LWEParams& operator=(const LWEParams& ) = delete; //forbidden
+#endif
 };
 
 #endif //LWEPARAMS_H

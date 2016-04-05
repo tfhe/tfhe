@@ -1,7 +1,26 @@
 #ifndef LWE_H
 #define LWE_H
 
+#include <stdint.h>
+
+//not very important, but all the functions exported in the output library
+//should use the C naming convention, for inter-compiler compatibility
+//reasons, or to bind it with non C++ code.
+#ifdef __cplusplus
 #define EXPORT extern "C"
+#else
+#define EXPORT 
+#endif
+
+// Idea:
+// we may want to represent an element x of the real torus by 
+// the integer rint(2^32.x) modulo 2^32
+//  -- addition, subtraction and integer combinations are native operation
+//  -- modulo 1 is mapped to mod 2^32, which is also native!
+// This looks much better than using float/doubles, where modulo 1 is not
+// natural at all.
+typedef uint32_t Torus32; 
+typedef uint64_t Torus64; 
 
 struct LWEParams;
 
@@ -24,6 +43,20 @@ struct RingGSWKey;
 struct RingGSWSample;
 
 struct LWEBootstrappingKey;
+
+//this is for compatibility with C code, to be able to use
+//"LWEParams" as a type and not "struct LWEParams"
+typedef struct LWEParams           LWEParams;
+typedef struct LWEKey              LWEKey;
+typedef struct LWESample           LWESample;
+typedef struct LWEKeySwitchKey     LWEKeySwitchKey;
+typedef struct RingLWEParams       RingLWEParams;
+typedef struct RingLWEKey          RingLWEKey;
+typedef struct RingLWESample       RingLWESample;
+typedef struct RingGSWParams       RingGSWParams;
+typedef struct RingGSWKey          RingGSWKey;
+typedef struct RingGSWSample       RingGSWSample;
+typedef struct LWEBootstrappingKey LWEBootstrappingKey;
 
 /**
  * This function generates a random LWE key for the given parameters.
