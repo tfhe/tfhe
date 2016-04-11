@@ -6,7 +6,7 @@ using namespace std;
 
 
 
-IntPolynomial::IntPolynomial(const int* coefs, const int N) {
+IntPolynomial::IntPolynomial(const int N) {
     this->coefs = new int[N]; 
 }
 
@@ -16,7 +16,7 @@ IntPolynomial::~IntPolynomial() {
 
 
 
-TorusPolynomial::TorusPolynomial(const Torus32* coefs, const int N) {
+TorusPolynomial::TorusPolynomial(const int N) {
     this->coefs = new int[N]; 
 }
 
