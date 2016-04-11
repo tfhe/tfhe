@@ -7,13 +7,15 @@
 //to all the LWE keys that use these params.
 struct LWEParams {
 	const int n;
-	const double alpha;
-	const int log_alpha;
+	const double alpha_min;
+	const double alpha_max;
+	const int log_alpha_min; //?
+
 
         //since all members are declared constant, a constructor is 
         //required in the structure.
 #ifdef __cplusplus
-	LWEParams(int n, double alpha);
+	LWEParams(int n, double alpha_min, double alpha_max);
 	~LWEParams();
 	LWEParams(const LWEParams&) = delete; //forbidden
 	LWEParams& operator=(const LWEParams& ) = delete; //forbidden

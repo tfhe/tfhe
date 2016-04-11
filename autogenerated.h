@@ -37,8 +37,8 @@ EXPORT void free_LWEParams_array(int nbelts, LWEParams* ptr);
 
 //initialize the LWEParams structure
 //(equivalent of the C++ constructor)
-EXPORT void init_LWEParams(LWEParams* obj, int n, double alpha);
-EXPORT void init_LWEParams_array(int nbelts, LWEParams* obj, int n, double alpha);
+EXPORT void init_LWEParams(LWEParams* obj, int n, double alpha_min, double alpha_max);
+EXPORT void init_LWEParams_array(int nbelts, LWEParams* obj, int n, double alpha_min, double alpha_max);
 
 //destroys the LWEParams structure
 //(equivalent of the C++ destructor)
@@ -47,8 +47,8 @@ EXPORT void destroy_LWEParams_array(int nbelts, LWEParams* obj);
  
 //allocates and initialize the LWEParams structure
 //(equivalent of the C++ new)
-EXPORT LWEParams* new_LWEParams(int n, double alpha);
-EXPORT LWEParams* new_LWEParams_array(int nbelts, int n, double alpha);
+EXPORT LWEParams* new_LWEParams(int n, double alpha_min, double alpha_max);
+EXPORT LWEParams* new_LWEParams_array(int nbelts, int n, double alpha_min, double alpha_max);
 
 //destroys and frees the LWEParams structure
 //(equivalent of the C++ delete)
