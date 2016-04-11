@@ -7,7 +7,7 @@ struct IntPolynomial {
    const int* coefs;
 
 #ifdef __cplusplus   
-   IntPolynomial(const int* coefs);
+   IntPolynomial(const int* coefs, const int N);
    ~IntPolynomial();
    IntPolynomial(const IntPolynomial&) = delete; //forbidden 
    IntPolynomial* operator=(const IntPolynomial&) = delete; //forbidden
@@ -16,10 +16,10 @@ struct IntPolynomial {
 
 
 struct TorusPolynomial {
-   const double* coefs;
+   const Torus* coefs;
 
 #ifdef __cplusplus   
-   TorusPolynomial(const double* coefs);
+   TorusPolynomial(const Torus32* coefs, const int N);
    ~TorusPolynomial();
    TorusPolynomial(const TorusPolynomial&) = delete; //forbidden 
    TorusPolynomial* operator=(const TorusPolynomial&) = delete; //forbidden

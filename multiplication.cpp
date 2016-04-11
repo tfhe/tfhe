@@ -6,8 +6,8 @@ using namespace std;
 
 
 
-IntPolynomial::IntPolynomial(const int* coefs) {
-    this->coefs = new int[1024]; //mettre N à la place de 1024
+IntPolynomial::IntPolynomial(const int* coefs, const int N) {
+    this->coefs = new int[N]; 
 }
 
 IntPolynomial::~IntPolynomial() {
@@ -16,8 +16,8 @@ IntPolynomial::~IntPolynomial() {
 
 
 
-TorusPolynomial::TorusPolynomial(const double* coefs) {
-    this->coefs = new int[1024]; //mettre N à la olace de 1024
+TorusPolynomial::TorusPolynomial(const Torus32* coefs, const int N) {
+    this->coefs = new int[N]; 
 }
 
 TorusPolynomial::~TorusPolynomial() {
