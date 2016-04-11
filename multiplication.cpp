@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <cmath>
+#include <cassert>
 #include "multiplication.h"
 
 
@@ -29,12 +30,31 @@ TorusPolynomial::~TorusPolynomial() {
 }
 
 
+/**
+ * This is the naive external multiplication of an integer polynomial
+ * with a torus polynomial. (this function should yield exactly the same
+ * result as the karatsuba or fft version) 
+ */
+EXPORT void multNaive(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2) {
+    const int N = poly1->N;
+    assert(poly2->N==N && result->N==N);
+    Torus32 ri;
+    for (int i=0; i<N; i++) {
+	ri=0;
+	for (int j=0; j<=i; j++) {
+	    ri += poly1->coefs[j]*poly2->coefsT[i-j];
+	}
+	for (int j=i+1; i<N; j++) {
+	    ri -= poly1->coefs[j]*poly2->coefsT[N+i-j];
+	}
+	result->coefsT[i]=ri;
+    }
+}
 
 /**
  * This function multiplies 2 polynomials (an integer poly and a torus poly)
  * by using Karatsuba
  */
-
 EXPORT void multKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2){
 	int size, h;
 	size = sizeof(poly1) / sizeof(poly1[0]);

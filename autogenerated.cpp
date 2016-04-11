@@ -4,6 +4,66 @@
 #include <cstdlib>
 #include <new>
 using namespace std;
+#include "multiplication.h" 
+//allocate memory space for a IntPolynomial
+
+EXPORT IntPolynomial* alloc_IntPolynomial() {
+    return (IntPolynomial*) malloc(sizeof(IntPolynomial));
+}
+EXPORT IntPolynomial* alloc_IntPolynomial_array(int nbelts) {
+    return (IntPolynomial*) malloc(nbelts*sizeof(IntPolynomial));
+}
+
+//free memory space for a LWEKey
+EXPORT void free_IntPolynomial(IntPolynomial* ptr) {
+    free(ptr);
+}
+EXPORT void free_IntPolynomial_array(int nbelts, IntPolynomial* ptr) {
+    free(ptr);
+}
+
+//initialize the key structure
+//(equivalent of the C++ constructor)
+EXPORT void init_IntPolynomial(IntPolynomial* obj, const int N) {
+    new(obj) IntPolynomial(N);
+}
+EXPORT void init_IntPolynomial_array(int nbelts, IntPolynomial* obj, const int N) {
+    for (int i=0; i<nbelts; i++) {
+	new(obj+i) IntPolynomial(N);
+    }
+}
+
+//destroys the IntPolynomial structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_IntPolynomial(IntPolynomial* obj) {
+    obj->~IntPolynomial();
+}
+EXPORT void destroy_IntPolynomial_array(int nbelts, IntPolynomial* obj) {
+    for (int i=0; i<nbelts; i++) {
+	(obj+i)->~IntPolynomial();
+    }
+}
+ 
+//allocates and initialize the IntPolynomial structure
+//(equivalent of the C++ new)
+EXPORT IntPolynomial* new_IntPolynomial(const int N) {
+    return new IntPolynomial(N);
+}
+EXPORT IntPolynomial* new_IntPolynomial_array(int nbelts, const int N) {
+    IntPolynomial* obj = alloc_IntPolynomial_array(nbelts);
+    init_IntPolynomial_array(nbelts,obj,N);
+    return obj;
+}
+
+//destroys and frees the IntPolynomial structure
+//(equivalent of the C++ delete)
+EXPORT void delete_IntPolynomial(IntPolynomial* obj) {
+    delete obj;
+}
+EXPORT void delete_IntPolynomial_array(int nbelts, IntPolynomial* obj) {
+    destroy_IntPolynomial_array(nbelts,obj);
+    free_IntPolynomial_array(nbelts,obj);
+}
 #include "lwekey.h" 
 //allocate memory space for a LWEKey
 
@@ -183,4 +243,64 @@ EXPORT void delete_LWESample(LWESample* obj) {
 EXPORT void delete_LWESample_array(int nbelts, LWESample* obj) {
     destroy_LWESample_array(nbelts,obj);
     free_LWESample_array(nbelts,obj);
+}
+#include "multiplication.h" 
+//allocate memory space for a TorusPolynomial
+
+EXPORT TorusPolynomial* alloc_TorusPolynomial() {
+    return (TorusPolynomial*) malloc(sizeof(TorusPolynomial));
+}
+EXPORT TorusPolynomial* alloc_TorusPolynomial_array(int nbelts) {
+    return (TorusPolynomial*) malloc(nbelts*sizeof(TorusPolynomial));
+}
+
+//free memory space for a LWEKey
+EXPORT void free_TorusPolynomial(TorusPolynomial* ptr) {
+    free(ptr);
+}
+EXPORT void free_TorusPolynomial_array(int nbelts, TorusPolynomial* ptr) {
+    free(ptr);
+}
+
+//initialize the key structure
+//(equivalent of the C++ constructor)
+EXPORT void init_TorusPolynomial(TorusPolynomial* obj, const int N) {
+    new(obj) TorusPolynomial(N);
+}
+EXPORT void init_TorusPolynomial_array(int nbelts, TorusPolynomial* obj, const int N) {
+    for (int i=0; i<nbelts; i++) {
+	new(obj+i) TorusPolynomial(N);
+    }
+}
+
+//destroys the TorusPolynomial structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_TorusPolynomial(TorusPolynomial* obj) {
+    obj->~TorusPolynomial();
+}
+EXPORT void destroy_TorusPolynomial_array(int nbelts, TorusPolynomial* obj) {
+    for (int i=0; i<nbelts; i++) {
+	(obj+i)->~TorusPolynomial();
+    }
+}
+ 
+//allocates and initialize the TorusPolynomial structure
+//(equivalent of the C++ new)
+EXPORT TorusPolynomial* new_TorusPolynomial(const int N) {
+    return new TorusPolynomial(N);
+}
+EXPORT TorusPolynomial* new_TorusPolynomial_array(int nbelts, const int N) {
+    TorusPolynomial* obj = alloc_TorusPolynomial_array(nbelts);
+    init_TorusPolynomial_array(nbelts,obj,N);
+    return obj;
+}
+
+//destroys and frees the TorusPolynomial structure
+//(equivalent of the C++ delete)
+EXPORT void delete_TorusPolynomial(TorusPolynomial* obj) {
+    delete obj;
+}
+EXPORT void delete_TorusPolynomial_array(int nbelts, TorusPolynomial* obj) {
+    destroy_TorusPolynomial_array(nbelts,obj);
+    free_TorusPolynomial_array(nbelts,obj);
 }

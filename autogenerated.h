@@ -1,5 +1,32 @@
 //THIS  FILE IS AUTOMATICALLY GENERATED
 //DO NOT EDIT BY HANDS
+//allocate memory space for a IntPolynomial
+EXPORT IntPolynomial* alloc_IntPolynomial();
+EXPORT IntPolynomial* alloc_IntPolynomial_array(int nbelts);
+
+//free memory space for a IntPolynomial
+EXPORT void free_IntPolynomial(IntPolynomial* ptr);
+EXPORT void free_IntPolynomial_array(int nbelts, IntPolynomial* ptr);
+
+//initialize the IntPolynomial structure
+//(equivalent of the C++ constructor)
+EXPORT void init_IntPolynomial(IntPolynomial* obj, const int N);
+EXPORT void init_IntPolynomial_array(int nbelts, IntPolynomial* obj, const int N);
+
+//destroys the IntPolynomial structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_IntPolynomial(IntPolynomial* obj);
+EXPORT void destroy_IntPolynomial_array(int nbelts, IntPolynomial* obj);
+ 
+//allocates and initialize the IntPolynomial structure
+//(equivalent of the C++ new)
+EXPORT IntPolynomial* new_IntPolynomial(const int N);
+EXPORT IntPolynomial* new_IntPolynomial_array(int nbelts, const int N);
+
+//destroys and frees the IntPolynomial structure
+//(equivalent of the C++ delete)
+EXPORT void delete_IntPolynomial(IntPolynomial* obj);
+EXPORT void delete_IntPolynomial_array(int nbelts, IntPolynomial* obj);
 //allocate memory space for a LWEKey
 EXPORT LWEKey* alloc_LWEKey();
 EXPORT LWEKey* alloc_LWEKey_array(int nbelts);
@@ -81,3 +108,30 @@ EXPORT LWESample* new_LWESample_array(int nbelts, const LWEParams* params);
 //(equivalent of the C++ delete)
 EXPORT void delete_LWESample(LWESample* obj);
 EXPORT void delete_LWESample_array(int nbelts, LWESample* obj);
+//allocate memory space for a TorusPolynomial
+EXPORT TorusPolynomial* alloc_TorusPolynomial();
+EXPORT TorusPolynomial* alloc_TorusPolynomial_array(int nbelts);
+
+//free memory space for a TorusPolynomial
+EXPORT void free_TorusPolynomial(TorusPolynomial* ptr);
+EXPORT void free_TorusPolynomial_array(int nbelts, TorusPolynomial* ptr);
+
+//initialize the TorusPolynomial structure
+//(equivalent of the C++ constructor)
+EXPORT void init_TorusPolynomial(TorusPolynomial* obj, const int N);
+EXPORT void init_TorusPolynomial_array(int nbelts, TorusPolynomial* obj, const int N);
+
+//destroys the TorusPolynomial structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_TorusPolynomial(TorusPolynomial* obj);
+EXPORT void destroy_TorusPolynomial_array(int nbelts, TorusPolynomial* obj);
+ 
+//allocates and initialize the TorusPolynomial structure
+//(equivalent of the C++ new)
+EXPORT TorusPolynomial* new_TorusPolynomial(const int N);
+EXPORT TorusPolynomial* new_TorusPolynomial_array(int nbelts, const int N);
+
+//destroys and frees the TorusPolynomial structure
+//(equivalent of the C++ delete)
+EXPORT void delete_TorusPolynomial(TorusPolynomial* obj);
+EXPORT void delete_TorusPolynomial_array(int nbelts, TorusPolynomial* obj);

@@ -12,7 +12,7 @@ LIB_O_FILES=$(patsubst %.cpp,%.o,${LIB_CPP_FILES}) \
 MAIN_FILES=$(patsubst %.cpp,%,${MAIN_CPP_FILES}) \
 	$(patsubst %.c,%,${MAIN_C_FILES})
 
-all: ${O_FILES} #${MAIN_FILES}
+all: ${O_FILES} ${MAIN_FILES}
 	
 clean:
 	rm ${O_FILES} ${MAIN_FILES} 2>/dev/null >/dev/null || true
