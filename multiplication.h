@@ -1,10 +1,12 @@
 #ifndef MULTILICATION_H
 #define MULTILICATION_H
 
+#include "lwe.h"
 
 
 struct IntPolynomial {
-   const int* coefs;
+   const int N;
+   int* coefs;
 
 #ifdef __cplusplus   
    IntPolynomial(const int N);
@@ -16,7 +18,8 @@ struct IntPolynomial {
 
 
 struct TorusPolynomial {
-   const Torus32* coefs;
+   const int N;
+   Torus32* coefsT;
 
 #ifdef __cplusplus   
    TorusPolynomial(const int N);
