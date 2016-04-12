@@ -103,6 +103,7 @@ EXPORT void gswSampleExtract(RingLWESample* result, const RingGSWSample* x);
 EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, double mu1, double mu0, const LWESample* x);
 
 //multiplication Karatsuba
+EXPORT void Karatsuba_aux(Torus32* R, const int* A, const Torus32* B, const int size);
 EXPORT void multKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
 
 

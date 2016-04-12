@@ -40,14 +40,14 @@ EXPORT void multNaive(TorusPolynomial* result, const IntPolynomial* poly1, const
     assert(poly2->N==N && result->N==N);
     Torus32 ri;
     for (int i=0; i<N; i++) {
-	ri=0;
-	for (int j=0; j<=i; j++) {
-	    ri += poly1->coefs[j]*poly2->coefsT[i-j];
-	}
-	for (int j=i+1; i<N; j++) {
-	    ri -= poly1->coefs[j]*poly2->coefsT[N+i-j];
-	}
-	result->coefsT[i]=ri;
+		ri=0;
+			for (int j=0; j<=i; j++) {
+		    	ri += poly1->coefs[j]*poly2->coefsT[i-j];
+			}
+			for (int j=i+1; i<N; j++) {
+		    	ri -= poly1->coefs[j]*poly2->coefsT[N+i-j];
+			}
+		result->coefsT[i]=ri;
     }
 }
 
@@ -55,45 +55,88 @@ EXPORT void multNaive(TorusPolynomial* result, const IntPolynomial* poly1, const
  * This function multiplies 2 polynomials (an integer poly and a torus poly)
  * by using Karatsuba
  */
-EXPORT void multKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2){
-	int size, h;
-	size = sizeof(poly1) / sizeof(poly1[0]);
-	h = size / 2;
+
+EXPORT void Karatsuba_aux(Torus32* R, const int* A, const Torus32* B, const int size){
+	int h = size / 2;
+
 	if (h!=1)
 	{
 		// split the polynomials in 2
-		IntPolynomial* A0[h], A1[h], Atemp[h];
-		TorusPolynomial* B0[h], B1[h], Btemp[h];
+		int* A0 = new int[h];
+		int* A1 = new int[h];
+		int* Atemp = new int[h];
+		Torus32* B0 = new Torus32[h];
+		Torus32* B1 = new Torus32[h];
+		Torus32* Btemp = new Torus32[h];
+
 		for (int i = 0; i < h; ++i)
 		{
-			A0[i] = poly1[i];
-			A1[i] = poly1[h+i];
+			A0[i] = A[i];
+			A1[i] = A[h+i];
 			Atemp[i] = A0[i] + A1[i];
-			B0[i] = poly2[i];
-			B1[i] = poly2[h+i];
+			B0[i] = B[i];
+			B1[i] = B[h+i];
 			Btemp[i] = B0[i] + B1[i];
-
 		}
 
 		// Karatsuba recursivly
-		TorusPolynomial* R0[2*h-1], R1[2*h-1], R2[2*h-1], Rtemp[2*h-1];
+		Torus32* R0 = new Torus32[2*h-1];
+		Torus32* R1 = new Torus32[2*h-1];
+		Torus32* R2 = new Torus32[2*h-1];
+		Torus32* Rtemp = new Torus32[2*h-1];
 		
-		multKaratsuba(R0, A0, B0);
-		multKaratsuba(R2, A1, B1);
-		multKaratsuba(Rtemp, Atemp, Btemp);
+		
+		Karatsuba_aux(R0, A0, B0, h);
+		Karatsuba_aux(R2, A1, B1, h);
+		Karatsuba_aux(Rtemp, Atemp, Btemp, h);
 		for (int i = 0; i < 2*h-1; ++i) R1[i] = Rtemp[i] - R0[i] - R2[i];
 
-		for (int i = 0; i < h; ++i) result[i] = R0[i];
-		for (int i = h; i < 2*h-1; ++i) result[i] = R0[i] + R1[i-h];
-		result[2*h-1] = R1[h-1];
-		for (int i = 2*h; i < 3*h-1; ++i) result[i] = R1[i-h] + R2[i-2*h+1];
-		for (int i = 3*h-1; i < 4*h-1; ++i) result[i] = R2[i-2*h+1];
+		for (int i = 0; i < h; ++i) R[i] = R0[i];
+		for (int i = h; i < 2*h-1; ++i) R[i] = R0[i] + R1[i-h];
+		R[2*h-1] = R1[h-1];
+		for (int i = 2*h; i < 3*h-1; ++i) R[i] = R1[i-h] + R2[i-2*h+1];
+		for (int i = 3*h-1; i < 4*h-1; ++i) R[i] = R2[i-2*h+1];
+
+		delete[] A0;
+		delete[] A1;
+		delete[] Atemp;
+		delete[] B0;
+		delete[] B1;
+		delete[] Btemp;
+		delete[] R0;
+		delete[] R1;
+		delete[] R2;
+		delete[] Rtemp;
 	}
 	else
 	{
-		result[0] = A[0]*B[0];
-		result[2] = A[1]*B[1];
-		result[1] = (A[0]+A[1])*(B[0]*B[1]) - result[0] - result[2];
+		R[0] = A[0]*B[0];
+		R[2] = A[1]*B[1];
+		R[1] = (A[0]+A[1])*(B[0]*B[1]) - R[0] - R[2];
 	}
 
+}
+
+
+EXPORT void multKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2){
+	int size;
+	size = sizeof(poly1) / sizeof(poly1->coefs[0]);
+	
+	int* A = new int[size];
+	Torus32* B = new Torus32[size];
+	for (int i = 0; i < size; ++i)
+	{
+		A[i] = poly1->coefs[i];
+		B[i] = poly2->coefsT[i];
+	}
+
+	Torus32* R = new Torus32[2*size-1];
+	
+	// Karatsuba 
+	Karatsuba_aux(R, A, B, size);
+	for (int i = 0; i < (2*size-1); ++i) result->coefsT[i] = R[i];
+
+	delete[] A;
+	delete[] B;
+	delete[] R;
 }
