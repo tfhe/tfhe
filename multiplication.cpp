@@ -112,29 +112,32 @@ EXPORT void Karatsuba_aux(Torus32* R, const int* A, const Torus32* B, const int 
 	{
 		R[0] = A[0]*B[0];
 		R[2] = A[1]*B[1];
-		R[1] = (A[0]+A[1])*(B[0]*B[1]) - R[0] - R[2];
+		R[1] = (A[0]+A[1])*(B[0]+B[1]) - R[0] - R[2];
 	}
 
 }
 
 
 EXPORT void multKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2){
-	int size;
-	size = sizeof(poly1) / sizeof(poly1->coefs[0]);
+	int N;
+	N = poly1->N;
 	
-	int* A = new int[size];
-	Torus32* B = new Torus32[size];
-	for (int i = 0; i < size; ++i)
+	int* A = new int[N];
+	Torus32* B = new Torus32[N];
+	for (int i = 0; i < N; ++i)
 	{
 		A[i] = poly1->coefs[i];
 		B[i] = poly2->coefsT[i];
 	}
 
-	Torus32* R = new Torus32[2*size-1];
+	Torus32* R = new Torus32[2*N-1];
 	
 	// Karatsuba 
-	Karatsuba_aux(R, A, B, size);
-	for (int i = 0; i < (2*size-1); ++i) result->coefsT[i] = R[i];
+	Karatsuba_aux(R, A, B, N);
+
+	// reduction mod X^N-1
+	for (int i = 0; i < N-1; ++i) result->coefsT[i] = R[i] + R[N+i];
+	result->coefsT[N-1] = R[N-1];
 
 	delete[] A;
 	delete[] B;
