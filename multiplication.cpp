@@ -44,7 +44,7 @@ EXPORT void multNaive(TorusPolynomial* result, const IntPolynomial* poly1, const
 			for (int j=0; j<=i; j++) {
 		    	ri += poly1->coefs[j]*poly2->coefsT[i-j];
 			}
-			for (int j=i+1; i<N; j++) {
+			for (int j=i+1; j<N; j++) {
 		    	ri -= poly1->coefs[j]*poly2->coefsT[N+i-j];
 			}
 		result->coefsT[i]=ri;
