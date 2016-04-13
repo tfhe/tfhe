@@ -76,8 +76,8 @@ EXPORT void Karatsuba_aux(Torus32* R, const int* A, const Torus32* B, const int 
 		// Karatsuba recursivly
 		Torus32* Rtemp = new Torus32[2*h-1];
 		
-		Karatsuba_aux((R.begin(),R.begin()+(2*h-2)), (A.begin(),A.begin()+(h-1)), (B.begin(),B.begin()+(h-1)), h);
-		Karatsuba_aux((R.begin()+(2*h),R.begin()+(4*h-2)), (A.begin()+h,A.begin()+(2*h-1)), (B.begin()+h,B.begin()+(2*h-1)), h);
+		Karatsuba_aux(R, A, B, h);// Karatsuba_aux((R.begin(),R.begin()+(2*h-2)), (A.begin(),A.begin()+(h-1)), (B.begin(),B.begin()+(h-1)), h);
+		Karatsuba_aux(R+(2*h), A+h, B+h, h); // Karatsuba_aux((R.begin()+(2*h),R.begin()+(4*h-2)), (A.begin()+h,A.begin()+(2*h-1)), (B.begin()+h,B.begin()+(2*h-1)), h);
 		Karatsuba_aux(Rtemp, Atemp, Btemp, h);
 		for (int i = 0; i < 2*h-1; ++i) Rtemp[i] = Rtemp[i] - R[i] - R[2*h+i];
 
