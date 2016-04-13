@@ -25,5 +25,5 @@ clean:
 	gcc -Wall -Werror -O0 -g3 -c -o $@ $<
 
 %: %.o ${LIB_O_FILES}
-	g++ -Wall -Werror -O0 -g3 -o $@ $< ${LIB_O_FILES}
+	g++ -Wall -Werror -O0 -g3 -o $@ $< ${LIB_O_FILES} -lfftw3 -lm
 

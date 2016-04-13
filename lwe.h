@@ -47,6 +47,7 @@ struct LWEBootstrappingKey;
 struct IntPolynomial;
 
 struct TorusPolynomial;
+struct LagrangeHalfCPolynomial;
 
 //this is for compatibility with C code, to be able to use
 //"LWEParams" as a type and not "struct LWEParams"
@@ -63,6 +64,7 @@ typedef struct RingGSWSample       RingGSWSample;
 typedef struct LWEBootstrappingKey LWEBootstrappingKey;
 typedef struct IntPolynomial	   IntPolynomial;
 typedef struct TorusPolynomial	   TorusPolynomial;
+typedef struct LagrangeHalfCPolynomial	   LagrangeHalfCPolynomial;
 
 /**
  * This function generates a random LWE key for the given parameters.

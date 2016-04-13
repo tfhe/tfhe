@@ -108,6 +108,33 @@ EXPORT LWESample* new_LWESample_array(int nbelts, const LWEParams* params);
 //(equivalent of the C++ delete)
 EXPORT void delete_LWESample(LWESample* obj);
 EXPORT void delete_LWESample_array(int nbelts, LWESample* obj);
+//allocate memory space for a LagrangeHalfCPolynomial
+EXPORT LagrangeHalfCPolynomial* alloc_LagrangeHalfCPolynomial();
+EXPORT LagrangeHalfCPolynomial* alloc_LagrangeHalfCPolynomial_array(int nbelts);
+
+//free memory space for a LagrangeHalfCPolynomial
+EXPORT void free_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* ptr);
+EXPORT void free_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolynomial* ptr);
+
+//initialize the LagrangeHalfCPolynomial structure
+//(equivalent of the C++ constructor)
+EXPORT void init_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* obj, const int N);
+EXPORT void init_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolynomial* obj, const int N);
+
+//destroys the LagrangeHalfCPolynomial structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* obj);
+EXPORT void destroy_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolynomial* obj);
+ 
+//allocates and initialize the LagrangeHalfCPolynomial structure
+//(equivalent of the C++ new)
+EXPORT LagrangeHalfCPolynomial* new_LagrangeHalfCPolynomial(const int N);
+EXPORT LagrangeHalfCPolynomial* new_LagrangeHalfCPolynomial_array(int nbelts, const int N);
+
+//destroys and frees the LagrangeHalfCPolynomial structure
+//(equivalent of the C++ delete)
+EXPORT void delete_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* obj);
+EXPORT void delete_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolynomial* obj);
 //allocate memory space for a TorusPolynomial
 EXPORT TorusPolynomial* alloc_TorusPolynomial();
 EXPORT TorusPolynomial* alloc_TorusPolynomial_array(int nbelts);

@@ -244,6 +244,66 @@ EXPORT void delete_LWESample_array(int nbelts, LWESample* obj) {
     destroy_LWESample_array(nbelts,obj);
     free_LWESample_array(nbelts,obj);
 }
+#include "polynomials.h" 
+//allocate memory space for a LagrangeHalfCPolynomial
+
+EXPORT LagrangeHalfCPolynomial* alloc_LagrangeHalfCPolynomial() {
+    return (LagrangeHalfCPolynomial*) malloc(sizeof(LagrangeHalfCPolynomial));
+}
+EXPORT LagrangeHalfCPolynomial* alloc_LagrangeHalfCPolynomial_array(int nbelts) {
+    return (LagrangeHalfCPolynomial*) malloc(nbelts*sizeof(LagrangeHalfCPolynomial));
+}
+
+//free memory space for a LWEKey
+EXPORT void free_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* ptr) {
+    free(ptr);
+}
+EXPORT void free_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolynomial* ptr) {
+    free(ptr);
+}
+
+//initialize the key structure
+//(equivalent of the C++ constructor)
+EXPORT void init_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* obj, const int N) {
+    new(obj) LagrangeHalfCPolynomial(N);
+}
+EXPORT void init_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolynomial* obj, const int N) {
+    for (int i=0; i<nbelts; i++) {
+	new(obj+i) LagrangeHalfCPolynomial(N);
+    }
+}
+
+//destroys the LagrangeHalfCPolynomial structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* obj) {
+    obj->~LagrangeHalfCPolynomial();
+}
+EXPORT void destroy_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolynomial* obj) {
+    for (int i=0; i<nbelts; i++) {
+	(obj+i)->~LagrangeHalfCPolynomial();
+    }
+}
+ 
+//allocates and initialize the LagrangeHalfCPolynomial structure
+//(equivalent of the C++ new)
+EXPORT LagrangeHalfCPolynomial* new_LagrangeHalfCPolynomial(const int N) {
+    return new LagrangeHalfCPolynomial(N);
+}
+EXPORT LagrangeHalfCPolynomial* new_LagrangeHalfCPolynomial_array(int nbelts, const int N) {
+    LagrangeHalfCPolynomial* obj = alloc_LagrangeHalfCPolynomial_array(nbelts);
+    init_LagrangeHalfCPolynomial_array(nbelts,obj,N);
+    return obj;
+}
+
+//destroys and frees the LagrangeHalfCPolynomial structure
+//(equivalent of the C++ delete)
+EXPORT void delete_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* obj) {
+    delete obj;
+}
+EXPORT void delete_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolynomial* obj) {
+    destroy_LagrangeHalfCPolynomial_array(nbelts,obj);
+    free_LagrangeHalfCPolynomial_array(nbelts,obj);
+}
 #include "multiplication.h" 
 //allocate memory space for a TorusPolynomial
 
