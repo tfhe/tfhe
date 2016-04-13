@@ -21,7 +21,6 @@ class FFT_Processor {
     const int _2N;
     const int N;    
     const int Ns2;
-    const double _1sN;
     double* in;
     fftw_complex* out;
     fftw_complex* rev_in;
@@ -30,7 +29,7 @@ class FFT_Processor {
     fftw_plan rev_p;
     public:
 
-    FFT_Processor(const int N): _2N(2*N),N(N),Ns2(N/2),_1sN(1./N) {
+    FFT_Processor(const int N): _2N(2*N),N(N),Ns2(N/2) {
          in = (double*) malloc(sizeof(double) * _2N);
          rev_out = (double*) malloc(sizeof(double) * _2N);
          out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (N+1));
@@ -63,6 +62,7 @@ class FFT_Processor {
 	for (int i=0; i<=Ns2; i++) assert(cabs(rev_in[2*i+1])<1e-20);
     }
     void execute_reverse(double* res, const cplx* a) {
+        static const double _1sN = 1./N;
 	for (int i=0; i<=Ns2; i++) rev_in[2*i]=0;
 	for (int i=0; i<Ns2; i++) rev_in[2*i+1]=a[i];
 	fftw_execute(rev_p);
