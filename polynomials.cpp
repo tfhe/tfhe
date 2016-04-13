@@ -14,7 +14,7 @@ LagrangeHalfCPolynomial::LagrangeHalfCPolynomial(const int N): N(N) {
 }
 
 LagrangeHalfCPolynomial::~LagrangeHalfCPolynomial() {
-    delete coefsC;
+    delete[] coefsC;
 }
 
 class FFT_Processor {
@@ -59,7 +59,7 @@ class FFT_Processor {
 	for (int i=0; i<N; i++) in[N+i]=-in[i];
 	fftw_execute(p);
 	for (int i=0; i<Ns2; i++) res[i]=out[2*i+1];
-	for (int i=0; i<=Ns2; i++) assert(cabs(rev_in[2*i+1])<1e-20);
+	for (int i=0; i<=Ns2; i++) assert(cabs(out[2*i])<1e-20);
     }
     void execute_reverse(double* res, const cplx* a) {
         static const double _1sN = 1./N;
