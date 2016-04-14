@@ -1,3 +1,4 @@
+#include <iostream>
 #include <cstdlib>
 #include <cmath>
 #include <cassert>
@@ -51,6 +52,8 @@ EXPORT void multNaive(TorusPolynomial* result, const IntPolynomial* poly1, const
     }
 }
 
+
+
 /**
  * This function multiplies 2 polynomials (an integer poly and a torus poly)
  * by using Karatsuba
@@ -76,8 +79,8 @@ EXPORT void Karatsuba_aux(Torus32* R, const int* A, const Torus32* B, const int 
 		// Karatsuba recursivly
 		Torus32* Rtemp = new Torus32[2*h-1];
 		
-		Karatsuba_aux(R, A, B, h);// Karatsuba_aux((R.begin(),R.begin()+(2*h-2)), (A.begin(),A.begin()+(h-1)), (B.begin(),B.begin()+(h-1)), h);
-		Karatsuba_aux(R+(2*h), A+h, B+h, h); // Karatsuba_aux((R.begin()+(2*h),R.begin()+(4*h-2)), (A.begin()+h,A.begin()+(2*h-1)), (B.begin()+h,B.begin()+(2*h-1)), h);
+		Karatsuba_aux(R, A, B, h); // (R[0],R[2*h-2]), (A[0],A[h-1]), (B[0],B[h-1])
+		Karatsuba_aux(R+(2*h), A+h, B+h, h); // (R[2*h],R[4*h-2]), (A[h],A[2*h-1]), (B[h],B[2*h-1])
 		Karatsuba_aux(Rtemp, Atemp, Btemp, h);
 		for (int i = 0; i < 2*h-1; ++i) Rtemp[i] = Rtemp[i] - R[i] - R[2*h+i];
 
@@ -116,10 +119,10 @@ EXPORT void multKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, c
 	// Karatsuba 
 	Karatsuba_aux(R, A, B, N);
 
-	// reduction mod X^N-1
-	for (int i = 0; i < N-1; ++i) result->coefsT[i] = R[i] + R[N+i];
+	// reduction mod X^N+1
+	for (int i = 0; i < N-1; ++i) result->coefsT[i] = R[i] - R[N+i];
 	result->coefsT[N-1] = R[N-1];
-
+	
 	delete[] A;
 	delete[] B;
 	delete[] R;

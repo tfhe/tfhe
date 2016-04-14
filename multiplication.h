@@ -39,12 +39,6 @@ struct TorusPolynomial {
  */
 EXPORT void multNaive(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
 
-/**
- * This is the naive external multiplication of an integer polynomial
- * with a torus polynomial. (this function should yield exactly the same
- * result as the karatsuba or fft version, but should be slower) 
- */
-EXPORT void multNaive(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
 
 
 /**

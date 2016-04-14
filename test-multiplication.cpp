@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <cstdlib>
 #include <cmath>
+#include <sys/time.h>
 #include "lwe.h"
 #include "multiplication.h"
 #include "polynomials.h"
@@ -32,13 +33,41 @@ int main(int argc, char** argv) {
     TorusPolynomial* resKaratsuba = new_TorusPolynomial(N);
 
     for (int i=0; i<N; i++) {
-	a->coefs[i]=(rand()%4096)-2048;
+	a->coefs[i]=(rand()%(4*N))-(2*N);
 	b->coefsT[i]=rand();
     }
 	
-    multNaive(resNaive,a,b);
-    multKaratsuba(resKaratsuba,a,b);
-    multFFT(resFFT,a,b);
+    //measure the time
+    clock_t cstart, cend;
+    double cycles, temps;
+
+    cstart = clock();
+    multNaive(resNaive,a,b);  
+    cend = clock();
+    cycles = cend - cstart;
+    temps = cycles/CLOCKS_PER_SEC;
+    cout << "multNaive: " << cycles << " clock cycles" << endl;
+    cout << "multNaive time: " << temps << " seconds" << endl;
+    cout << endl;
+
+    cstart = clock();
+    multKaratsuba(resKaratsuba,a,b);  
+    cend = clock();
+    cycles = cend - cstart;
+    temps = cycles/CLOCKS_PER_SEC;
+    cout << "multKaratsuba: " << cycles << " clock cycles" << endl;
+    cout << "multKaratsuba time: " << temps << " seconds" << endl;
+    cout << endl;
+    
+    cstart = clock();
+    multFFT(resFFT,a,b);  
+    cend = clock();
+    cycles = cend - cstart;
+    temps = cycles/CLOCKS_PER_SEC;
+    cout << "multFFT: " << cycles << " clock cycles" << endl;
+    cout << "multFFT time: " << temps << " seconds" << endl;
+    cout << endl;
+    
 
     for (int i=0; i<N; i++) {
 	if (abs(int(resNaive->coefsT[i]-resFFT->coefsT[i])) > 1) {
