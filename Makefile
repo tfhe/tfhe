@@ -12,10 +12,18 @@ LIB_O_FILES=$(patsubst %.cpp,%.o,${LIB_CPP_FILES}) \
 MAIN_FILES=$(patsubst %.cpp,%,${MAIN_CPP_FILES}) \
 	$(patsubst %.c,%,${MAIN_C_FILES})
 
+OPTIM=$(patsubst %.cpp,%-optim,${CPP_FILES},${C_FILES})
+OPTIMOPTIONS = -O2 -DNDEBUG -funroll-loops -funroll-all-loops
+
 all: ${O_FILES} ${MAIN_FILES}
 	
+optim: ${OPTIM}
+
+%-optim: %.cpp ${HFILES}
+	g++ -Wall $(OPTIMOPTIONS) -fopenmp -std=c++11 $< -o $@ -lfftw3 -lm 
+
 clean:
-	rm ${O_FILES} ${MAIN_FILES} 2>/dev/null >/dev/null || true
+	rm ${O_FILES} ${MAIN_FILES} ${OPTIM} 2>/dev/null >/dev/null || true
 
 
 %.o: %.cpp ${H_FILES}
