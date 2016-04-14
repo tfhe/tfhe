@@ -24,7 +24,7 @@ void dieDramatically(string message) {
 
 
 int main(int argc, char** argv) {
-    int count = 200; //number of tests to compare the 3 types of multiplication
+    const int count = 200; //number of tests to compare the 3 types of multiplication
 
     const int N = 1024;
     IntPolynomial* a = new_IntPolynomial(N);
