@@ -55,8 +55,10 @@ EXPORT void multNaive(TorusPolynomial* result, const IntPolynomial* poly1, const
 
 
 /**
- * This function multiplies 2 polynomials (an integer poly and a torus poly)
- * by using Karatsuba
+ * This function multiplies 2 polynomials (an integer poly and a torus poly) by using Karatsuba
+ * The karatsuba function is multKaratsuba: it takes in input two polynomials and multiplies them 
+ * To do that, it uses the auxiliary function Karatsuba_aux, which is recursive ad which works with 
+ * the vectors containing the coefficients of the polynomials (primitive types)
  */
 
 // A and B of size = size
@@ -101,7 +103,7 @@ EXPORT void Karatsuba_aux(Torus32* R, const int* A, const Torus32* B, const int 
 
 }
 
-
+// poly1, poly2 and result are polynomials mod X^N+1
 EXPORT void multKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2){
 	int N;
 	N = poly1->N;

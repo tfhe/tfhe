@@ -24,7 +24,7 @@ void dieDramatically(string message) {
 
 
 int main(int argc, char** argv) {
-    int count = 200;
+    int count = 200; //number of tests to compare the 3 types of multiplication
 
     const int N = 1024;
     IntPolynomial* a = new_IntPolynomial(N);
@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
     	b->coefsT[i]=rand();
         }
     	
-        //measure the time
+        //measure the execution time
         clock_t cstart, cend;
 
         cstart = clock();
@@ -76,6 +76,7 @@ int main(int argc, char** argv) {
         }
     }
 
+    // computing the average number of cycles per type of multiplication
     double cyc_naive = 0;
     double cyc_karatsuba = 0;
     double cyc_fft = 0;
