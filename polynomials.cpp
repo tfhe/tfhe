@@ -53,7 +53,7 @@ class FFT_Processor {
 	for (int i=0; i<=Ns2; i++) assert(cabs(out[2*i])<1e-20);
     }
     void execute_direct_torus32(cplx* res, const Torus32* a) {
-	static const double _2pm33 = 1./double(1l<<33);
+	static const double _2pm33 = 1./double(INT64_C(1)<<33);
 	int32_t* aa = (int32_t*) a;
 	for (int i=0; i<N; i++) in[i]=aa[i]*_2pm33;
 	for (int i=0; i<N; i++) in[N+i]=-in[i];
@@ -69,12 +69,12 @@ class FFT_Processor {
 	for (int i=0; i<N; i++) res[i]=rev_out[i]*_1sN;
     }
     void execute_reverse_Torus32(Torus32* res, const cplx* a) {
-	static const double _2p32 = double(1l<<32);
+	static const double _2p32 = double(INT64_C(1)<<32);
 	static const double _1sN = double(1)/double(N);
 	for (int i=0; i<=Ns2; i++) rev_in[2*i]=0;
 	for (int i=0; i<Ns2; i++) rev_in[2*i+1]=a[i];
 	fftw_execute(rev_p);
-	for (int i=0; i<N; i++) res[i]=Torus32(long(fmod(rev_out[i]*_1sN,1.)*_2p32));
+	for (int i=0; i<N; i++) res[i]=Torus32(int64_t(fmod(rev_out[i]*_1sN,1.)*_2p32));
 	for (int i=0; i<N; i++) assert(abs(rev_out[N+i]+rev_out[i])<1e-20);
     }
 
