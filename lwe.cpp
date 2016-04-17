@@ -25,7 +25,7 @@ EXPORT void lweKeyGen(LWEKey* result) {
  * The LWE key for the result must be allocated and initialized
  * (this means that the parameters are already in the result)
  */
-EXPORT void lweSymEncrypt(LWESample* result, double message, const LWEKey* key){
+EXPORT void lweSymEncrypt(LWESample* result, Torus32 message, double alpha, const LWEKey* key){
     
 /*
     mpfr_t temp;
@@ -47,7 +47,7 @@ EXPORT void lweSymEncrypt(LWESample* result, double message, const LWEKey* key){
 
 
 
-
+EXPORT Torus32 lwePhase(const LWESample* sample, const LWEKey* key);
 
 
 

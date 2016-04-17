@@ -126,7 +126,7 @@ EXPORT void Karatsuba_aux(Torus32* R, const int* A, const Torus32* B, const int 
 EXPORT void multKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2){
 	const int N = poly1->N;
 	Torus32* R = new Torus32[2*N-1];
-	char* buf = new char[8*N*4]; //that's large enough to store every tmp variables 
+	char* buf = new char[16*N]; //that's large enough to store every tmp variables (2*2*N*4)
 	
 	// Karatsuba 
 	Karatsuba_aux(R, poly1->coefs, poly2->coefsT, N, buf);

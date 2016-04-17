@@ -72,12 +72,13 @@ typedef struct LagrangeHalfCPolynomial	   LagrangeHalfCPolynomial;
  * (this means that the parameters are already in the result)
  */
 EXPORT void lweKeyGen(LWEKey* result);
-EXPORT void lweSymEncrypt(LWESample* result, double message, const LWEKey* key);
+EXPORT void lweSymEncrypt(LWESample* result, Torus32 message, double alpha, const LWEKey* key);
+EXPORT Torus32 lwePhase(const LWESample* sample, const LWEKey* key);
 EXPORT double lweSymDecrypt(const LWESample* sample, const LWEKey* key);
 
 EXPORT void lweLinearCombination(LWESample* result, const int* combi, const LWESample* samples, const LWEParams* params);
 
-EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWESample sample);
+EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWESample* sample);
 
 // Ring
 EXPORT void ringLweKeyGen(LWEKey* result);
