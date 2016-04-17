@@ -88,7 +88,7 @@ EXPORT void multNaive(TorusPolynomial* result, const IntPolynomial* poly1, const
 // A and B of size = size
 // R of size = 2*size-1
 EXPORT void Karatsuba_aux(Torus32* R, const int* A, const Torus32* B, const int size, const char* buf){
-        const int h = size / 2;
+    const int h = size / 2;
 	const int sm1 = size-1;
 
 	//we stop the karatsuba recursion at h=4, because on my machine,

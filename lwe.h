@@ -19,8 +19,8 @@
 //  -- modulo 1 is mapped to mod 2^32, which is also native!
 // This looks much better than using float/doubles, where modulo 1 is not
 // natural at all.
-typedef uint32_t Torus32; 
-typedef uint64_t Torus64; 
+typedef int32_t Torus32; //avant uint32_t
+typedef int64_t Torus64; //avant uint64_t
 
 struct LWEParams;
 

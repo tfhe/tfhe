@@ -4,9 +4,9 @@
 #include "lwe.h"
 
 struct LWESample {
-   Torus32* a; //-- the n coefs of the mask
-   Torus32 b;  //
-   double alpha; //-- average noise of the sample
+	Torus32* a; //-- the n coefs of the mask
+    Torus32 b;  //
+   	double alpha; //-- average noise of the sample
 
 #ifdef __cplusplus
    LWESample(const LWEParams* params);
