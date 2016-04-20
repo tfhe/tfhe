@@ -20,7 +20,7 @@
 // This looks much better than using float/doubles, where modulo 1 is not
 // natural at all.
 typedef int32_t Torus32; //avant uint32_t
-typedef int64_t Torus64; //avant uint64_t
+//typedef int64_t Torus64; //avant uint64_t
 
 struct LWEParams;
 
@@ -67,14 +67,32 @@ typedef struct TorusPolynomial	   TorusPolynomial;
 typedef struct LagrangeHalfCPolynomial	   LagrangeHalfCPolynomial;
 
 /**
+ * this function converts a double to a Torus32
+ */
+EXPORT Torus32 dtot32(double d);
+/**
+ * this function converts a torus32 to a double in [-0.5;0.5]
+ */
+EXPORT double t32tod(Torus32 x);
+
+/**
  * This function generates a random LWE key for the given parameters.
  * The LWE key for the result must be allocated and initialized
  * (this means that the parameters are already in the result)
  */
 EXPORT void lweKeyGen(LWEKey* result);
+/**
+ * This function lwe encrypts a message with the given key
+ */
 EXPORT void lweSymEncrypt(LWESample* result, Torus32 message, double alpha, const LWEKey* key);
+/**
+ * this function computes the phase of a lwe sample on the message space (1/Msize.Z) / Z
+ */
 EXPORT Torus32 lwePhase(const LWESample* sample, const LWEKey* key);
-EXPORT double lweSymDecrypt(const LWESample* sample, const LWEKey* key, const int Msize);
+/**
+ * this function decrypts a lwe sample on the message space (1/Msize.Z) / Z
+ */
+EXPORT Torus32 lweSymDecrypt(const LWESample* sample, const LWEKey* key, const int Msize);
 
 EXPORT void lweLinearCombination(LWESample* result, const int* combi, const LWESample* samples, const LWEParams* params);
 

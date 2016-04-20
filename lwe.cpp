@@ -8,35 +8,41 @@
 
 using namespace std;
 
-default_random_engine generator;
-long _two31 = pow(2,31);
-long _two32 = pow(2,32);
+static default_random_engine generator;
+static const int64_t _two31 = INT64_C(1) << 31;
+static const int64_t _two32 = INT64_C(1) << 32;
+static const double _two32_double = _two32;
+static const double _two31_double = _two31;
+
+
+EXPORT Torus32 dtot32(double d) {
+    return int32_t(int64_t((d - int64_t(d))*_two32));
+}
+EXPORT double t32tod(Torus32 x) {
+    return double(x)/_two32_double;
+}
 
 
 // Gaussian sample centered in message, with standard deviation sigma
 Torus32 gaussian32(Torus32 message, double sigma){
-    double mu = (double) message/_two31;
-    normal_distribution<double> distribution(mu,sigma);
-    return (Torus32) (distribution(generator)*_two31);
+    //TODO: attention, il y a une différence entre param et stdev. je
+    //crois que c'est un facteur sqrt(pi/2). a vérifier.
+    normal_distribution<double> distribution(0.,sigma); //TODO: can we create a global distrib of param 1 and multiply by sigma?
+    double err = distribution(generator);
+    return message + dtot32(err);
 }
 
 
 // Used to approximate the phase to the nearest message possible in the message space
 // The constant Msize will indicate on which message space we are working (how many messages possible)
-double approxPhase(Torus32 phase, int Msize){
-    double interv = (double) 1/Msize; // width of each intervall
-    double start = interv/2; // begin of the first intervall
-    double end;
-    double phi = (double) phase/_two31;
-    if (phase < 0) phase += 1;
-
-    for (int i = 1; i < Msize; ++i)
-    {
-        end = start + interv;
-        if (phi>=start && phi<end) return ((double) start + interv/2);
-        start = end;
-    }
-    return 0;
+Torus32 approxPhase(Torus32 phase, int Msize){
+    uint64_t interv = UINT64_C(-1)/Msize; // width of each intervall
+    uint64_t half_interval = interv/2; // begin of the first intervall
+    uint64_t phase64 = (uint64_t(phase)<<32) + half_interval;
+    //floor to the nearest multiples of interv
+    phase64 -= phase64%interv;
+    //rescale to torus32
+    return int32_t(phase64>>32); 
 }
 
 
@@ -51,10 +57,12 @@ double approxPhase(Torus32 phase, int Msize){
  */
 EXPORT void lweKeyGen(LWEKey* result) {
   int n = result->params->n;
+  uniform_int_distribution<int> distribution(0,1);
 
   for (int i=0; i<n; i++) {
-    result->key[i]=rand()%2;
+    result->key[i]=distribution(generator);
     // à completer je crois (entropy of the key)
+    // Nico: c'est ok comme ca
   }
 }
 
@@ -67,13 +75,12 @@ EXPORT void lweKeyGen(LWEKey* result) {
  */
 EXPORT void lweSymEncrypt(LWESample* result, Torus32 message, double alpha, const LWEKey* key){
     int n = key->params->n;
-    double temp;
+    uniform_real_distribution<double> distribution(-0.5,0.5);
 
     result->b = gaussian32(message, alpha); 
     for (int i = 0; i < n; ++i)
     {
-        temp = (double) rand()/RAND_MAX;
-        result->a[i] = (Torus32) (temp*_two32 -_two31);
+        result->a[i] = dtot32(distribution(generator));
         result->b += result->a[i]*key->key[i];
     }
 }
@@ -84,20 +91,22 @@ EXPORT void lweSymEncrypt(LWESample* result, Torus32 message, double alpha, cons
  * This function computes the phase of sample by using key : phi = b - a.s
  */
 EXPORT Torus32 lwePhase(const LWESample* sample, const LWEKey* key){
-    int n = key->params->n;
-    Torus32 phi = sample->b;
+    const int n = key->params->n;
+    Torus32 phi = 0;
+    const Torus32 *__restrict a = sample->a;
+    const int * __restrict k = key->key;
 
-    for (int i = 0; i < n; ++i) phi -= sample->a[i]*key->key[i]; 
-    return phi;
+    for (int i = 0; i < n; ++i) 
+	phi += a[i]*k[i]; 
+    return sample->b - phi;
 }
-
 
 
 /**
  * This function computes the decryption of sample by using key
  * The constant Msize indicates the message space and is used to approximate the phase
  */
-EXPORT double lweSymDecrypt(const LWESample* sample, const LWEKey* key, const int Msize){
+EXPORT Torus32 lweSymDecrypt(const LWESample* sample, const LWEKey* key, const int Msize){
     Torus32 phi;
 
     phi = lwePhase(sample, key);
