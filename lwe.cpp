@@ -28,7 +28,6 @@ double approxPhase(Torus32 phase, int Msize){
     double start = interv/2; // begin of the first intervall
     double end;
     double phi = (double) phase/_two31;
-    cout << phi << endl;
     if (phase < 0) phase += 1;
 
     for (int i = 1; i < Msize; ++i)
