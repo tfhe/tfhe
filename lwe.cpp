@@ -2,8 +2,32 @@
 #include "lwe.h"
 #include "lweparams.h"
 #include "lwekey.h"
+#include "lwesamples.h"
+#include <random>
 
 using namespace std;
+
+default_random_engine generator;
+
+
+// Gaussian sample centered in message, with standard deviation sigma
+void gaussian32(Torus32 x, Torus32 message, double sigma){
+    double mu = message >> 31;
+    normal_distribution<double> distribution(mu,sigma);
+    x = (Torus32) distribution(generator) << 31;
+}
+
+
+// Used to approximate the phase to the nearest message possible in the message space
+// The constant Msize will indicate on which message space we are working
+void approxPhase(double result, Torus32 phase, int Msize){
+    //double phi = phase >> 31;
+}
+
+
+
+
+
 
 /**
  * This function generates a random LWE key for the given parameters.
@@ -12,50 +36,70 @@ using namespace std;
  */
 EXPORT void lweKeyGen(LWEKey* result) {
   int n = result->params->n;
+
   for (int i=0; i<n; i++) {
     result->key[i]=rand()%2;
-    // à completer je crois
+    // à completer je crois (entropy of the key)
   }
 }
 
 
 
 /**
- * This function generates a random LWE key for the given parameters.
- * The LWE key for the result must be allocated and initialized
+ * This function encrypts message by using key, with average noise alpha
+ * The LWE sample for the result must be allocated and initialized
  * (this means that the parameters are already in the result)
  */
 EXPORT void lweSymEncrypt(LWESample* result, Torus32 message, double alpha, const LWEKey* key){
-    
-/*
-    mpfr_t temp;
-    mpfr_init(temp);
+    int n = key->params->n;
 
-    gaussian(c[N], mu, sigma); // rajouter un condition de verification 
-    if (mpfr_cmp_d(c[N],0.0)<0) mpfr_add_d(c[N], c[N], 1.0, MPFR_RNDN); //on travaille mod 1
-
-    for (int i = 0; i < N; ++i)
+    gaussian32(result->b, message, alpha); 
+    for (int i = 0; i < n; ++i)
     {
-        uniform_01(c[i]); // uniforme en [0,1]
-        mpfr_mul(temp, c[i], sk[i], MPFR_RNDN);
-        mpfr_add(c[N], c[N], temp, MPFR_RNDN);
+        result->a[i] = (Torus32) (rand()%2) << 31;
+        result->b += result->a[i]*key->key[i];
     }
-    mpfr_frac(c[N], c[N], MPFR_RNDN); //on travaille mod 1, donc on elimine la partie entiere
-    
-    mpfr_clear(temp);*/
 }
 
 
 
-EXPORT Torus32 lwePhase(const LWESample* sample, const LWEKey* key);
+/**
+ * This function computes the phase of sample by using key : phi = b - a.s
+ */
+EXPORT Torus32 lwePhase(const LWESample* sample, const LWEKey* key){
+    int n = key->params->n;
+    Torus32 phi = sample->b;
+
+    for (int i = 0; i < n; ++i) phi -= sample->a[i]*key->key[i];
+    return phi;
+}
 
 
 
-EXPORT double lweSymDecrypt(const LWESample* sample, const LWEKey* key);
+/**
+ * This function computes the decryption of sample by using key
+ * The constant Msize indicates the message space and is used to approximate the phase
+ */
+EXPORT double lweSymDecrypt(const LWESample* sample, const LWEKey* key, const int Msize){
+    Torus32 phi;
+    double mu = 0;
+
+    phi = lwePhase(sample, key);
+    approxPhase(mu, phi, Msize);
+    return mu; 
+}
+
+
+
+
+
+
+
+
 
 EXPORT void lweLinearCombination(LWESample* result, const int* combi, const LWESample* samples, const LWEParams* params);
 
-EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWESample sample);
+EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWESample* sample);
 
 // Ring
 EXPORT void ringLweKeyGen(LWEKey* result);

@@ -74,7 +74,7 @@ typedef struct LagrangeHalfCPolynomial	   LagrangeHalfCPolynomial;
 EXPORT void lweKeyGen(LWEKey* result);
 EXPORT void lweSymEncrypt(LWESample* result, Torus32 message, double alpha, const LWEKey* key);
 EXPORT Torus32 lwePhase(const LWESample* sample, const LWEKey* key);
-EXPORT double lweSymDecrypt(const LWESample* sample, const LWEKey* key);
+EXPORT double lweSymDecrypt(const LWESample* sample, const LWEKey* key, const int Msize);
 
 EXPORT void lweLinearCombination(LWESample* result, const int* combi, const LWESample* samples, const LWEParams* params);
 
