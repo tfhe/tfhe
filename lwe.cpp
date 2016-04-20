@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <iostream>
 #include "lwe.h"
 #include "lweparams.h"
 #include "lwekey.h"
@@ -8,20 +9,35 @@
 using namespace std;
 
 default_random_engine generator;
+long _two31 = pow(2,31);
+long _two32 = pow(2,32);
 
 
 // Gaussian sample centered in message, with standard deviation sigma
-void gaussian32(Torus32 x, Torus32 message, double sigma){
-    double mu = message >> 31;
+Torus32 gaussian32(Torus32 message, double sigma){
+    double mu = (double) message/_two31;
     normal_distribution<double> distribution(mu,sigma);
-    x = (Torus32) distribution(generator) << 31;
+    return (Torus32) (distribution(generator)*_two31);
 }
 
 
 // Used to approximate the phase to the nearest message possible in the message space
-// The constant Msize will indicate on which message space we are working
-void approxPhase(double result, Torus32 phase, int Msize){
-    //double phi = phase >> 31;
+// The constant Msize will indicate on which message space we are working (how many messages possible)
+double approxPhase(Torus32 phase, int Msize){
+    double interv = (double) 1/Msize; // width of each intervall
+    double start = interv/2; // begin of the first intervall
+    double end;
+    double phi = (double) phase/_two31;
+    cout << phi << endl;
+    if (phase < 0) phase += 1;
+
+    for (int i = 1; i < Msize; ++i)
+    {
+        end = start + interv;
+        if (phi>=start && phi<end) return ((double) start + interv/2);
+        start = end;
+    }
+    return 0;
 }
 
 
@@ -53,10 +69,10 @@ EXPORT void lweKeyGen(LWEKey* result) {
 EXPORT void lweSymEncrypt(LWESample* result, Torus32 message, double alpha, const LWEKey* key){
     int n = key->params->n;
 
-    gaussian32(result->b, message, alpha); 
+    result->b = gaussian32(message, alpha); 
     for (int i = 0; i < n; ++i)
     {
-        result->a[i] = (Torus32) (rand()%2) << 31;
+        result->a[i] = (Torus32) (rand()%_two32 - _two31);
         result->b += result->a[i]*key->key[i];
     }
 }
@@ -70,7 +86,7 @@ EXPORT Torus32 lwePhase(const LWESample* sample, const LWEKey* key){
     int n = key->params->n;
     Torus32 phi = sample->b;
 
-    for (int i = 0; i < n; ++i) phi -= sample->a[i]*key->key[i];
+    for (int i = 0; i < n; ++i) phi -= sample->a[i]*key->key[i]; 
     return phi;
 }
 
@@ -82,11 +98,9 @@ EXPORT Torus32 lwePhase(const LWESample* sample, const LWEKey* key){
  */
 EXPORT double lweSymDecrypt(const LWESample* sample, const LWEKey* key, const int Msize){
     Torus32 phi;
-    double mu = 0;
 
     phi = lwePhase(sample, key);
-    approxPhase(mu, phi, Msize);
-    return mu; 
+    return approxPhase(phi, Msize);
 }
 
 
