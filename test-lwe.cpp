@@ -35,9 +35,10 @@ int main(int argc, char** argv) {
 
     lweKeyGen(key);
     lweSymEncrypt(cipher, mu, alpha, key);
-    cout << "C = [";
-    for (int i = 0; i < n; ++i) cout << i << "-" << cipher->a[i] << ", ";
-    cout << "b-" << cipher->b << "]" << endl;
+    cout << "a = [";
+    for (int i = 0; i < n-1; ++i) cout << cipher->a[i] << ", ";
+    cout << cipher->a[n-1] << "]" << endl;
+    cout << "b = " << cipher->b << endl;
 
     phi = lwePhase(cipher, key);
     cout << "phi = " << phi << endl;

@@ -67,11 +67,13 @@ EXPORT void lweKeyGen(LWEKey* result) {
  */
 EXPORT void lweSymEncrypt(LWESample* result, Torus32 message, double alpha, const LWEKey* key){
     int n = key->params->n;
+    double temp;
 
     result->b = gaussian32(message, alpha); 
     for (int i = 0; i < n; ++i)
     {
-        result->a[i] = (Torus32) (rand()%_two32 - _two31);
+        temp = (double) rand()/RAND_MAX;
+        result->a[i] = (Torus32) (temp*_two32 -_two31);
         result->b += result->a[i]*key->key[i];
     }
 }
