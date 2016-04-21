@@ -27,7 +27,7 @@ int main(int argc, char** argv) {
     LWEKey* key = new_LWEKey(params);
     LWESample* cipher = new_LWESample(params);
     Torus32 mu = dtot32(0.5);
-    //Attention, 1<<30 correspond au message 0.25!!
+    //Attention, 1<<30 correspond au message 0.25!! Ila: t'as raison!
     double alpha = 0.0625;
     Torus32 phi;
     double message;  
@@ -51,7 +51,7 @@ int main(int argc, char** argv) {
     for (int i=0; i<trials; i++) {
         Torus32 input = dtot32((i%3)/3.);
 	lweKeyGen(key);
-	lweSymEncrypt(cipher, input, 0.06, key);
+	lweSymEncrypt(cipher, input, 0.047, key); // Ila: attention au niveau de bruit!!! à voir (0.06 n'est pas le bon je crois, 0.047 marche parfaitement)
 	phi = lwePhase(cipher, key);
 	Torus32 decrypted = lweSymDecrypt(cipher, key, 3);
 	if ( !approxEquals(input,decrypted) ) {
