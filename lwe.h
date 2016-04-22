@@ -94,7 +94,7 @@ EXPORT Torus32 lwePhase(const LWESample* sample, const LWEKey* key);
  */
 EXPORT Torus32 lweSymDecrypt(const LWESample* sample, const LWEKey* key, const int Msize);
 
-EXPORT void lweLinearCombination(LWESample* result, const int* combi, const LWESample* samples, const LWEParams* params);
+EXPORT void lweLinearCombination(LWESample* result, const int* combi, const LWESample** samples, const LWEParams* params);
 
 EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWESample* sample);
 

@@ -27,10 +27,7 @@ EXPORT double t32tod(Torus32 x) {
 
 // Gaussian sample centered in message, with standard deviation sigma
 Torus32 gaussian32(Torus32 message, double sigma){
-    //TODO: attention, il y a une différence entre param et stdev. je
-    //crois que c'est un facteur sqrt(pi/2). a vérifier.
-    // Ila: je sais que stdev et param ne sont pas la meme chose, mais cette fonction se sert de la stdev
-    // si on lui passe sigma=param, alors il faudra rajouter ici le facteur dont tu parles
+    //Attention: all the implementation will use the stdev instead of the gaussian fourier param
     normal_distribution<double> distribution(0.,sigma); //TODO: can we create a global distrib of param 1 and multiply by sigma?
     double err = distribution(generator);
     return message + dtot32(err);
@@ -54,6 +51,7 @@ Torus32 approxPhase(Torus32 phase, int Msize){
 
 
 
+
 /**
  * This function generates a random LWE key for the given parameters.
  * The LWE key for the result must be allocated and initialized
@@ -65,15 +63,13 @@ EXPORT void lweKeyGen(LWEKey* result) {
 
   for (int i=0; i<n; i++) {
     result->key[i]=distribution(generator);
-    // à completer je crois (entropy of the key)
-    // Nico: c'est ok comme ca
   }
 }
 
 
 
 /**
- * This function encrypts message by using key, with average noise alpha
+ * This function encrypts message by using key, with stdev alpha
  * The LWE sample for the result must be allocated and initialized
  * (this means that the parameters are already in the result)
  */
@@ -101,7 +97,7 @@ EXPORT Torus32 lwePhase(const LWESample* sample, const LWEKey* key){
     const int * __restrict k = key->key;
 
     for (int i = 0; i < n; ++i) 
-	phi += a[i]*k[i]; 
+	   phi += a[i]*k[i]; 
     return sample->b - phi;
 }
 
@@ -124,19 +120,19 @@ EXPORT Torus32 lweSymDecrypt(const LWESample* sample, const LWEKey* key, const i
 
 
 
-
-EXPORT void lweLinearCombination(LWESample* result, const int* combi, const LWESample* samples, const LWEParams* params);
+//voir si on le garde ou on fait lweAdd (laisser en suspense)
+EXPORT void lweLinearCombination(LWESample* result, const int* combi, const LWESample** samples, const LWEParams* params);
 
 EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWESample* sample);
 
-// Ring
+// RingLWE
 EXPORT void ringLweKeyGen(LWEKey* result);
 EXPORT void ringLweSymEncrypt(LWESample* result, double message, const LWEKey* key);
 EXPORT double ringLweSymDecrypt(const LWESample* sample, const LWEKey* key);
 
 EXPORT void ringLwePolyCombination(LWESample* result, const int* combi, const LWESample* samples, const LWEParams* params);
 
-// GSW
+// RingGSW
 EXPORT void ringGswKeyGen(LWEKey* result);
 EXPORT void ringGswSymEncrypt(LWESample* result, double message, const LWEKey* key);
 EXPORT double ringGswSymDecrypt(const LWESample* sample, const LWEKey* key);
