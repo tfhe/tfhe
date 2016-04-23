@@ -23,31 +23,25 @@ typedef int32_t Torus32; //avant uint32_t
 //typedef int64_t Torus64; //avant uint64_t
 
 struct LWEParams;
-
 struct LWEKey;
-
 struct LWESample;
-
 struct LWEKeySwitchKey;
-
 struct RingLWEParams;
-
 struct RingLWEKey;
-
 struct RingLWESample;
-
 struct RingGSWParams;
-
 struct RingGSWKey;
-
 struct RingGSWSample;
-
+// *** ()
 struct LWEBootstrappingKey;
-
+// * ()
 struct IntPolynomial;
-
 struct TorusPolynomial;
 struct LagrangeHalfCPolynomial;
+// **** Ilaria (Platinum)
+struct SemiRingGSWParams;
+struct SemiRingGSWKey;
+struct SemiRingGSWSample;
 
 //this is for compatibility with C code, to be able to use
 //"LWEParams" as a type and not "struct LWEParams"
@@ -65,6 +59,10 @@ typedef struct LWEBootstrappingKey LWEBootstrappingKey;
 typedef struct IntPolynomial	   IntPolynomial;
 typedef struct TorusPolynomial	   TorusPolynomial;
 typedef struct LagrangeHalfCPolynomial	   LagrangeHalfCPolynomial;
+typedef struct SemiRingGSWParams   SemiRingGSWParams;
+typedef struct SemiRingGSWKey      SemiRingGSWKey;
+typedef struct SemiRingGSWSample   SemiRingGSWSample;
+
 
 /**
  * this function converts a double to a Torus32
@@ -86,45 +84,80 @@ EXPORT void lweKeyGen(LWEKey* result);
  */
 EXPORT void lweSymEncrypt(LWESample* result, Torus32 message, double alpha, const LWEKey* key);
 /**
- * this function computes the phase of a lwe sample on the message space (1/Msize.Z) / Z
+ * this function computes the phase of a lwe sample
  */
 EXPORT Torus32 lwePhase(const LWESample* sample, const LWEKey* key);
 /**
- * this function decrypts a lwe sample on the message space (1/Msize.Z) / Z
+ * this function decrypts a lwe sample by rounding the phase on the message space (1/Msize.Z) / Z
  */
 EXPORT Torus32 lweSymDecrypt(const LWESample* sample, const LWEKey* key, const int Msize);
 
-EXPORT void lweLinearCombination(LWESample* result, const int* combi, const LWESample** samples, const LWEParams* params);
+//Arithmetic operations on LWE samples
+/** result = (0,0) */
+EXPORT void lweClear(LWESample* result, const LWEParams* params);
+/** result = (0,mu) */
+EXPORT void lweNoiselessTrivial(LWESample* result, Torus32 mu, const LWEParams* params);
+/** result = result + a */
+EXPORT void lweAddTo(LWESample* result, const LWESample* a, const LWEParams* params);
+/** result = result - a */
+EXPORT void lweSubTo(LWESample* result, const LWESample* a, const LWEParams* params);
+/** result = result + p.a */
+EXPORT void lweAddMulTo(LWESample* result, int p, const LWESample* a, const LWEParams* params);
+/** result = result - p.a */
+EXPORT void lweSubMulTo(LWESample* result, int p, const LWESample* a, const LWEParams* params);
 
+EXPORT void createKeySwitchKey(LWEKeySwitchKey* result, const LWEKey* in_key, const LWEKey* out_key);
 EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWESample* sample);
-
-
 
 
 // Ring
 EXPORT void ringLweKeyGen(RingLWEKey* result);
 EXPORT void ringLweSymEncrypt(RingLWESample* result, TorusPolynomial* message, const RingLWEKey* key);
-EXPORT double ringLweSymDecrypt(const RingLWESample* sample, const RingLWEKey* key);
+EXPORT void ringLweSymDecrypt(TorusPolynomial* result, const RingLWESample* sample, const RingLWEKey* key);
 
-EXPORT void ringLwePolyCombination(RingLWESample* result, const int* combi, const RingLWESample* samples, const RingLWEParams* params);
+//TODO: mettre les mêmes fonctions arithmétiques que pour LWE
 
 // GSW
 EXPORT void ringGswKeyGen(LWEKey* result);
-EXPORT void ringGswSymEncrypt(LWESample* result, double message, const LWEKey* key);
-EXPORT double ringGswSymDecrypt(const LWESample* sample, const LWEKey* key);
+EXPORT void ringGswSymEncrypt(RingGSWSample* result, const IntPolynomial* message, const RingGSWKey* key);
+EXPORT void ringGswSymDecrypt(IntPolynomial* result, const RingGSWSample* sample, const RingGSWKey* key); 
+EXPORT void ringGswSymEncryptInt(RingGSWSample* result, const int message, const RingGSWKey* key);
+EXPORT int ringGswSymDecryptInt(const RingGSWSample* sample, const RingGSWKey* key); 
+//do we really decrypt GSW samples?
 
-EXPORT void ringGswPolyCombination(LWESample* result, const int* combi, const LWESample* samples, const LWEParams* params);
+//TODO: Ilaria.
+EXPORT void ringGSWExternProduct(RingLWESample* result, const RingGSWSample* a, const RingLWESample* b, const RingLWEParams* rlweParams, const RingGSWParams* rgswParams);
 
-//extractions Ring LWE -> LWE
-EXPORT void keyExtract(LWEKey* result, const RingLWEKey*); //sans doute un param supplémentaire
-EXPORT void sampleExtract(LWESample* result, const RingLWESample* x);
+//TODO: mettre les mêmes fonctions arithmétiques que pour LWE
+//      pour les opérations externes, prévoir int et intPolynomial
 
-//extraction RingGSW -> GSW
-EXPORT void gswKeyExtract(RingLWEKey* result, const RingGSWKey* key); //sans doute un param supplémentaire
-EXPORT void gswSampleExtract(RingLWESample* result, const RingGSWSample* x);
+//extractions RingLWE -> LWE
+EXPORT void ringLweExtractKey(LWEKey* result, const RingLWEKey*); //sans doute un param supplémentaire
+EXPORT void ringLweExtractSample(LWESample* result, const RingLWESample* x);
 
-//bootstrapping
-EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, double mu1, double mu0, const LWESample* x);
+//extraction RingGSW -> SemiRingGSW
+EXPORT void ringGswExtractKey(SemiRingGSWSample* result, const RingGSWKey* key);
+EXPORT void ringGswExtractSample(RingLWESample* result, const RingGSWSample* x);
+
+//LWE to LWE Single gate bootstrapping
+//TODO: Malika
+EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LWESample* x);
+//these functions call the bootstrapping, assuming that the message space is {0,1/4} 
+EXPORT void lweNand(LWESample* result, const LWEBootstrappingKey* bk, const LWESample* a, const LWESample* b);
+EXPORT void lweOr(LWESample* result, const LWEBootstrappingKey* bk, const LWESample* a, const LWESample* b);
+EXPORT void lweAnd(LWESample* result, const LWEBootstrappingKey* bk, const LWESample* a, const LWESample* b);
+EXPORT void lweXor(LWESample* result, const LWEBootstrappingKey* bk, const LWESample* a, const LWESample* b);
+// mux(a,b,c) = a?b:c = a et b + not(a) et c 
+EXPORT void lweMux(LWESample* result, const LWEBootstrappingKey* bk, const LWESample* a, const LWESample* b, const LWESample* c);
+EXPORT void lweNot(LWESample* result, LWESample* a);
+
+
+//leveled functions
+
+//LWE to SemiRing Bootstrapping
+EXPORT void semiRingBootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LWESample* x);
+
+
 
 //multiplication Karatsuba
 EXPORT void multKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
