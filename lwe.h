@@ -98,12 +98,15 @@ EXPORT void lweLinearCombination(LWESample* result, const int* combi, const LWES
 
 EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWESample* sample);
 
-// Ring
-EXPORT void ringLweKeyGen(LWEKey* result);
-EXPORT void ringLweSymEncrypt(LWESample* result, double message, const LWEKey* key);
-EXPORT double ringLweSymDecrypt(const LWESample* sample, const LWEKey* key);
 
-EXPORT void ringLwePolyCombination(LWESample* result, const int* combi, const LWESample* samples, const LWEParams* params);
+
+
+// Ring
+EXPORT void ringLweKeyGen(RingLWEKey* result);
+EXPORT void ringLweSymEncrypt(RingLWESample* result, TorusPolynomial* message, const RingLWEKey* key);
+EXPORT double ringLweSymDecrypt(const RingLWESample* sample, const RingLWEKey* key);
+
+EXPORT void ringLwePolyCombination(RingLWESample* result, const int* combi, const RingLWESample* samples, const RingLWEParams* params);
 
 // GSW
 EXPORT void ringGswKeyGen(LWEKey* result);

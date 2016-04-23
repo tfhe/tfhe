@@ -2,6 +2,7 @@
 #define RINGLWE_H
 
 #include "lwe.h"
+#include "multiplication.h"
 
 struct RingLWEParams {
     const int N; //a power of 2: degree of the polynomials

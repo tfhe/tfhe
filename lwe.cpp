@@ -4,6 +4,7 @@
 #include "lweparams.h"
 #include "lwekey.h"
 #include "lwesamples.h"
+#include "ringlwe.h"
 #include <random>
 
 using namespace std;
@@ -61,9 +62,8 @@ EXPORT void lweKeyGen(LWEKey* result) {
   int n = result->params->n;
   uniform_int_distribution<int> distribution(0,1);
 
-  for (int i=0; i<n; i++) {
+  for (int i=0; i<n; i++) 
     result->key[i]=distribution(generator);
-  }
 }
 
 
@@ -125,12 +125,57 @@ EXPORT void lweLinearCombination(LWESample* result, const int* combi, const LWES
 
 EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWESample* sample);
 
-// RingLWE
-EXPORT void ringLweKeyGen(LWEKey* result);
-EXPORT void ringLweSymEncrypt(LWESample* result, double message, const LWEKey* key);
-EXPORT double ringLweSymDecrypt(const LWESample* sample, const LWEKey* key);
 
-EXPORT void ringLwePolyCombination(LWESample* result, const int* combi, const LWESample* samples, const LWEParams* params);
+
+
+
+
+
+// RingLWE
+EXPORT void ringLweKeyGen(RingLWEKey* result){
+  int N = result->params->N;
+  int k = result->params->k;
+  uniform_int_distribution<int> distribution(0,1);
+
+  for (int i = 0; i < k; ++i)
+      for (int j = 0; j < N; ++j)
+          result->key->coefs[i][j] = distribution(generator);
+}
+
+
+
+
+EXPORT void ringLweSymEncrypt(RingLWESample* result, TorusPolynomial* message, const RingLWEKey* key){
+    /*
+    int N = key->params->N;
+    int k = key->k;
+    uniform_real_distribution<double> distribution(-0.5,0.5);
+    TorusPolynomial* temp;
+
+    for (int j = 0; j < N; ++j)
+        result->b[j] = gaussian32(0, alpha) + message[j];   
+    
+    for (int i = 0; i < k; ++i)
+    {
+        for (int j = 0; j < N; ++j)
+            result->a[i][j] = dtot32(distribution(generator));
+        multKaratsuba(temp, key->key[i], result->a[i]);
+
+    }
+    */
+    
+}
+
+
+
+
+
+
+
+
+EXPORT double ringLweSymDecrypt(const RingLWESample* sample, const RingLWEKey* key);
+
+EXPORT void ringLwePolyCombination(RingLWESample* result, const int* combi, const RingLWESample* samples, const RingLWEParams* params);
 
 // RingGSW
 EXPORT void ringGswKeyGen(LWEKey* result);

@@ -1,5 +1,6 @@
 #include "lwe.h"
 #include "ringlwe.h"
+#include "multiplication.h"
 
 //struct RingLWEParams {
 //    const int k; //number of polynomials in the mask
