@@ -139,7 +139,7 @@ EXPORT void ringLweKeyGen(RingLWEKey* result){
 
   for (int i = 0; i < k; ++i)
       for (int j = 0; j < N; ++j)
-          result->key->coefs[i][j] = distribution(generator);
+          result->key[i].coefs[j] = distribution(generator);
 }
 
 
