@@ -97,14 +97,14 @@ EXPORT Torus32 lweSymDecrypt(const LWESample* sample, const LWEKey* key, const i
 EXPORT void lweClear(LWESample* result, const LWEParams* params);
 /** result = (0,mu) */
 EXPORT void lweNoiselessTrivial(LWESample* result, Torus32 mu, const LWEParams* params);
-/** result = result + a */
-EXPORT void lweAddTo(LWESample* result, const LWESample* a, const LWEParams* params);
-/** result = result - a */
-EXPORT void lweSubTo(LWESample* result, const LWESample* a, const LWEParams* params);
-/** result = result + p.a */
-EXPORT void lweAddMulTo(LWESample* result, int p, const LWESample* a, const LWEParams* params);
-/** result = result - p.a */
-EXPORT void lweSubMulTo(LWESample* result, int p, const LWESample* a, const LWEParams* params);
+/** result = result + sample */
+EXPORT void lweAddTo(LWESample* result, const LWESample* sample, const LWEParams* params);
+/** result = result - sample */
+EXPORT void lweSubTo(LWESample* result, const LWESample* sample, const LWEParams* params);
+/** result = result + p.sample */
+EXPORT void lweAddMulTo(LWESample* result, int p, const LWESample* sample, const LWEParams* params);
+/** result = result - p.sample */
+EXPORT void lweSubMulTo(LWESample* result, int p, const LWESample* sample, const LWEParams* params);
 
 EXPORT void createKeySwitchKey(LWEKeySwitchKey* result, const LWEKey* in_key, const LWEKey* out_key);
 EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWESample* sample);
@@ -112,8 +112,8 @@ EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWE
 
 // Ring
 EXPORT void ringLweKeyGen(RingLWEKey* result);
-EXPORT void ringLweSymEncrypt(RingLWESample* result, TorusPolynomial* message, const RingLWEKey* key);
-EXPORT void ringLweSymDecrypt(TorusPolynomial* result, const RingLWESample* sample, const RingLWEKey* key);
+EXPORT void ringLweSymEncrypt(RingLWESample* result, TorusPolynomial* message, double alpha, const RingLWEKey* key);
+EXPORT void ringLweSymDecrypt(TorusPolynomial* result, const RingLWESample* sample, const RingLWEKey* key, int Msize);
 
 //TODO: mettre les mêmes fonctions arithmétiques que pour LWE
 
