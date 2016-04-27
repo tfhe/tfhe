@@ -139,3 +139,39 @@ EXPORT void multKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, c
 	delete[] R;
 	delete[] buf;
 }
+
+// poly1, poly2 and result are polynomials mod X^N+1
+EXPORT void addMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2){
+	const int N = poly1->N;
+	Torus32* R = new Torus32[2*N-1];
+	char* buf = new char[16*N]; //that's large enough to store every tmp variables (2*2*N*4)
+	
+	// Karatsuba 
+	Karatsuba_aux(R, poly1->coefs, poly2->coefsT, N, buf);
+
+	// reduction mod X^N+1
+	for (int i = 0; i < N-1; ++i) 
+	    result->coefsT[i] += R[i] - R[N+i];
+	result->coefsT[N-1] += R[N-1];
+	
+	delete[] R;
+	delete[] buf;
+}
+
+// poly1, poly2 and result are polynomials mod X^N+1
+EXPORT void subMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2){
+	const int N = poly1->N;
+	Torus32* R = new Torus32[2*N-1];
+	char* buf = new char[16*N]; //that's large enough to store every tmp variables (2*2*N*4)
+	
+	// Karatsuba 
+	Karatsuba_aux(R, poly1->coefs, poly2->coefsT, N, buf);
+
+	// reduction mod X^N+1
+	for (int i = 0; i < N-1; ++i) 
+	    result->coefsT[i] -= R[i] - R[N+i];
+	result->coefsT[N-1] -= R[N-1];
+	
+	delete[] R;
+	delete[] buf;
+}

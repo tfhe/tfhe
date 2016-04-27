@@ -46,6 +46,12 @@ EXPORT void multNaive(TorusPolynomial* result, const IntPolynomial* poly1, const
  * by using Karatsuba
  */
 EXPORT void multKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+EXPORT void addMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+EXPORT void subMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+
+#define mulRTorusPolynomial multKaratsuba
+#define addMulRToTorusPolynomial addMultKaratsuba
+#define subMulRToTorusPolynomial subMultKaratsuba
 
 
 #endif //MULTILICATION_H
