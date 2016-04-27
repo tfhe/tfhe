@@ -124,6 +124,66 @@ EXPORT void delete_LWEKey_array(int nbelts, LWEKey* obj) {
     destroy_LWEKey_array(nbelts,obj);
     free_LWEKey_array(nbelts,obj);
 }
+#include "lwekeyswitch.h" 
+//allocate memory space for a LWEKeySwitchKey
+
+EXPORT LWEKeySwitchKey* alloc_LWEKeySwitchKey() {
+    return (LWEKeySwitchKey*) malloc(sizeof(LWEKeySwitchKey));
+}
+EXPORT LWEKeySwitchKey* alloc_LWEKeySwitchKey_array(int nbelts) {
+    return (LWEKeySwitchKey*) malloc(nbelts*sizeof(LWEKeySwitchKey));
+}
+
+//free memory space for a LWEKey
+EXPORT void free_LWEKeySwitchKey(LWEKeySwitchKey* ptr) {
+    free(ptr);
+}
+EXPORT void free_LWEKeySwitchKey_array(int nbelts, LWEKeySwitchKey* ptr) {
+    free(ptr);
+}
+
+//initialize the key structure
+//(equivalent of the C++ constructor)
+EXPORT void init_LWEKeySwitchKey(LWEKeySwitchKey* obj, int base, LWEParams* in_params, LWEParams* out_params) {
+    new(obj) LWEKeySwitchKey(base,in_params,out_params);
+}
+EXPORT void init_LWEKeySwitchKey_array(int nbelts, LWEKeySwitchKey* obj, int base, LWEParams* in_params, LWEParams* out_params) {
+    for (int i=0; i<nbelts; i++) {
+	new(obj+i) LWEKeySwitchKey(base,in_params,out_params);
+    }
+}
+
+//destroys the LWEKeySwitchKey structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_LWEKeySwitchKey(LWEKeySwitchKey* obj) {
+    obj->~LWEKeySwitchKey();
+}
+EXPORT void destroy_LWEKeySwitchKey_array(int nbelts, LWEKeySwitchKey* obj) {
+    for (int i=0; i<nbelts; i++) {
+	(obj+i)->~LWEKeySwitchKey();
+    }
+}
+ 
+//allocates and initialize the LWEKeySwitchKey structure
+//(equivalent of the C++ new)
+EXPORT LWEKeySwitchKey* new_LWEKeySwitchKey(int base, LWEParams* in_params, LWEParams* out_params) {
+    return new LWEKeySwitchKey(base,in_params,out_params);
+}
+EXPORT LWEKeySwitchKey* new_LWEKeySwitchKey_array(int nbelts, int base, LWEParams* in_params, LWEParams* out_params) {
+    LWEKeySwitchKey* obj = alloc_LWEKeySwitchKey_array(nbelts);
+    init_LWEKeySwitchKey_array(nbelts,obj,base,in_params,out_params);
+    return obj;
+}
+
+//destroys and frees the LWEKeySwitchKey structure
+//(equivalent of the C++ delete)
+EXPORT void delete_LWEKeySwitchKey(LWEKeySwitchKey* obj) {
+    delete obj;
+}
+EXPORT void delete_LWEKeySwitchKey_array(int nbelts, LWEKeySwitchKey* obj) {
+    destroy_LWEKeySwitchKey_array(nbelts,obj);
+    free_LWEKeySwitchKey_array(nbelts,obj);
+}
 #include "lweparams.h" 
 //allocate memory space for a LWEParams
 
@@ -303,6 +363,366 @@ EXPORT void delete_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* obj) {
 EXPORT void delete_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolynomial* obj) {
     destroy_LagrangeHalfCPolynomial_array(nbelts,obj);
     free_LagrangeHalfCPolynomial_array(nbelts,obj);
+}
+#include "ringgsw.h" 
+//allocate memory space for a RingGSWKey
+
+EXPORT RingGSWKey* alloc_RingGSWKey() {
+    return (RingGSWKey*) malloc(sizeof(RingGSWKey));
+}
+EXPORT RingGSWKey* alloc_RingGSWKey_array(int nbelts) {
+    return (RingGSWKey*) malloc(nbelts*sizeof(RingGSWKey));
+}
+
+//free memory space for a LWEKey
+EXPORT void free_RingGSWKey(RingGSWKey* ptr) {
+    free(ptr);
+}
+EXPORT void free_RingGSWKey_array(int nbelts, RingGSWKey* ptr) {
+    free(ptr);
+}
+
+//initialize the key structure
+//(equivalent of the C++ constructor)
+EXPORT void init_RingGSWKey(RingGSWKey* obj, const RingGSWParams* params) {
+    new(obj) RingGSWKey(params);
+}
+EXPORT void init_RingGSWKey_array(int nbelts, RingGSWKey* obj, const RingGSWParams* params) {
+    for (int i=0; i<nbelts; i++) {
+	new(obj+i) RingGSWKey(params);
+    }
+}
+
+//destroys the RingGSWKey structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_RingGSWKey(RingGSWKey* obj) {
+    obj->~RingGSWKey();
+}
+EXPORT void destroy_RingGSWKey_array(int nbelts, RingGSWKey* obj) {
+    for (int i=0; i<nbelts; i++) {
+	(obj+i)->~RingGSWKey();
+    }
+}
+ 
+//allocates and initialize the RingGSWKey structure
+//(equivalent of the C++ new)
+EXPORT RingGSWKey* new_RingGSWKey(const RingGSWParams* params) {
+    return new RingGSWKey(params);
+}
+EXPORT RingGSWKey* new_RingGSWKey_array(int nbelts, const RingGSWParams* params) {
+    RingGSWKey* obj = alloc_RingGSWKey_array(nbelts);
+    init_RingGSWKey_array(nbelts,obj,params);
+    return obj;
+}
+
+//destroys and frees the RingGSWKey structure
+//(equivalent of the C++ delete)
+EXPORT void delete_RingGSWKey(RingGSWKey* obj) {
+    delete obj;
+}
+EXPORT void delete_RingGSWKey_array(int nbelts, RingGSWKey* obj) {
+    destroy_RingGSWKey_array(nbelts,obj);
+    free_RingGSWKey_array(nbelts,obj);
+}
+#include "ringgsw.h" 
+//allocate memory space for a RingGSWParams
+
+EXPORT RingGSWParams* alloc_RingGSWParams() {
+    return (RingGSWParams*) malloc(sizeof(RingGSWParams));
+}
+EXPORT RingGSWParams* alloc_RingGSWParams_array(int nbelts) {
+    return (RingGSWParams*) malloc(nbelts*sizeof(RingGSWParams));
+}
+
+//free memory space for a LWEKey
+EXPORT void free_RingGSWParams(RingGSWParams* ptr) {
+    free(ptr);
+}
+EXPORT void free_RingGSWParams_array(int nbelts, RingGSWParams* ptr) {
+    free(ptr);
+}
+
+//initialize the key structure
+//(equivalent of the C++ constructor)
+EXPORT void init_RingGSWParams(RingGSWParams* obj, int l, RingLWEParams* ringlwe_params) {
+    new(obj) RingGSWParams(l,ringlwe_params);
+}
+EXPORT void init_RingGSWParams_array(int nbelts, RingGSWParams* obj, int l, RingLWEParams* ringlwe_params) {
+    for (int i=0; i<nbelts; i++) {
+	new(obj+i) RingGSWParams(l,ringlwe_params);
+    }
+}
+
+//destroys the RingGSWParams structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_RingGSWParams(RingGSWParams* obj) {
+    obj->~RingGSWParams();
+}
+EXPORT void destroy_RingGSWParams_array(int nbelts, RingGSWParams* obj) {
+    for (int i=0; i<nbelts; i++) {
+	(obj+i)->~RingGSWParams();
+    }
+}
+ 
+//allocates and initialize the RingGSWParams structure
+//(equivalent of the C++ new)
+EXPORT RingGSWParams* new_RingGSWParams(int l, RingLWEParams* ringlwe_params) {
+    return new RingGSWParams(l,ringlwe_params);
+}
+EXPORT RingGSWParams* new_RingGSWParams_array(int nbelts, int l, RingLWEParams* ringlwe_params) {
+    RingGSWParams* obj = alloc_RingGSWParams_array(nbelts);
+    init_RingGSWParams_array(nbelts,obj,l,ringlwe_params);
+    return obj;
+}
+
+//destroys and frees the RingGSWParams structure
+//(equivalent of the C++ delete)
+EXPORT void delete_RingGSWParams(RingGSWParams* obj) {
+    delete obj;
+}
+EXPORT void delete_RingGSWParams_array(int nbelts, RingGSWParams* obj) {
+    destroy_RingGSWParams_array(nbelts,obj);
+    free_RingGSWParams_array(nbelts,obj);
+}
+#include "ringgsw.h" 
+//allocate memory space for a RingGSWSample
+
+EXPORT RingGSWSample* alloc_RingGSWSample() {
+    return (RingGSWSample*) malloc(sizeof(RingGSWSample));
+}
+EXPORT RingGSWSample* alloc_RingGSWSample_array(int nbelts) {
+    return (RingGSWSample*) malloc(nbelts*sizeof(RingGSWSample));
+}
+
+//free memory space for a LWEKey
+EXPORT void free_RingGSWSample(RingGSWSample* ptr) {
+    free(ptr);
+}
+EXPORT void free_RingGSWSample_array(int nbelts, RingGSWSample* ptr) {
+    free(ptr);
+}
+
+//initialize the key structure
+//(equivalent of the C++ constructor)
+EXPORT void init_RingGSWSample(RingGSWSample* obj, const RingGSWParams* params) {
+    new(obj) RingGSWSample(params);
+}
+EXPORT void init_RingGSWSample_array(int nbelts, RingGSWSample* obj, const RingGSWParams* params) {
+    for (int i=0; i<nbelts; i++) {
+	new(obj+i) RingGSWSample(params);
+    }
+}
+
+//destroys the RingGSWSample structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_RingGSWSample(RingGSWSample* obj) {
+    obj->~RingGSWSample();
+}
+EXPORT void destroy_RingGSWSample_array(int nbelts, RingGSWSample* obj) {
+    for (int i=0; i<nbelts; i++) {
+	(obj+i)->~RingGSWSample();
+    }
+}
+ 
+//allocates and initialize the RingGSWSample structure
+//(equivalent of the C++ new)
+EXPORT RingGSWSample* new_RingGSWSample(const RingGSWParams* params) {
+    return new RingGSWSample(params);
+}
+EXPORT RingGSWSample* new_RingGSWSample_array(int nbelts, const RingGSWParams* params) {
+    RingGSWSample* obj = alloc_RingGSWSample_array(nbelts);
+    init_RingGSWSample_array(nbelts,obj,params);
+    return obj;
+}
+
+//destroys and frees the RingGSWSample structure
+//(equivalent of the C++ delete)
+EXPORT void delete_RingGSWSample(RingGSWSample* obj) {
+    delete obj;
+}
+EXPORT void delete_RingGSWSample_array(int nbelts, RingGSWSample* obj) {
+    destroy_RingGSWSample_array(nbelts,obj);
+    free_RingGSWSample_array(nbelts,obj);
+}
+#include "ringlwe.h" 
+//allocate memory space for a RingLWEKey
+
+EXPORT RingLWEKey* alloc_RingLWEKey() {
+    return (RingLWEKey*) malloc(sizeof(RingLWEKey));
+}
+EXPORT RingLWEKey* alloc_RingLWEKey_array(int nbelts) {
+    return (RingLWEKey*) malloc(nbelts*sizeof(RingLWEKey));
+}
+
+//free memory space for a LWEKey
+EXPORT void free_RingLWEKey(RingLWEKey* ptr) {
+    free(ptr);
+}
+EXPORT void free_RingLWEKey_array(int nbelts, RingLWEKey* ptr) {
+    free(ptr);
+}
+
+//initialize the key structure
+//(equivalent of the C++ constructor)
+EXPORT void init_RingLWEKey(RingLWEKey* obj, const RingLWEParams* params) {
+    new(obj) RingLWEKey(params);
+}
+EXPORT void init_RingLWEKey_array(int nbelts, RingLWEKey* obj, const RingLWEParams* params) {
+    for (int i=0; i<nbelts; i++) {
+	new(obj+i) RingLWEKey(params);
+    }
+}
+
+//destroys the RingLWEKey structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_RingLWEKey(RingLWEKey* obj) {
+    obj->~RingLWEKey();
+}
+EXPORT void destroy_RingLWEKey_array(int nbelts, RingLWEKey* obj) {
+    for (int i=0; i<nbelts; i++) {
+	(obj+i)->~RingLWEKey();
+    }
+}
+ 
+//allocates and initialize the RingLWEKey structure
+//(equivalent of the C++ new)
+EXPORT RingLWEKey* new_RingLWEKey(const RingLWEParams* params) {
+    return new RingLWEKey(params);
+}
+EXPORT RingLWEKey* new_RingLWEKey_array(int nbelts, const RingLWEParams* params) {
+    RingLWEKey* obj = alloc_RingLWEKey_array(nbelts);
+    init_RingLWEKey_array(nbelts,obj,params);
+    return obj;
+}
+
+//destroys and frees the RingLWEKey structure
+//(equivalent of the C++ delete)
+EXPORT void delete_RingLWEKey(RingLWEKey* obj) {
+    delete obj;
+}
+EXPORT void delete_RingLWEKey_array(int nbelts, RingLWEKey* obj) {
+    destroy_RingLWEKey_array(nbelts,obj);
+    free_RingLWEKey_array(nbelts,obj);
+}
+#include "ringlwe.h" 
+//allocate memory space for a RingLWEParams
+
+EXPORT RingLWEParams* alloc_RingLWEParams() {
+    return (RingLWEParams*) malloc(sizeof(RingLWEParams));
+}
+EXPORT RingLWEParams* alloc_RingLWEParams_array(int nbelts) {
+    return (RingLWEParams*) malloc(nbelts*sizeof(RingLWEParams));
+}
+
+//free memory space for a LWEKey
+EXPORT void free_RingLWEParams(RingLWEParams* ptr) {
+    free(ptr);
+}
+EXPORT void free_RingLWEParams_array(int nbelts, RingLWEParams* ptr) {
+    free(ptr);
+}
+
+//initialize the key structure
+//(equivalent of the C++ constructor)
+EXPORT void init_RingLWEParams(RingLWEParams* obj, int N, int k, double alpha_min, double alpha_max) {
+    new(obj) RingLWEParams(N,k,alpha_min,alpha_max);
+}
+EXPORT void init_RingLWEParams_array(int nbelts, RingLWEParams* obj, int N, int k, double alpha_min, double alpha_max) {
+    for (int i=0; i<nbelts; i++) {
+	new(obj+i) RingLWEParams(N,k,alpha_min,alpha_max);
+    }
+}
+
+//destroys the RingLWEParams structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_RingLWEParams(RingLWEParams* obj) {
+    obj->~RingLWEParams();
+}
+EXPORT void destroy_RingLWEParams_array(int nbelts, RingLWEParams* obj) {
+    for (int i=0; i<nbelts; i++) {
+	(obj+i)->~RingLWEParams();
+    }
+}
+ 
+//allocates and initialize the RingLWEParams structure
+//(equivalent of the C++ new)
+EXPORT RingLWEParams* new_RingLWEParams(int N, int k, double alpha_min, double alpha_max) {
+    return new RingLWEParams(N,k,alpha_min,alpha_max);
+}
+EXPORT RingLWEParams* new_RingLWEParams_array(int nbelts, int N, int k, double alpha_min, double alpha_max) {
+    RingLWEParams* obj = alloc_RingLWEParams_array(nbelts);
+    init_RingLWEParams_array(nbelts,obj,N,k,alpha_min,alpha_max);
+    return obj;
+}
+
+//destroys and frees the RingLWEParams structure
+//(equivalent of the C++ delete)
+EXPORT void delete_RingLWEParams(RingLWEParams* obj) {
+    delete obj;
+}
+EXPORT void delete_RingLWEParams_array(int nbelts, RingLWEParams* obj) {
+    destroy_RingLWEParams_array(nbelts,obj);
+    free_RingLWEParams_array(nbelts,obj);
+}
+#include "ringlwe.h" 
+//allocate memory space for a RingLWESample
+
+EXPORT RingLWESample* alloc_RingLWESample() {
+    return (RingLWESample*) malloc(sizeof(RingLWESample));
+}
+EXPORT RingLWESample* alloc_RingLWESample_array(int nbelts) {
+    return (RingLWESample*) malloc(nbelts*sizeof(RingLWESample));
+}
+
+//free memory space for a LWEKey
+EXPORT void free_RingLWESample(RingLWESample* ptr) {
+    free(ptr);
+}
+EXPORT void free_RingLWESample_array(int nbelts, RingLWESample* ptr) {
+    free(ptr);
+}
+
+//initialize the key structure
+//(equivalent of the C++ constructor)
+EXPORT void init_RingLWESample(RingLWESample* obj, const RingLWEParams* params) {
+    new(obj) RingLWESample(params);
+}
+EXPORT void init_RingLWESample_array(int nbelts, RingLWESample* obj, const RingLWEParams* params) {
+    for (int i=0; i<nbelts; i++) {
+	new(obj+i) RingLWESample(params);
+    }
+}
+
+//destroys the RingLWESample structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_RingLWESample(RingLWESample* obj) {
+    obj->~RingLWESample();
+}
+EXPORT void destroy_RingLWESample_array(int nbelts, RingLWESample* obj) {
+    for (int i=0; i<nbelts; i++) {
+	(obj+i)->~RingLWESample();
+    }
+}
+ 
+//allocates and initialize the RingLWESample structure
+//(equivalent of the C++ new)
+EXPORT RingLWESample* new_RingLWESample(const RingLWEParams* params) {
+    return new RingLWESample(params);
+}
+EXPORT RingLWESample* new_RingLWESample_array(int nbelts, const RingLWEParams* params) {
+    RingLWESample* obj = alloc_RingLWESample_array(nbelts);
+    init_RingLWESample_array(nbelts,obj,params);
+    return obj;
+}
+
+//destroys and frees the RingLWESample structure
+//(equivalent of the C++ delete)
+EXPORT void delete_RingLWESample(RingLWESample* obj) {
+    delete obj;
+}
+EXPORT void delete_RingLWESample_array(int nbelts, RingLWESample* obj) {
+    destroy_RingLWESample_array(nbelts,obj);
+    free_RingLWESample_array(nbelts,obj);
 }
 #include "multiplication.h" 
 //allocate memory space for a TorusPolynomial
