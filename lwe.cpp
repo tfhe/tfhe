@@ -5,6 +5,7 @@
 #include "lwekey.h"
 #include "lwesamples.h"
 #include "ringlwe.h"
+#include "ringgsw.h"
 #include <random>
 
 using namespace std;
