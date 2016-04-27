@@ -115,7 +115,22 @@ EXPORT void ringLweKeyGen(RingLWEKey* result);
 EXPORT void ringLweSymEncrypt(RingLWESample* result, TorusPolynomial* message, double alpha, const RingLWEKey* key);
 EXPORT void ringLweSymDecrypt(TorusPolynomial* result, const RingLWESample* sample, const RingLWEKey* key, int Msize);
 
-//TODO: mettre les mêmes fonctions arithmétiques que pour LWE
+//Arithmetic operations on RingLWE samples
+/** result = (0,0) */
+EXPORT void RingLweClear(RingLWESample* result, const RingLWEParams* params);
+/** result = (0,mu) */
+EXPORT void RingLweNoiselessTrivial(RingLWESample* result, const TorusPolynomial* mu, const RingLWEParams* params);
+/** result = result + sample */
+EXPORT void RingLweAddTo(RingLWESample* result, const RingLWESample* sample, const RingLWEParams* params);
+/** result = result - sample */
+EXPORT void RingLweSubTo(RingLWESample* result, const RingLWESample* sample, const RingLWEParams* params);
+/** result = result + p.sample */
+EXPORT void RingLweAddMulTo(RingLWESample* result, int p, const RingLWESample* sample, const RingLWEParams* params);
+/** result = result - p.sample */
+EXPORT void RingLweSubMulTo(RingLWESample* result, int p, const RingLWESample* sample, const RingLWEParams* params);
+
+// EXPORT void ringLwePolyCombination(RingLWESample* result, const int* combi, const RingLWESample* samples, const RingLWEParams* params);
+
 
 // GSW
 EXPORT void ringGswKeyGen(LWEKey* result);

@@ -36,7 +36,12 @@ EXPORT void ClearTorusPolynomial(TorusPolynomial* result) {
     for (int i = 0; i < N; ++i) result->coefsT[i] = 0;
 }
 
+// TorusPolynomial = TorusPolynomial
+EXPORT void CopyTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* sample) {
+    int N = result->N;
 
+    for (int i = 0; i < N; ++i) result->coefsT[i] = sample->coefsT[i];
+}
 
 // TorusPolynomial + TorusPolynomial
 EXPORT void AddTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly1, const TorusPolynomial* poly2) {
@@ -45,8 +50,6 @@ EXPORT void AddTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* p
     for (int i = 0; i < N; ++i) result->coefsT[i] = poly1->coefsT[i] + poly2->coefsT[i];
 }
 
-
-
 // TorusPolynomial - TorusPolynomial
 EXPORT void SubTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly1, const TorusPolynomial* poly2) {
     int N = poly1->N;
@@ -54,6 +57,19 @@ EXPORT void SubTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* p
     for (int i = 0; i < N; ++i) result->coefsT[i] = poly1->coefsT[i] - poly2->coefsT[i];
 }
 
+// TorusPolynomial + p*TorusPolynomial
+EXPORT void AddMulTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly1, const TorusPolynomial* poly2, int p) {
+    int N = poly1->N;
+
+    for (int i = 0; i < N; ++i) result->coefsT[i] = poly1->coefsT[i] + p*poly2->coefsT[i];
+}
+
+// TorusPolynomial - p*TorusPolynomial
+EXPORT void SubMulTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly1, const TorusPolynomial* poly2, int p) {
+    int N = poly1->N;
+
+    for (int i = 0; i < N; ++i) result->coefsT[i] = poly1->coefsT[i] - p*poly2->coefsT[i];
+}
 
 
 
@@ -237,9 +253,8 @@ EXPORT void ringLweSymEncrypt(RingLWESample* result, TorusPolynomial* message, d
     int N = key->params->N;
     int k = key->params->k;
     uniform_real_distribution<double> distribution(-0.5,0.5);
-    TorusPolynomial* temp0 = new_TorusPolynomial(N);
-    TorusPolynomial* temp1 = new_TorusPolynomial(N);
-
+    TorusPolynomial* temp0 = new_TorusPolynomial(N); // temporary value for Karatsuba
+    
     for (int j = 0; j < N; ++j)
         result->b->coefsT[j] = gaussian32(0, alpha) + message->coefsT[j];   
     
@@ -248,12 +263,9 @@ EXPORT void ringLweSymEncrypt(RingLWESample* result, TorusPolynomial* message, d
         for (int j = 0; j < N; ++j)
             result->a[i].coefsT[j] = dtot32(distribution(generator));
         multKaratsuba(temp0, &key->key[i], &result->a[i]);
-        AddTorusPolynomial(temp1, temp1, temp0); 
+        AddTorusPolynomial(result->b, result->b, temp0); 
     }
-    AddTorusPolynomial(result->b, result->b, temp1);
-
     delete_TorusPolynomial(temp0);
-    delete_TorusPolynomial(temp1);
 }
 
 
@@ -269,7 +281,7 @@ EXPORT void ringLwePhase(TorusPolynomial* phase, const RingLWESample* sample, co
     int k = key->params->k;
     TorusPolynomial* temp = new_TorusPolynomial(N);
 
-    for (int j = 0; j < N; ++j) phase->coefsT[j] = sample->b->coefsT[j]; // phi = b
+    CopyTorusPolynomial(phase, sample->b); // phi = b
 
     for (int i = 0; i < k; ++i)
     {
@@ -280,16 +292,20 @@ EXPORT void ringLwePhase(TorusPolynomial* phase, const RingLWESample* sample, co
 }
 
 
-
-EXPORT void ringLweApproxPhase(TorusPolynomial* phase, int Msize){}
+/**
+ * This function computes the approximation of the phase 
+ * à revoir, surtout le Msize
+ */
+EXPORT void ringLweApproxPhase(TorusPolynomial* message, TorusPolynomial* phase, int Msize, int N){
+    for (int i = 0; i < N; ++i) message->coefsT[i] = approxPhase(phase->coefsT[i], Msize);
+}
 
 
 
 
 EXPORT void ringLweSymDecrypt(TorusPolynomial* result, const RingLWESample* sample, const RingLWEKey* key, int Msize){
-    
     ringLwePhase(result, sample, key);
-    ringLweApproxPhase(result, Msize);
+    ringLweApproxPhase(result, result, Msize, key->params->N);
 }
 
 
@@ -300,7 +316,72 @@ EXPORT void ringLweSymDecrypt(TorusPolynomial* result, const RingLWESample* samp
 
 
 
-EXPORT void ringLwePolyCombination(RingLWESample* result, const int* combi, const RingLWESample* samples, const RingLWEParams* params);
+
+
+//Arithmetic operations on RingLWE samples
+/** result = (0,0) */
+EXPORT void RingLweClear(RingLWESample* result, const RingLWEParams* params){
+    int k = params->k;
+
+    for (int i = 0; i < k; ++i) ClearTorusPolynomial(&result->a[i]);
+    ClearTorusPolynomial(result->b);
+    result->current_alpha = 0.;
+}
+
+/** result = (0,mu) */
+EXPORT void RingLweNoiselessTrivial(RingLWESample* result, const TorusPolynomial* mu, const RingLWEParams* params){
+    int k = params->k;
+
+    for (int i = 0; i < k; ++i) ClearTorusPolynomial(&result->a[i]);
+    CopyTorusPolynomial(result->b, mu);
+    result->current_alpha = 0.;
+}
+
+/** result = result + sample */
+EXPORT void RingLweAddTo(RingLWESample* result, const RingLWESample* sample, const RingLWEParams* params){
+    int k = params->k;
+
+    for (int i = 0; i < k; ++i) AddTorusPolynomial(&result->a[i], &result->a[i], &sample->a[i]);
+    AddTorusPolynomial(result->b, result->b, sample->b);
+    result->current_alpha += sample->current_alpha; //à revoir
+}
+
+/** result = result - sample */
+EXPORT void RingLweSubTo(RingLWESample* result, const RingLWESample* sample, const RingLWEParams* params){
+    int k = params->k;
+
+    for (int i = 0; i < k; ++i) SubTorusPolynomial(&result->a[i], &result->a[i], &sample->a[i]);
+    SubTorusPolynomial(result->b, result->b, sample->b);
+    result->current_alpha += sample->current_alpha; //à revoir
+}
+
+/** result = result + p.sample */
+EXPORT void RingLweAddMulTo(RingLWESample* result, int p, const RingLWESample* sample, const RingLWEParams* params){
+    int k = params->k;
+
+    for (int i = 0; i < k; ++i) AddMulTorusPolynomial(&result->a[i], &result->a[i], &sample->a[i], p);
+    AddMulTorusPolynomial(result->b, result->b, sample->b, p);
+    result->current_alpha += sample->current_alpha; //à revoir
+}
+
+/** result = result - p.sample */
+EXPORT void RingLweSubMulTo(RingLWESample* result, int p, const RingLWESample* sample, const RingLWEParams* params){
+    int k = params->k;
+
+    for (int i = 0; i < k; ++i) SubMulTorusPolynomial(&result->a[i], &result->a[i], &sample->a[i], p);
+    SubMulTorusPolynomial(result->b, result->b, sample->b, p);
+    result->current_alpha += sample->current_alpha; //à revoir
+}
+
+// EXPORT void ringLwePolyCombination(RingLWESample* result, const int* combi, const RingLWESample* samples, const RingLWEParams* params);
+
+
+
+
+
+
+
+
 
 // RingGSW
 EXPORT void ringGswKeyGen(LWEKey* result);
