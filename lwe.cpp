@@ -1,12 +1,13 @@
 #include <cstdlib>
 #include <iostream>
+#include <random>
+#include <cassert>
 #include "lwe.h"
 #include "lweparams.h"
 #include "lwekey.h"
 #include "lwesamples.h"
 #include "ringlwe.h"
 #include "ringgsw.h"
-#include <random>
 
 using namespace std;
 
@@ -38,8 +39,9 @@ EXPORT void ClearTorusPolynomial(TorusPolynomial* result) {
 }
 
 // TorusPolynomial = TorusPolynomial
-EXPORT void CopyTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* sample) {
-    int N = result->N;
+EXPORT void CopyTorusPolynomial(TorusPolynomial* __restrict result, const TorusPolynomial* __restrict sample) {
+    assert(result!=sample);
+    const int N = result->N;
 
     for (int i = 0; i < N; ++i) result->coefsT[i] = sample->coefsT[i];
 }
@@ -51,6 +53,14 @@ EXPORT void AddTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* p
     for (int i = 0; i < N; ++i) result->coefsT[i] = poly1->coefsT[i] + poly2->coefsT[i];
 }
 
+// TorusPolynomial += TorusPolynomial
+EXPORT void AddToTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly2) {
+    int N = poly2->N;
+
+    for (int i = 0; i < N; ++i) result->coefsT[i] += poly2->coefsT[i];
+}
+
+
 // TorusPolynomial - TorusPolynomial
 EXPORT void SubTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly1, const TorusPolynomial* poly2) {
     int N = poly1->N;
@@ -58,18 +68,39 @@ EXPORT void SubTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* p
     for (int i = 0; i < N; ++i) result->coefsT[i] = poly1->coefsT[i] - poly2->coefsT[i];
 }
 
+// TorusPolynomial -= TorusPolynomial
+EXPORT void SubToTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly2) {
+    int N = poly2->N;
+
+    for (int i = 0; i < N; ++i) result->coefsT[i] -= poly2->coefsT[i];
+}
+
 // TorusPolynomial + p*TorusPolynomial
-EXPORT void AddMulTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly1, const TorusPolynomial* poly2, int p) {
+EXPORT void AddMulZTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly1, int p, const TorusPolynomial* poly2) {
     int N = poly1->N;
 
     for (int i = 0; i < N; ++i) result->coefsT[i] = poly1->coefsT[i] + p*poly2->coefsT[i];
 }
 
+// TorusPolynomial += p*TorusPolynomial
+EXPORT void AddMulZToTorusPolynomial(TorusPolynomial* result, int p, const TorusPolynomial* poly2) {
+    int N = poly2->N;
+
+    for (int i = 0; i < N; ++i) result->coefsT[i] += p*poly2->coefsT[i];
+}
+
 // TorusPolynomial - p*TorusPolynomial
-EXPORT void SubMulTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly1, const TorusPolynomial* poly2, int p) {
+EXPORT void SubMulZTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly1, int p, const TorusPolynomial* poly2) {
     int N = poly1->N;
 
     for (int i = 0; i < N; ++i) result->coefsT[i] = poly1->coefsT[i] - p*poly2->coefsT[i];
+}
+
+// TorusPolynomial -= p*TorusPolynomial
+EXPORT void SubMulZToTorusPolynomial(TorusPolynomial* result, int p, const TorusPolynomial* poly2) {
+    int N = poly2->N;
+
+    for (int i = 0; i < N; ++i) result->coefsT[i] += p*poly2->coefsT[i];
 }
 
 
@@ -351,8 +382,8 @@ EXPORT void RingLweAddTo(RingLWESample* result, const RingLWESample* sample, con
 EXPORT void RingLweSubTo(RingLWESample* result, const RingLWESample* sample, const RingLWEParams* params){
     int k = params->k;
 
-    for (int i = 0; i < k; ++i) SubTorusPolynomial(&result->a[i], &result->a[i], &sample->a[i]);
-    SubTorusPolynomial(result->b, result->b, sample->b);
+    for (int i = 0; i < k; ++i) SubToTorusPolynomial(&result->a[i], &sample->a[i]);
+    SubToTorusPolynomial(result->b, sample->b);
     result->current_alpha += sample->current_alpha; //à revoir
 }
 
