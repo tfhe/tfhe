@@ -37,13 +37,29 @@ RingLWEKey::~RingLWEKey() {
 //};
 
 RingLWESample::RingLWESample(const RingLWEParams* params): k(params->k) {
-    a = new_TorusPolynomial_array(k, params->N);
-    b = new_TorusPolynomial(params->N);
+    //Small change here: 
+    //a is a table of k+1 polynomials, b is an alias for &a[k]
+    //like that, we can access all the coefficients as before:
+    //  &sample->a[0],...,&sample->a[k-1]  and &sample->b
+    //or we can also do it in a single for loop
+    //  &sample->a[0],...,&sample->a[k]
+    a = new_TorusPolynomial_array(k+1, params->N);
+    b = a+k;
     current_alpha = 0;
 }
 
 RingLWESample::~RingLWESample() {
-    delete_TorusPolynomial_array(k, a);
-    delete_TorusPolynomial(b);
+    delete_TorusPolynomial_array(k+1, a);
+}
+
+RingLWESampleFFT::RingLWESampleFFT(const RingLWEParams* params): k(params->k) {
+    //a is a table of k+1 polynomials, b is an alias for &a[k]
+    a = new_LagrangeHalfCPolynomial_array(k+1, params->N);
+    b = a+k;
+    current_alpha = 0;
+}
+
+RingLWESampleFFT::~RingLWESampleFFT() {
+    delete_LagrangeHalfCPolynomial_array(k+1, a);
 }
 

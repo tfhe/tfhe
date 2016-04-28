@@ -43,4 +43,17 @@ struct RingLWESample {
 #endif
 };
 
+struct RingLWESampleFFT {
+    const int k; //required during the destructor call...
+    LagrangeHalfCPolynomial* a;
+    LagrangeHalfCPolynomial* b;
+    double current_alpha;
+#ifdef __cplusplus
+    RingLWESampleFFT(const RingLWEParams* params);
+    ~RingLWESampleFFT();
+    RingLWESampleFFT(const RingLWESampleFFT&) = delete;
+    void operator=(const RingLWESampleFFT&) = delete;
+#endif
+};
+
 #endif // RINGLWE_H

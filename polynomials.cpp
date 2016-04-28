@@ -103,7 +103,7 @@ EXPORT void TorusPolynomial_ifft(TorusPolynomial* result, const LagrangeHalfCPol
 
 //MISC OPERATIONS
 /** sets to zero */
-EXPORT void clear(LagrangeHalfCPolynomial* result) {
+EXPORT void clearLagrangeHalfCPolynomial(LagrangeHalfCPolynomial* result) {
     const int N = result->N;
     for (int i=0; i<N; i++) result->coefsC[i]=0;
 }
@@ -132,5 +132,23 @@ EXPORT void LagrangeHalfCPolynomial_mul(
 EXPORT void LagrangeHalfCPolynomial_addmul(
 	LagrangeHalfCPolynomial* accum, 
 	const LagrangeHalfCPolynomial* a, 
-	const LagrangeHalfCPolynomial* b);
+	const LagrangeHalfCPolynomial* b) 
+{
+    const int Ns2 = a->N/2;
+    for (int i=0; i<Ns2; i++) 
+	accum->coefsC[i] += a->coefsC[i]*b->coefsC[i];
+}
+
+
+/** termwise multiplication and addTo in Lagrange space */
+EXPORT void LagrangeHalfCPolynomial_submul(
+	LagrangeHalfCPolynomial* accum, 
+	const LagrangeHalfCPolynomial* a, 
+	const LagrangeHalfCPolynomial* b) 
+{
+    const int Ns2 = a->N/2;
+    for (int i=0; i<Ns2; i++) 
+	accum->coefsC[i] -= a->coefsC[i]*b->coefsC[i];
+}
+
 

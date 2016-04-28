@@ -34,7 +34,7 @@ EXPORT void TorusPolynomial_ifft(TorusPolynomial* result, const LagrangeHalfCPol
 
 //MISC OPERATIONS
 /** sets to zero */
-EXPORT void clear(LagrangeHalfCPolynomial* result);
+EXPORT void clearLagrangeHalfCPolynomial(LagrangeHalfCPolynomial* result);
 
 /** multiplication via direct FFT */
 EXPORT void multFFT(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
@@ -45,6 +45,10 @@ EXPORT void LagrangeHalfCPolynomial_mul(
 	const LagrangeHalfCPolynomial* b);
 /** termwise multiplication and addTo in Lagrange space */
 EXPORT void LagrangeHalfCPolynomial_addmul(
+	LagrangeHalfCPolynomial* accum, 
+	const LagrangeHalfCPolynomial* a, 
+	const LagrangeHalfCPolynomial* b);
+EXPORT void LagrangeHalfCPolynomial_submul(
 	LagrangeHalfCPolynomial* accum, 
 	const LagrangeHalfCPolynomial* a, 
 	const LagrangeHalfCPolynomial* b);
