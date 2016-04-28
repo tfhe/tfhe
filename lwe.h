@@ -135,10 +135,9 @@ EXPORT void RingLweSubMulTo(RingLWESample* result, int p, const RingLWESample* s
 
 // GSW
 EXPORT void ringGswKeyGen(RingGSWKey* result);
-EXPORT void ringGswSymEncrypt(RingGSWSample* result, const TorusPolynomial* message, double alpha, const RingGSWKey* key);
-EXPORT void ringGswSymEncryptT(RingGSWSample* result, const Torus32 message, double alpha, const RingGSWKey* key);
+EXPORT void ringGswSymEncrypt(RingGSWSample* result, const IntPolynomial* message, double alpha, const RingGSWKey* key);
+EXPORT void ringGswSymEncryptInt(RingGSWSample* result, const int message, double alpha, const RingGSWKey* key);
 EXPORT void ringGswSymDecrypt(IntPolynomial* result, const RingGSWSample* sample, const RingGSWKey* key); 
-EXPORT void ringGswSymEncryptInt(RingGSWSample* result, const int message, const RingGSWKey* key);
 EXPORT int ringGswSymDecryptInt(const RingGSWSample* sample, const RingGSWKey* key); 
 //do we really decrypt GSW samples?
 

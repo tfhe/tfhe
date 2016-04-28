@@ -466,7 +466,7 @@ EXPORT void ringGswKeyGen(RingGSWKey* result){
 
 
 
-EXPORT void ringGswSymEncrypt(RingGSWSample* result, const TorusPolynomial* message, double alpha, const RingGSWKey* key){
+EXPORT void ringGswSymEncrypt(RingGSWSample* result, const IntPolynomial* message, double alpha, const RingGSWKey* key){
     int N = key->params->ringlwe_params->N;
     int k = key->params->ringlwe_params->k;
     int l = key->params->l;
@@ -475,8 +475,7 @@ EXPORT void ringGswSymEncrypt(RingGSWSample* result, const TorusPolynomial* mess
 
     for (int i = 0; i < l; ++i)
         for (int j = 0; j < N; ++j)
-            message_h[i].coefsT[j] = message->coefsT[j] << (i+1);
-
+            message_h[i].coefsT[j] = message->coefs[j] << (i+1); // petite doute ici --> à revoir
 
     for (int p = 0; p < (k+1)*l; ++p) // each line of the RingGSWSample is a RingLWESample (on aurait pu appeler la fonction ringLweSymEncrypt)
     {
@@ -503,7 +502,7 @@ EXPORT void ringGswSymEncrypt(RingGSWSample* result, const TorusPolynomial* mess
  * encrypts a constant message
  */
 
-EXPORT void ringGswSymEncryptT(RingGSWSample* result, const Torus32 message, double alpha, const RingGSWKey* key){
+EXPORT void ringGswSymEncryptInt(RingGSWSample* result, const int message, double alpha, const RingGSWKey* key){
     int N = key->params->ringlwe_params->N;
     int k = key->params->ringlwe_params->k;
     int l = key->params->l;
@@ -511,8 +510,7 @@ EXPORT void ringGswSymEncryptT(RingGSWSample* result, const Torus32 message, dou
     int q; // quotient of p/l
 
     for (int i = 0; i < l; ++i)
-        message_h[i] = message << (i+1);
-
+        message_h[i] = message << (i+1); // petite doute ici --> à revoir
 
     for (int p = 0; p < (k+1)*l; ++p) // each line of the RingGSWSample is a RingLWESample (on aurait pu appeler la fonction ringLweSymEncrypt)
     {
@@ -540,10 +538,14 @@ EXPORT void ringGswSymEncryptT(RingGSWSample* result, const Torus32 message, dou
 
 
 EXPORT void ringGswSymDecrypt(IntPolynomial* result, const RingGSWSample* sample, const RingGSWKey* key); 
-
-EXPORT void ringGswSymEncryptInt(RingGSWSample* result, const int message, const RingGSWKey* key);
 EXPORT int ringGswSymDecryptInt(const RingGSWSample* sample, const RingGSWKey* key); 
 //do we really decrypt GSW samples?
+
+
+
+
+
+
 
 
 
