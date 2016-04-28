@@ -113,6 +113,7 @@ EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWE
 // Ring
 EXPORT void ringLweKeyGen(RingLWEKey* result);
 EXPORT void ringLweSymEncrypt(RingLWESample* result, TorusPolynomial* message, double alpha, const RingLWEKey* key);
+EXPORT void ringLweSymEncryptT(RingLWESample* result, Torus32 message, double alpha, const RingLWEKey* key);
 EXPORT void ringLweSymDecrypt(TorusPolynomial* result, const RingLWESample* sample, const RingLWEKey* key, int Msize);
 
 //Arithmetic operations on RingLWE samples
@@ -133,8 +134,9 @@ EXPORT void RingLweSubMulTo(RingLWESample* result, int p, const RingLWESample* s
 
 
 // GSW
-EXPORT void ringGswKeyGen(LWEKey* result);
-EXPORT void ringGswSymEncrypt(RingGSWSample* result, const IntPolynomial* message, const RingGSWKey* key);
+EXPORT void ringGswKeyGen(RingGSWKey* result);
+EXPORT void ringGswSymEncrypt(RingGSWSample* result, const TorusPolynomial* message, double alpha, const RingGSWKey* key);
+EXPORT void ringGswSymEncryptT(RingGSWSample* result, const Torus32 message, double alpha, const RingGSWKey* key);
 EXPORT void ringGswSymDecrypt(IntPolynomial* result, const RingGSWSample* sample, const RingGSWKey* key); 
 EXPORT void ringGswSymEncryptInt(RingGSWSample* result, const int message, const RingGSWKey* key);
 EXPORT int ringGswSymDecryptInt(const RingGSWSample* sample, const RingGSWKey* key); 

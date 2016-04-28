@@ -9,6 +9,7 @@
 #include "ringlwe.h"
 #include "ringgsw.h"
 
+
 using namespace std;
 
 static default_random_engine generator;
@@ -452,8 +453,92 @@ EXPORT void RingLweSubMulTo(RingLWESample* result, int p, const RingLWESample* s
 
 
 // RingGSW
-EXPORT void ringGswKeyGen(LWEKey* result);
-EXPORT void ringGswSymEncrypt(RingGSWSample* result, const IntPolynomial* message, const RingGSWKey* key);
+/** meme chose que RingLWE */
+EXPORT void ringGswKeyGen(RingGSWKey* result){
+  int N = result->params->ringlwe_params->N;
+  int k = result->params->ringlwe_params->k;
+  uniform_int_distribution<int> distribution(0,1);
+
+  for (int i = 0; i < k; ++i)
+      for (int j = 0; j < N; ++j)
+          result->key[i].coefs[j] = distribution(generator);
+}
+
+
+
+EXPORT void ringGswSymEncrypt(RingGSWSample* result, const TorusPolynomial* message, double alpha, const RingGSWKey* key){
+    int N = key->params->ringlwe_params->N;
+    int k = key->params->ringlwe_params->k;
+    int l = key->params->l;
+    TorusPolynomial* message_h = new_TorusPolynomial_array(l, N); 
+    int q; // quotient of p/l
+
+    for (int i = 0; i < l; ++i)
+        for (int j = 0; j < N; ++j)
+            message_h[i].coefsT[j] = message->coefsT[j] << (i+1);
+
+
+    for (int p = 0; p < (k+1)*l; ++p) // each line of the RingGSWSample is a RingLWESample (on aurait pu appeler la fonction ringLweSymEncrypt)
+    {
+        for (int j = 0; j < N; ++j)
+            result->sample[p]->b->coefsT[j] = gaussian32(0, alpha);   
+    
+        for (int i = 0; i < k; ++i)
+        {
+            UniformTorusPolynomial(&result->sample[p]->a[i]);
+            addMulRToTorusPolynomial(result->sample[p]->b, &key->key[i], &result->sample[p]->a[i]);
+        }
+
+        q = (int) (((double) p)/((double) l)); 
+        AddToTorusPolynomial(&result->sample[p]->a[q], &message_h[p%l]); // when q=k adds to a[k] = b
+    }
+
+    delete_TorusPolynomial_array(l, message_h);
+}
+
+
+
+
+/**
+ * encrypts a constant message
+ */
+
+EXPORT void ringGswSymEncryptT(RingGSWSample* result, const Torus32 message, double alpha, const RingGSWKey* key){
+    int N = key->params->ringlwe_params->N;
+    int k = key->params->ringlwe_params->k;
+    int l = key->params->l;
+    Torus32* message_h = new Torus32[l];
+    int q; // quotient of p/l
+
+    for (int i = 0; i < l; ++i)
+        message_h[i] = message << (i+1);
+
+
+    for (int p = 0; p < (k+1)*l; ++p) // each line of the RingGSWSample is a RingLWESample (on aurait pu appeler la fonction ringLweSymEncrypt)
+    {
+        for (int j = 0; j < N; ++j)
+            result->sample[p]->b->coefsT[j] = gaussian32(0, alpha);   
+    
+        for (int i = 0; i < k; ++i)
+        {
+            UniformTorusPolynomial(&result->sample[p]->a[i]);
+            addMulRToTorusPolynomial(result->sample[p]->b, &key->key[i], &result->sample[p]->a[i]);
+        }
+
+        q = (int) (((double) p)/((double) l)); 
+        result->sample[p]->a[q].coefsT[0] += message_h[p%l]; // when q=k adds to a[k] = b
+    }
+
+    delete[] message_h;
+}
+
+
+
+
+
+
+
+
 EXPORT void ringGswSymDecrypt(IntPolynomial* result, const RingGSWSample* sample, const RingGSWKey* key); 
 
 EXPORT void ringGswSymEncryptInt(RingGSWSample* result, const int message, const RingGSWKey* key);
