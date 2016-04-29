@@ -10,10 +10,9 @@ struct LWEKeySwitchKey {
     int l;
     LWEParams* in_params; // params input key 
     LWEParams* out_params; // params output key 
-    LWESample* ks0_raw;
+    LWESample* ks0_raw;//tableau qui contient tout les LWE samples de taille nlbase
     LWESample** ks1_raw;
-    LWESample*** ks2_raw;
-    LWESample**** ks;
+    LWESample*** ks;
 
 #ifdef __cplusplus
     LWEKeySwitchKey(int base, LWEParams* in_params, LWEParams* out_params);

@@ -158,6 +158,7 @@ EXPORT void ringGswExtractSample(RingLWESample* result, const RingGSWSample* x);
 //LWE to LWE Single gate bootstrapping
 //TODO: Malika
 EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LWESample* x);
+
 //these functions call the bootstrapping, assuming that the message space is {0,1/4} 
 EXPORT void lweNand(LWESample* result, const LWEBootstrappingKey* bk, const LWESample* a, const LWESample* b);
 EXPORT void lweOr(LWESample* result, const LWEBootstrappingKey* bk, const LWESample* a, const LWESample* b);

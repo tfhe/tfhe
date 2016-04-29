@@ -7,6 +7,7 @@
 
 struct RingGSWParams {
     const int l;
+    const int Bgbit;// peut être restreint à une puissance de 2 et on stocke seulement le nb de bits
     const RingLWEParams* ringlwe_params;
 
 #ifdef __cplusplus
@@ -34,8 +35,8 @@ struct RingGSWKey {
 struct RingGSWSample {
     const int k;
     const int l;
-    RingLWESample* sample_raw;
-    RingLWESample** sample;
+    RingLWESample* sample_raw;//RingLWESample* all_sample; (k+1)\ell RingLWE Sample 
+    RingLWESample** sample;// accés optionnel qui permet d'accéder aux différents blocs à l'intérieur.
     double current_alpha;
 
 #ifdef __cplusplus
