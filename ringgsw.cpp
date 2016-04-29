@@ -5,8 +5,13 @@
 
 
 
-RingGSWParams::RingGSWParams(int l, RingLWEParams* ringlwe_params):
-    l(l),ringlwe_params(ringlwe_params) {}
+RingGSWParams::RingGSWParams(int l, int Bgbit, RingLWEParams* ringlwe_params):
+    l(l),
+    Bgbit(Bgbit),
+    ringlwe_params(ringlwe_params),
+    kpl(int((ringlwe_params->k+1)*l))
+    {}
+
 
 RingGSWParams::~RingGSWParams() {}
 
@@ -26,17 +31,17 @@ RingGSWKey::~RingGSWKey() {
 
 
 RingGSWSample::RingGSWSample(const RingGSWParams* params): k(params->ringlwe_params->k), l(params->l) {
-    sample_raw = new_RingLWESample_array((k+1)*l,params->ringlwe_params);
-    sample = new RingLWESample*[(k+1)*l];
+    all_sample = new_RingLWESample_array((k+1)*l,params->ringlwe_params);
+    sample = new RingLWESample*[k+1];
 
-    for (int p = 0; p < (k+1)*l; ++p)
-	    sample[p] = sample_raw + p;
+    for (int p = 0; p < k+1; ++p)
+	    sample[p] = all_sample + p*l;
 
 	current_alpha = 0;
 }
 
 RingGSWSample::~RingGSWSample() {
-    delete_RingLWESample_array((k+1)*l,sample_raw);
+    delete_RingLWESample_array((k+1)*l,all_sample);
     delete[] sample;
 }
 

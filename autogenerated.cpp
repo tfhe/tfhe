@@ -444,12 +444,12 @@ EXPORT void free_RingGSWParams_array(int nbelts, RingGSWParams* ptr) {
 
 //initialize the key structure
 //(equivalent of the C++ constructor)
-EXPORT void init_RingGSWParams(RingGSWParams* obj, int l, RingLWEParams* ringlwe_params) {
-    new(obj) RingGSWParams(l,ringlwe_params);
+EXPORT void init_RingGSWParams(RingGSWParams* obj, int l, int Bgbit, RingLWEParams* ringlwe_params) {
+    new(obj) RingGSWParams(l,Bgbit,ringlwe_params);
 }
-EXPORT void init_RingGSWParams_array(int nbelts, RingGSWParams* obj, int l, RingLWEParams* ringlwe_params) {
+EXPORT void init_RingGSWParams_array(int nbelts, RingGSWParams* obj, int l, int Bgbit, RingLWEParams* ringlwe_params) {
     for (int i=0; i<nbelts; i++) {
-	new(obj+i) RingGSWParams(l,ringlwe_params);
+	new(obj+i) RingGSWParams(l,Bgbit,ringlwe_params);
     }
 }
 
@@ -466,12 +466,12 @@ EXPORT void destroy_RingGSWParams_array(int nbelts, RingGSWParams* obj) {
  
 //allocates and initialize the RingGSWParams structure
 //(equivalent of the C++ new)
-EXPORT RingGSWParams* new_RingGSWParams(int l, RingLWEParams* ringlwe_params) {
-    return new RingGSWParams(l,ringlwe_params);
+EXPORT RingGSWParams* new_RingGSWParams(int l, int Bgbit, RingLWEParams* ringlwe_params) {
+    return new RingGSWParams(l,Bgbit,ringlwe_params);
 }
-EXPORT RingGSWParams* new_RingGSWParams_array(int nbelts, int l, RingLWEParams* ringlwe_params) {
+EXPORT RingGSWParams* new_RingGSWParams_array(int nbelts, int l, int Bgbit, RingLWEParams* ringlwe_params) {
     RingGSWParams* obj = alloc_RingGSWParams_array(nbelts);
-    init_RingGSWParams_array(nbelts,obj,l,ringlwe_params);
+    init_RingGSWParams_array(nbelts,obj,l,Bgbit,ringlwe_params);
     return obj;
 }
 
@@ -723,6 +723,66 @@ EXPORT void delete_RingLWESample(RingLWESample* obj) {
 EXPORT void delete_RingLWESample_array(int nbelts, RingLWESample* obj) {
     destroy_RingLWESample_array(nbelts,obj);
     free_RingLWESample_array(nbelts,obj);
+}
+#include "ringlwe.h" 
+//allocate memory space for a RingLWESampleFFT
+
+EXPORT RingLWESampleFFT* alloc_RingLWESampleFFT() {
+    return (RingLWESampleFFT*) malloc(sizeof(RingLWESampleFFT));
+}
+EXPORT RingLWESampleFFT* alloc_RingLWESampleFFT_array(int nbelts) {
+    return (RingLWESampleFFT*) malloc(nbelts*sizeof(RingLWESampleFFT));
+}
+
+//free memory space for a LWEKey
+EXPORT void free_RingLWESampleFFT(RingLWESampleFFT* ptr) {
+    free(ptr);
+}
+EXPORT void free_RingLWESampleFFT_array(int nbelts, RingLWESampleFFT* ptr) {
+    free(ptr);
+}
+
+//initialize the key structure
+//(equivalent of the C++ constructor)
+EXPORT void init_RingLWESampleFFT(RingLWESampleFFT* obj, const RingLWEParams* params) {
+    new(obj) RingLWESampleFFT(params);
+}
+EXPORT void init_RingLWESampleFFT_array(int nbelts, RingLWESampleFFT* obj, const RingLWEParams* params) {
+    for (int i=0; i<nbelts; i++) {
+	new(obj+i) RingLWESampleFFT(params);
+    }
+}
+
+//destroys the RingLWESampleFFT structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_RingLWESampleFFT(RingLWESampleFFT* obj) {
+    obj->~RingLWESampleFFT();
+}
+EXPORT void destroy_RingLWESampleFFT_array(int nbelts, RingLWESampleFFT* obj) {
+    for (int i=0; i<nbelts; i++) {
+	(obj+i)->~RingLWESampleFFT();
+    }
+}
+ 
+//allocates and initialize the RingLWESampleFFT structure
+//(equivalent of the C++ new)
+EXPORT RingLWESampleFFT* new_RingLWESampleFFT(const RingLWEParams* params) {
+    return new RingLWESampleFFT(params);
+}
+EXPORT RingLWESampleFFT* new_RingLWESampleFFT_array(int nbelts, const RingLWEParams* params) {
+    RingLWESampleFFT* obj = alloc_RingLWESampleFFT_array(nbelts);
+    init_RingLWESampleFFT_array(nbelts,obj,params);
+    return obj;
+}
+
+//destroys and frees the RingLWESampleFFT structure
+//(equivalent of the C++ delete)
+EXPORT void delete_RingLWESampleFFT(RingLWESampleFFT* obj) {
+    delete obj;
+}
+EXPORT void delete_RingLWESampleFFT_array(int nbelts, RingLWESampleFFT* obj) {
+    destroy_RingLWESampleFFT_array(nbelts,obj);
+    free_RingLWESampleFFT_array(nbelts,obj);
 }
 #include "multiplication.h" 
 //allocate memory space for a TorusPolynomial

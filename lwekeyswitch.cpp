@@ -3,7 +3,7 @@
 
 LWEKeySwitchKey::LWEKeySwitchKey(int basebit, LWEParams* in_params, LWEParams* out_params){
     this->basebit=basebit;
- this->base=1<<basebit;   
+    this->base=1<<basebit;   
     this->in_params=in_params; 
     this->out_params=out_params; 
     int n=in_params->n;
@@ -23,7 +23,6 @@ LWEKeySwitchKey::LWEKeySwitchKey(int basebit, LWEParams* in_params, LWEParams* o
 LWEKeySwitchKey::~LWEKeySwitchKey() {
 	delete_LWESample_array(in_params->n*l*base,ks0_raw);
     delete[] ks1_raw;
-    delete[] ks2_raw;
     delete[] ks;
 }
 
