@@ -141,7 +141,7 @@ EXPORT void ringGswSymDecrypt(IntPolynomial* result, const RingGSWSample* sample
 EXPORT int ringGswSymDecryptInt(const RingGSWSample* sample, const RingGSWKey* key); 
 //do we really decrypt GSW samples?
 
-//TODO: Ilaria.
+//TODO: Ilaria.Theoreme3.5
 EXPORT void ringGSWExternProduct(RingLWESample* result, const RingGSWSample* a, const RingLWESample* b, const RingLWEParams* rlweParams, const RingGSWParams* rgswParams);
 
 //TODO: mettre les mêmes fonctions arithmétiques que pour LWE
@@ -158,6 +158,8 @@ EXPORT void ringGswExtractSample(RingLWESample* result, const RingGSWSample* x);
 //LWE to LWE Single gate bootstrapping
 //TODO: Malika
 EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LWESample* x);
+//fonction clear, AddHto, Mult par X^{ai-1} result=X^{ai-1} \times input (ligne 5 de l'algo),Extract, KeyExtract, SampleExtract, Keyswitch
+
 
 //these functions call the bootstrapping, assuming that the message space is {0,1/4} 
 EXPORT void lweNand(LWESample* result, const LWEBootstrappingKey* bk, const LWESample* a, const LWESample* b);

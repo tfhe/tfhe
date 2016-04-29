@@ -6,7 +6,8 @@
 #include "lwesamples.h"
 
 struct LWEKeySwitchKey {
-    int base;
+int basebit;
+    int base;// peut être restreient a être une petite puissance de 2 ou même égal à 2
     int l;
     LWEParams* in_params; // params input key 
     LWEParams* out_params; // params output key 
