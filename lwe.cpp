@@ -478,6 +478,7 @@ EXPORT void ringGSWClear(RingGSWSample* result, const RingGSWParams* params){
     for (int p = 0; p < kpl; ++p)
         RingLweClear(result->row_sample[p], params->ringlwe_params);
 }
+
 // Result += H
 EXPORT void ringGSWAddH(RingGSWSample* result, const RingGSWParams* params){
     int kpl = params->kpl;
@@ -492,6 +493,7 @@ EXPORT void ringGSWAddH(RingGSWSample* result, const RingGSWParams* params){
         result->row_sample[p]->a[q].coefsT[0] += h[p%l]; // when q=k adds to a[k] = b
     }
 }
+
 // Result += mu*H
 EXPORT void ringGSWAddMuH(RingGSWSample* result, const IntPolynomial* message, const RingGSWParams* params){
     int N = params->ringlwe_params->N;
@@ -516,6 +518,7 @@ EXPORT void ringGSWAddMuH(RingGSWSample* result, const IntPolynomial* message, c
 
     delete_TorusPolynomial_array(l, message_h);
 }
+
 // Result += mu*H, mu integer
 EXPORT void ringGSWAddMuIntH(RingGSWSample* result, const int message, const RingGSWParams* params){
     int kpl = params->kpl;
@@ -530,6 +533,7 @@ EXPORT void ringGSWAddMuIntH(RingGSWSample* result, const int message, const Rin
         result->row_sample[p]->a[q].coefsT[0] += message*h[p%l]; // when q=k adds to a[k] = b
     }
 }
+
 // Result = RingGsw(0)
 EXPORT void ringGSWEncryptZero(RingGSWSample* result, double alpha, const RingGSWKey* key){
     int N = key->params->ringlwe_params->N;
@@ -601,7 +605,9 @@ EXPORT int ringGswSymDecryptInt(const RingGSWSample* sample, const RingGSWKey* k
 
 
 /*
-static Zq tab[log_Bg_q];
+Une fonction pour la decoposition en base Bg 
+
+    static Zq tab[log_Bg_q];
     static const uint64_t maskMod = Bg-1; //0x0000FFFF
     static const uint64_t offset = compute_offset(tab);
     //static const uint64_t offset = (((UINT64_C(1)<<(logBg*(log_Bg_q)))-UINT64_C(1))/maskMod)*(Bg/2);
