@@ -31,17 +31,21 @@ RingGSWKey::~RingGSWKey() {
 
 
 RingGSWSample::RingGSWSample(const RingGSWParams* params): k(params->ringlwe_params->k), l(params->l) {
-    all_sample = new_RingLWESample_array((k+1)*l,params->ringlwe_params);
-    sample = new RingLWESample*[k+1];
+    all_sample = new_RingLWESample_array((k+1)*l,params->ringlwe_params); // tous les samples comme un vecteur ligne
+    row_sample = new RingLWESample*[(k+1)*l]; // lignes de la matrice RingGSW
+    bloc_sample = new RingLWESample*[k+1]; // blocs horizontaux (l lignes) de la matrice RingGSW
 
+    for (int p = 0; p < (k+1)*l; ++p)
+        row_sample[p] = all_sample + p;
     for (int p = 0; p < k+1; ++p)
-	    sample[p] = all_sample + p*l;
+	    bloc_sample[p] = all_sample + p*l;
 
 	current_alpha = 0;
 }
 
 RingGSWSample::~RingGSWSample() {
     delete_RingLWESample_array((k+1)*l,all_sample);
-    delete[] sample;
+    delete[] row_sample;
+    delete[] bloc_sample;
 }
 

@@ -145,6 +145,20 @@ EXPORT void ringGswSymDecrypt(IntPolynomial* result, const RingGSWSample* sample
 EXPORT int ringGswSymDecryptInt(const RingGSWSample* sample, const RingGSWKey* key); 
 //do we really decrypt GSW samples?
 
+// support Functions for RingGSW
+// Result = 0
+EXPORT void ringGSWClear(RingGSWSample* result, const RingGSWParams* params);
+// Result += H
+EXPORT void ringGSWAddH(RingGSWSample* result, const RingGSWParams* params);
+// Result += mu*H
+EXPORT void ringGSWAddMuH(RingGSWSample* result, const IntPolynomial* message, const RingGSWParams* params);
+// Result += mu*H, mu integer
+EXPORT void ringGSWAddMuIntH(RingGSWSample* result, const int message, const RingGSWParams* params);
+// Result = RingGsw(0)
+EXPORT void ringGSWEncryptZero(RingGSWSample* result, double alpha, const RingGSWKey* key);
+
+
+
 //TODO: Ilaria.Theoreme3.5
 EXPORT void ringGSWExternProduct(RingLWESample* result, const RingGSWSample* a, const RingLWESample* b, const RingLWEParams* rlweParams, const RingGSWParams* rgswParams);
 

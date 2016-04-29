@@ -37,7 +37,8 @@ struct RingGSWSample {
     const int k;
     const int l;
     RingLWESample* all_sample;//RingLWESample* all_sample; (k+1)\ell RingLWE Sample 
-    RingLWESample** sample;// accés optionnel qui permet d'accéder aux différents blocs à l'intérieur.
+    RingLWESample** row_sample;// accés optionnel qui permet d'accéder aux différents lignes à l'intérieur.
+    RingLWESample** bloc_sample;// accés optionnel qui permet d'accéder aux différents blocs à l'intérieur.
     double current_alpha;
 
 #ifdef __cplusplus

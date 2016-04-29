@@ -452,6 +452,8 @@ EXPORT void RingLweSubMulTo(RingLWESample* result, int p, const RingLWESample* s
 
 
 
+
+
 // RingGSW
 /** meme chose que RingLWE */
 EXPORT void ringGswKeyGen(RingGSWKey* result){
@@ -466,71 +468,148 @@ EXPORT void ringGswKeyGen(RingGSWKey* result){
 
 
 
-EXPORT void ringGswSymEncrypt(RingGSWSample* result, const IntPolynomial* message, double alpha, const RingGSWKey* key){
-    int N = key->params->ringlwe_params->N;
-    int k = key->params->ringlwe_params->k;
-    int l = key->params->l;
-    TorusPolynomial* message_h = new_TorusPolynomial_array(l, N); 
+
+
+// support Functions for RingGSW
+// Result = 0
+EXPORT void ringGSWClear(RingGSWSample* result, const RingGSWParams* params){
+    int kpl = params->kpl;
+
+    for (int p = 0; p < kpl; ++p)
+        RingLweClear(result->row_sample[p], params->ringlwe_params);
+}
+// Result += H
+EXPORT void ringGSWAddH(RingGSWSample* result, const RingGSWParams* params){
+    int kpl = params->kpl;
+    int l = params->l;
+    int Bgbit = params->Bgbit;
+    Torus32* message_h = new Torus32[l];
     int q; // quotient of p/l
 
+    // compute mu*h = mu*[1/Bg,...,1/Bg^l]
+    // ce serait bien de pouvoir passer h avec les parametres, sans devoir le calculer à chaque fois
     for (int i = 0; i < l; ++i)
-        for (int j = 0; j < N; ++j)
-            message_h[i].coefsT[j] = message->coefs[j] << (i+1); // petite doute ici --> à revoir
+        message_h[i] = dtot32((double) (Bgbit >> (i+1))); // 1/(Bg^(i+1)) as a Torus32 
 
-    for (int p = 0; p < (k+1)*l; ++p) // each line of the RingGSWSample is a RingLWESample (on aurait pu appeler la fonction ringLweSymEncrypt)
+    // compute result += mu*H
+    for (int p = 0; p < kpl; ++p)
     {
-        for (int j = 0; j < N; ++j)
-            result->sample[p]->b->coefsT[j] = gaussian32(0, alpha);   
-    
-        for (int i = 0; i < k; ++i)
-        {
-            UniformTorusPolynomial(&result->sample[p]->a[i]);
-            addMulRToTorusPolynomial(result->sample[p]->b, &key->key[i], &result->sample[p]->a[i]);
-        }
-
         q = (int) (((double) p)/((double) l)); 
-        AddToTorusPolynomial(&result->sample[p]->a[q], &message_h[p%l]); // when q=k adds to a[k] = b
+        result->row_sample[p]->a[q].coefsT[0] += message_h[p%l]; // when q=k adds to a[k] = b
+    }
+
+    delete[] message_h;
+}
+// Result += mu*H
+EXPORT void ringGSWAddMuH(RingGSWSample* result, const IntPolynomial* message, const RingGSWParams* params){
+    int N = params->ringlwe_params->N;
+    int kpl = params->kpl;
+    int l = params->l;
+    int Bgbit = params->Bgbit;
+    TorusPolynomial* message_h = new_TorusPolynomial_array(l, N); 
+    Torus32 powBg;
+    int q; // quotient of p/l
+
+    // compute mu*h = mu*[1/Bg,...,1/Bg^l]
+    // ce serait bien de pouvoir passer h avec les parametres, sans devoir le calculer à chaque fois
+    for (int i = 0; i < l; ++i)
+    {
+        powBg = dtot32((double) (Bgbit >> (i+1))); // 1/(Bg^(i+1)) as a Torus32
+        for (int j = 0; j < N; ++j)
+            message_h[i].coefsT[j] = message->coefs[j]*powBg; 
+    }
+
+    // compute result += mu*H
+    for (int p = 0; p < kpl; ++p)
+    {
+        q = (int) (((double) p)/((double) l)); 
+        AddToTorusPolynomial(&result->row_sample[p]->a[q], &message_h[p%l]); // when q=k adds to a[k] = b
     }
 
     delete_TorusPolynomial_array(l, message_h);
 }
+// Result += mu*H, mu integer
+EXPORT void ringGSWAddMuIntH(RingGSWSample* result, const int message, const RingGSWParams* params){
+    int kpl = params->kpl;
+    int l = params->l;
+    int Bgbit = params->Bgbit;
+    Torus32* message_h = new Torus32[l];
+    Torus32 powBg;
+    int q; // quotient of p/l
+
+    // compute mu*h = mu*[1/Bg,...,1/Bg^l]
+    // ce serait bien de pouvoir passer h avec les parametres, sans devoir le calculer à chaque fois
+    for (int i = 0; i < l; ++i)
+    {
+        powBg = dtot32((double) (Bgbit >> (i+1))); // 1/(Bg^(i+1)) as a Torus32
+        message_h[i] = message*powBg; 
+    }
+
+    // compute result += mu*H
+    for (int p = 0; p < kpl; ++p)
+    {
+        q = (int) (((double) p)/((double) l)); 
+        result->row_sample[p]->a[q].coefsT[0] += message_h[p%l]; // when q=k adds to a[k] = b
+    }
+
+    delete[] message_h;
+}
+// Result = RingGsw(0)
+EXPORT void ringGSWEncryptZero(RingGSWSample* result, double alpha, const RingGSWKey* key){
+    int N = key->params->ringlwe_params->N;
+    int k = key->params->ringlwe_params->k;
+    int kpl = key->params->kpl;
+        
+    for (int p = 0; p < kpl; ++p) // each line of the RingGSWSample is a RingLWESample (on aurait pu appeler la fonction ringLweSymEncrypt)
+    {
+        for (int j = 0; j < N; ++j)
+            result->row_sample[p]->b->coefsT[j] = gaussian32(0, alpha);   
+    
+        for (int i = 0; i < k; ++i)
+        {
+            UniformTorusPolynomial(&result->row_sample[p]->a[i]);
+            addMulRToTorusPolynomial(result->row_sample[p]->b, &key->key[i], &result->row_sample[p]->a[i]);
+        }
+    }
+}
 
 
+
+
+
+/*
+EXPORT void ringGSWMulByXaiMinusOne(GSW* result, int ai, const GSW* bk);
+EXPORT void ringLWEExternMulRLWETo(RLWE* accum, GSW* a); //  accum = a \odot accum
+*/
+
+
+
+/**
+ * encrypts a poly message
+ */
+EXPORT void ringGswSymEncrypt(RingGSWSample* result, const IntPolynomial* message, double alpha, const RingGSWKey* key){
+    ringGSWEncryptZero(result, alpha, key);
+    ringGSWAddMuH(result, message, key->params);
+}
 
 
 /**
  * encrypts a constant message
  */
-
 EXPORT void ringGswSymEncryptInt(RingGSWSample* result, const int message, double alpha, const RingGSWKey* key){
-    int N = key->params->ringlwe_params->N;
-    int k = key->params->ringlwe_params->k;
-    int l = key->params->l;
-    Torus32* message_h = new Torus32[l];
-    int q; // quotient of p/l
-
-    for (int i = 0; i < l; ++i)
-        message_h[i] = message << (i+1); // petite doute ici --> à revoir
-
-    for (int p = 0; p < (k+1)*l; ++p) // each line of the RingGSWSample is a RingLWESample (on aurait pu appeler la fonction ringLweSymEncrypt)
-    {
-        for (int j = 0; j < N; ++j)
-            result->sample[p]->b->coefsT[j] = gaussian32(0, alpha);   
-    
-        for (int i = 0; i < k; ++i)
-        {
-            UniformTorusPolynomial(&result->sample[p]->a[i]);
-            addMulRToTorusPolynomial(result->sample[p]->b, &key->key[i], &result->sample[p]->a[i]);
-        }
-
-        q = (int) (((double) p)/((double) l)); 
-        result->sample[p]->a[q].coefsT[0] += message_h[p%l]; // when q=k adds to a[k] = b
-    }
-
-    delete[] message_h;
+    ringGSWEncryptZero(result, alpha, key);
+    ringGSWAddMuIntH(result, message, key->params);
 }
 
 
+/**
+ * encrypts a message = 0 ou 1
+ */
+EXPORT void ringGSWEncryptB(RingGSWSample* result, const int message, double alpha, const RingGSWKey* key){
+    ringGSWEncryptZero(result, alpha, key);
+    if (message == 1)
+        ringGSWAddH(result, key->params);    
+}
 
 
 
