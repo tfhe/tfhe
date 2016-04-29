@@ -10,10 +10,16 @@ RingGSWParams::RingGSWParams(int l, int Bgbit, RingLWEParams* ringlwe_params):
     Bgbit(Bgbit),
     ringlwe_params(ringlwe_params),
     kpl(int((ringlwe_params->k+1)*l))
-    {}
+    {
+        h = new Torus32[l];
+        for (int i = 0; i < l; ++i)
+            h[i] = dtot32((double) (Bgbit >> (i+1))); // 1/(Bg^(i+1)) as a Torus32 
+    }
 
 
-RingGSWParams::~RingGSWParams() {}
+RingGSWParams::~RingGSWParams() {
+    delete[] h;
+}
 
 
 

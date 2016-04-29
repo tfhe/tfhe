@@ -10,6 +10,7 @@ struct RingGSWParams {
     const int Bgbit;// peut être restreint à une puissance de 2 et on stocke seulement le nb de bits
     const RingLWEParams* ringlwe_params;
     const int kpl; // (k+1)*l
+    Torus32* h; // powers of Bgbit
 
 #ifdef __cplusplus
     RingGSWParams(int l, int Bgbit, RingLWEParams* ringlwe_params);

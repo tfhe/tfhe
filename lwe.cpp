@@ -482,42 +482,30 @@ EXPORT void ringGSWClear(RingGSWSample* result, const RingGSWParams* params){
 EXPORT void ringGSWAddH(RingGSWSample* result, const RingGSWParams* params){
     int kpl = params->kpl;
     int l = params->l;
-    int Bgbit = params->Bgbit;
-    Torus32* message_h = new Torus32[l];
     int q; // quotient of p/l
+    const Torus32* h = params->h;
 
-    // compute mu*h = mu*[1/Bg,...,1/Bg^l]
-    // ce serait bien de pouvoir passer h avec les parametres, sans devoir le calculer à chaque fois
-    for (int i = 0; i < l; ++i)
-        message_h[i] = dtot32((double) (Bgbit >> (i+1))); // 1/(Bg^(i+1)) as a Torus32 
-
-    // compute result += mu*H
+    // compute result += H
     for (int p = 0; p < kpl; ++p)
     {
         q = (int) (((double) p)/((double) l)); 
-        result->row_sample[p]->a[q].coefsT[0] += message_h[p%l]; // when q=k adds to a[k] = b
+        result->row_sample[p]->a[q].coefsT[0] += h[p%l]; // when q=k adds to a[k] = b
     }
-
-    delete[] message_h;
 }
 // Result += mu*H
 EXPORT void ringGSWAddMuH(RingGSWSample* result, const IntPolynomial* message, const RingGSWParams* params){
     int N = params->ringlwe_params->N;
     int kpl = params->kpl;
     int l = params->l;
-    int Bgbit = params->Bgbit;
     TorusPolynomial* message_h = new_TorusPolynomial_array(l, N); 
-    Torus32 powBg;
     int q; // quotient of p/l
+    const Torus32* h = params->h;
+    //const int* message = message->coefs;
 
     // compute mu*h = mu*[1/Bg,...,1/Bg^l]
-    // ce serait bien de pouvoir passer h avec les parametres, sans devoir le calculer à chaque fois
     for (int i = 0; i < l; ++i)
-    {
-        powBg = dtot32((double) (Bgbit >> (i+1))); // 1/(Bg^(i+1)) as a Torus32
         for (int j = 0; j < N; ++j)
-            message_h[i].coefsT[j] = message->coefs[j]*powBg; 
-    }
+            message_h[i].coefsT[j] = message->coefs[j]*h[i]; 
 
     // compute result += mu*H
     for (int p = 0; p < kpl; ++p)
@@ -532,27 +520,15 @@ EXPORT void ringGSWAddMuH(RingGSWSample* result, const IntPolynomial* message, c
 EXPORT void ringGSWAddMuIntH(RingGSWSample* result, const int message, const RingGSWParams* params){
     int kpl = params->kpl;
     int l = params->l;
-    int Bgbit = params->Bgbit;
-    Torus32* message_h = new Torus32[l];
-    Torus32 powBg;
     int q; // quotient of p/l
-
-    // compute mu*h = mu*[1/Bg,...,1/Bg^l]
-    // ce serait bien de pouvoir passer h avec les parametres, sans devoir le calculer à chaque fois
-    for (int i = 0; i < l; ++i)
-    {
-        powBg = dtot32((double) (Bgbit >> (i+1))); // 1/(Bg^(i+1)) as a Torus32
-        message_h[i] = message*powBg; 
-    }
+    const Torus32* h = params->h;
 
     // compute result += mu*H
     for (int p = 0; p < kpl; ++p)
     {
         q = (int) (((double) p)/((double) l)); 
-        result->row_sample[p]->a[q].coefsT[0] += message_h[p%l]; // when q=k adds to a[k] = b
+        result->row_sample[p]->a[q].coefsT[0] += message*h[p%l]; // when q=k adds to a[k] = b
     }
-
-    delete[] message_h;
 }
 // Result = RingGsw(0)
 EXPORT void ringGSWEncryptZero(RingGSWSample* result, double alpha, const RingGSWKey* key){
@@ -577,10 +553,6 @@ EXPORT void ringGSWEncryptZero(RingGSWSample* result, double alpha, const RingGS
 
 
 
-/*
-EXPORT void ringGSWMulByXaiMinusOne(GSW* result, int ai, const GSW* bk);
-EXPORT void ringLWEExternMulRLWETo(RLWE* accum, GSW* a); //  accum = a \odot accum
-*/
 
 
 
@@ -619,11 +591,25 @@ EXPORT void ringGSWEncryptB(RingGSWSample* result, const int message, double alp
 EXPORT void ringGswSymDecrypt(IntPolynomial* result, const RingGSWSample* sample, const RingGSWKey* key); 
 EXPORT int ringGswSymDecryptInt(const RingGSWSample* sample, const RingGSWKey* key); 
 //do we really decrypt GSW samples?
+// EXPORT void ringGSWMulByXaiMinusOne(GSW* result, int ai, const GSW* bk);
+// EXPORT void ringLWEExternMulRLWETo(RLWE* accum, GSW* a); //  accum = a \odot accum
 
 
 
 
 
+
+
+/*
+static Zq tab[log_Bg_q];
+    static const uint64_t maskMod = Bg-1; //0x0000FFFF
+    static const uint64_t offset = compute_offset(tab);
+    //static const uint64_t offset = (((UINT64_C(1)<<(logBg*(log_Bg_q)))-UINT64_C(1))/maskMod)*(Bg/2);
+    static const int halfBg = Bg/2;
+
+    int digit =  int( ( addModQ(x,offset) >> (position*logBg) ) & maskMod );
+    return (digit>=halfBg)?(digit-tab[position]):(q-tab[position]+digit);
+*/
 
 
 
