@@ -4,6 +4,7 @@
 #include "lwe.h"
 #include "ringlwe.h"
 #include "multiplication.h"
+#include "polynomials.h"
 
 struct RingGSWParams {
     const int l;
@@ -47,6 +48,21 @@ struct RingGSWSample {
     ~RingGSWSample();
     RingGSWSample(const RingGSWSample&) = delete;
     void operator=(const RingGSWSample&) = delete;
+#endif
+};
+
+struct RingGSWSampleFFT {
+    const int k;
+    const int l;
+    RingLWESampleFFT* all_samples;
+    RingLWESampleFFT** sample;
+    double current_alpha;
+
+#ifdef __cplusplus
+    RingGSWSampleFFT(const RingGSWParams* params);
+    ~RingGSWSampleFFT();
+    RingGSWSampleFFT(const RingGSWSampleFFT&) = delete;
+    void operator=(const RingGSWSampleFFT&) = delete;
 #endif
 };
 

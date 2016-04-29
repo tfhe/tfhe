@@ -151,4 +151,18 @@ EXPORT void LagrangeHalfCPolynomial_submul(
 	accum->coefsC[i] -= a->coefsC[i]*b->coefsC[i];
 }
 
+EXPORT void LagrangeHalfCPolynomial_clear(
+	LagrangeHalfCPolynomial* reps) {
+    const int Ns2 = reps->N/2;
+    for (int i=0; i<Ns2; i++) 
+	reps->coefsC[i] = 0;
+}
+
+EXPORT void LagrangeHalfCPolynomial_addto(
+	LagrangeHalfCPolynomial* accum, 
+	const LagrangeHalfCPolynomial* a) {
+    const int Ns2 = accum->N/2;
+    for (int i=0; i<Ns2; i++) 
+	accum->coefsC[i] += a->coefsC[i];
+}    
 

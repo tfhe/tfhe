@@ -55,3 +55,19 @@ RingGSWSample::~RingGSWSample() {
     delete[] bloc_sample;
 }
 
+RingGSWSampleFFT::RingGSWSampleFFT(const RingGSWParams* params): k(params->ringlwe_params->k), l(params->l) {
+    all_samples = new_RingLWESampleFFT_array((k+1)*l,params->ringlwe_params);
+    sample = new RingLWESampleFFT*[(k+1)*l];
+
+    for (int p = 0; p < (k+1); ++p)
+	sample[p] = all_samples + p*l;
+
+    current_alpha = 0;
+}
+
+RingGSWSampleFFT::~RingGSWSampleFFT() {
+    delete_RingLWESampleFFT_array((k+1)*l,all_samples);
+    delete[] sample;
+}
+
+

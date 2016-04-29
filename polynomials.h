@@ -44,6 +44,11 @@ EXPORT void LagrangeHalfCPolynomial_mul(
 	const LagrangeHalfCPolynomial* a, 
 	const LagrangeHalfCPolynomial* b);
 /** termwise multiplication and addTo in Lagrange space */
+EXPORT void LagrangeHalfCPolynomial_clear(
+	LagrangeHalfCPolynomial* reps);
+EXPORT void LagrangeHalfCPolynomial_addto(
+	LagrangeHalfCPolynomial* accum, 
+	const LagrangeHalfCPolynomial* a);
 EXPORT void LagrangeHalfCPolynomial_addmul(
 	LagrangeHalfCPolynomial* accum, 
 	const LagrangeHalfCPolynomial* a, 
