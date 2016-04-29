@@ -29,9 +29,11 @@ struct LWEKeySwitchKey;
 struct RingLWEParams;
 struct RingLWEKey;
 struct RingLWESample;
+struct RingLWESampleFFT;
 struct RingGSWParams;
 struct RingGSWKey;
 struct RingGSWSample;
+struct RingGSWSampleFFT;
 // *** ()
 struct LWEBootstrappingKey;
 // * ()
@@ -52,9 +54,11 @@ typedef struct LWEKeySwitchKey     LWEKeySwitchKey;
 typedef struct RingLWEParams       RingLWEParams;
 typedef struct RingLWEKey          RingLWEKey;
 typedef struct RingLWESample       RingLWESample;
+typedef struct RingLWESampleFFT       RingLWESampleFFT;
 typedef struct RingGSWParams       RingGSWParams;
 typedef struct RingGSWKey          RingGSWKey;
 typedef struct RingGSWSample       RingGSWSample;
+typedef struct RingGSWSampleFFT       RingGSWSampleFFT;
 typedef struct LWEBootstrappingKey LWEBootstrappingKey;
 typedef struct IntPolynomial	   IntPolynomial;
 typedef struct TorusPolynomial	   TorusPolynomial;
