@@ -146,6 +146,24 @@ EXPORT void ringGSWExternProduct(RingLWESample* result, const RingGSWSample* a, 
 
 //TODO: mettre les mêmes fonctions arithmétiques que pour LWE
 //      pour les opérations externes, prévoir int et intPolynomial
+//Arithmetic operations on RingLWE samples
+/** result = (0,0) */
+EXPORT void RingGswClear(RingGSWSample* result, const RingGSWParams* params);
+/** result = (0,mu) */
+//EXPORT void RingGSwNoiselessTrivial(RingGSWSample* result, const TorusPolynomial* mu, const RingGSWParams* params);
+
+/** result = result + sample */
+EXPORT void RingGswAddTo(RingGSWSample* result, const RingGSWSample* sample, const RingGSWParams* params);
+
+/** result = result - sample */
+//EXPORT void RingGswSubTo(RingLWESample* result, const RingLWESample* sample, const RingLWEParams* params);
+/** result = result + p.sample */
+//EXPORT void RingGswAddMulTo(RingLWESample* result, int p, const RingLWESample* sample, const RingLWEParams* params);
+/** result = result - p.sample */
+//EXPORT void RingGswSubMulTo(RingLWESample* result, int p, const RingLWESample* sample, const RingLWEParams* params);
+
+
+
 
 //extractions RingLWE -> LWE
 EXPORT void ringLweExtractKey(LWEKey* result, const RingLWEKey*); //sans doute un param supplémentaire
