@@ -609,19 +609,19 @@ for (int i=0; i<kpl;i++)
 
 //crée la clé de KeySwitching
 EXPORT void createKeySwitchKey(LWEKeySwitchKey* result, const LWEKey* in_key, const LWEKey* out_key){
-const int n=result->n;
-//const int B=result->base;
-const int l=result->l;
-const int Bl=result->basebit;
-     for(int i=1;i<n;i++){
-for(int j=1;j<l;j++){
-for(int k=1;i<Bl;i++){
-    Torus32 x=(in_key->key[i]*k)*(1<<(32-j*Bl));
+    const int n=result->n;
+    //const int B=result->base;
+    const int l=result->l;
+    const int Bl=result->basebit;
+    for(int i=0;i<n;i++){
+	for(int j=0;j<l;j++){
+	    for(int k=0;i<Bl;i++){
+		Torus32 x=(in_key->key[i]*k)*(1<<(32-j*Bl));
 
-lweSymEncrypt(&result->ks[i][j][k],x,out_key->params->alpha_min,out_key);
-}
-}
-}
+		lweSymEncrypt(&result->ks[i][j][k],x,out_key->params->alpha_min,out_key);
+	    }
+	}
+    }
 }
 
 //
