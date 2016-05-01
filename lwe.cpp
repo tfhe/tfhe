@@ -143,6 +143,24 @@ EXPORT void SubMulZToTorusPolynomial(TorusPolynomial* result, int p, const Torus
 }
 
 
+
+
+// Norme Euclidienne d'un IntPolynomial
+EXPORT int NormEuclidIntPolynomial(const IntPolynomial* poly){
+    const int N = poly->N;
+    int temp1 = 0;
+
+    for (int i = 0; i < N; ++i)
+    {
+        int temp0 = poly->coefs[i]*poly->coefs[i];
+        temp1 += temp0;
+    }
+    return temp1;
+}
+
+
+
+
 // Gaussian sample centered in message, with standard deviation sigma
 Torus32 gaussian32(Torus32 message, double sigma){
     //Attention: all the implementation will use the stdev instead of the gaussian fourier param
@@ -210,13 +228,13 @@ EXPORT void lweSymEncrypt(LWESample* result, Torus32 message, double alpha, cons
  */
 EXPORT Torus32 lwePhase(const LWESample* sample, const LWEKey* key){
     const int n = key->params->n;
-    Torus32 phi = 0;
+    Torus32 axs = 0;
     const Torus32 *__restrict a = sample->a;
     const int * __restrict k = key->key;
 
     for (int i = 0; i < n; ++i) 
-	   phi += a[i]*k[i]; 
-    return sample->b - phi;
+	   axs += a[i]*k[i]; 
+    return sample->b - axs;
 }
 
 
@@ -259,7 +277,7 @@ EXPORT void lweAddTo(LWESample* result, const LWESample* sample, const LWEParams
 
     for (int i = 0; i < n; ++i) result->a[i] += sample->a[i];
     result->b += sample->b;
-    result->current_variance += sample->current_variance; //à revoir
+    result->current_variance += sample->current_variance; 
 }
 
 /** result = result - sample */
@@ -268,7 +286,7 @@ EXPORT void lweSubTo(LWESample* result, const LWESample* sample, const LWEParams
 
     for (int i = 0; i < n; ++i) result->a[i] -= sample->a[i];
     result->b -= sample->b;
-    result->current_variance += sample->current_variance; //à revoir
+    result->current_variance += sample->current_variance; 
 }
 
 /** result = result + p.sample */
@@ -277,7 +295,7 @@ EXPORT void lweAddMulTo(LWESample* result, int p, const LWESample* sample, const
 
     for (int i = 0; i < n; ++i) result->a[i] += p*sample->a[i];
     result->b += p*sample->b;
-    result->current_variance += (p*p)*sample->current_variance; //à revoir
+    result->current_variance += (p*p)*sample->current_variance; 
 }
 
 /** result = result - p.sample */
@@ -286,7 +304,7 @@ EXPORT void lweSubMulTo(LWESample* result, int p, const LWESample* sample, const
 
     for (int i = 0; i < n; ++i) result->a[i] -= p*sample->a[i];
     result->b -= p*sample->b;
-    result->current_variance += (p*p)*sample->current_variance; //à revoir
+    result->current_variance += (p*p)*sample->current_variance; 
 }
 
 
@@ -327,6 +345,8 @@ EXPORT void ringLweSymEncrypt(RingLWESample* result, TorusPolynomial* message, d
 	UniformTorusPolynomial(&result->a[i]);
 	addMulRToTorusPolynomial(result->b, &key->key[i], &result->a[i]);
     }
+
+    result->current_variance = alpha*alpha;
 }
 
 /**
@@ -346,6 +366,8 @@ EXPORT void ringLweSymEncryptT(RingLWESample* result, Torus32 message, double al
 	UniformTorusPolynomial(&result->a[i]);
 	addMulRToTorusPolynomial(result->b, &key->key[i], &result->a[i]);
     }
+
+    result->current_variance = alpha*alpha;
 }
 
 
@@ -418,7 +440,7 @@ EXPORT void RingLweAddTo(RingLWESample* result, const RingLWESample* sample, con
     for (int i = 0; i < k; ++i) 
 	AddToTorusPolynomial(&result->a[i], &sample->a[i]);
     AddToTorusPolynomial(result->b, sample->b);
-    result->current_variance += sample->current_variance; //à revoir//OK si c'est la variance
+    result->current_variance += sample->current_variance;
 }
 
 /** result = result - sample */
@@ -428,7 +450,7 @@ EXPORT void RingLweSubTo(RingLWESample* result, const RingLWESample* sample, con
     for (int i = 0; i < k; ++i) 
 	SubToTorusPolynomial(&result->a[i], &sample->a[i]);
     SubToTorusPolynomial(result->b, sample->b);
-    result->current_variance += sample->current_variance; //à revoir//Idem
+    result->current_variance += sample->current_variance; 
 }
 
 /** result = result + p.sample */
@@ -448,16 +470,17 @@ EXPORT void RingLweSubMulTo(RingLWESample* result, int p, const RingLWESample* s
     for (int i = 0; i < k; ++i) 
 	SubMulZToTorusPolynomial(&result->a[i], p, &sample->a[i]);
     SubMulZToTorusPolynomial(result->b, p, sample->b);
-    result->current_variance += (p*p)*sample->current_variance; //à revoir
+    result->current_variance += (p*p)*sample->current_variance; 
 }
 
 
 /** result = result + p.sample */
 EXPORT void RingLweAddMulRTo(RingLWESample* result, const IntPolynomial* p, const RingLWESample* sample, const RingLWEParams* params){
     const int k = params->k;
-
+    
     for (int i = 0; i <= k; ++i)
-       addMulRToTorusPolynomial(result->a+i,p,sample->a+i);	
+       addMulRToTorusPolynomial(result->a+i, p, sample->a+i);	
+    result->current_variance += NormEuclidIntPolynomial(p)*sample->current_variance; 
 }
 
 
@@ -485,7 +508,7 @@ EXPORT void ringGSWClear(RingGSWSample* result, const RingGSWParams* params){
     const int kpl = params->kpl;
 
     for (int p = 0; p < kpl; ++p)
-        RingLweClear(result->row_sample[p], params->ringlwe_params);
+        RingLweClear(&result->all_sample[p], params->ringlwe_params);
 }
 
 // Result += H
@@ -499,7 +522,7 @@ EXPORT void ringGSWAddH(RingGSWSample* result, const RingGSWParams* params){
     for (int p = 0; p < kpl; ++p)
     {
         q = (int) (((double) p)/((double) l)); 
-        result->row_sample[p]->a[q].coefsT[0] += h[p%l]; // when q=k adds to a[k] = b
+        result->all_sample[p].a[q].coefsT[0] += h[p%l]; // when q=k adds to a[k] = b
     }
 }
 
@@ -522,7 +545,7 @@ EXPORT void ringGSWAddMuH(RingGSWSample* result, const IntPolynomial* message, c
     for (int p = 0; p < kpl; ++p)
     {
         q = (int) (((double) p)/((double) l)); 
-        AddToTorusPolynomial(&result->row_sample[p]->a[q], &message_h[p%l]); // when q=k adds to a[k] = b
+        AddToTorusPolynomial(&result->all_sample[p].a[q], &message_h[p%l]); // when q=k adds to a[k] = b
     }
 
     delete_TorusPolynomial_array(l, message_h);
@@ -539,7 +562,7 @@ EXPORT void ringGSWAddMuIntH(RingGSWSample* result, const int message, const Rin
     for (int p = 0; p < kpl; ++p)
     {
         q = (int) (((double) p)/((double) l)); 
-        result->row_sample[p]->a[q].coefsT[0] += message*h[p%l]; // when q=k adds to a[k] = b
+        result->all_sample[p].a[q].coefsT[0] += message*h[p%l]; // when q=k adds to a[k] = b
     }
 }
 
@@ -552,12 +575,12 @@ EXPORT void ringGSWEncryptZero(RingGSWSample* result, double alpha, const RingGS
     for (int p = 0; p < kpl; ++p) // each line of the RingGSWSample is a RingLWESample (on aurait pu appeler la fonction ringLweSymEncrypt)
     {
         for (int j = 0; j < N; ++j)
-            result->row_sample[p]->b->coefsT[j] = gaussian32(0, alpha);   
+            result->all_sample[p].b->coefsT[j] = gaussian32(0, alpha);   
     
         for (int i = 0; i < k; ++i)
         {
-            UniformTorusPolynomial(&result->row_sample[p]->a[i]);
-            addMulRToTorusPolynomial(result->row_sample[p]->b, &key->key[i], &result->row_sample[p]->a[i]);
+            UniformTorusPolynomial(&result->all_sample[p].a[i]);
+            addMulRToTorusPolynomial(result->all_sample[p].b, &key->key[i], &result->all_sample[p].a[i]);
         }
     }
 }
