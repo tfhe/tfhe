@@ -673,16 +673,10 @@ EXPORT int ringGswSymDecryptInt(const RingGSWSample* sample, const RingGSWKey* k
 //fonction de decomposition
 EXPORT void ringLWEDecompH(IntPolynomial* result, const RingLWESample* sample, const RingGSWParams* params){
     int k = params->ringlwe_params->k;
-    int N = params->ringlwe_params->N;
     int l = params->l;
-    int Nl = N*l;
-    int index = 0;
 
-    for (int i = 0; i < k+1; ++i) // b=a[k]
-    {
-        Torus32PolynomialDecompH(result+index, &sample->a[i], params);
-        index += Nl;
-    }
+    for (int i = 0; i <= k; ++i) // b=a[k]
+        Torus32PolynomialDecompH(result+(i*l), &sample->a[i], params);
 }
 
 
