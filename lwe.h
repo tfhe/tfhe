@@ -164,7 +164,7 @@ EXPORT void Torus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomia
 EXPORT void ringLWEDecompH(IntPolynomial* result, const RingLWESample* sample,const RingGSWParams* params);	
 
 //TODO: Ilaria.Theoreme3.5
-EXPORT void ringGSWExternProduct(RingLWESample* result, const RingGSWSample* a, const RingLWESample* b, const RingLWEParams* rlweParams, const RingGSWParams* rgswParams);
+EXPORT void ringGSWExternProduct(RingLWESample* result, const RingGSWSample* a, const RingLWESample* b, const RingGSWParams* params);
 
 // result=result+ (X^ai-1)*bi (ligne 5 de l'algo)
 EXPORT void ringGSWMulByXaiMinusOne(RingGSWSample* result, int ai, const RingGSWSample* bk, const RingGSWParams* params);
