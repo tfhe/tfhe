@@ -8,6 +8,7 @@
 #include "lwesamples.h"
 #include "ringlwe.h"
 #include "ringgsw.h"
+#include "lwekeyswitch.h"
 
 
 using namespace std;
@@ -608,25 +609,20 @@ for (int i=0; i<kpl;i++)
 
 //crée la clé de KeySwitching
 EXPORT void createKeySwitchKey(LWEKeySwitchKey* result, const LWEKey* in_key, const LWEKey* out_key){
-result->n=in-key->params->n;
-int B=result->base;
-int l=result->l;
-int Bl=result->basebit;
+const int n=result->n;
+//const int B=result->base;
+const int l=result->l;
+const int Bl=result->basebit;
      for(int i=1;i<n;i++){
-for(int i=1;i<l;i++){
-for(int k=1;i<b;i++){
-Torus32 x=(in_key[i]*k)*(1<<(32-j*Bl));
-LWESymEncrypt(&result->ks[i][j][k],x,out_key->params->alpha_min,out_key);
+for(int j=1;j<l;j++){
+for(int k=1;i<Bl;i++){
+    Torus32 x=(in_key->key[i]*k)*(1<<(32-j*Bl));
+
+lweSymEncrypt(&result->ks[i][j][k],x,out_key->params->alpha_min,out_key);
 }
 }
 }
 }
-
-//EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWESample* sample);
-
-
-
-
 
 
 /**
