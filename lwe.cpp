@@ -787,11 +787,13 @@ EXPORT void ringLweExtractSample(LWESample* result, const RingLWESample* x);
 EXPORT void ringGswExtractKey(SemiRingGSWSample* result, const RingGSWKey* key);
 EXPORT void ringGswExtractSample(RingLWESample* result, const RingGSWSample* x);
 
+/*
 //calcule l'arrondi inférieur d'un élément Torus32
 int bar(uint64_t b, uint64_t Nx2){
 uint64_t xx=b*Nx2+(1l<<31);
 return (xx>>32)%Nx2;
 }
+*/
 
 //LWE to LWE Single gate bootstrapping
 //TODO: Malika

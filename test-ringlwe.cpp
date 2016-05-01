@@ -4,13 +4,15 @@
 #include <cstdlib>
 #include <cmath>
 #include <sys/time.h>
+#include <random>
 #include "lwe.h"
 #include "multiplication.h"
 #include "polynomials.h"
 #include "ringlwe.h"
 
 using namespace std;
-
+static default_random_engine generator;
+static uniform_int_distribution<int> distribution(0,1);
 
 
 
@@ -29,10 +31,13 @@ int main(int argc, char** argv) {
     RingLWESample* cipher = new_RingLWESample(params);
     RingLWESample* cipherT = new_RingLWESample(params);
 
-    double alpha = 0.0625;
+    double alpha = 0.;
 
     TorusPolynomial* mu = new_TorusPolynomial(N);
-    UniformTorusPolynomial(mu);
+    for (int i = 0; i < N; ++i){
+        int temp = distribution(generator);
+        mu->coefsT[i] = dtot32((double) temp/2);
+    }
     Torus32 muT = dtot32(0.5);
 
     TorusPolynomial* phi = new_TorusPolynomial(N);
@@ -56,13 +61,13 @@ int main(int argc, char** argv) {
     for (int i = 0; i < N; ++i)
     {
         if (dechif->coefsT[i] != mu->coefsT[i])
-            cout << dechif->coefsT[i] << " = " << mu->coefsT[i] << " error!!!" << endl;     
+            cout << dechif->coefsT[i] << " =? " << mu->coefsT[i] << " error!!!" << endl;     
     }
 
     ringLweSymDecryptT(dechifT, cipherT, key, Msize);
     cout << "Test LweSymDecryptT :" << endl;
     if (dechifT != muT)
-            cout << "Error!!!" << endl;     
+            cout << dechifT << " =? " << muT << " Error!!!" << endl;     
 
 
 
