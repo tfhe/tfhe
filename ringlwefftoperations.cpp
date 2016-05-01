@@ -46,7 +46,7 @@ EXPORT void RingLweFFTClear(RingLWESampleFFT* result, const RingLWEParams* param
 
     for (int i = 0; i < k; ++i) clearLagrangeHalfCPolynomial(&result->a[i]);
     clearLagrangeHalfCPolynomial(result->b);
-    result->current_alpha = 0.;
+    result->current_variance = 0.;
 }
 
 /** result = (0,mu) */
@@ -55,7 +55,7 @@ EXPORT void RingLweFFTNoiselessTrivial(RingLWESampleFFT* result, const TorusPoly
 
     for (int i = 0; i < k; ++i) clearLagrangeHalfCPolynomial(&result->a[i]);
     TorusPolynomial_fft(result->b, mu);
-    result->current_alpha = 0.;
+    result->current_variance = 0.;
 }
 
 /** result = (0,mu) where mu is constant*/
@@ -70,7 +70,7 @@ EXPORT void RingLweFFTNoiselessTrivialT(RingLWESampleFFT* result, const Torus32 
 	clearLagrangeHalfCPolynomial(&result->a[i]);
     for (int j=0; j<Ns2; j++)
 	b[j]=muc;
-    result->current_alpha = 0.;
+    result->current_variance = 0.;
 }
 
 /** result = result + sample */
@@ -82,7 +82,7 @@ EXPORT void RingLweFFTAddTo(RingLWESampleFFT* result, const RingLWESampleFFT* sa
 //    for (int i = 0; i < k; ++i) 
 //	AddToLagrangeHalfCPolynomial(&result->a[i], &sample->a[i]);
 //    AddToLagrangeHalfCPolynomial(result->b, sample->b);
-//    result->current_alpha += sample->current_alpha; //à revoir//OK si c'est la variance
+//    result->current_variance += sample->current_variance; //à revoir//OK si c'est la variance
 //}
 
 /** result = result - sample */
@@ -97,7 +97,7 @@ EXPORT void RingLweFFTAddMulZTo(RingLWESampleFFT* result, int p, const RingLWESa
 //    for (int i = 0; i < k; ++i) 
 //	AddMulZToTorusPolynomial(&result->a[i], p, &sample->a[i]);
 //    AddMulZToTorusPolynomial(result->b, p, sample->b);
-//    result->current_alpha += (p*p)*sample->current_alpha;
+//    result->current_variance += (p*p)*sample->current_variance;
 //}
 
 /** result = result - p.sample */

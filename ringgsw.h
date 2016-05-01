@@ -45,7 +45,7 @@ struct RingGSWSample {
     RingLWESample* all_sample;//RingLWESample* all_sample; (k+1)\ell RingLWE Sample 
     RingLWESample** row_sample;// accés optionnel qui permet d'accéder aux différents lignes à l'intérieur.
     RingLWESample** bloc_sample;// accés optionnel qui permet d'accéder aux différents blocs à l'intérieur.
-    double current_alpha;
+    double current_variance;
 
 #ifdef __cplusplus
     RingGSWSample(const RingGSWParams* params);
@@ -60,7 +60,7 @@ struct RingGSWSampleFFT {
     const int l;
     RingLWESampleFFT* all_samples;
     RingLWESampleFFT** sample;
-    double current_alpha;
+    double current_variance;
 
 #ifdef __cplusplus
     RingGSWSampleFFT(const RingGSWParams* params);

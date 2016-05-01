@@ -34,7 +34,7 @@ RingLWEKey::~RingLWEKey() {
 //struct RingLWESample {
 //    TorusPolynomial* a;
 //    TorusPolynomial* b;
-//    double current_alpha;
+//    double current_variance;
 //};
 
 RingLWESample::RingLWESample(const RingLWEParams* params): k(params->k) {
@@ -46,7 +46,7 @@ RingLWESample::RingLWESample(const RingLWEParams* params): k(params->k) {
     //  &sample->a[0],...,&sample->a[k]
     a = new_TorusPolynomial_array(k+1, params->N);
     b = a+k;
-    current_alpha = 0;
+    current_variance = 0;
 }
 
 RingLWESample::~RingLWESample() {
@@ -57,7 +57,7 @@ RingLWESampleFFT::RingLWESampleFFT(const RingLWEParams* params): k(params->k) {
     //a is a table of k+1 polynomials, b is an alias for &a[k]
     a = new_LagrangeHalfCPolynomial_array(k+1, params->N);
     b = a+k;
-    current_alpha = 0;
+    current_variance = 0;
 }
 
 RingLWESampleFFT::~RingLWESampleFFT() {

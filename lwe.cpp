@@ -239,7 +239,7 @@ EXPORT void lweClear(LWESample* result, const LWEParams* params){
 
     for (int i = 0; i < n; ++i) result->a[i] = 0;
     result->b = 0;
-    result->alpha = 0.;
+    result->current_variance = 0.;
 }
 
 /** result = (0,mu) */
@@ -248,7 +248,7 @@ EXPORT void lweNoiselessTrivial(LWESample* result, Torus32 mu, const LWEParams* 
 
     for (int i = 0; i < n; ++i) result->a[i] = 0;
     result->b = mu;
-    result->alpha = 0.;
+    result->current_variance = 0.;
 }
 
 /** result = result + sample */
@@ -257,7 +257,7 @@ EXPORT void lweAddTo(LWESample* result, const LWESample* sample, const LWEParams
 
     for (int i = 0; i < n; ++i) result->a[i] += sample->a[i];
     result->b += sample->b;
-    result->alpha += sample->alpha; //à revoir
+    result->current_variance += sample->current_variance; //à revoir
 }
 
 /** result = result - sample */
@@ -266,7 +266,7 @@ EXPORT void lweSubTo(LWESample* result, const LWESample* sample, const LWEParams
 
     for (int i = 0; i < n; ++i) result->a[i] -= sample->a[i];
     result->b -= sample->b;
-    result->alpha += sample->alpha; //à revoir
+    result->current_variance += sample->current_variance; //à revoir
 }
 
 /** result = result + p.sample */
@@ -275,7 +275,7 @@ EXPORT void lweAddMulTo(LWESample* result, int p, const LWESample* sample, const
 
     for (int i = 0; i < n; ++i) result->a[i] += p*sample->a[i];
     result->b += p*sample->b;
-    result->alpha += (p*p)*sample->alpha; //à revoir
+    result->current_variance += (p*p)*sample->current_variance; //à revoir
 }
 
 /** result = result - p.sample */
@@ -284,7 +284,7 @@ EXPORT void lweSubMulTo(LWESample* result, int p, const LWESample* sample, const
 
     for (int i = 0; i < n; ++i) result->a[i] -= p*sample->a[i];
     result->b -= p*sample->b;
-    result->alpha += (p*p)*sample->alpha; //à revoir
+    result->current_variance += (p*p)*sample->current_variance; //à revoir
 }
 
 
@@ -387,7 +387,7 @@ EXPORT void RingLweClear(RingLWESample* result, const RingLWEParams* params){
 
     for (int i = 0; i < k; ++i) ClearTorusPolynomial(&result->a[i]);
     ClearTorusPolynomial(result->b);
-    result->current_alpha = 0.;
+    result->current_variance = 0.;
 }
 
 /** result = (0,mu) */
@@ -396,7 +396,7 @@ EXPORT void RingLweNoiselessTrivial(RingLWESample* result, const TorusPolynomial
 
     for (int i = 0; i < k; ++i) ClearTorusPolynomial(&result->a[i]);
     CopyTorusPolynomial(result->b, mu);
-    result->current_alpha = 0.;
+    result->current_variance = 0.;
 }
 
 /** result = (0,mu) where mu is constant*/
@@ -406,7 +406,7 @@ EXPORT void RingLweNoiselessTrivialT(RingLWESample* result, const Torus32 mu, co
     for (int i = 0; i < k; ++i) ClearTorusPolynomial(&result->a[i]);
     ClearTorusPolynomial(result->b);
     result->b->coefsT[0]=mu;
-    result->current_alpha = 0.;
+    result->current_variance = 0.;
 }
 
 /** result = result + sample */
@@ -416,7 +416,7 @@ EXPORT void RingLweAddTo(RingLWESample* result, const RingLWESample* sample, con
     for (int i = 0; i < k; ++i) 
 	AddToTorusPolynomial(&result->a[i], &sample->a[i]);
     AddToTorusPolynomial(result->b, sample->b);
-    result->current_alpha += sample->current_alpha; //à revoir//OK si c'est la variance
+    result->current_variance += sample->current_variance; //à revoir//OK si c'est la variance
 }
 
 /** result = result - sample */
@@ -426,7 +426,7 @@ EXPORT void RingLweSubTo(RingLWESample* result, const RingLWESample* sample, con
     for (int i = 0; i < k; ++i) 
 	SubToTorusPolynomial(&result->a[i], &sample->a[i]);
     SubToTorusPolynomial(result->b, sample->b);
-    result->current_alpha += sample->current_alpha; //à revoir//Idem
+    result->current_variance += sample->current_variance; //à revoir//Idem
 }
 
 /** result = result + p.sample */
@@ -436,7 +436,7 @@ EXPORT void RingLweAddMulTo(RingLWESample* result, int p, const RingLWESample* s
     for (int i = 0; i < k; ++i) 
 	AddMulZToTorusPolynomial(&result->a[i], p, &sample->a[i]);
     AddMulZToTorusPolynomial(result->b, p, sample->b);
-    result->current_alpha += (p*p)*sample->current_alpha;
+    result->current_variance += (p*p)*sample->current_variance;
 }
 
 /** result = result - p.sample */
@@ -446,7 +446,7 @@ EXPORT void RingLweSubMulTo(RingLWESample* result, int p, const RingLWESample* s
     for (int i = 0; i < k; ++i) 
 	SubMulZToTorusPolynomial(&result->a[i], p, &sample->a[i]);
     SubMulZToTorusPolynomial(result->b, p, sample->b);
-    result->current_alpha += (p*p)*sample->current_alpha; //à revoir
+    result->current_variance += (p*p)*sample->current_variance; //à revoir
 }
 
 

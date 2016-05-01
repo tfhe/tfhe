@@ -34,7 +34,7 @@ struct RingLWESample {
     const int k; //required during the destructor call...
     TorusPolynomial* a;
     TorusPolynomial* b;
-    double current_alpha;
+    double current_variance;
 #ifdef __cplusplus
     RingLWESample(const RingLWEParams* params);
     ~RingLWESample();
@@ -47,7 +47,7 @@ struct RingLWESampleFFT {
     const int k; //required during the destructor call...
     LagrangeHalfCPolynomial* a;
     LagrangeHalfCPolynomial* b;
-    double current_alpha;
+    double current_variance;
 #ifdef __cplusplus
     RingLWESampleFFT(const RingLWEParams* params);
     ~RingLWESampleFFT();

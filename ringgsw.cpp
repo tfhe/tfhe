@@ -60,7 +60,7 @@ RingGSWSample::RingGSWSample(const RingGSWParams* params): k(params->ringlwe_par
     for (int p = 0; p < k+1; ++p)
 	    bloc_sample[p] = all_sample + p*l;
 
-	current_alpha = 0;
+	current_variance = 0;
 }
 
 RingGSWSample::~RingGSWSample() {
@@ -76,7 +76,7 @@ RingGSWSampleFFT::RingGSWSampleFFT(const RingGSWParams* params): k(params->ringl
     for (int p = 0; p < (k+1); ++p)
 	sample[p] = all_samples + p*l;
 
-    current_alpha = 0;
+    current_variance = 0;
 }
 
 RingGSWSampleFFT::~RingGSWSampleFFT() {
