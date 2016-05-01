@@ -6,10 +6,11 @@
 #include "lwesamples.h"
 
 struct LWEKeySwitchKey {
-int basebit;
+    int basebit;
     int base;// peut être restreient a être une petite puissance de 2 ou même égal à 2
     int n;
     int l;
+    uint32_t mask;
     LWEParams* in_params; // params input key 
     LWEParams* out_params; // params output key 
     LWESample* ks0_raw;//tableau qui contient tout les LWE samples de taille nlbase
@@ -17,7 +18,7 @@ int basebit;
     LWESample*** ks;// de taille n pointe vers ks1 un tableau dont les cases sont espaceés de ell positions
 
 #ifdef __cplusplus
-    LWEKeySwitchKey(int base, LWEParams* in_params, LWEParams* out_params);
+    LWEKeySwitchKey(int basebit, LWEParams* in_params, LWEParams* out_params);
     ~LWEKeySwitchKey();
     LWEKeySwitchKey(const LWEKeySwitchKey&) = delete;
     void operator=(const LWEKeySwitchKey&) = delete;

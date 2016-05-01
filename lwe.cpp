@@ -626,11 +626,22 @@ EXPORT void createKeySwitchKey(LWEKeySwitchKey* result, const LWEKey* in_key, co
     }
 }
 
-//
+//sample=(a',b')
 EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWESample* sample){
-
+    const LWEParams* par=ks->out_params;
+    const int n=ks->in_params->n;
+    const int Bl=ks->basebit;
+    const int l=ks->l;
+    const uint32_t mask=ks->mask;
+    lweNoiselessTrivial(result,sample->b,par);
+    for (int i=0;i<n;i++){
+	uint32_t ai=sample->a[i];
+	for (int j=0;j<l;j++){
+	    uint32_t aij=(ai>>(32-(j+1)*Bl))& mask;
+	    lweSubTo(result,&ks->ks[i][j][aij],par);	
+	}
+    }
 }
-
 
 
 /**
