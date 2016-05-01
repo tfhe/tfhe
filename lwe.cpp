@@ -733,10 +733,28 @@ EXPORT void semiRingBootstrap(LWESample* result, const LWEBootstrappingKey* bk, 
 //extractions Ring LWE -> LWE
 EXPORT void keyExtract(LWEKey* result, const RingLWEKey* key) //sans doute un param supplémentaire
 {
-    assert(result->params->n == key->params->k*key->params->N);
+    const int N = key->params->N;
+    const int k = key->params->k;
+    const int n = result->params->n;
+    assert(n == k*N);
+    for (int i=0; i<k; i++) {
+	result->key[i*N]=key->key[i].coefs[0];
+	for (int j=1; j<N; j++)
+	    result->key[i*N+j]=-key->key[i].coefs[N-j];
+    }
 }
     
-    // EXPORT void sampleExtract(LWESample* result, const RingLWESample* x);
+EXPORT void sampleExtract(LWESample* result, const RingLWESample* x, const LWEParams* params,  const RingLWEParams* rparams) {
+    const int N = rparams->N;
+    const int k = rparams->k;
+    const int n = params->n;
+    assert(n == k*N);
+    for (int i=0; i<k; i++) {
+	for (int j=0; j<N; j++)
+	    result->a[i*N+j]=x->a[i].coefsT[j];
+    }
+    result->b=x->b->coefsT[0];
+}
 
 //extraction RingGSW -> GSW
 // EXPORT void gswKeyExtract(RingLWEKey* result, const RingGSWKey* key); //sans doute un param supplémentaire
