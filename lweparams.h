@@ -7,9 +7,9 @@
 //to all the LWE keys that use these params.
 struct LWEParams {
 	const int n;
-	const double alpha_min;
-	const double alpha_max;
-	const int log_alpha_min; //?
+	const double alpha_min;//le plus petit bruit tq sur
+	const double alpha_max;//le plus gd bruit qui permet le déchiffrement
+
 
 
         //since all members are declared constant, a constructor is 

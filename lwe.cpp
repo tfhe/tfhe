@@ -606,6 +606,25 @@ for (int i=0; i<kpl;i++)
     RingLweAddMulRTo(accum,&dec[i],&sample->all_sample[i],par);
 }
 
+//crée la clé de KeySwitching
+EXPORT void createKeySwitchKey(LWEKeySwitchKey* result, const LWEKey* in_key, const LWEKey* out_key){
+result->n=in-key->params->n;
+int B=result->base;
+int l=result->l;
+int Bl=result->basebit;
+     for(int i=1;i<n;i++){
+for(int i=1;i<l;i++){
+for(int k=1;i<b;i++){
+Torus32 x=(in_key[i]*k)*(1<<(32-j*Bl));
+LWESymEncrypt(&result->ks[i][j][k],x,out_key->params->alpha_min,out_key);
+}
+}
+}
+}
+
+//EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWESample* sample);
+
+
 
 
 
