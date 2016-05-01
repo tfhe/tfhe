@@ -20,14 +20,15 @@ RingGSWParams::RingGSWParams(int l, int Bgbit, RingLWEParams* ringlwe_params):
     	    h[i] = 1 << kk; // 1/(Bg^(i+1)) as a Torus32
 	    }	
 
-        // offset = Bg/2 * (1 + Bg + Bg^2 + ... + Bg^(l-1)) 
-        Torus32 offset;
-        Torus32 temp0;
-        offset = 0;
+        // offset = Bg/2 * (2^(32-Bgbit) + 2^(32-2*Bgbit) + ... + 2^(32-l*Bgbit)) 
+        uint32_t offset;
+        uint32_t temp0, temp1;
+        temp1 = 0;
         for (int i = 0; i < l; ++i) {
-            temp0 = offset;
-            offset = temp0*Bg + halfBg;
+            temp0 = 1 << (32-(i+1)*Bgbit);
+            temp1 += temp1;
         }
+        offset = temp1*halfBg;
 
     }
 

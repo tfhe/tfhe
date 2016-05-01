@@ -660,26 +660,38 @@ EXPORT void ringLWEDecompH(IntPolynomial* result, const RingLWESample* sample, c
     int k = params->ringlwe_params->k;
     int N = params->ringlwe_params->N;
     int l = params->l;
-    int Bgbit = params->Bgbit;
-    int maskMod = params->maskMod;
-    Torus32 offset = params->offset;
-    Torus32 temp;
+    int Nl = N*l;
     int index = 0;
 
     for (int i = 0; i < k+1; ++i) // b=a[k]
-        for (int j = 0; j < N; ++j)
-        {
-            temp = sample->a[i].coefsT[j];
-            for (int p = 0; p < l; ++p)
-            {
-                result->coefs[index] = ((temp + offset) >> (p*Bgbit)) &maskMod;
-                index += 1;
-            }   
-        }
+    {
+        Torus32PolynomialDecompH(result+index, &sample->a[i], params);
+        index += Nl;
+    }
 }
 
 
-EXPORT void Torus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const RingGSWParams* params);
+EXPORT void Torus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const RingGSWParams* params){
+    int N = params->ringlwe_params->N;
+    int l = params->l;
+    int Bgbit = params->Bgbit;
+    uint32_t maskMod = params->maskMod;
+    int32_t halfBg = params->halfBg;
+    uint32_t offset = params->offset;
+    uint32_t temp;
+    int index = 0;
+
+    for (int j = 0; j < N; ++j)
+    {
+        temp = sample->coefsT[j];
+        for (int p = 0; p < l; ++p)
+        {
+            temp = ((temp + offset) >> ((p+1)*Bgbit)) &maskMod; // doute
+            result->coefs[index] = temp - halfBg;
+            index += 1;
+        }   
+    }
+}
     
 
 

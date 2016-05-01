@@ -10,12 +10,12 @@ struct RingGSWParams {
     const int l;
     const int Bgbit;// peut être restreint à une puissance de 2 et on stocke seulement le nb de bits
     const int Bg;// base
-    const int halfBg; // Bg/2
-    const int maskMod; // Bg-1
+    const int32_t halfBg; // Bg/2
+    const uint32_t maskMod; // Bg-1
     const RingLWEParams* ringlwe_params;
     const int kpl; // (k+1)*l
     Torus32* h; // powers of Bgbit
-    Torus32 offset; // offset = Bg/2 * (1 + Bg + Bg^2 + ... + Bg^(l-1))
+    uint32_t offset; // offset = Bg/2 * (2^(32-Bgbit) + 2^(32-2*Bgbit) + ... + 2^(32-l*Bgbit))
 
 #ifdef __cplusplus
     RingGSWParams(int l, int Bgbit, RingLWEParams* ringlwe_params);
