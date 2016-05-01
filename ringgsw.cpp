@@ -9,17 +9,26 @@ RingGSWParams::RingGSWParams(int l, int Bgbit, RingLWEParams* ringlwe_params):
     l(l),
     Bgbit(Bgbit),
     Bg(1<<Bgbit),
+    halfBg(Bg/2),
+    maskMod(Bg-1),
     ringlwe_params(ringlwe_params),
     kpl(int((ringlwe_params->k+1)*l))
     {
         h = new Torus32[l];
         for (int i = 0; i < l; ++i) {
-	    int kk = (32-(i+1)*Bgbit);
-	    if (kk>=0)
-		h[i] = 1 << kk; // 1/(Bg^(i+1)) as a Torus32
-	    else
-	       h[i] = 0;
-	}	    
+    	    int kk = (32-(i+1)*Bgbit);
+    	    h[i] = 1 << kk; // 1/(Bg^(i+1)) as a Torus32
+	    }	
+
+        // offset = Bg/2 * (1 + Bg + Bg^2 + ... + Bg^(l-1)) 
+        Torus32 offset;
+        Torus32 temp0;
+        offset = 0;
+        for (int i = 0; i < l; ++i) {
+            temp0 = offset;
+            offset = temp0*Bg + halfBg;
+        }
+
     }
 
 

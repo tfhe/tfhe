@@ -574,12 +574,15 @@ for (int i=a;i<N;i++)//sur que N>i-a>=0
 }
 
 
+
+
+
+
 //mult externe de X^ai-1 par bki
 EXPORT void ringLWEMulByXaiMinusOne(RingLWESample* result, int ai, const RingLWESample* bk, const RingLWEParams* params){
 int k=params->k;
 for(int i=0;i<=k;i++)
 TorusPolynomialMulByXaiMinusOne(&result->a[i],ai,&bk->a[i]);
-
 }
 
 //mult externe de X^{a_i} par bki
@@ -653,18 +656,38 @@ EXPORT int ringGswSymDecryptInt(const RingGSWSample* sample, const RingGSWKey* k
 
 
 
-/*
-Une fonction pour la decoposition en base Bg 
 
-    static Zq tab[log_Bg_q];
-    static const uint64_t maskMod = Bg-1; //0x0000FFFF
-    static const uint64_t offset = compute_offset(tab);
-    //static const uint64_t offset = (((UINT64_C(1)<<(logBg*(log_Bg_q)))-UINT64_C(1))/maskMod)*(Bg/2);
-    static const int halfBg = Bg/2;
+//fonction de decomposition
+EXPORT void ringLWEDecompH(IntPolynomial* result, const RingLWESample* sample, const RingGSWParams* params){
+    int k = params->ringlwe_params->k;
+    int N = params->ringlwe_params->N;
+    int Bgbit = params->Bgbit;
+    int maskMod = params->maskMod;
+    Torus32 offset = params->offset;
+    Torus32 temp;
+    int index = 0;
 
-    int digit =  int( ( addModQ(x,offset) >> (position*logBg) ) & maskMod );
-    return (digit>=halfBg)?(digit-tab[position]):(q-tab[position]+digit);
-*/
+    for (int i = 0; i < k+1; ++i) // b=a[k]
+        for (int j = 0; j < N; ++j)
+        {
+            temp = sample->a[i].coefsT[j];
+            for (int p = 0; p < l; ++p)
+            {
+                result->coefs[index] = ((temp + offset) >> (p*Bgbit)) &maskMod;
+                index += 1;
+            }   
+        }
+}
+
+
+EXPORT void Torus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const RingGSWParams* params);
+    
+
+
+
+
+
+
 
 
 
