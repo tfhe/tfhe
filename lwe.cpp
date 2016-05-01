@@ -624,6 +624,12 @@ lweSymEncrypt(&result->ks[i][j][k],x,out_key->params->alpha_min,out_key);
 }
 }
 
+//
+EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWESample* sample){
+
+}
+
+
 
 /**
  * encrypts a poly message
