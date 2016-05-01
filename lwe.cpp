@@ -9,7 +9,7 @@
 #include "ringlwe.h"
 #include "ringgsw.h"
 #include "lwekeyswitch.h"
-
+#include "lwebootstrappingkey.h"
 
 using namespace std;
 
@@ -789,32 +789,33 @@ EXPORT void ringGswExtractSample(RingLWESample* result, const RingGSWSample* x);
 
 //calcule l'arrondi inférieur d'un élément Torus32
 int bar(uint64_t b, uint64_t Nx2){
-unint xx=b*Nx2+(1l<<31);
-return (x>>32)%Nx2;
+uint64_t xx=b*Nx2+(1l<<31);
+return (xx>>32)%Nx2;
 }
 
 //LWE to LWE Single gate bootstrapping
-/*TODO: Malika
-
+//TODO: Malika
 EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LWESample* x){
     Torus32 a=(mu1-mu0)/2;
-    const int N=bk->bk_params->ringlwe_params->N;
+    const int N=bk->accum_params->N;
+    
     const int Ns2=N/2;
     const uint64_t Nx2= 2*N;
-    int barb=bar(b,Nx2);//TODO
+    int barb=bar(x->b,Nx2);//TODO
+    
     RingLWEParams* accum_par=bk->accum_params;
     TorusPolynomial* testvect=new_TorusPolynomial(N);//je definis le test vector (multiplié par a inclus !
     TorusPolynomial* testvectbis=new_TorusPolynomial(N);
     for (int i=0;i<Ns2;i++){
-	testvect->coefs[i]=a;
+	testvect->coefsT[i]=a;
     }    
     for (int i=Ns2;i<N;i++){
-	testvect->coefs[i]=-a;
+	testvect->coefsT[i]=-a;
     }
     for (int i=0;i< barb;i++)
-	testvectbis->coefs[i]=-testvect->coefs[i-barb+N];
+	testvectbis->coefsT[i]=-testvect->coefsT[i-barb+N];
     for (int i=barb;i<N;i++)
-	testvectbis->coefs[i]=testvect->coefs[i-barb];
+	testvectbis->coefsT[i]=testvect->coefsT[i-barb];
 
     //RingLWESample* result, const TorusPolynomial* mu, const RingLWEParams* params
     RingLWESample* acc;
@@ -825,7 +826,7 @@ EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 
 
     }
 }
-*/
+
 
 //these functions call the bootstrapping, assuming that the message space is {0,1/4} 
 EXPORT void lweNand(LWESample* result, const LWEBootstrappingKey* bk, const LWESample* a, const LWESample* b);
