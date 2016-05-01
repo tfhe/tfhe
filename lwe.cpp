@@ -142,7 +142,6 @@ EXPORT void SubMulZToTorusPolynomial(TorusPolynomial* result, int p, const Torus
 }
 
 
-
 // Gaussian sample centered in message, with standard deviation sigma
 Torus32 gaussian32(Torus32 message, double sigma){
     //Attention: all the implementation will use the stdev instead of the gaussian fourier param
@@ -447,6 +446,15 @@ EXPORT void RingLweSubMulTo(RingLWESample* result, int p, const RingLWESample* s
 	SubMulZToTorusPolynomial(&result->a[i], p, &sample->a[i]);
     SubMulZToTorusPolynomial(result->b, p, sample->b);
     result->current_alpha += (p*p)*sample->current_alpha; //à revoir
+}
+
+
+/** result = result + p.sample */
+EXPORT void RingLweAddMulRTo(RingLWESample* result, const IntPolynomial* p, const RingLWESample* sample, const RingLWEParams* params){
+    int k = params->k;
+
+    for (int i = 0; i <= k; ++i)
+       addMulRToTorusPolynomial(result->a+i,p,sample->a+i);	
 }
 
 
