@@ -158,9 +158,8 @@ EXPORT void ringGSWAddMuIntH(RingGSWSample* result, const int message, const Rin
 EXPORT void ringGSWEncryptZero(RingGSWSample* result, double alpha, const RingGSWKey* key);
 
 //fonction de decomposition
-EXPORT void ringLWEDecompH(IntPolynomial* result, const RingLWESample* sample,const RingGSWParams* params);
 EXPORT void Torus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const RingGSWParams* params);
-	
+EXPORT void ringLWEDecompH(IntPolynomial* result, const RingLWESample* sample,const RingGSWParams* params);	
 
 //TODO: Ilaria.Theoreme3.5
 EXPORT void ringGSWExternProduct(RingLWESample* result, const RingGSWSample* a, const RingLWESample* b, const RingLWEParams* rlweParams, const RingGSWParams* rgswParams);
@@ -170,10 +169,7 @@ EXPORT void ringGSWMulByXaiMinusOne(RingGSWSample* result, int ai, const RingGSW
 EXPORT void ringLWEMulByXaiMinusOne(RingLWESample* result, int ai, const RingLWESample* bk, const RingLWEParams* params);
 
 //ligne 5 algo,mult externe
-EXPORT void ringLWEExternMulRLWETo(RingLWESample* accum, RingGSWSample* a,const RingLWEParams* params); //  accum = a \odot accum
-
-
-
+EXPORT void ringLWEExternMulRGSWTo(RingLWESample* accum, RingGSWSample* a,const RingGSWParams* params);
 
 /** result = (0,mu) */
 EXPORT void RingGSwNoiselessTrivial(RingGSWSample* result, const TorusPolynomial* mu, const RingGSWParams* params);

@@ -552,15 +552,49 @@ EXPORT void ringGSWEncryptZero(RingGSWSample* result, double alpha, const RingGS
 }
 
 
-//
 
+void TorusPolynomialMulByXaiMinusOne(TorusPolynomial* result, int a, const TorusPolynomial* bk){
+int N=bk->N;
+Torus32* out=result->coefsT;
+Torus32* in =bk->coefsT; 
+
+for (int i=0;i<a;i++)//sur que i-a<0
+    out[i]= -in[i-a+N]-in[i];
+
+for (int i=a;i<N;i++)//sur que N>i-a>=0
+    out[i]= in[i-a]-in[i];
+}
+
+
+//mult externe de X^ai-1 par bki
+EXPORT void ringLWEMulByXaiMinusOne(RingLWESample* result, int ai, const RingLWESample* bk, const RingLWEParams* params){
+int k=params->k;
+for(int i=0;i<=k;i++)
+TorusPolynomialMulByXaiMinusOne(&result->a[i],ai,&bk->a[i]);
+
+}
+
+//mult externe de X^{a_i} par bki
+EXPORT void ringGSWMulByXaiMinusOne(RingGSWSample* result, int ai, const RingGSWSample* bk, const RingGSWParams* params){
+RingLWEParams* par=params->ringlwe_params;
+int kpl=params->kpl;
+for (int i=0;i<kpl;i++)
+ringLWEMulByXaiMinusOne(&result->all_sample[i],ai,&bk->all_sample[i],par);
+}
+
+//Update l'accumulateur ligne 5 de l'algo toujours
+//void ringLWEDecompH(IntPolynomial* result, const RingLWESample* sample,const RingGSWParams* params);	
+//voi
+EXPORT void ringLWEExternMulRGSWTo(RingLWESample* accum, const RingGSWSample* sample,const RingGSWParams* params)
+{
+RingLWEParams* par=params->ringlwe_params;
+int kpl=par->kpl;
+dec =new IntPolynomial[kpl];
+ringLWEDecompH(dec,accum,params);
 
 
 }
 
-
-//Produit Externe
-EXPORT void ringLWEExternMulRLWETo(RingLWESample* accum, RingGSWSample* a) //  accum = a \odot accum
 
 
 
