@@ -661,6 +661,7 @@ EXPORT int ringGswSymDecryptInt(const RingGSWSample* sample, const RingGSWKey* k
 EXPORT void ringLWEDecompH(IntPolynomial* result, const RingLWESample* sample, const RingGSWParams* params){
     int k = params->ringlwe_params->k;
     int N = params->ringlwe_params->N;
+    int l = params->l;
     int Bgbit = params->Bgbit;
     int maskMod = params->maskMod;
     Torus32 offset = params->offset;
