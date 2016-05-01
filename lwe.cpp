@@ -611,9 +611,6 @@ for (int i=a;i<N;i++)//sur que N>i-a>=0
 
 
 
-
-
-
 //mult externe de X^ai-1 par bki
 EXPORT void ringLWEMulByXaiMinusOne(RingLWESample* result, int ai, const RingLWESample* bk, const RingLWEParams* params){
 const int k=params->k;
@@ -790,9 +787,44 @@ EXPORT void ringLweExtractSample(LWESample* result, const RingLWESample* x);
 EXPORT void ringGswExtractKey(SemiRingGSWSample* result, const RingGSWKey* key);
 EXPORT void ringGswExtractSample(RingLWESample* result, const RingGSWSample* x);
 
+//calcule l'arrondi inférieur d'un élément Torus32
+int bar(uint64_t b, uint64_t Nx2){
+unint xx=b*Nx2+(1l<<31);
+return (x>>32)%Nx2;
+}
+
 //LWE to LWE Single gate bootstrapping
 //TODO: Malika
-EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LWESample* x);
+
+EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LWESample* x){
+    Torus32 a=(mu1-mu0)/2;
+    const int N=bk->bk_params->ringlwe_params->N;
+    const int Ns2=N/2;
+    const uint64_t Nx2= 2*N;
+    int barb=bar(b,Nx2);//TODO
+    RingLWEParams* accum_par=bk->accum_params;
+    TorusPolynomial* testvect=new_TorusPolynomial(N);//je definis le test vector (multiplié par a inclus !
+    TorusPolynomial* testvectbis=new_TorusPolynomial(N);
+    for (int i=0;i<Ns2;i++){
+	testvect->coefs[i]=a;
+    }    
+    for (int i=Ns2;i<N;i++){
+	testvect->coefs[i]=-a;
+    }
+    for (int i=0;i< barb;i++)
+	testvectbis->coefs[i]=-testvect->coefs[i-barb+N];
+    for (int i=barb;i<N;i++)
+	testvectbis->coefs[i]=testvect->coefs[i-barb];
+
+    //RingLWESample* result, const TorusPolynomial* mu, const RingLWEParams* params
+    RingLWESample* acc;
+    acc=new_RingLWESample(accum_par);
+    RingLweNoiselessTrivial(acc,testvect,accum_par);
+
+    for (int i=0;i<N;i++){
+
+    }
+}
 
 
 
