@@ -62,5 +62,9 @@ int main(int argc, char** argv) {
     cout << "There were " << failures << " failures out of " << trials << " trials" << endl;
     cout << "(it might be normal)" << endl;
 
+    delete_LWEParams(params); //les deux alpha mis un peu au hasard
+    delete_LWEKey(key);
+    delete_LWESample(cipher);
+
     return 0;
 }

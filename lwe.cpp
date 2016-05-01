@@ -323,13 +323,13 @@ EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWE
 
 // RingLWE
 EXPORT void ringLweKeyGen(RingLWEKey* result){
-  const int N = result->params->N;
-  const int k = result->params->k;
-  uniform_int_distribution<int> distribution(0,1);
+    const int N = result->params->N;
+    const int k = result->params->k;
+    uniform_int_distribution<int> distribution(0,1);
 
-  for (int i = 0; i < k; ++i)
-      for (int j = 0; j < N; ++j)
-          result->key[i].coefs[j] = distribution(generator);
+    for (int i = 0; i < k; ++i)
+        for (int j = 0; j < N; ++j)
+            result->key[i].coefs[j] = distribution(generator);
 }
 
 
@@ -399,6 +399,16 @@ EXPORT void ringLweApproxPhase(TorusPolynomial* message, const TorusPolynomial* 
 EXPORT void ringLweSymDecrypt(TorusPolynomial* result, const RingLWESample* sample, const RingLWEKey* key, int Msize){
     ringLwePhase(result, sample, key);
     ringLweApproxPhase(result, result, Msize, key->params->N);
+}
+
+
+EXPORT void ringLweSymDecryptT(Torus32 result, const RingLWESample* sample, const RingLWEKey* key, int Msize){
+    TorusPolynomial* phase = new_TorusPolynomial(key->params->N);
+
+    ringLwePhase(phase, sample, key);
+    result = approxPhase(phase->coefsT[0], Msize);
+
+    delete_TorusPolynomial(phase);
 }
 
 

@@ -77,6 +77,50 @@ EXPORT Torus32 dtot32(double d);
  */
 EXPORT double t32tod(Torus32 x);
 
+
+
+
+// TorusPolynomial = 0
+EXPORT void ClearTorusPolynomial(TorusPolynomial* result);
+// TorusPolynomial = random
+EXPORT void UniformTorusPolynomial(TorusPolynomial* result);
+// TorusPolynomial = TorusPolynomial
+EXPORT void CopyTorusPolynomial(TorusPolynomial* __restrict result, const TorusPolynomial* __restrict sample);
+// TorusPolynomial + TorusPolynomial
+EXPORT void AddTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly1, const TorusPolynomial* poly2);
+// TorusPolynomial += TorusPolynomial
+EXPORT void AddToTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly2);
+// TorusPolynomial - TorusPolynomial
+EXPORT void SubTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly1, const TorusPolynomial* poly2);
+// TorusPolynomial -= TorusPolynomial
+EXPORT void SubToTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly2);
+// TorusPolynomial + p*TorusPolynomial
+EXPORT void AddMulZTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly1, int p, const TorusPolynomial* poly2);
+// TorusPolynomial += p*TorusPolynomial
+EXPORT void AddMulZToTorusPolynomial(TorusPolynomial* result, const int p, const TorusPolynomial* poly2);
+// TorusPolynomial - p*TorusPolynomial
+EXPORT void SubMulZTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly1, const int p, const TorusPolynomial* poly2);
+// TorusPolynomial -= p*TorusPolynomial
+EXPORT void SubMulZToTorusPolynomial(TorusPolynomial* result, int p, const TorusPolynomial* poly2);
+
+
+
+// Norme Euclidienne d'un IntPolynomial
+EXPORT int NormEuclidIntPolynomial(const IntPolynomial* poly);
+// Gaussian sample centered in message, with standard deviation sigma
+Torus32 gaussian32(Torus32 message, double sigma);
+
+// Used to approximate the phase to the nearest message possible in the message space
+// The constant Msize will indicate on which message space we are working (how many messages possible)
+Torus32 approxPhase(Torus32 phase, int Msize);
+
+
+
+
+
+
+
+
 /**
  * This function generates a random LWE key for the given parameters.
  * The LWE key for the result must be allocated and initialized
@@ -118,7 +162,10 @@ EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWE
 EXPORT void ringLweKeyGen(RingLWEKey* result);
 EXPORT void ringLweSymEncrypt(RingLWESample* result, TorusPolynomial* message, double alpha, const RingLWEKey* key);
 EXPORT void ringLweSymEncryptT(RingLWESample* result, Torus32 message, double alpha, const RingLWEKey* key);
+EXPORT void ringLwePhase(TorusPolynomial* phase, const RingLWESample* sample, const RingLWEKey* key);
+EXPORT void ringLweApproxPhase(TorusPolynomial* message, const TorusPolynomial* phase, int Msize, int N);
 EXPORT void ringLweSymDecrypt(TorusPolynomial* result, const RingLWESample* sample, const RingLWEKey* key, int Msize);
+EXPORT void ringLweSymDecryptT(Torus32 result, const RingLWESample* sample, const RingLWEKey* key, int Msize);
 
 //Arithmetic operations on RingLWE samples
 /** result = (0,0) */
