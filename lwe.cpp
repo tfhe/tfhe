@@ -823,7 +823,6 @@ EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 
     RingLWESample* acc;
     acc=new_RingLWESample(accum_par);
     RingLweNoiselessTrivial(acc,testvect,accum_par);
-
     for (int i=0;i<N;i++){
 
     }
