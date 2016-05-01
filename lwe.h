@@ -157,18 +157,26 @@ EXPORT void ringGSWAddMuIntH(RingGSWSample* result, const int message, const Rin
 // Result = RingGsw(0)
 EXPORT void ringGSWEncryptZero(RingGSWSample* result, double alpha, const RingGSWKey* key);
 
-
+//fonction de decomposition
+EXPORT void ringLWEDecompH(IntPolynomial* result, const RingLWESample* sample,const RingGSWParams* params);
+EXPORT void Torus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const RingGSWParams* params);
+	
 
 //TODO: Ilaria.Theoreme3.5
 EXPORT void ringGSWExternProduct(RingLWESample* result, const RingGSWSample* a, const RingLWESample* b, const RingLWEParams* rlweParams, const RingGSWParams* rgswParams);
 
-//TODO: mettre les mêmes fonctions arithmétiques que pour LWE
-//      pour les opérations externes, prévoir int et intPolynomial
-//Arithmetic operations on RingLWE samples
-/** result = (0,0) */
-EXPORT void RingGswClear(RingGSWSample* result, const RingGSWParams* params);
+// result=result+ (X^ai-1)*bi (ligne 5 de l'algo)
+EXPORT void ringGSWMulByXaiMinusOne(RingGSWSample* result, int ai, const RingGSWSample* bk, const RingGSWparams* params);
+EXPORT void ringLWEMulByXaiMinusOne(RingLWESample* result, int ai, const RingLWESample* bk, const RingLWEParams* params);
+
+//ligne 5 algo,mult externe
+EXPORT void ringLWEExternMulRLWETo(RingLWESample* accum, RingGSWSample* a,const RingLWEParams* params); //  accum = a \odot accum
+
+
+
+
 /** result = (0,mu) */
-//EXPORT void RingGSwNoiselessTrivial(RingGSWSample* result, const TorusPolynomial* mu, const RingGSWParams* params);
+EXPORT void RingGSwNoiselessTrivial(RingGSWSample* result, const TorusPolynomial* mu, const RingGSWParams* params);
 
 /** result = result + sample */
 EXPORT void RingGswAddTo(RingGSWSample* result, const RingGSWSample* sample, const RingGSWParams* params);
@@ -179,8 +187,6 @@ EXPORT void RingGswAddTo(RingGSWSample* result, const RingGSWSample* sample, con
 //EXPORT void RingGswAddMulTo(RingLWESample* result, int p, const RingLWESample* sample, const RingLWEParams* params);
 /** result = result - p.sample */
 //EXPORT void RingGswSubMulTo(RingLWESample* result, int p, const RingLWESample* sample, const RingLWEParams* params);
-
-
 
 
 //extractions RingLWE -> LWE
@@ -194,7 +200,7 @@ EXPORT void ringGswExtractSample(RingLWESample* result, const RingGSWSample* x);
 //LWE to LWE Single gate bootstrapping
 //TODO: Malika
 EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LWESample* x);
-//fonction clear, AddHto, Mult par X^{ai-1} result=X^{ai-1} \times input (ligne 5 de l'algo),Extract, KeyExtract, SampleExtract, Keyswitch
+//fonction clear, AddHto, Mult par X^{ai-1} ,Extract, KeyExtract, SampleExtract, Keyswitch
 
 
 //these functions call the bootstrapping, assuming that the message space is {0,1/4} 
