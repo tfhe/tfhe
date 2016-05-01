@@ -733,8 +733,12 @@ EXPORT void semiRingBootstrap(LWESample* result, const LWEBootstrappingKey* bk, 
 // EXPORT void ringGswPolyCombination(LWESample* result, const int* combi, const LWESample* samples, const LWEParams* params);
 
 //extractions Ring LWE -> LWE
-// EXPORT void keyExtract(LWEKey* result, const RingLWEKey*); //sans doute un param supplémentaire
-// EXPORT void sampleExtract(LWESample* result, const RingLWESample* x);
+EXPORT void keyExtract(LWEKey* result, const RingLWEKey* key) //sans doute un param supplémentaire
+{
+    assert(result->params->n == key->params->k*key->params->N);
+}
+    
+    // EXPORT void sampleExtract(LWESample* result, const RingLWESample* x);
 
 //extraction RingGSW -> GSW
 // EXPORT void gswKeyExtract(RingLWEKey* result, const RingGSWKey* key); //sans doute un param supplémentaire
