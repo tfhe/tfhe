@@ -593,14 +593,16 @@ ringLWEMulByXaiMinusOne(&result->all_sample[i],ai,&bk->all_sample[i],par);
 //Update l'accumulateur ligne 5 de l'algo toujours
 //void ringLWEDecompH(IntPolynomial* result, const RingLWESample* sample,const RingGSWParams* params);	
 //voi
-EXPORT void ringLWEExternMulRGSWTo(RingLWESample* accum, const RingGSWSample* sample,const RingGSWParams* params)
-{
+EXPORT void ringLWEExternMulRGSWTo(RingLWESample* accum, const RingGSWSample* sample,const RingGSWParams* params){
 RingLWEParams* par=params->ringlwe_params;
+int N=par->N;
 int kpl=par->kpl;
-dec =new IntPolynomial[kpl];
+IntPolynomial* dec =new IntPolynomial_array(kpl,N);
 ringLWEDecompH(dec,accum,params);
+RingLweClear(accum);
+for (int i=0; i<kpl:i++) 
 
-
+    RingLWEAddMultRTo(accum,&dec[i],&sample->all_sample[i],params);
 }
 
 
