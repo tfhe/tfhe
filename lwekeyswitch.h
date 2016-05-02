@@ -6,16 +6,17 @@
 #include "lwesamples.h"
 
 struct LWEKeySwitchKey {
-    int basebit;
-    int base;// peut être restreient a être une petite puissance de 2 ou même égal à 2
-    int n;
-    int l;
-    uint32_t mask;
-    LWEParams* in_params; // params input key 
-    LWEParams* out_params; // params output key 
-    LWESample* ks0_raw;//tableau qui contient tout les LWE samples de taille nlbase
+    int basebit; ///< log_2(base)
+    int base; ///< decomposition base: a power of 2 
+    int n; ///< length of the input key: s'
+    int l; ///< decomposition length
+    uint32_t mask; ///< mask=base-1, used for mod base ops
+    LWEParams* in_params; ///< params of the input key s'
+    LWEParams* out_params; ///< params of the output key s 
+    LWESample* ks0_raw; //tableau qui contient tout les LWE samples de taille nlbase
     LWESample** ks1_raw;// de taille nl  pointe vers un tableau ks0_raw dont les cases sont espaceés de base positions
-    LWESample*** ks;// de taille n pointe vers ks1 un tableau dont les cases sont espaceés de ell positions
+    LWESample*** ks; ///< the keyswitch elements: a n.l.base matrix
+    // de taille n pointe vers ks1 un tableau dont les cases sont espaceés de ell positions
 
 #ifdef __cplusplus
     LWEKeySwitchKey(int basebit, LWEParams* in_params, LWEParams* out_params);
