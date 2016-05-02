@@ -77,6 +77,15 @@ EXPORT Torus32 dtot32(double d);
  */
 EXPORT double t32tod(Torus32 x);
 
+/**
+ * this function converts and rounds a torus32 to a int in [0;Msize[
+ */
+EXPORT int modSwitchFromPhase(Torus32 phase, int Msize);
+/**
+ * this function converts an int in [0;Msize[ mod Msize to a torus32
+ */
+EXPORT Torus32 modSwitchToPhase(int mu, int Msize);
+
 
 
 
@@ -165,7 +174,7 @@ EXPORT void ringLweSymEncryptT(RingLWESample* result, Torus32 message, double al
 EXPORT void ringLwePhase(TorusPolynomial* phase, const RingLWESample* sample, const RingLWEKey* key);
 EXPORT void ringLweApproxPhase(TorusPolynomial* message, const TorusPolynomial* phase, int Msize, int N);
 EXPORT void ringLweSymDecrypt(TorusPolynomial* result, const RingLWESample* sample, const RingLWEKey* key, int Msize);
-EXPORT void ringLweSymDecryptT(Torus32 result, const RingLWESample* sample, const RingLWEKey* key, int Msize);
+EXPORT Torus32 ringLweSymDecryptT(const RingLWESample* sample, const RingLWEKey* key, int Msize);
 
 //Arithmetic operations on RingLWE samples
 /** result = (0,0) */

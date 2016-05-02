@@ -12,7 +12,6 @@
 
 using namespace std;
 static default_random_engine generator;
-static uniform_int_distribution<int> distribution(0,1);
 
 
 
@@ -24,37 +23,45 @@ double approxEquals(Torus32 a, Torus32 b) { return abs(a-b)<10; }
 
 int main(int argc, char** argv) {
     
-    RingLWEParams* params = new_RingLWEParams(512, 2, 0.2, 0.5); //les deux alpha mis un peu au hasard
-    int N = params->N;
-    // int k = params->k;
+    const int N = 512;
+    const int k = 2;
+    const int alpha_min = 0.01;
+    const int alpha_max = 0.02;
+    const int Msize = 7;
+    const double alpha = 0.0275;
+    static uniform_int_distribution<int> distribution(0,Msize-1);
+
+    RingLWEParams* params = new_RingLWEParams(N, k, alpha_min, alpha_max); 
+    //les deux alpha mis un peu au hasard
     RingLWEKey* key = new_RingLWEKey(params);
     RingLWESample* cipher = new_RingLWESample(params);
     RingLWESample* cipherT = new_RingLWESample(params);
 
-    double alpha = 0.;
+
+    //the probability that a sample with stdev alpha decrypts wrongly on
+    //the a Msize message space.
+    double expected_error_proba = 1.-erf(1./(sqrt(2.)*2.*Msize*alpha));
+
+
+    cout << "-------------" << endl;
+    cout << "WARNING:" << endl;
+    cout << "All the tests below are supposed to fail with proba: " << expected_error_proba << endl; 
+    cout << "It is normal and it is part of the test!" << endl; 
+    cout << "-------------" << endl;
+
 
     TorusPolynomial* mu = new_TorusPolynomial(N);
+    TorusPolynomial* phi = new_TorusPolynomial(N);
+    TorusPolynomial* dechif = new_TorusPolynomial(N);
+
     for (int i = 0; i < N; ++i){
         int temp = distribution(generator);
-        mu->coefsT[i] = dtot32((double) temp/2);
+        mu->coefsT[i] = modSwitchToPhase(temp, Msize);
+	//cout << mu->coefsT[i] << endl;
     }
-    Torus32 muT = dtot32(0.5);
-
-    TorusPolynomial* phi = new_TorusPolynomial(N);
-    TorusPolynomial* phiT = new_TorusPolynomial(N);
-    int Msize = 4;  
-
-    TorusPolynomial* dechif = new_TorusPolynomial(N);
-    Torus32 dechifT = 0;
-
-
-
     ringLweKeyGen(key);
     ringLweSymEncrypt(cipher, mu, alpha, key);
-    ringLweSymEncryptT(cipherT, muT, alpha, key);
-
     ringLwePhase(phi, cipher, key);
-    ringLwePhase(phiT, cipherT, key);
 
     ringLweSymDecrypt(dechif, cipher, key, Msize);
     cout << "Test LweSymDecrypt :" << endl;
@@ -64,13 +71,22 @@ int main(int argc, char** argv) {
             cout << dechif->coefsT[i] << " =? " << mu->coefsT[i] << " error!!!" << endl;     
     }
 
-    ringLweSymDecryptT(dechifT, cipherT, key, Msize);
-    cout << "Test LweSymDecryptT :" << endl;
-    if (dechifT != muT)
-            cout << dechifT << " =? " << muT << " Error!!!" << endl;     
 
+    TorusPolynomial* phiT = new_TorusPolynomial(N);
 
+    for (int trial=1; trial<1000; trial++) {
+    Torus32 muT = modSwitchToPhase(distribution(generator), Msize);
+    Torus32 dechifT = 0;
 
+    ringLweSymEncryptT(cipherT, muT, alpha, key);
+    ringLwePhase(phiT, cipherT, key);
+    dechifT = ringLweSymDecryptT(cipherT, key, Msize);
+    
+    if (dechifT != muT) {
+	cout << "Test LweSymDecryptT: trial " << trial << endl;
+	cout << dechifT << " =? " << muT << " Error!!!" << endl; 
+    }    
+    }
 
     /*
     cout << "a = [";
@@ -106,7 +122,6 @@ int main(int argc, char** argv) {
 
 
 
-    delete_RingLWEParams(params); //les deux alpha mis un peu au hasard
     delete_RingLWEKey(key);
     delete_RingLWESample(cipher);
     delete_RingLWESample(cipherT);
@@ -115,6 +130,9 @@ int main(int argc, char** argv) {
     delete_TorusPolynomial(phi);
     delete_TorusPolynomial(phiT);
     delete_TorusPolynomial(dechif);
+
+    //ATTENTION, le params est utilisé dans divers destructeurs, il faut l'effacer en dernier 
+    delete_RingLWEParams(params); 
     
     return 0;
 }

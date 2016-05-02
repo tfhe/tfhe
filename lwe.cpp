@@ -173,19 +173,33 @@ Torus32 gaussian32(Torus32 message, double sigma){
 // Used to approximate the phase to the nearest message possible in the message space
 // The constant Msize will indicate on which message space we are working (how many messages possible)
 Torus32 approxPhase(Torus32 phase, int Msize){
-    uint64_t interv = UINT64_C(-1)/Msize; // width of each intervall
+    uint64_t interv = (UINT64_C(1)<<63)/Msize; // width of each intervall
     uint64_t half_interval = interv/2; // begin of the first intervall
-    uint64_t phase64 = (uint64_t(phase)<<32) + half_interval;
+    uint64_t phase63 = (uint64_t(phase)<<31) + half_interval;
     //floor to the nearest multiples of interv
-    phase64 -= phase64%interv;
+    phase63 -= phase63%interv;
     //rescale to torus32
-    return int32_t(phase64>>32); 
+    return int32_t(phase63>>31); 
 }
 
+// Used to approximate the phase to the nearest message possible in the message space
+// The constant Msize will indicate on which message space we are working (how many messages possible)
+EXPORT int modSwitchFromPhase(Torus32 phase, int Msize){
+    uint64_t interv = (UINT64_C(1)<<63)/Msize; // width of each intervall
+    uint64_t half_interval = interv/2; // begin of the first intervall
+    uint64_t phase63 = (uint64_t(phase)<<31) + half_interval;
+    //floor to the nearest multiples of interv
+    return phase63/interv;
+}
 
-
-
-
+// Used to approximate the phase to the nearest message possible in the message space
+// The constant Msize will indicate on which message space we are working (how many messages possible)
+EXPORT Torus32 modSwitchToPhase(int mu, int Msize){
+    uint64_t interv = (UINT64_C(1)<<63)/Msize; // width of each intervall
+    uint64_t phase63 = mu*interv;
+    //floor to the nearest multiples of interv
+    return phase63>>31;
+}
 
 
 /**
@@ -402,13 +416,14 @@ EXPORT void ringLweSymDecrypt(TorusPolynomial* result, const RingLWESample* samp
 }
 
 
-EXPORT void ringLweSymDecryptT(Torus32 result, const RingLWESample* sample, const RingLWEKey* key, int Msize){
+EXPORT Torus32 ringLweSymDecryptT(const RingLWESample* sample, const RingLWEKey* key, int Msize){
     TorusPolynomial* phase = new_TorusPolynomial(key->params->N);
 
     ringLwePhase(phase, sample, key);
-    result = approxPhase(phase->coefsT[0], Msize);
+    Torus32 result = approxPhase(phase->coefsT[0], Msize);
 
     delete_TorusPolynomial(phase);
+    return result;
 }
 
 
