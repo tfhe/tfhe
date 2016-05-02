@@ -31,7 +31,7 @@ TorusPolynomial::~TorusPolynomial() {
 }
 
 
-void multNaive_plain_aux(Torus32* __restrict result, const int* __restrict poly1, const Torus32* __restrict poly2, const int N) {
+void torusPolynomialMultNaive_plain_aux(Torus32* __restrict result, const int* __restrict poly1, const Torus32* __restrict poly2, const int N) {
     const int _2Nm1 = 2*N-1;
     Torus32 ri;
     for (int i=0; i<N; i++) {
@@ -50,7 +50,7 @@ void multNaive_plain_aux(Torus32* __restrict result, const int* __restrict poly1
     }
 }
 
-void multNaive_aux(Torus32* __restrict result, const int* __restrict poly1, const Torus32* __restrict poly2, const int N) {
+void torusPolynomialMultNaive_aux(Torus32* __restrict result, const int* __restrict poly1, const Torus32* __restrict poly2, const int N) {
     Torus32 ri;
     for (int i=0; i<N; i++) {
 		ri=0;
@@ -69,18 +69,18 @@ void multNaive_aux(Torus32* __restrict result, const int* __restrict poly1, cons
  * with a torus polynomial. (this function should yield exactly the same
  * result as the karatsuba or fft version) 
  */
-EXPORT void multNaive(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2) {
+EXPORT void torusPolynomialMultNaive(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2) {
     const int N = poly1->N;
     assert(result!=poly2);
     assert(poly2->N==N && result->N==N);
-    multNaive_aux(result->coefsT, poly1->coefs, poly2->coefsT, N);
+    torusPolynomialMultNaive_aux(result->coefsT, poly1->coefs, poly2->coefsT, N);
 }
 
 
 
 /**
  * This function multiplies 2 polynomials (an integer poly and a torus poly) by using Karatsuba
- * The karatsuba function is multKaratsuba: it takes in input two polynomials and multiplies them 
+ * The karatsuba function is torusPolynomialMultKaratsuba: it takes in input two polynomials and multiplies them 
  * To do that, it uses the auxiliary function Karatsuba_aux, which is recursive ad which works with 
  * the vectors containing the coefficients of the polynomials (primitive types)
  */
@@ -95,7 +95,7 @@ EXPORT void Karatsuba_aux(Torus32* R, const int* A, const Torus32* B, const int 
 	//it seems to be optimal
 	if (h<=4)
 	{
-	    multNaive_plain_aux(R, A, B, size);
+	    torusPolynomialMultNaive_plain_aux(R, A, B, size);
 	    return;
 	}
 
@@ -123,7 +123,7 @@ EXPORT void Karatsuba_aux(Torus32* R, const int* A, const Torus32* B, const int 
 }
 
 // poly1, poly2 and result are polynomials mod X^N+1
-EXPORT void multKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2){
+EXPORT void torusPolynomialMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2){
 	const int N = poly1->N;
 	Torus32* R = new Torus32[2*N-1];
 	char* buf = new char[16*N]; //that's large enough to store every tmp variables (2*2*N*4)

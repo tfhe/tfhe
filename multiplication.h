@@ -37,7 +37,7 @@ struct TorusPolynomial {
  * with a torus polynomial. (this function should yield exactly the same
  * result as the karatsuba or fft version, but should be slower) 
  */
-EXPORT void multNaive(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+EXPORT void torusPolynomialMultNaive(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
 
 
 
@@ -45,11 +45,11 @@ EXPORT void multNaive(TorusPolynomial* result, const IntPolynomial* poly1, const
  * This function multiplies 2 polynomials (an integer poly and a torus poly)
  * by using Karatsuba
  */
-EXPORT void multKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+EXPORT void torusPolynomialMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
 EXPORT void addMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
 EXPORT void subMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
 
-#define mulRTorusPolynomial multKaratsuba
+#define mulRTorusPolynomial torusPolynomialMultKaratsuba
 #define addMulRToTorusPolynomial addMultKaratsuba
 #define subMulRToTorusPolynomial subMultKaratsuba
 

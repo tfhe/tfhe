@@ -1,6 +1,9 @@
 #ifndef NUMERIC_FUNCTIONS_H
 #define NUMERIC_FUNCTIONS_H
 
+///@file
+///@brief This file contains the operations on numerical types (especially Torus32)
+
 #include <cstdlib>
 #include <iostream>
 #include <random>

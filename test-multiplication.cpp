@@ -48,12 +48,12 @@ int main(int argc, char** argv) {
         clock_t cstart, cend;
 
         cstart = clock();
-        multNaive(resNaive,a,b);  
+        torusPolynomialMultNaive(resNaive,a,b);  
         cend = clock();
         cycles_naive[i] = cend - cstart;
         
         cstart = clock();
-        multKaratsuba(resKaratsuba,a,b);  
+        torusPolynomialMultKaratsuba(resKaratsuba,a,b);  
         cend = clock();
         cycles_karatsuba[i] = cend - cstart;
         
@@ -90,11 +90,11 @@ int main(int argc, char** argv) {
     cyc_karatsuba = cyc_karatsuba/count;
     cyc_fft = cyc_fft/count;
 
-    cout << "multNaive: " << cyc_naive << " clock cycles (average)" << endl;
-    cout << "multNaive time: " << (cyc_naive/CLOCKS_PER_SEC) << " seconds" << endl;
+    cout << "torusPolynomialMultNaive: " << cyc_naive << " clock cycles (average)" << endl;
+    cout << "torusPolynomialMultNaive time: " << (cyc_naive/CLOCKS_PER_SEC) << " seconds" << endl;
     cout << endl;
-    cout << "multKaratsuba: " << cyc_karatsuba << " clock cycles (average)" << endl;
-    cout << "multKaratsuba time: " << (cyc_karatsuba/CLOCKS_PER_SEC) << " seconds" << endl;
+    cout << "torusPolynomialMultKaratsuba: " << cyc_karatsuba << " clock cycles (average)" << endl;
+    cout << "torusPolynomialMultKaratsuba time: " << (cyc_karatsuba/CLOCKS_PER_SEC) << " seconds" << endl;
     cout << endl;
     cout << "multFFT: " << cyc_fft << " clock cycles (average)" << endl;
     cout << "multFFT time: " << (cyc_fft/CLOCKS_PER_SEC) << " seconds" << endl;

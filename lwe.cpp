@@ -13,134 +13,6 @@
 
 using namespace std;
 
-/**
- * This function generates a random LWE key for the given parameters.
- * The LWE key for the result must be allocated and initialized
- * (this means that the parameters are already in the result)
- */
-EXPORT void lweKeyGen(LWEKey* result) {
-  const int n = result->params->n;
-  uniform_int_distribution<int> distribution(0,1);
-
-  for (int i=0; i<n; i++) 
-    result->key[i]=distribution(generator);
-}
-
-
-
-/**
- * This function encrypts message by using key, with stdev alpha
- * The LWE sample for the result must be allocated and initialized
- * (this means that the parameters are already in the result)
- */
-EXPORT void lweSymEncrypt(LWESample* result, Torus32 message, double alpha, const LWEKey* key){
-    const int n = key->params->n;
-
-    result->b = gaussian32(message, alpha); 
-    for (int i = 0; i < n; ++i)
-    {
-        result->a[i] = uniformTorus32_distrib(generator);
-        result->b += result->a[i]*key->key[i];
-    }
-
-    result->current_variance = alpha*alpha;
-}
-
-
-
-/**
- * This function computes the phase of sample by using key : phi = b - a.s
- */
-EXPORT Torus32 lwePhase(const LWESample* sample, const LWEKey* key){
-    const int n = key->params->n;
-    Torus32 axs = 0;
-    const Torus32 *__restrict a = sample->a;
-    const int * __restrict k = key->key;
-
-    for (int i = 0; i < n; ++i) 
-	   axs += a[i]*k[i]; 
-    return sample->b - axs;
-}
-
-
-/**
- * This function computes the decryption of sample by using key
- * The constant Msize indicates the message space and is used to approximate the phase
- */
-EXPORT Torus32 lweSymDecrypt(const LWESample* sample, const LWEKey* key, const int Msize){
-    Torus32 phi;
-
-    phi = lwePhase(sample, key);
-    return approxPhase(phi, Msize);
-}
-
-
-
-
-//Arithmetic operations on LWE samples
-/** result = (0,0) */
-EXPORT void lweClear(LWESample* result, const LWEParams* params){
-    const int n = params->n;
-
-    for (int i = 0; i < n; ++i) result->a[i] = 0;
-    result->b = 0;
-    result->current_variance = 0.;
-}
-
-/** result = (0,mu) */
-EXPORT void lweNoiselessTrivial(LWESample* result, Torus32 mu, const LWEParams* params){
-    const int n = params->n;
-
-    for (int i = 0; i < n; ++i) result->a[i] = 0;
-    result->b = mu;
-    result->current_variance = 0.;
-}
-
-/** result = result + sample */
-EXPORT void lweAddTo(LWESample* result, const LWESample* sample, const LWEParams* params){
-    const int n = params->n;
-
-    for (int i = 0; i < n; ++i) result->a[i] += sample->a[i];
-    result->b += sample->b;
-    result->current_variance += sample->current_variance; 
-}
-
-/** result = result - sample */
-EXPORT void lweSubTo(LWESample* result, const LWESample* sample, const LWEParams* params){
-    const int n = params->n;
-
-    for (int i = 0; i < n; ++i) result->a[i] -= sample->a[i];
-    result->b -= sample->b;
-    result->current_variance += sample->current_variance; 
-}
-
-/** result = result + p.sample */
-EXPORT void lweAddMulTo(LWESample* result, int p, const LWESample* sample, const LWEParams* params){
-    const int n = params->n;
-
-    for (int i = 0; i < n; ++i) result->a[i] += p*sample->a[i];
-    result->b += p*sample->b;
-    result->current_variance += (p*p)*sample->current_variance; 
-}
-
-/** result = result - p.sample */
-EXPORT void lweSubMulTo(LWESample* result, int p, const LWESample* sample, const LWEParams* params){
-    const int n = params->n;
-
-    for (int i = 0; i < n; ++i) result->a[i] -= p*sample->a[i];
-    result->b -= p*sample->b;
-    result->current_variance += (p*p)*sample->current_variance; 
-}
-
-
-EXPORT void createKeySwitchKey(LWEKeySwitchKey* result, const LWEKey* in_key, const LWEKey* out_key);
-//voir si on le garde ou on fait lweAdd (laisser en suspense)
-
-// EXPORT void lweLinearCombination(LWESample* result, const int* combi, const LWESample** samples, const LWEParams* params);
-
-EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWESample* sample);
-
-
 
 
 
@@ -167,7 +39,7 @@ EXPORT void ringLweSymEncrypt(RingLWESample* result, TorusPolynomial* message, d
     
     for (int i = 0; i < k; ++i)
     {
-	UniformTorusPolynomial(&result->a[i]);
+	torusPolynomialUniform(&result->a[i]);
 	addMulRToTorusPolynomial(result->b, &key->key[i], &result->a[i]);
     }
 
@@ -188,7 +60,7 @@ EXPORT void ringLweSymEncryptT(RingLWESample* result, Torus32 message, double al
     
     for (int i = 0; i < k; ++i)
     {
-	UniformTorusPolynomial(&result->a[i]);
+	torusPolynomialUniform(&result->a[i]);
 	addMulRToTorusPolynomial(result->b, &key->key[i], &result->a[i]);
     }
 
@@ -203,7 +75,7 @@ EXPORT void ringLweSymEncryptT(RingLWESample* result, Torus32 message, double al
 EXPORT void ringLwePhase(TorusPolynomial* phase, const RingLWESample* sample, const RingLWEKey* key){
     const int k = key->params->k;
 
-    CopyTorusPolynomial(phase, sample->b); // phi = b
+    torusPolynomialCopy(phase, sample->b); // phi = b
 
     for (int i = 0; i < k; ++i)
         subMulRToTorusPolynomial(phase, &key->key[i], &sample->a[i]);
@@ -242,76 +114,76 @@ EXPORT Torus32 ringLweSymDecryptT(const RingLWESample* sample, const RingLWEKey*
 
 //Arithmetic operations on RingLWE samples
 /** result = (0,0) */
-EXPORT void RingLweClear(RingLWESample* result, const RingLWEParams* params){
+EXPORT void ringLweClear(RingLWESample* result, const RingLWEParams* params){
     const int k = params->k;
 
-    for (int i = 0; i < k; ++i) ClearTorusPolynomial(&result->a[i]);
-    ClearTorusPolynomial(result->b);
+    for (int i = 0; i < k; ++i) torusPolynomialClear(&result->a[i]);
+    torusPolynomialClear(result->b);
     result->current_variance = 0.;
 }
 
 /** result = (0,mu) */
-EXPORT void RingLweNoiselessTrivial(RingLWESample* result, const TorusPolynomial* mu, const RingLWEParams* params){
+EXPORT void ringLweNoiselessTrivial(RingLWESample* result, const TorusPolynomial* mu, const RingLWEParams* params){
     const int k = params->k;
 
-    for (int i = 0; i < k; ++i) ClearTorusPolynomial(&result->a[i]);
-    CopyTorusPolynomial(result->b, mu);
+    for (int i = 0; i < k; ++i) torusPolynomialClear(&result->a[i]);
+    torusPolynomialCopy(result->b, mu);
     result->current_variance = 0.;
 }
 
 /** result = (0,mu) where mu is constant*/
-EXPORT void RingLweNoiselessTrivialT(RingLWESample* result, const Torus32 mu, const RingLWEParams* params){
+EXPORT void ringLweNoiselessTrivialT(RingLWESample* result, const Torus32 mu, const RingLWEParams* params){
     const int k = params->k;
 
-    for (int i = 0; i < k; ++i) ClearTorusPolynomial(&result->a[i]);
-    ClearTorusPolynomial(result->b);
+    for (int i = 0; i < k; ++i) torusPolynomialClear(&result->a[i]);
+    torusPolynomialClear(result->b);
     result->b->coefsT[0]=mu;
     result->current_variance = 0.;
 }
 
 /** result = result + sample */
-EXPORT void RingLweAddTo(RingLWESample* result, const RingLWESample* sample, const RingLWEParams* params){
+EXPORT void ringLweAddTo(RingLWESample* result, const RingLWESample* sample, const RingLWEParams* params){
     const int k = params->k;
 
     for (int i = 0; i < k; ++i) 
-	AddToTorusPolynomial(&result->a[i], &sample->a[i]);
-    AddToTorusPolynomial(result->b, sample->b);
+	torusPolynomialAddTo(&result->a[i], &sample->a[i]);
+    torusPolynomialAddTo(result->b, sample->b);
     result->current_variance += sample->current_variance;
 }
 
 /** result = result - sample */
-EXPORT void RingLweSubTo(RingLWESample* result, const RingLWESample* sample, const RingLWEParams* params){
+EXPORT void ringLweSubTo(RingLWESample* result, const RingLWESample* sample, const RingLWEParams* params){
     const int k = params->k;
 
     for (int i = 0; i < k; ++i) 
-	SubToTorusPolynomial(&result->a[i], &sample->a[i]);
-    SubToTorusPolynomial(result->b, sample->b);
+	torusPolynomialSubTo(&result->a[i], &sample->a[i]);
+    torusPolynomialSubTo(result->b, sample->b);
     result->current_variance += sample->current_variance; 
 }
 
 /** result = result + p.sample */
-EXPORT void RingLweAddMulTo(RingLWESample* result, int p, const RingLWESample* sample, const RingLWEParams* params){
+EXPORT void ringLweAddMulTo(RingLWESample* result, int p, const RingLWESample* sample, const RingLWEParams* params){
     const int k = params->k;
 
     for (int i = 0; i < k; ++i) 
-	AddMulZToTorusPolynomial(&result->a[i], p, &sample->a[i]);
-    AddMulZToTorusPolynomial(result->b, p, sample->b);
+	torusPolynomialAddMulZTo(&result->a[i], p, &sample->a[i]);
+    torusPolynomialAddMulZTo(result->b, p, sample->b);
     result->current_variance += (p*p)*sample->current_variance;
 }
 
 /** result = result - p.sample */
-EXPORT void RingLweSubMulTo(RingLWESample* result, int p, const RingLWESample* sample, const RingLWEParams* params){
+EXPORT void ringLweSubMulTo(RingLWESample* result, int p, const RingLWESample* sample, const RingLWEParams* params){
     const int k = params->k;
 
     for (int i = 0; i < k; ++i) 
-	SubMulZToTorusPolynomial(&result->a[i], p, &sample->a[i]);
-    SubMulZToTorusPolynomial(result->b, p, sample->b);
+	torusPolynomialSubMulZTo(&result->a[i], p, &sample->a[i]);
+    torusPolynomialSubMulZTo(result->b, p, sample->b);
     result->current_variance += (p*p)*sample->current_variance; 
 }
 
 
 /** result = result + p.sample */
-EXPORT void RingLweAddMulRTo(RingLWESample* result, const IntPolynomial* p, const RingLWESample* sample, const RingLWEParams* params){
+EXPORT void ringLweAddMulRTo(RingLWESample* result, const IntPolynomial* p, const RingLWESample* sample, const RingLWEParams* params){
     const int k = params->k;
     
     for (int i = 0; i <= k; ++i)
@@ -344,7 +216,7 @@ EXPORT void ringGSWClear(RingGSWSample* result, const RingGSWParams* params){
     const int kpl = params->kpl;
 
     for (int p = 0; p < kpl; ++p)
-        RingLweClear(&result->all_sample[p], params->ringlwe_params);
+        ringLweClear(&result->all_sample[p], params->ringlwe_params);
 }
 
 // Result += H
@@ -381,7 +253,7 @@ EXPORT void ringGSWAddMuH(RingGSWSample* result, const IntPolynomial* message, c
     for (int p = 0; p < kpl; ++p)
     {
         q = (int) (((double) p)/((double) l)); 
-        AddToTorusPolynomial(&result->all_sample[p].a[q], &message_h[p%l]); // when q=k adds to a[k] = b
+        torusPolynomialAddTo(&result->all_sample[p].a[q], &message_h[p%l]); // when q=k adds to a[k] = b
     }
 
     delete_TorusPolynomial_array(l, message_h);
@@ -402,7 +274,7 @@ EXPORT void ringGSWAddMuIntH(RingGSWSample* result, const int message, const Rin
     }
 }
 
-// Result = RingGsw(0)
+// Result = ringGsw(0)
 EXPORT void ringGSWEncryptZero(RingGSWSample* result, double alpha, const RingGSWKey* key){
     const int N = key->params->ringlwe_params->N;
     const int k = key->params->ringlwe_params->k;
@@ -415,7 +287,7 @@ EXPORT void ringGSWEncryptZero(RingGSWSample* result, double alpha, const RingGS
     
         for (int i = 0; i < k; ++i)
         {
-            UniformTorusPolynomial(&result->all_sample[p].a[i]);
+            torusPolynomialUniform(&result->all_sample[p].a[i]);
             addMulRToTorusPolynomial(result->all_sample[p].b, &key->key[i], &result->all_sample[p].a[i]);
         }
     }
@@ -460,13 +332,13 @@ const int N=par->N;
 const int kpl=params->kpl;
 IntPolynomial* dec =new_IntPolynomial_array(kpl,N);
 ringLWEDecompH(dec,accum,params);
-RingLweClear(accum,par);
+ringLweClear(accum,par);
 for (int i=0; i<kpl;i++) 
-    RingLweAddMulRTo(accum,&dec[i],&sample->all_sample[i],par);
+    ringLweAddMulRTo(accum,&dec[i],&sample->all_sample[i],par);
 }
 
 //crée la clé de KeySwitching
-EXPORT void createKeySwitchKey(LWEKeySwitchKey* result, const LWEKey* in_key, const LWEKey* out_key){
+EXPORT void lweCreateKeySwitchKey(LWEKeySwitchKey* result, const LWEKey* in_key, const LWEKey* out_key){
     const int n=result->n;
     //const int B=result->base;
     const int l=result->l;
@@ -594,7 +466,7 @@ EXPORT void ringGSWExternProduct(RingLWESample* result, const RingGSWSample* a, 
     ringLWEDecompH(dec, b, params);
     
     for (int i = 0; i < kpl; i++) 
-        RingLweAddMulRTo(result, &dec[i], &a->all_sample[i], parlwe);
+        ringLweAddMulRTo(result, &dec[i], &a->all_sample[i], parlwe);
 }
 
 
@@ -648,7 +520,7 @@ EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 
     //RingLWESample* result, const TorusPolynomial* mu, const RingLWEParams* params
     RingLWESample* acc;
     acc=new_RingLWESample(accum_par);
-    RingLweNoiselessTrivial(acc,testvect,accum_par);
+    ringLweNoiselessTrivial(acc,testvect,accum_par);
     for (int i=0;i<N;i++){
 
     }
