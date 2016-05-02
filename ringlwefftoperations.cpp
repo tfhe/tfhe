@@ -12,14 +12,6 @@
 
 using namespace std;
 
-static default_random_engine generator;
-static const int64_t _two31 = INT64_C(1) << 31; // 2^31
-static const int64_t _two32 = INT64_C(1) << 32; // 2^32
-static const double _two32_double = _two32;
-static const double _two31_double = _two31;
-
-static uniform_int_distribution<Torus32> uniformTorus32_distrib(INT32_MIN, INT32_MAX);
-
 
 EXPORT void ringLweToFFTConvert(RingLWESampleFFT* result, const RingLWESample* source, const RingLWEParams* params){
     const int k = params->k;

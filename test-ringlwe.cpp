@@ -11,8 +11,6 @@
 #include "ringlwe.h"
 
 using namespace std;
-static default_random_engine generator;
-
 
 
 
@@ -56,7 +54,7 @@ int main(int argc, char** argv) {
 
     for (int i = 0; i < N; ++i){
         int temp = distribution(generator);
-        mu->coefsT[i] = modSwitchToPhase(temp, Msize);
+        mu->coefsT[i] = modSwitchToTorus32(temp, Msize);
 	//cout << mu->coefsT[i] << endl;
     }
     ringLweKeyGen(key);
@@ -75,7 +73,7 @@ int main(int argc, char** argv) {
     TorusPolynomial* phiT = new_TorusPolynomial(N);
 
     for (int trial=1; trial<1000; trial++) {
-    Torus32 muT = modSwitchToPhase(distribution(generator), Msize);
+    Torus32 muT = modSwitchToTorus32(distribution(generator), Msize);
     Torus32 dechifT = 0;
 
     ringLweSymEncryptT(cipherT, muT, alpha, key);

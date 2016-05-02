@@ -22,6 +22,8 @@
 typedef int32_t Torus32; //avant uint32_t
 //typedef int64_t Torus64; //avant uint64_t
 
+#include "numeric-functions.h"
+
 struct LWEParams;
 struct LWEKey;
 struct LWESample;
@@ -68,65 +70,7 @@ typedef struct SemiRingGSWKey      SemiRingGSWKey;
 typedef struct SemiRingGSWSample   SemiRingGSWSample;
 
 
-/**
- * this function converts a double to a Torus32
- */
-EXPORT Torus32 dtot32(double d);
-/**
- * this function converts a torus32 to a double in [-0.5;0.5]
- */
-EXPORT double t32tod(Torus32 x);
-
-/**
- * this function converts and rounds a torus32 to a int in [0;Msize[
- */
-EXPORT int modSwitchFromPhase(Torus32 phase, int Msize);
-/**
- * this function converts an int in [0;Msize[ mod Msize to a torus32
- */
-EXPORT Torus32 modSwitchToPhase(int mu, int Msize);
-
-
-
-
-// TorusPolynomial = 0
-EXPORT void ClearTorusPolynomial(TorusPolynomial* result);
-// TorusPolynomial = random
-EXPORT void UniformTorusPolynomial(TorusPolynomial* result);
-// TorusPolynomial = TorusPolynomial
-EXPORT void CopyTorusPolynomial(TorusPolynomial* __restrict result, const TorusPolynomial* __restrict sample);
-// TorusPolynomial + TorusPolynomial
-EXPORT void AddTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly1, const TorusPolynomial* poly2);
-// TorusPolynomial += TorusPolynomial
-EXPORT void AddToTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly2);
-// TorusPolynomial - TorusPolynomial
-EXPORT void SubTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly1, const TorusPolynomial* poly2);
-// TorusPolynomial -= TorusPolynomial
-EXPORT void SubToTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly2);
-// TorusPolynomial + p*TorusPolynomial
-EXPORT void AddMulZTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly1, int p, const TorusPolynomial* poly2);
-// TorusPolynomial += p*TorusPolynomial
-EXPORT void AddMulZToTorusPolynomial(TorusPolynomial* result, const int p, const TorusPolynomial* poly2);
-// TorusPolynomial - p*TorusPolynomial
-EXPORT void SubMulZTorusPolynomial(TorusPolynomial* result, const TorusPolynomial* poly1, const int p, const TorusPolynomial* poly2);
-// TorusPolynomial -= p*TorusPolynomial
-EXPORT void SubMulZToTorusPolynomial(TorusPolynomial* result, int p, const TorusPolynomial* poly2);
-
-
-
-// Norme Euclidienne d'un IntPolynomial
-EXPORT int NormEuclidIntPolynomial(const IntPolynomial* poly);
-// Gaussian sample centered in message, with standard deviation sigma
-Torus32 gaussian32(Torus32 message, double sigma);
-
-// Used to approximate the phase to the nearest message possible in the message space
-// The constant Msize will indicate on which message space we are working (how many messages possible)
-Torus32 approxPhase(Torus32 phase, int Msize);
-
-
-
-
-
+#include "toruspolynomial-functions.h"
 
 
 
