@@ -136,7 +136,7 @@ EXPORT void ringGSWExternProduct(RingLWESample* result, const RingGSWSample* a, 
 
 // result=result+ (X^ai-1)*bi (ligne 5 de l'algo)
 EXPORT void ringGSWMulByXaiMinusOne(RingGSWSample* result, int ai, const RingGSWSample* bk, const RingGSWParams* params);
-EXPORT void ringLWEMulByXaiMinusOne(RingLWESample* result, int ai, const RingLWESample* bk, const RingLWEParams* params);
+EXPORT void ringLWEMulByXaiMinusOne(RingLWESample* result, int ai, const RingGSWSample* bk, const RingLWEParams* params);
 
 //ligne 5 algo,mult externe
 EXPORT void ringLWEExternMulRGSWTo(RingLWESample* accum, const RingGSWSample* sample,const RingGSWParams* params);

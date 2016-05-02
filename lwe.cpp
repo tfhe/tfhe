@@ -336,7 +336,7 @@ for (int i=a;i<N;i++)//sur que N>i-a>=0
 
 
 //mult externe de X^ai-1 par bki
-EXPORT void ringLWEMulByXaiMinusOne(RingLWESample* result, int ai, const RingLWESample* bk, const RingLWEParams* params){
+EXPORT void ringLWEMulByXaiMinusOne(RingLWESample* result, int ai, const RingGSWSample* bk, const RingLWEParams* params){
     const int k=params->k;
     for(int i=0;i<=k;i++)
         TorusPolynomialMulByXaiMinusOne(&result->a[i],ai,&bk->a[i]);
@@ -439,12 +439,6 @@ EXPORT int ringGswSymDecryptInt(const RingGSWSample* sample, const RingGSWKey* k
 // EXPORT void ringLWEExternMulRLWETo(RLWE* accum, GSW* a); //  accum = a \odot accum
 
 
-
-
-
-
-
-
 //fonction de decomposition
 EXPORT void ringLWEDecompH(IntPolynomial* result, const RingLWESample* sample, const RingGSWParams* params){
     const int k = params->ringlwe_params->k;
@@ -474,15 +468,6 @@ EXPORT void Torus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomia
     }
 }
     
-
-
-
-
-
-
-
-
-
 
 //TODO: Ilaria.
 EXPORT void ringGSWExternProduct(RingLWESample* result, const RingGSWSample* a, const RingLWESample* b, const RingGSWParams* params){
@@ -521,24 +506,37 @@ return (xx>>32)%Nx2;
 }
 
 
+
+EXPORT void sampleExtract(LWESample* result, const RingLWESample* x, const LWEParams* params,  const RingLWEParams* rparams) {
+    const int N = rparams->N;
+    const int k = rparams->k;
+    const int n = params->n;
+    assert(n == k*N);
+    for (int i=0; i<k; i++) {
+    	for (int j=0; j<N; j++)
+    	    result->a[i*N+j]=x->a[i].coefsT[j];
+    }
+    result->b=x->b->coefsT[0];
+}
+
 //LWE to LWE Single gate bootstrapping
 //TODO: Malika
 EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LWESample* x){
-    Torus32 a=(mu1-mu0)/2;
+    Torus32 aa=(mu1-mu0)/2;
     const int N=bk->accum_params->N;
     
     const int Ns2=N/2;
     const uint64_t Nx2= 2*N;
-    int barb=bar(x->b,Nx2);//TODO
+    int barb=bar(x->b,Nx2);
     
     RingLWEParams* accum_par=bk->accum_params;
     TorusPolynomial* testvect=new_TorusPolynomial(N);//je definis le test vector (multiplié par a inclus !
     TorusPolynomial* testvectbis=new_TorusPolynomial(N);
     for (int i=0;i<Ns2;i++){
-	   testvect->coefsT[i]=a;
+	   testvect->coefsT[i]=aa;
     }    
     for (int i=Ns2;i<N;i++){
-	   testvect->coefsT[i]=-a;
+	   testvect->coefsT[i]=-aa;
     }
     for (int i=0;i< barb;i++)
 	   testvectbis->coefsT[i]=-testvect->coefsT[i-barb+N];
@@ -550,8 +548,20 @@ EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 
     acc=new_RingLWESample(accum_par);
     ringLweNoiselessTrivial(acc,testvect,accum_par);
     for (int i=0;i<N;i++){
-
-    }
+int bara=bar(x->a[i],Nx2);
+RingGSWSample* temp;
+ringGSWMulByXaiMinusOne(temp,bara,&bk->bk[i],bk->bk_params);
+ringGSWAddH(temp,bk->bk_params);
+ringGSWExternProduct(acc,temp,acc,bk->bk_params);
+}
+LWESample* u;
+sampleExtract(result,acc,bk->params,accum_par);
+lweNoiselessTrivial(u,aa,bk->params);
+for (int i=0;i<bk->params->n;i++){
+result->a[i]=u->a[i]+result->a[i];
+  }
+result->b=u->b+result->b;
+lweKeySwitch(result,bk->ks,result);
 }
 
 
@@ -588,17 +598,7 @@ EXPORT void keyExtract(LWEKey* result, const RingLWEKey* key) //sans doute un pa
     }
 }
     
-EXPORT void sampleExtract(LWESample* result, const RingLWESample* x, const LWEParams* params,  const RingLWEParams* rparams) {
-    const int N = rparams->N;
-    const int k = rparams->k;
-    const int n = params->n;
-    assert(n == k*N);
-    for (int i=0; i<k; i++) {
-    	for (int j=0; j<N; j++)
-    	    result->a[i*N+j]=x->a[i].coefsT[j];
-    }
-    result->b=x->b->coefsT[0];
-}
+
 
 //extraction RingGSW -> GSW
 // EXPORT void gswKeyExtract(RingLWEKey* result, const RingGSWKey* key); //sans doute un param supplémentaire
