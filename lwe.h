@@ -89,6 +89,8 @@ EXPORT Torus32 ringLweSymDecryptT(const RingLWESample* sample, const RingLWEKey*
 //Arithmetic operations on RingLWE samples
 /** result = (0,0) */
 EXPORT void ringLweClear(RingLWESample* result, const RingLWEParams* params);
+/** result = sample */
+EXPORT void ringLweCopy(RingLWESample* result, const RingLWESample* sample, const RingLWEParams* params);
 /** result = (0,mu) */
 EXPORT void ringLweNoiselessTrivial(RingLWESample* result, const TorusPolynomial* mu, const RingLWEParams* params);
 /** result = result + sample */

@@ -17,7 +17,7 @@ LWEKeySwitchKey::LWEKeySwitchKey(int basebit, LWEParams* in_params, LWEParams* o
    
     for (int p = 0; p < n*l; ++p)
 	    ks1_raw[p] = ks0_raw + base*p;
-	 for (int p = 0; p < n; ++p)
+	for (int p = 0; p < n; ++p)
 	    ks[p] = ks1_raw + l*p;
 }
 

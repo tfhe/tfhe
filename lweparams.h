@@ -12,8 +12,8 @@ struct LWEParams {
 
 
 
-        //since all members are declared constant, a constructor is 
-        //required in the structure.
+//since all members are declared constant, a constructor is 
+//required in the structure.
 #ifdef __cplusplus
 	LWEParams(int n, double alpha_min, double alpha_max);
 	~LWEParams();

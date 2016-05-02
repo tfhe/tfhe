@@ -31,6 +31,8 @@ EXPORT double t32tod(Torus32 x) {
 
 // Used to approximate the phase to the nearest message possible in the message space
 // The constant Msize will indicate on which message space we are working (how many messages possible)
+//
+// "travailler sur 63 bits au lieu de 64, car dans nos cas pratiques, c'est plus précis"
 EXPORT Torus32 approxPhase(Torus32 phase, int Msize){
     uint64_t interv = (UINT64_C(1)<<63)/Msize; // width of each intervall
     uint64_t half_interval = interv/2; // begin of the first intervall
