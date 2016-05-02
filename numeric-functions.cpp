@@ -34,13 +34,13 @@ EXPORT double t32tod(Torus32 x) {
 //
 // "travailler sur 63 bits au lieu de 64, car dans nos cas pratiques, c'est plus précis"
 EXPORT Torus32 approxPhase(Torus32 phase, int Msize){
-    uint64_t interv = (UINT64_C(1)<<63)/Msize; // width of each intervall
+    uint64_t interv = ((UINT64_C(1)<<63)/Msize)*2; // width of each intervall
     uint64_t half_interval = interv/2; // begin of the first intervall
-    uint64_t phase63 = (uint64_t(phase)<<31) + half_interval;
+    uint64_t phase64 = (uint64_t(phase)<<32) + half_interval;
     //floor to the nearest multiples of interv
-    phase63 -= phase63%interv;
+    phase64 -= phase64%interv;
     //rescale to torus32
-    return int32_t(phase63>>31); 
+    return int32_t(phase64>>32); 
 }
 
 // Used to approximate the phase to the nearest message possible in the message space
@@ -48,11 +48,11 @@ EXPORT Torus32 approxPhase(Torus32 phase, int Msize){
 //
 // "travailler sur 63 bits au lieu de 64, car dans nos cas pratiques, c'est plus précis"
 EXPORT int modSwitchFromTorus32(Torus32 phase, int Msize){
-    uint64_t interv = (UINT64_C(1)<<63)/Msize; // width of each intervall
+    uint64_t interv = ((UINT64_C(1)<<63)/Msize)*2; // width of each intervall
     uint64_t half_interval = interv/2; // begin of the first intervall
-    uint64_t phase63 = (uint64_t(phase)<<31) + half_interval;
+    uint64_t phase64 = (uint64_t(phase)<<32) + half_interval;
     //floor to the nearest multiples of interv
-    return phase63/interv;
+    return phase64/interv;
 }
 
 // Used to approximate the phase to the nearest message possible in the message space
@@ -60,9 +60,9 @@ EXPORT int modSwitchFromTorus32(Torus32 phase, int Msize){
 //
 // "travailler sur 63 bits au lieu de 64, car dans nos cas pratiques, c'est plus précis"
 EXPORT Torus32 modSwitchToTorus32(int mu, int Msize){
-    uint64_t interv = (UINT64_C(1)<<63)/Msize; // width of each intervall
-    uint64_t phase63 = mu*interv;
+    uint64_t interv = ((UINT64_C(1)<<63)/Msize)*2; // width of each intervall
+    uint64_t phase64 = mu*interv;
     //floor to the nearest multiples of interv
-    return phase63>>31;
+    return phase64>>32;
 }
 

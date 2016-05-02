@@ -5,8 +5,6 @@
 ///@brief This file contains the operations on polynomials
 
 
-#include <cassert>
-#include <cmath>
 #include "lwe.h"
 #include "polynomials.h"
 

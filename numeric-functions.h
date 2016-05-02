@@ -4,19 +4,17 @@
 ///@file
 ///@brief This file contains the operations on numerical types (especially Torus32)
 
-#include <cstdlib>
-#include <iostream>
-#include <random>
-#include <cassert>
 #include "lwe.h"
-#include "numeric-functions.h"
 
+#ifdef __cplusplus
+#include <random>
 extern std::default_random_engine generator;
 extern std::uniform_int_distribution<Torus32> uniformTorus32_distrib;
 static const int64_t _two31 = INT64_C(1) << 31; // 2^31
 static const int64_t _two32 = INT64_C(1) << 32; // 2^32
 static const double _two32_double = _two32;
 static const double _two31_double = _two31;
+#endif
 
 /** 
  * modular gaussian distribution of standard deviation sigma centered on
