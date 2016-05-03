@@ -532,21 +532,21 @@ EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 
     //RingLWESample* result, const TorusPolynomial* mu, const RingLWEParams* params
     RingLWESample* acc;
     acc=new_RingLWESample(accum_par);
-    ringLweNoiselessTrivial(acc,testvect,accum_par);
+    ringLweNoiselessTrivial(acc,testvectbis,accum_par);
+RingGSWSample* temp=new_RingGSWSample(bk->bk_params);
     for (int i=0;i<N;i++){
 int bara=bar(x->a[i],Nx2);
-RingGSWSample* temp;
 ringGSWMulByXaiMinusOne(temp,bara,bk->bk,bk->bk_params);
 ringGSWAddH(temp,bk->bk_params);
-ringGSWExternProduct(acc,temp,acc,bk->bk_params);
+ringLWEExternMulRGSWTo(acc,temp,bk->bk_params);
 }
-LWESample* u;//=LWESample(bk->params);
+//LWESample* u=new_LWESample(bk->params);
 sampleExtract(result,acc,bk->params,accum_par);
-lweNoiselessTrivial(u,aa,bk->params);
+/*lweNoiselessTrivial(u,aa,bk->params);
 for (int i=0;i<bk->params->n;i++){
 result->a[i]=u->a[i]+result->a[i];
-  }
-result->b=u->b+result->b;
+  }*/
+result->b=result->b+aa;
 lweKeySwitch(result,bk->ks,result);
 }
 
