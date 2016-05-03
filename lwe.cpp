@@ -485,11 +485,11 @@ EXPORT void ringGswExtractKey(SemiRingGSWSample* result, const RingGSWKey* key);
 EXPORT void ringGswExtractSample(RingLWESample* result, const RingGSWSample* x);
 
 
-//calcule l'arrondi inférieur d'un élément Torus32
+/*//calcule l'arrondi inférieur d'un élément Torus32
 int bar(uint64_t b, uint64_t Nx2){
 uint64_t xx=b*Nx2+(1l<<31);
 return (xx>>32)%Nx2;
-}
+}*/
 
 
 
@@ -513,8 +513,8 @@ EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 
     
     const int Ns2=N/2;
     const uint64_t Nx2= 2*N;
-    int barb=bar(x->b,Nx2);
-    
+
+    int barb=modSwitchFromTorus32(x->b,Nx2);
     RingLWEParams* accum_par=bk->accum_params;
     TorusPolynomial* testvect=new_TorusPolynomial(N);//je definis le test vector (multiplié par a inclus !
     TorusPolynomial* testvectbis=new_TorusPolynomial(N);
@@ -535,7 +535,7 @@ EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 
     ringLweNoiselessTrivial(acc,testvectbis,accum_par);
 RingGSWSample* temp=new_RingGSWSample(bk->bk_params);
     for (int i=0;i<N;i++){
-int bara=bar(x->a[i],Nx2);
+int bara=modSwitchFromTorus32(x->a[i],Nx2);
 ringGSWMulByXaiMinusOne(temp,bara,bk->bk,bk->bk_params);
 ringGSWAddH(temp,bk->bk_params);
 ringLWEExternMulRGSWTo(acc,temp,bk->bk_params);
