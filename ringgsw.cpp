@@ -72,7 +72,7 @@ RingGSWSampleFFT::RingGSWSampleFFT(const RingGSWParams* params): k(params->ringl
     for (int p = 0; p < (k+1); ++p)
 	sample[p] = all_samples + p*l;
 
-    current_variance = 0;
+    //current_variance = 0;
 }
 
 RingGSWSampleFFT::~RingGSWSampleFFT() {

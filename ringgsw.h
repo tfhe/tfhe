@@ -40,11 +40,11 @@ struct RingGSWKey {
 
 
 struct RingGSWSample {
+    RingLWESample* all_sample; ///< RingLWESample* all_sample; (k+1)l RingLWE Sample 
+    RingLWESample** bloc_sample;///< accès optionnel aux différents blocs de taille l.
+    // double current_variance;
     const int k;
     const int l;
-    RingLWESample* all_sample; ///< RingLWESample* all_sample; (k+1)\ell RingLWE Sample 
-    RingLWESample** bloc_sample;///< accés optionnel qui permet d'accéder aux différents blocs à l'intérieur.
-    // double current_variance;
 
 #ifdef __cplusplus
     RingGSWSample(const RingGSWParams* params);
@@ -55,11 +55,11 @@ struct RingGSWSample {
 };
 
 struct RingGSWSampleFFT {
+    RingLWESampleFFT* all_samples; ///< RingLWESample* all_sample; (k+1)l RingLWE Sample 
+    RingLWESampleFFT** sample; ///< accès optionnel aux différents blocs de taille l.
+    //double current_variance;
     const int k;
     const int l;
-    RingLWESampleFFT* all_samples;
-    RingLWESampleFFT** sample;
-    double current_variance;
 
 #ifdef __cplusplus
     RingGSWSampleFFT(const RingGSWParams* params);

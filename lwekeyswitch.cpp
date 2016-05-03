@@ -1,15 +1,14 @@
 #include "lwekeyswitch.h"
 
 
-LWEKeySwitchKey::LWEKeySwitchKey(int basebit, LWEParams* in_params, LWEParams* out_params){
+LWEKeySwitchKey::LWEKeySwitchKey(int basebit, int kslength, const LWEParams* in_params, const LWEParams* out_params){
     this->basebit=basebit;
     this->base=1<<basebit;   
     this->in_params=in_params; 
     this->out_params=out_params; 
     this->mask= base-1;
     int n=in_params->n;
-    int l=(32+basebit-1)/basebit; // \ell=partie entiere superieure 32/basebit 
-//garantit qu'on a au moins 32 bits de precision
+    int l=kslength;
     ks0_raw = new_LWESample_array(n*l*base,out_params);
     ks1_raw = new LWESample*[n*l];
     ks = new LWESample**[n];

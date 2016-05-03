@@ -20,6 +20,7 @@ using namespace std;
 double approxEquals(Torus32 a, Torus32 b) { return abs(a-b)<10; }
 
 int main(int argc, char** argv) {
+    for (int i=0; i<20000; i++) uniformTorus32_distrib(generator);
     
     const int N = 512;
     const int k = 2;

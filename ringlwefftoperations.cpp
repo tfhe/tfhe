@@ -16,17 +16,15 @@ using namespace std;
 EXPORT void ringLweToFFTConvert(RingLWESampleFFT* result, const RingLWESample* source, const RingLWEParams* params){
     const int k = params->k;
     
-    for (int i = 0; i < k; ++i)
+    for (int i = 0; i <= k; ++i)
 	TorusPolynomial_fft(result->a+i,source->a+i);
-    TorusPolynomial_fft(result->b, source->b);
 }
 
 EXPORT void ringLweFromFFTConvert(RingLWESample* result, const RingLWESampleFFT* source, const RingLWEParams* params){
     const int k = params->k;
     
-    for (int i = 0; i < k; ++i)
+    for (int i = 0; i <= k; ++i)
 	TorusPolynomial_ifft(result->a+i,source->a+i);
-    TorusPolynomial_ifft(result->b, source->b);
 }
 
 
@@ -36,8 +34,7 @@ EXPORT void ringLweFromFFTConvert(RingLWESample* result, const RingLWESampleFFT*
 EXPORT void ringLweFFTClear(RingLWESampleFFT* result, const RingLWEParams* params){
     int k = params->k;
 
-    for (int i = 0; i < k; ++i) clearLagrangeHalfCPolynomial(&result->a[i]);
-    clearLagrangeHalfCPolynomial(result->b);
+    for (int i = 0; i <= k; ++i) clearLagrangeHalfCPolynomial(&result->a[i]);
     result->current_variance = 0.;
 }
 
@@ -45,8 +42,7 @@ EXPORT void ringLweFFTClear(RingLWESampleFFT* result, const RingLWEParams* param
 EXPORT void ringLweFFTNoiselessTrivial(RingLWESampleFFT* result, const TorusPolynomial* mu, const RingLWEParams* params){
     int k = params->k;
 
-    for (int i = 0; i < k; ++i) clearLagrangeHalfCPolynomial(&result->a[i]);
-    TorusPolynomial_fft(result->b, mu);
+    for (int i = 0; i <= k; ++i) clearLagrangeHalfCPolynomial(&result->a[i]);
     result->current_variance = 0.;
 }
 

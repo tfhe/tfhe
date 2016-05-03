@@ -27,6 +27,33 @@ EXPORT IntPolynomial* new_IntPolynomial_array(int nbelts, const int N);
 //(equivalent of the C++ delete)
 EXPORT void delete_IntPolynomial(IntPolynomial* obj);
 EXPORT void delete_IntPolynomial_array(int nbelts, IntPolynomial* obj);
+//allocate memory space for a LWEBootstrappingKey
+EXPORT LWEBootstrappingKey* alloc_LWEBootstrappingKey();
+EXPORT LWEBootstrappingKey* alloc_LWEBootstrappingKey_array(int nbelts);
+
+//free memory space for a LWEBootstrappingKey
+EXPORT void free_LWEBootstrappingKey(LWEBootstrappingKey* ptr);
+EXPORT void free_LWEBootstrappingKey_array(int nbelts, LWEBootstrappingKey* ptr);
+
+//initialize the LWEBootstrappingKey structure
+//(equivalent of the C++ constructor)
+EXPORT void init_LWEBootstrappingKey(LWEBootstrappingKey* obj, const LWEParams* in_out_params, const RingGSWParams* bk_params);
+EXPORT void init_LWEBootstrappingKey_array(int nbelts, LWEBootstrappingKey* obj, const LWEParams* in_out_params, const RingGSWParams* bk_params);
+
+//destroys the LWEBootstrappingKey structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_LWEBootstrappingKey(LWEBootstrappingKey* obj);
+EXPORT void destroy_LWEBootstrappingKey_array(int nbelts, LWEBootstrappingKey* obj);
+ 
+//allocates and initialize the LWEBootstrappingKey structure
+//(equivalent of the C++ new)
+EXPORT LWEBootstrappingKey* new_LWEBootstrappingKey(const LWEParams* in_out_params, const RingGSWParams* bk_params);
+EXPORT LWEBootstrappingKey* new_LWEBootstrappingKey_array(int nbelts, const LWEParams* in_out_params, const RingGSWParams* bk_params);
+
+//destroys and frees the LWEBootstrappingKey structure
+//(equivalent of the C++ delete)
+EXPORT void delete_LWEBootstrappingKey(LWEBootstrappingKey* obj);
+EXPORT void delete_LWEBootstrappingKey_array(int nbelts, LWEBootstrappingKey* obj);
 //allocate memory space for a LWEKey
 EXPORT LWEKey* alloc_LWEKey();
 EXPORT LWEKey* alloc_LWEKey_array(int nbelts);
@@ -64,8 +91,8 @@ EXPORT void free_LWEKeySwitchKey_array(int nbelts, LWEKeySwitchKey* ptr);
 
 //initialize the LWEKeySwitchKey structure
 //(equivalent of the C++ constructor)
-EXPORT void init_LWEKeySwitchKey(LWEKeySwitchKey* obj, int base, LWEParams* in_params, LWEParams* out_params);
-EXPORT void init_LWEKeySwitchKey_array(int nbelts, LWEKeySwitchKey* obj, int base, LWEParams* in_params, LWEParams* out_params);
+EXPORT void init_LWEKeySwitchKey(LWEKeySwitchKey* obj, int basebit, int kslength, const LWEParams* in_params, const LWEParams* out_params);
+EXPORT void init_LWEKeySwitchKey_array(int nbelts, LWEKeySwitchKey* obj, int basebit, int kslength, const LWEParams* in_params, const LWEParams* out_params);
 
 //destroys the LWEKeySwitchKey structure
 //(equivalent of the C++ destructor)
@@ -74,8 +101,8 @@ EXPORT void destroy_LWEKeySwitchKey_array(int nbelts, LWEKeySwitchKey* obj);
  
 //allocates and initialize the LWEKeySwitchKey structure
 //(equivalent of the C++ new)
-EXPORT LWEKeySwitchKey* new_LWEKeySwitchKey(int base, LWEParams* in_params, LWEParams* out_params);
-EXPORT LWEKeySwitchKey* new_LWEKeySwitchKey_array(int nbelts, int base, LWEParams* in_params, LWEParams* out_params);
+EXPORT LWEKeySwitchKey* new_LWEKeySwitchKey(int basebit, int kslength, const LWEParams* in_params, const LWEParams* out_params);
+EXPORT LWEKeySwitchKey* new_LWEKeySwitchKey_array(int nbelts, int basebit, int kslength, const LWEParams* in_params, const LWEParams* out_params);
 
 //destroys and frees the LWEKeySwitchKey structure
 //(equivalent of the C++ delete)
@@ -243,6 +270,33 @@ EXPORT RingGSWSample* new_RingGSWSample_array(int nbelts, const RingGSWParams* p
 //(equivalent of the C++ delete)
 EXPORT void delete_RingGSWSample(RingGSWSample* obj);
 EXPORT void delete_RingGSWSample_array(int nbelts, RingGSWSample* obj);
+//allocate memory space for a RingGSWSampleFFT
+EXPORT RingGSWSampleFFT* alloc_RingGSWSampleFFT();
+EXPORT RingGSWSampleFFT* alloc_RingGSWSampleFFT_array(int nbelts);
+
+//free memory space for a RingGSWSampleFFT
+EXPORT void free_RingGSWSampleFFT(RingGSWSampleFFT* ptr);
+EXPORT void free_RingGSWSampleFFT_array(int nbelts, RingGSWSampleFFT* ptr);
+
+//initialize the RingGSWSampleFFT structure
+//(equivalent of the C++ constructor)
+EXPORT void init_RingGSWSampleFFT(RingGSWSampleFFT* obj, const RingGSWParams* params);
+EXPORT void init_RingGSWSampleFFT_array(int nbelts, RingGSWSampleFFT* obj, const RingGSWParams* params);
+
+//destroys the RingGSWSampleFFT structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_RingGSWSampleFFT(RingGSWSampleFFT* obj);
+EXPORT void destroy_RingGSWSampleFFT_array(int nbelts, RingGSWSampleFFT* obj);
+ 
+//allocates and initialize the RingGSWSampleFFT structure
+//(equivalent of the C++ new)
+EXPORT RingGSWSampleFFT* new_RingGSWSampleFFT(const RingGSWParams* params);
+EXPORT RingGSWSampleFFT* new_RingGSWSampleFFT_array(int nbelts, const RingGSWParams* params);
+
+//destroys and frees the RingGSWSampleFFT structure
+//(equivalent of the C++ delete)
+EXPORT void delete_RingGSWSampleFFT(RingGSWSampleFFT* obj);
+EXPORT void delete_RingGSWSampleFFT_array(int nbelts, RingGSWSampleFFT* obj);
 //allocate memory space for a RingLWEKey
 EXPORT RingLWEKey* alloc_RingLWEKey();
 EXPORT RingLWEKey* alloc_RingLWEKey_array(int nbelts);

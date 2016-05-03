@@ -515,7 +515,7 @@ EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 
     const uint64_t Nx2= 2*N;
 
     int barb=modSwitchFromTorus32(x->b,Nx2);
-    RingLWEParams* accum_par=bk->accum_params;
+    const RingLWEParams* accum_par=bk->accum_params;
     TorusPolynomial* testvect=new_TorusPolynomial(N);//je definis le test vector (multiplié par a inclus !
     TorusPolynomial* testvectbis=new_TorusPolynomial(N);
     for (int i=0;i<Ns2;i++){
@@ -541,7 +541,7 @@ ringGSWAddH(temp,bk->bk_params);
 ringLWEExternMulRGSWTo(acc,temp,bk->bk_params);
 }
 //LWESample* u=new_LWESample(bk->params);
-sampleExtract(result,acc,bk->params,accum_par);
+sampleExtract(result,acc,bk->in_out_params,accum_par);
 /*lweNoiselessTrivial(u,aa,bk->params);
 for (int i=0;i<bk->params->n;i++){
 result->a[i]=u->a[i]+result->a[i];

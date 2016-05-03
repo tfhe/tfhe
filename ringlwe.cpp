@@ -11,7 +11,12 @@
 //};
 
 RingLWEParams::RingLWEParams(int N, int k, double alpha_min, double alpha_max):
-    N(N),k(k),alpha_min(alpha_min),alpha_max(alpha_max) {}
+    N(N),
+    k(k),
+    alpha_min(alpha_min),
+    alpha_max(alpha_max),
+    extracted_lweparams(N*k,alpha_min, alpha_max)
+{}
 
 RingLWEParams::~RingLWEParams() {}
 
