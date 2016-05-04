@@ -28,7 +28,9 @@ struct RingGSWParams {
 
 struct RingGSWKey {
     const RingGSWParams* params; ///< the parameters
+    const RingLWEParams* ringlwe_params; ///< the ringlwe params of each rows
     IntPolynomial* key; ///< the key (array of k polynomials)
+    RingLWEKey ringlwe_key;
 
 #ifdef __cplusplus
     RingGSWKey(const RingGSWParams* params);

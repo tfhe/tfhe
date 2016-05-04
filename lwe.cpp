@@ -209,15 +209,9 @@ EXPORT void ringLweAddMulRTo(RingLWESample* result, const IntPolynomial* p, cons
 
 
 // RingGSW
-/** meme chose que RingLWE */
+/** generate a ringgsw key (in fact, a ringlwe key) */
 EXPORT void ringGswKeyGen(RingGSWKey* result){
-    const int N = result->params->ringlwe_params->N;
-    const int k = result->params->ringlwe_params->k;
-    uniform_int_distribution<int> distribution(0,1);
-
-    for (int i = 0; i < k; ++i)
-        for (int j = 0; j < N; ++j)
-            result->key[i].coefs[j] = distribution(generator);
+    ringLweKeyGen(&result->ringlwe_key);
 }
 
 

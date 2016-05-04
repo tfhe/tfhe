@@ -39,13 +39,12 @@ RingGSWParams::~RingGSWParams() {
 
 // same key as in RingLWE
 RingGSWKey::RingGSWKey(const RingGSWParams* params):
-    params(params)
+    params(params),ringlwe_params(params->ringlwe_params),ringlwe_key(ringlwe_params)
 {
-    key = new_IntPolynomial_array(params->ringlwe_params->k,params->ringlwe_params->N);   
+    key = ringlwe_key.key;
 }
 
 RingGSWKey::~RingGSWKey() {
-    delete_IntPolynomial_array(params->ringlwe_params->k,key);
 }
 
 
