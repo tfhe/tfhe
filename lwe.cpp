@@ -208,6 +208,14 @@ EXPORT void ringLweAddMulRTo(RingLWESample* result, const IntPolynomial* p, cons
 
 
 
+
+
+
+
+
+
+
+
 // RingGSW
 /** generate a ringgsw key (in fact, a ringlwe key) */
 EXPORT void ringGswKeyGen(RingGSWKey* result){
@@ -411,9 +419,43 @@ EXPORT void ringGSWEncryptB(RingGSWSample* result, const int message, double alp
 
 
 
+// à revoir
+EXPORT void ringGswPhase(TorusPolynomial* phase, const RingGSWSample* sample, const RingGSWKey* key){
+    const int k = key->params->ringlwe_params->k;
 
-EXPORT void ringGswSymDecrypt(IntPolynomial* result, const RingGSWSample* sample, const RingGSWKey* key); 
-EXPORT int ringGswSymDecryptInt(const RingGSWSample* sample, const RingGSWKey* key); 
+    torusPolynomialCopy(phase, sample[0]->b); // phi = b
+
+    for (int i = 0; i < k; ++i)
+        subMulRToTorusPolynomial(phase, &key->key[i], &sample[0]->a[i]);
+}
+
+// à revoir
+EXPORT void ringGswApproxPhase(IntPolynomial* message, const TorusPolynomial* phase, int Msize, int N){
+    for (int i = 0; i < N; ++i) message->coefsT[i] = modSwitchFromTorus32(phase->coefsT[i], Msize);
+}
+
+
+// à revoir
+EXPORT void ringGswSymDecrypt(IntPolynomial* result, const RingGSWSample* sample, const RingGSWKey* key){
+    TorusPolynomial* phase = new_TorusPolynomial(key->params->ringlwe_params->N);
+
+    ringGswPhase(phase, sample, key);
+    ringGswApproxPhase(result, phase, Msize, key->params->ringlwe_params->N);
+
+    delete_TorusPolynomial(phase);
+}
+
+
+// à revoir
+EXPORT int ringGswSymDecryptInt(const RingGSWSample* sample, const RingGSWKey* key){
+    TorusPolynomial* phase = new_TorusPolynomial(key->params->ringlwe_params->N);
+
+    ringGswPhase(phase, sample, key);
+    int result = modSwitchFromTorus32(phase->coefsT[0], Msize);
+
+    delete_TorusPolynomial(phase);
+    return result;
+}
 //do we really decrypt GSW samples?
 // EXPORT void ringGSWMulByXaiMinusOne(GSW* result, int ai, const GSW* bk);
 // EXPORT void ringLWEExternMulRLWETo(RLWE* accum, GSW* a); //  accum = a \odot accum

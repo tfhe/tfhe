@@ -20,13 +20,13 @@ using namespace std;
 double approxEquals(Torus32 a, Torus32 b) { return abs(a-b)<10; }
 
 int main(int argc, char** argv) {
-    for (int i=0; i<20000; i++) uniformTorus32_distrib(generator);
+    for (int i=0; i<20000; i++) uniformTorus32_distrib(generator); // Ila ?????
     
     const int N = 512;
     const int k = 2;
     const int alpha_min = 0.01;
     const int alpha_max = 0.071;
-    const int Msize = 7;
+    const int Msize = 7; // taille de l'espace des coeffs du polynome du message
     const double alpha = 0.02;
     static uniform_int_distribution<int> distribution(0,Msize-1);
 
@@ -200,7 +200,7 @@ int main(int argc, char** argv) {
         torusPolynomialAddMulZ(mu, mu0, p, mu1); // mu = mu0 + p.mu1
         ringLweSymDecrypt(dechif, cipher, key, Msize); // DECRYPTION
         
-        cout << "Test ingLweAddMulTo Trial :" << trial << endl;
+        cout << "Test ringLweAddMulTo Trial :" << trial << endl;
         for (int i = 0; i < N; ++i)
         {
             decInt = modSwitchFromTorus32(dechif->coefsT[i], Msize);
@@ -214,7 +214,7 @@ int main(int argc, char** argv) {
         
 
 
-        // result = result - p.sample 
+        // cipher = cipher0 - p.cipher1 
         ringLweCopy(cipher, cipher0, params);
         ringLweSubMulTo(cipher, p, cipher1, params);
         torusPolynomialSubMulZ(mu, mu0, p, mu1); // mu = mu0 - p.mu1

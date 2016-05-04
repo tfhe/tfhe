@@ -2,12 +2,14 @@
 #include <iostream>
 #include <random>
 #include <cassert>
+#include <limits.h>
 #include "lwe.h"
 
 using namespace std;
 
 default_random_engine generator;
 uniform_int_distribution<Torus32> uniformTorus32_distrib(INT32_MIN, INT32_MAX);
+uniform_int_distribution<int> uniformInt_distrib(INT_MIN, INT_MAX);
 
 // Gaussian sample centered in message, with standard deviation sigma
 EXPORT Torus32 gaussian32(Torus32 message, double sigma){
