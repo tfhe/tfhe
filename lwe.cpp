@@ -14,6 +14,12 @@
 using namespace std;
 
 
+#ifndef NDEBUG
+const RingLWEKey* debug_accum_key;
+const LWEKey* debug_extract_key;
+const LWEKey* debug_in_key;
+#endif
+
 
 
 
@@ -379,6 +385,7 @@ EXPORT void lweCreateKeySwitchKey(LWEKeySwitchKey* result, const LWEKey* in_key,
     	    for(int k=0;k<base;k++){
 		Torus32 x=(in_key->key[i]*k)*(1<<(32-(j+1)*basebit));
 		lweSymEncrypt(&result->ks[i][j][k],x,out_key->params->alpha_min,out_key);
+		//printf("i,j,k,ki,x,phase=%d,%d,%d,%d,%d,%d\n",i,j,k,in_key->key[i],x,lwePhase(&result->ks[i][j][k],out_key));
     	    }
     	}
     }
@@ -388,17 +395,27 @@ EXPORT void lweCreateKeySwitchKey(LWEKeySwitchKey* result, const LWEKey* in_key,
 EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWESample* sample){
     const LWEParams* par=ks->out_params;
     const int n=ks->in_params->n;
-    const int Bl=ks->basebit;
+    const int basebit=ks->basebit;
     const int l=ks->l;
     const uint32_t mask=ks->mask;
 
     lweNoiselessTrivial(result,sample->b,par);
+#ifndef NDEBUG
+    Torus32 expected = sample->b;
+    Torus32 actual = lwePhase(result, debug_in_key);
+    printf("initialization: actual=%d, expected=%d\n",actual, expected);
+#endif
     for (int i=0;i<n;i++){
     	uint32_t ai=sample->a[i];
     	for (int j=0;j<l;j++){
-    	    uint32_t aij=(ai>>(32-(j+1)*Bl))& mask;
+    	    uint32_t aij=(ai>>(32-(j+1)*basebit))& mask;
     	    lweSubTo(result,&ks->ks[i][j][aij],par);	
     	}
+#ifndef NDEBUG
+    expected -= ai*debug_extract_key->key[i];
+    actual = lwePhase(result, debug_in_key);
+    printf("iter %d: ai=%d, ki=%d, actual=%d, expected=%d\n", i, ai, debug_extract_key->key[i], actual, expected);
+#endif
     }
 }
 
@@ -576,17 +593,12 @@ EXPORT void sampleExtract(LWESample* result, const RingLWESample* x, const LWEPa
     const int n = params->n;
     assert(n == k*N);
     for (int i=0; i<k; i++) {
-    	for (int j=0; j<N; j++)
-    	    result->a[i*N+j]=x->a[i].coefsT[j];
+	result->a[i*N]=x->a[i].coefsT[0];
+    	for (int j=1; j<N; j++)
+    	    result->a[i*N+j]=-x->a[i].coefsT[N-j];
     }
     result->b=x->b->coefsT[0];
 }
-
-#ifndef NDEBUG
-const RingLWEKey* debug_accum_key;
-const LWEKey* debug_extract_key;
-const LWEKey* debug_in_key;
-#endif
 
 //LWE to LWE Single gate bootstrapping
 //TODO: Malika
@@ -653,7 +665,7 @@ EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 
 #endif
     lweKeySwitch(result, bk->ks, u);
 #ifndef NDEBUG
-    ph = lwePhase(u, debug_in_key);
+    ph = lwePhase(result, debug_in_key);
     printf("Phase after keySwitch: %d\n",ph);
 #endif
 
@@ -723,9 +735,8 @@ EXPORT void ringLweExtractKey(LWEKey* result, const RingLWEKey* key) //sans dout
     const int n = result->params->n;
     assert(n == k*N);
     for (int i=0; i<k; i++) {
-	    result->key[i*N]=key->key[i].coefs[0];
-    	for (int j=1; j<N; j++)
-    	    result->key[i*N+j]=-key->key[i].coefs[N-j];
+    	for (int j=0; j<N; j++)
+    	    result->key[i*N+j]=key->key[i].coefs[j];
     }
 }
     

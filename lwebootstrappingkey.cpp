@@ -4,7 +4,7 @@
 #include "lwebootstrappingkey.h"
 #include "ringgsw.h"
 
-const int basebit = 1;
+const int basebit = 2;
 const int kslength = 32/basebit;
 
 using namespace std;

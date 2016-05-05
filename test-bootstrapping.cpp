@@ -53,8 +53,8 @@ int main(int argc, char** argv) {
     const int l_bk = 3;
     const int Bgbit_bk = 10;
     //const int ks_basebit = 4;
-    const int alpha_in = 1./500.;
-    const int alpha_bk = 1e-9;
+    const double alpha_in = 5e-4;
+    const double alpha_bk = 1e-8;
     //const int alpha_ks = 1e-6;
 
     LWEParams* params_in = new_LWEParams(n, alpha_in, 1./16.);
