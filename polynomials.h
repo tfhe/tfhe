@@ -38,6 +38,9 @@ EXPORT void clearLagrangeHalfCPolynomial(LagrangeHalfCPolynomial* result);
 
 /** multiplication via direct FFT */
 EXPORT void multFFT(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+EXPORT void addMultToFFT(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+EXPORT void subMultToFFT(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+
 /** termwise multiplication in Lagrange space */
 EXPORT void LagrangeHalfCPolynomial_mul(
 	LagrangeHalfCPolynomial* result, 

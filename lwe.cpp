@@ -30,12 +30,12 @@ EXPORT void ringLweKeyGen(RingLWEKey* result){
 }
 
 
-EXPORT void ringLweSymEncrypt(RingLWESample* result, TorusPolynomial* message, double alpha, const RingLWEKey* key){
+EXPORT void ringLweSymEncryptZero(RingLWESample* result, double alpha, const RingLWEKey* key){
     const int N = key->params->N;
     const int k = key->params->k;
     
     for (int j = 0; j < N; ++j)
-        result->b->coefsT[j] = gaussian32(0, alpha) + message->coefsT[j];   
+        result->b->coefsT[j] = gaussian32(0, alpha);   
     
     for (int i = 0; i < k; ++i)
     {
@@ -46,25 +46,22 @@ EXPORT void ringLweSymEncrypt(RingLWESample* result, TorusPolynomial* message, d
     result->current_variance = alpha*alpha;
 }
 
+EXPORT void ringLweSymEncrypt(RingLWESample* result, TorusPolynomial* message, double alpha, const RingLWEKey* key){
+    const int N = key->params->N;
+    
+    ringLweSymEncryptZero(result, alpha, key);
+
+    for (int j = 0; j < N; ++j)
+        result->b->coefsT[j] += message->coefsT[j];   
+}
+
 /**
  * encrypts a constant message
  */
 EXPORT void ringLweSymEncryptT(RingLWESample* result, Torus32 message, double alpha, const RingLWEKey* key){
-    const int N = key->params->N;
-    const int k = key->params->k;
-    
-    for (int j = 0; j < N; ++j)
-        result->b->coefsT[j] = gaussian32(0, alpha);
-    result->b->coefsT[0]+=message;
+    ringLweSymEncryptZero(result, alpha, key);
 
-    
-    for (int i = 0; i < k; ++i)
-    {
-	torusPolynomialUniform(&result->a[i]);
-	addMulRToTorusPolynomial(result->b, &key->key[i], &result->a[i]);
-    }
-
-    result->current_variance = alpha*alpha;
+    result->b->coefsT[0] += message;
 }
 
 
@@ -235,91 +232,105 @@ EXPORT void ringGSWClear(RingGSWSample* result, const RingGSWParams* params){
 
 // Result += H
 EXPORT void ringGSWAddH(RingGSWSample* result, const RingGSWParams* params){
-    const int kpl = params->kpl;
+    const int k = params->ringlwe_params->k;
     const int l = params->l;
-    int q; // quotient of p/l
     const Torus32* h = params->h;
 
     // compute result += H
-    for (int p = 0; p < kpl; ++p)
-    {
-        q = (int) (((double) p)/((double) l)); 
-        result->all_sample[p].a[q].coefsT[0] += h[p%l]; // when q=k adds to a[k] = b
-    }
+    for (int bloc = 0; bloc <= k; ++bloc)
+	for (int i=0; i<l; i++) 
+	    result->bloc_sample[bloc][i].a[bloc].coefsT[0]+=h[i];
 }
 
 // Result += mu*H
-EXPORT void ringGSWAddMuH(RingGSWSample* result, const IntPolynomial* message, const RingGSWParams* params){
+EXPORT void ringGSWAddMuH(RingGSWSample* result, const IntPolynomial* message, const RingGSWParams* params) {
+    const int k = params->ringlwe_params->k;
     const int N = params->ringlwe_params->N;
-    const int kpl = params->kpl;
     const int l = params->l;
-    TorusPolynomial* message_h = new_TorusPolynomial_array(l, N); 
-    int q; // quotient of p/l
     const Torus32* h = params->h;
-    //const int* message = message->coefs;
+    const int* mu = message->coefs;
 
-    // compute mu*h = mu*[1/Bg,...,1/Bg^l]
-    for (int i = 0; i < l; ++i)
-        for (int j = 0; j < N; ++j)
-            message_h[i].coefsT[j] = message->coefs[j]*h[i]; 
-
-    // compute result += mu*H
-    for (int p = 0; p < kpl; ++p)
-    {
-        q = (int) (((double) p)/((double) l)); 
-        torusPolynomialAddTo(&result->all_sample[p].a[q], &message_h[p%l]); // when q=k adds to a[k] = b
-    }
-
-    delete_TorusPolynomial_array(l, message_h);
+    // compute result += H
+    for (int bloc = 0; bloc <= k; ++bloc)
+	for (int i=0; i<l; i++) {
+	    Torus32* target = 
+		result->bloc_sample[bloc][i].a[bloc].coefsT;
+	    const Torus32 hi=h[i];
+	    for (int j=0; j<N; j++) {
+		target[j]+=mu[j]*hi;
+	    }
+	}
 }
 
 // Result += mu*H, mu integer
-EXPORT void ringGSWAddMuIntH(RingGSWSample* result, const int message, const RingGSWParams* params){
-    const int kpl = params->kpl;
+EXPORT void ringGSWAddMuIntH(RingGSWSample* result, const int message, const RingGSWParams* params)
+{
+    const int k = params->ringlwe_params->k;
     const int l = params->l;
-    int q; // quotient of p/l
     const Torus32* h = params->h;
 
-    // compute result += mu*H
-    for (int p = 0; p < kpl; ++p)
-    {
-        q = (int) (((double) p)/((double) l)); 
-        result->all_sample[p].a[q].coefsT[0] += message*h[p%l]; // when q=k adds to a[k] = b
-    }
+    // compute result += H
+    for (int bloc = 0; bloc <= k; ++bloc)
+	for (int i=0; i<l; i++) 
+	    result->bloc_sample[bloc][i].a[bloc].coefsT[0]+=message*h[i];
 }
 
 // Result = ringGsw(0)
 EXPORT void ringGSWEncryptZero(RingGSWSample* result, double alpha, const RingGSWKey* key){
-    const int N = key->params->ringlwe_params->N;
-    const int k = key->params->ringlwe_params->k;
+    const RingLWEKey* rlkey = &key->ringlwe_key;
     const int kpl = key->params->kpl;
         
     for (int p = 0; p < kpl; ++p) // each line of the RingGSWSample is a RingLWESample (on aurait pu appeler la fonction ringLweSymEncrypt)
+	//Indeed!!
     {
-        for (int j = 0; j < N; ++j)
-            result->all_sample[p].b->coefsT[j] = gaussian32(0, alpha);   
-    
-        for (int i = 0; i < k; ++i)
-        {
-            torusPolynomialUniform(&result->all_sample[p].a[i]);
-            addMulRToTorusPolynomial(result->all_sample[p].b, &key->key[i], &result->all_sample[p].a[i]);
-        }
+	ringLweSymEncryptZero(&result->all_sample[p], alpha, rlkey);
     }
 }
 
 
 
 void TorusPolynomialMulByXaiMinusOne(TorusPolynomial* result, int a, const TorusPolynomial* bk){
-const int N=bk->N;
-Torus32* out=result->coefsT;
-Torus32* in =bk->coefsT; 
+    const int N=bk->N;
+    Torus32* out=result->coefsT;
+    Torus32* in =bk->coefsT; 
 
-for (int i=0;i<a;i++)//sur que i-a<0
-    out[i]= -in[i-a+N]-in[i];
+    assert(a>=0 && a<2*N);
 
-for (int i=a;i<N;i++)//sur que N>i-a>=0
-    out[i]= in[i-a]-in[i];
+    if (a<N) {
+	for (int i=0;i<a;i++)//sur que i-a<0
+	    out[i]= -in[i-a+N]-in[i];
+	for (int i=a;i<N;i++)//sur que N>i-a>=0
+	    out[i]= in[i-a]-in[i];
+    } else {
+	const int aa=a-N;
+	for (int i=0;i<aa;i++)//sur que i-a<0
+	    out[i]= in[i-aa+N]-in[i];
+	for (int i=aa;i<N;i++)//sur que N>i-a>=0
+	    out[i]= -in[i-aa]-in[i];
+    }
 }
+
+void TorusPolynomialMulByXai(TorusPolynomial* result, int a, const TorusPolynomial* bk){
+    const int N=bk->N;
+    Torus32* out=result->coefsT;
+    Torus32* in =bk->coefsT; 
+
+    assert(a>=0 && a<2*N);
+
+    if (a<N) {
+	for (int i=0;i<a;i++)//sur que i-a<0
+	    out[i]= -in[i-a+N];
+	for (int i=a;i<N;i++)//sur que N>i-a>=0
+	    out[i]= in[i-a];
+    } else {
+	const int aa=a-N;
+	for (int i=0;i<aa;i++)//sur que i-a<0
+	    out[i]= in[i-aa+N];
+	for (int i=aa;i<N;i++)//sur que N>i-a>=0
+	    out[i]= -in[i-aa];
+    }
+}
+
 
 
 
@@ -350,20 +361,24 @@ EXPORT void ringLWEExternMulRGSWTo(RingLWESample* accum, const RingGSWSample* sa
     ringLweClear(accum,par);
     for (int i=0; i<kpl;i++) 
         ringLweAddMulRTo(accum,&dec[i],&sample->all_sample[i],par);
+
+    delete_IntPolynomial_array(kpl, dec);
 }
 
 //crée la clé de KeySwitching
 EXPORT void lweCreateKeySwitchKey(LWEKeySwitchKey* result, const LWEKey* in_key, const LWEKey* out_key){
     const int n=result->n;
-    //const int B=result->base;
+    const int basebit=result->basebit;
     const int l=result->l;
-    const int Bl=result->basebit;
+    const int base=result->base;
 
+    cerr << "create_keyswitch: " << n << " " << l << " " << base << " ("<< n*l*base*out_key->params->n*4 << "bytes)" << endl;
+    cerr << "  with noise stdev: " << out_key->params->alpha_min << endl;
     for(int i=0;i<n;i++){
     	for(int j=0;j<l;j++){
-    	    for(int k=0;i<Bl;i++){
-        		Torus32 x=(in_key->key[i]*k)*(1<<(32-j*Bl));
-        		lweSymEncrypt(&result->ks[i][j][k],x,out_key->params->alpha_min,out_key);
+    	    for(int k=0;k<base;k++){
+		Torus32 x=(in_key->key[i]*k)*(1<<(32-(j+1)*basebit));
+		lweSymEncrypt(&result->ks[i][j][k],x,out_key->params->alpha_min,out_key);
     	    }
     	}
     }
@@ -418,7 +433,7 @@ EXPORT void ringGSWEncryptB(RingGSWSample* result, const int message, double alp
 
 
 
-
+/*
 // à revoir
 EXPORT void ringGswPhase(TorusPolynomial* phase, const RingGSWSample* sample, const RingGSWKey* key){
     const int k = key->params->ringlwe_params->k;
@@ -433,19 +448,39 @@ EXPORT void ringGswPhase(TorusPolynomial* phase, const RingGSWSample* sample, co
 EXPORT void ringGswApproxPhase(IntPolynomial* message, const TorusPolynomial* phase, int Msize, int N){
     for (int i = 0; i < N; ++i) message->coefsT[i] = modSwitchFromTorus32(phase->coefsT[i], Msize);
 }
-
+*/
 
 // à revoir
-EXPORT void ringGswSymDecrypt(IntPolynomial* result, const RingGSWSample* sample, const RingGSWKey* key){
-    TorusPolynomial* phase = new_TorusPolynomial(key->params->ringlwe_params->N);
+EXPORT void ringGswSymDecrypt(IntPolynomial* result, const RingGSWSample* sample, const RingGSWKey* key, const int Msize){
+    const RingGSWParams* params = key->params;
+    const RingLWEParams* rlwe_params = params->ringlwe_params;
+    const int N = rlwe_params->N;
+    const int l = params->l;
+    const int k = rlwe_params->k;
+    TorusPolynomial* testvec = new_TorusPolynomial(N);
+    TorusPolynomial* tmp = new_TorusPolynomial(N);
+    IntPolynomial* decomp = new_IntPolynomial_array(l,N);
+    
+    const Torus32 indic = modSwitchToTorus32(1, Msize);
+    torusPolynomialClear(testvec);
+    testvec->coefsT[0]=indic;
+    Torus32PolynomialDecompH(decomp, testvec, params);
 
-    ringGswPhase(phase, sample, key);
-    ringGswApproxPhase(result, phase, Msize, key->params->ringlwe_params->N);
-
-    delete_TorusPolynomial(phase);
+    torusPolynomialClear(testvec);
+    for (int i=0; i<l; i++) {
+	for (int j=1; j<N; j++) assert(decomp[i].coefs[j]==0);
+	ringLwePhase(tmp, &sample->bloc_sample[k][i], &key->ringlwe_key);
+	addMulRToTorusPolynomial(testvec, decomp+i, tmp);
+    }
+    for (int i=0; i<N; i++)
+	result->coefs[i]=modSwitchFromTorus32(testvec->coefsT[i], Msize);
+    
+    delete_TorusPolynomial(testvec);
+    delete_TorusPolynomial(tmp);
+    delete_IntPolynomial_array(l,decomp);
 }
 
-
+/*
 // à revoir
 EXPORT int ringGswSymDecryptInt(const RingGSWSample* sample, const RingGSWKey* key){
     TorusPolynomial* phase = new_TorusPolynomial(key->params->ringlwe_params->N);
@@ -456,6 +491,7 @@ EXPORT int ringGswSymDecryptInt(const RingGSWSample* sample, const RingGSWKey* k
     delete_TorusPolynomial(phase);
     return result;
 }
+*/
 //do we really decrypt GSW samples?
 // EXPORT void ringGSWMulByXaiMinusOne(GSW* result, int ai, const GSW* bk);
 // EXPORT void ringLWEExternMulRLWETo(RLWE* accum, GSW* a); //  accum = a \odot accum
@@ -484,7 +520,7 @@ EXPORT void Torus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomia
         uint32_t temp0 = sample->coefsT[j] + offset;
         for (int p = 0; p < l; ++p)
         {
-            uint32_t temp1 = (temp0 >> ((32-p-1)*Bgbit)) &maskMod; // doute
+            uint32_t temp1 = (temp0 >> (32-(p+1)*Bgbit)) &maskMod; // doute
             result[p].coefs[j] = temp1 - halfBg;
         }   
     }
@@ -500,8 +536,13 @@ EXPORT void ringGSWExternProduct(RingLWESample* result, const RingGSWSample* a, 
     
     ringLWEDecompH(dec, b, params);
     
+    ringLweClear(result, parlwe);
     for (int i = 0; i < kpl; i++) 
         ringLweAddMulRTo(result, &dec[i], &a->all_sample[i], parlwe);
+
+    result->current_variance += b->current_variance; //todo + the error term?
+
+    delete_IntPolynomial_array(kpl, dec);
 }
 
 
@@ -541,52 +582,120 @@ EXPORT void sampleExtract(LWESample* result, const RingLWESample* x, const LWEPa
     result->b=x->b->coefsT[0];
 }
 
+#ifndef NDEBUG
+const RingLWEKey* debug_accum_key;
+const LWEKey* debug_extract_key;
+const LWEKey* debug_in_key;
+#endif
+
 //LWE to LWE Single gate bootstrapping
 //TODO: Malika
 EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LWESample* x){
-    Torus32 aa=(mu1-mu0)/2;
-    const int N=bk->accum_params->N;
-    
+    const Torus32 ab=(mu0+mu1)/2;
+    const Torus32 aa=mu0-ab; //it is important to define it like this and not (mu0-mu1)/2!
+    const RingGSWParams* bk_params = bk->bk_params;
+    const RingLWEParams* accum_params = bk->accum_params;
+    const LWEParams* extract_params = &accum_params->extracted_lweparams;
+    const LWEParams* in_params = bk->in_out_params;
+    const int N=accum_params->N;
     const int Ns2=N/2;
-    const uint64_t Nx2= 2*N;
+    const int Nx2= 2*N;
+    const int n = in_params->n;
+    
+    TorusPolynomial* testvect=new_TorusPolynomial(N);
+    TorusPolynomial* testvectbis=new_TorusPolynomial(N);
+#ifndef NDEBUG
+    Torus32 ph = lwePhase(x, debug_in_key);
+    printf("Phase before loop: %d\n",ph);
+    printf("aa (enc 0) before loop: %d\n",aa);
+#endif
 
     int barb=modSwitchFromTorus32(x->b,Nx2);
-    const RingLWEParams* accum_par=bk->accum_params;
-    TorusPolynomial* testvect=new_TorusPolynomial(N);//je definis le test vector (multiplié par a inclus !
-    TorusPolynomial* testvectbis=new_TorusPolynomial(N);
-    for (int i=0;i<Ns2;i++){
+    //je definis le test vector (multiplié par a inclus !
+    for (int i=0;i<Ns2;i++)
 	   testvect->coefsT[i]=aa;
-    }    
-    for (int i=Ns2;i<N;i++){
+    for (int i=Ns2;i<N;i++)
 	   testvect->coefsT[i]=-aa;
+    TorusPolynomialMulByXai(testvectbis, barb, testvect);
+
+    RingLWESample* acc = new_RingLWESample(accum_params);
+    ringLweNoiselessTrivial(acc, testvectbis, accum_params);
+//#ifndef NDEBUG
+//    ringLweSymDecrypt(testvectbis, acc, accum_params);
+//
+//    int accum
+//    Torus32 ph = lwePhase(x, debug_in_key);
+//    printf("Phase before loop: %d\n",ph);
+//    printf("aa (enc 0) before loop: %d\n",aa);
+//#endif
+    RingGSWSample* temp = new_RingGSWSample(bk_params);
+    for (int i=0; i<n; i++) {
+	int bara=modSwitchFromTorus32(-x->a[i],Nx2);
+	if (bara==0) continue; //indeed, this is an easy case!
+	ringGSWMulByXaiMinusOne(temp, bara, bk->bk+i, bk_params);
+	ringGSWAddH(temp, bk->bk_params);
+	ringLWEExternMulRGSWTo(acc, temp, bk_params);
     }
-    for (int i=0;i< barb;i++)
-	   testvectbis->coefsT[i]=-testvect->coefsT[i-barb+N];
-    for (int i=barb;i<N;i++)
-	   testvectbis->coefsT[i]=testvect->coefsT[i-barb];
+#ifndef NDEBUG
+    ringLwePhase(testvectbis, acc, debug_accum_key);
+    printf("Phase after loop: %d\n",testvectbis->coefsT[0]);
+#endif
+    LWESample* u = new_LWESample(extract_params);
+    sampleExtract(u, acc, extract_params, accum_params);
+#ifndef NDEBUG
+    ph = lwePhase(u, debug_extract_key);
+    printf("Phase after extract: %d\n",ph);
+#endif
+    u->b += ab;
+#ifndef NDEBUG
+    ph = lwePhase(u, debug_extract_key);
+    printf("Phase after add average: %d\n",ph);
+#endif
+    lweKeySwitch(result, bk->ks, u);
+#ifndef NDEBUG
+    ph = lwePhase(u, debug_in_key);
+    printf("Phase after keySwitch: %d\n",ph);
+#endif
 
-    //RingLWESample* result, const TorusPolynomial* mu, const RingLWEParams* params
-    RingLWESample* acc;
-    acc=new_RingLWESample(accum_par);
-    ringLweNoiselessTrivial(acc,testvectbis,accum_par);
-RingGSWSample* temp=new_RingGSWSample(bk->bk_params);
-    for (int i=0;i<N;i++){
-int bara=modSwitchFromTorus32(x->a[i],Nx2);
-ringGSWMulByXaiMinusOne(temp,bara,bk->bk,bk->bk_params);
-ringGSWAddH(temp,bk->bk_params);
-ringLWEExternMulRGSWTo(acc,temp,bk->bk_params);
+    delete_LWESample(u);
+    delete_RingGSWSample(temp);
+    delete_RingLWESample(acc);
+    delete_TorusPolynomial(testvectbis);
+    delete_TorusPolynomial(testvect);
 }
-//LWESample* u=new_LWESample(bk->params);
-sampleExtract(result,acc,bk->in_out_params,accum_par);
-/*lweNoiselessTrivial(u,aa,bk->params);
-for (int i=0;i<bk->params->n;i++){
-result->a[i]=u->a[i]+result->a[i];
-  }*/
-result->b=result->b+aa;
-lweKeySwitch(result,bk->ks,result);
+
+EXPORT void createBootstrappingKey(
+	LWEBootstrappingKey* bk, 
+	const LWEKey* key_in, 
+	const RingGSWKey* rgsw_key) {
+    assert(bk->bk_params==rgsw_key->params);
+    assert(bk->in_out_params==key_in->params);
+
+    const LWEParams* in_out_params = bk->in_out_params; 
+    const RingGSWParams* bk_params = bk->bk_params;
+    const RingLWEParams* accum_params = bk_params->ringlwe_params;
+    const LWEParams* extract_params = &accum_params->extracted_lweparams;
+    
+    //LWEKeySwitchKey* ks; ///< the keyswitch key (s'->s)
+    const RingLWEKey* accum_key = &rgsw_key->ringlwe_key;
+    LWEKey* extracted_key = new_LWEKey(extract_params);
+    ringLweExtractKey(extracted_key, accum_key);
+    lweCreateKeySwitchKey(bk->ks, extracted_key, key_in);
+    delete_LWEKey(extracted_key);
+    
+    //RingGSWSample* bk; ///< the bootstrapping key (s->s")
+    int* kin = key_in->key;
+    const double alpha = accum_params->alpha_min;
+    const int n = in_out_params->n;
+    const int kpl = bk_params->kpl;
+    const int k = accum_params->k;
+    const int N = accum_params->N;
+    cout << "create the bootstrapping key bk ("  << "  " << n*kpl*(k+1)*N*4 << " bytes)" << endl;
+    cout << "  with noise_stdev: " << alpha << endl;
+    for (int i=0; i<n; i++) {
+	ringGswSymEncryptInt(&bk->bk[i], kin[i], alpha, rgsw_key);
+    }
 }
-
-
 //these functions call the bootstrapping, assuming that the message space is {0,1/4} 
 EXPORT void lweNand(LWESample* result, const LWEBootstrappingKey* bk, const LWESample* a, const LWESample* b);
 EXPORT void lweOr(LWESample* result, const LWEBootstrappingKey* bk, const LWESample* a, const LWESample* b);
@@ -607,7 +716,7 @@ EXPORT void semiRingBootstrap(LWESample* result, const LWEBootstrappingKey* bk, 
 // EXPORT void ringGswPolyCombination(LWESample* result, const int* combi, const LWESample* samples, const LWEParams* params);
 
 //extractions Ring LWE -> LWE
-EXPORT void keyExtract(LWEKey* result, const RingLWEKey* key) //sans doute un param supplémentaire
+EXPORT void ringLweExtractKey(LWEKey* result, const RingLWEKey* key) //sans doute un param supplémentaire
 {
     const int N = key->params->N;
     const int k = key->params->k;

@@ -54,6 +54,33 @@ EXPORT LWEBootstrappingKey* new_LWEBootstrappingKey_array(int nbelts, const LWEP
 //(equivalent of the C++ delete)
 EXPORT void delete_LWEBootstrappingKey(LWEBootstrappingKey* obj);
 EXPORT void delete_LWEBootstrappingKey_array(int nbelts, LWEBootstrappingKey* obj);
+//allocate memory space for a LWEBootstrappingKeyFFT
+EXPORT LWEBootstrappingKeyFFT* alloc_LWEBootstrappingKeyFFT();
+EXPORT LWEBootstrappingKeyFFT* alloc_LWEBootstrappingKeyFFT_array(int nbelts);
+
+//free memory space for a LWEBootstrappingKeyFFT
+EXPORT void free_LWEBootstrappingKeyFFT(LWEBootstrappingKeyFFT* ptr);
+EXPORT void free_LWEBootstrappingKeyFFT_array(int nbelts, LWEBootstrappingKeyFFT* ptr);
+
+//initialize the LWEBootstrappingKeyFFT structure
+//(equivalent of the C++ constructor)
+EXPORT void init_LWEBootstrappingKeyFFT(LWEBootstrappingKeyFFT* obj, const LWEParams* in_out_params, const RingGSWParams* bk_params);
+EXPORT void init_LWEBootstrappingKeyFFT_array(int nbelts, LWEBootstrappingKeyFFT* obj, const LWEParams* in_out_params, const RingGSWParams* bk_params);
+
+//destroys the LWEBootstrappingKeyFFT structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_LWEBootstrappingKeyFFT(LWEBootstrappingKeyFFT* obj);
+EXPORT void destroy_LWEBootstrappingKeyFFT_array(int nbelts, LWEBootstrappingKeyFFT* obj);
+ 
+//allocates and initialize the LWEBootstrappingKeyFFT structure
+//(equivalent of the C++ new)
+EXPORT LWEBootstrappingKeyFFT* new_LWEBootstrappingKeyFFT(const LWEParams* in_out_params, const RingGSWParams* bk_params);
+EXPORT LWEBootstrappingKeyFFT* new_LWEBootstrappingKeyFFT_array(int nbelts, const LWEParams* in_out_params, const RingGSWParams* bk_params);
+
+//destroys and frees the LWEBootstrappingKeyFFT structure
+//(equivalent of the C++ delete)
+EXPORT void delete_LWEBootstrappingKeyFFT(LWEBootstrappingKeyFFT* obj);
+EXPORT void delete_LWEBootstrappingKeyFFT_array(int nbelts, LWEBootstrappingKeyFFT* obj);
 //allocate memory space for a LWEKey
 EXPORT LWEKey* alloc_LWEKey();
 EXPORT LWEKey* alloc_LWEKey_array(int nbelts);

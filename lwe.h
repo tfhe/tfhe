@@ -41,6 +41,7 @@ struct RingGSWSample;
 struct RingGSWSampleFFT;
 // *** ()
 struct LWEBootstrappingKey;
+struct LWEBootstrappingKeyFFT;
 // * ()
 struct IntPolynomial;
 struct TorusPolynomial;
@@ -65,6 +66,7 @@ typedef struct RingGSWKey          RingGSWKey;
 typedef struct RingGSWSample       RingGSWSample;
 typedef struct RingGSWSampleFFT       RingGSWSampleFFT;
 typedef struct LWEBootstrappingKey LWEBootstrappingKey;
+typedef struct LWEBootstrappingKeyFFT LWEBootstrappingKeyFFT;
 typedef struct IntPolynomial	   IntPolynomial;
 typedef struct TorusPolynomial	   TorusPolynomial;
 typedef struct LagrangeHalfCPolynomial	   LagrangeHalfCPolynomial;
@@ -85,6 +87,7 @@ EXPORT void ringLwePhase(TorusPolynomial* phase, const RingLWESample* sample, co
 EXPORT void ringLweApproxPhase(TorusPolynomial* message, const TorusPolynomial* phase, int Msize, int N);
 EXPORT void ringLweSymDecrypt(TorusPolynomial* result, const RingLWESample* sample, const RingLWEKey* key, int Msize);
 EXPORT Torus32 ringLweSymDecryptT(const RingLWESample* sample, const RingLWEKey* key, int Msize);
+EXPORT void sampleExtract(LWESample* result, const RingLWESample* x, const LWEParams* params,  const RingLWEParams* rparams);
 
 //Arithmetic operations on RingLWE samples
 /** result = (0,0) */
@@ -109,7 +112,7 @@ EXPORT void ringLweSubMulTo(RingLWESample* result, int p, const RingLWESample* s
 EXPORT void ringGswKeyGen(RingGSWKey* result);
 EXPORT void ringGswSymEncrypt(RingGSWSample* result, const IntPolynomial* message, double alpha, const RingGSWKey* key);
 EXPORT void ringGswSymEncryptInt(RingGSWSample* result, const int message, double alpha, const RingGSWKey* key);
-EXPORT void ringGswSymDecrypt(IntPolynomial* result, const RingGSWSample* sample, const RingGSWKey* key); 
+EXPORT void ringGswSymDecrypt(IntPolynomial* result, const RingGSWSample* sample, const RingGSWKey* key, const int Msize);
 EXPORT int ringGswSymDecryptInt(const RingGSWSample* sample, const RingGSWKey* key); 
 //do we really decrypt GSW samples?
 

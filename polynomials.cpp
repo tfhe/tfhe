@@ -74,7 +74,8 @@ class FFT_Processor {
 	for (int i=0; i<=Ns2; i++) rev_in[2*i]=0;
 	for (int i=0; i<Ns2; i++) rev_in[2*i+1]=a[i];
 	fftw_execute(rev_p);
-	for (int i=0; i<N; i++) res[i]=Torus32(int64_t(fmod(rev_out[i]*_1sN,1.)*_2p32));
+	for (int i=0; i<N; i++) res[i]=Torus32(int64_t(rev_out[i]*_1sN*_2p32));
+	//pas besoin du fmod... Torus32(int64_t(fmod(rev_out[i]*_1sN,1.)*_2p32));
 	for (int i=0; i<N; i++) assert(abs(rev_out[N+i]+rev_out[i])<1e-20);
     }
 
@@ -116,6 +117,30 @@ EXPORT void multFFT(TorusPolynomial* result, const IntPolynomial* poly1, const T
     TorusPolynomial_fft(tmp+1,poly2);
     LagrangeHalfCPolynomial_mul(tmp+2,tmp+0,tmp+1);
     TorusPolynomial_ifft(result, tmp+2);
+    delete_LagrangeHalfCPolynomial_array(3,tmp);
+}
+EXPORT void addMultToFFT(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2) {
+    const int N = poly1->N;
+    LagrangeHalfCPolynomial* tmp = new_LagrangeHalfCPolynomial_array(3,N);
+    TorusPolynomial* tmpr = new_TorusPolynomial(N);
+    IntPolynomial_fft(tmp+0,poly1);
+    TorusPolynomial_fft(tmp+1,poly2);
+    LagrangeHalfCPolynomial_mul(tmp+2,tmp+0,tmp+1);
+    TorusPolynomial_ifft(tmpr, tmp+2);
+    torusPolynomialAddTo(result, tmpr);
+    delete_TorusPolynomial(tmpr);
+    delete_LagrangeHalfCPolynomial_array(3,tmp);
+}
+EXPORT void subMultToFFT(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2) {
+    const int N = poly1->N;
+    LagrangeHalfCPolynomial* tmp = new_LagrangeHalfCPolynomial_array(3,N);
+    TorusPolynomial* tmpr = new_TorusPolynomial(N);
+    IntPolynomial_fft(tmp+0,poly1);
+    TorusPolynomial_fft(tmp+1,poly2);
+    LagrangeHalfCPolynomial_mul(tmp+2,tmp+0,tmp+1);
+    TorusPolynomial_ifft(tmpr, tmp+2);
+    torusPolynomialSubTo(result, tmpr);
+    delete_TorusPolynomial(tmpr);
     delete_LagrangeHalfCPolynomial_array(3,tmp);
 }
 /** termwise multiplication in Lagrange space */

@@ -33,7 +33,7 @@ clean:
 
 
 debug/%.o: %.cpp ${H_FILES}
-	g++ -std=c++11 ${DEBUGFLAGS} -c -o $@ $<
+	g++ -std=gnu++11 ${DEBUGFLAGS} -c -o $@ $<
 
 debug/%.o: %.c ${H_FILES}
 	gcc ${DEBUGFLAGS} -c -o $@ $<
@@ -42,7 +42,7 @@ debug/%.o: %.c ${H_FILES}
 	g++ ${DEBUGFLAGS} -o $@ $< ${DEBUG_LIB_O_FILES} ${LIBS}
 
 optim/%.o: %.cpp ${H_FILES}
-	g++ -std=c++11 ${OPTIMFLAGS} -c -o $@ $<
+	g++ -std=gnu++11 ${OPTIMFLAGS} -c -o $@ $<
 
 optim/%.o: %.c ${H_FILES}
 	gcc ${OPTIMFLAGS} -c -o $@ $<

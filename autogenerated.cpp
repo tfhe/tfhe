@@ -124,6 +124,66 @@ EXPORT void delete_LWEBootstrappingKey_array(int nbelts, LWEBootstrappingKey* ob
     destroy_LWEBootstrappingKey_array(nbelts,obj);
     free_LWEBootstrappingKey_array(nbelts,obj);
 }
+#include "lwebootstrappingkey.h" 
+//allocate memory space for a LWEBootstrappingKeyFFT
+
+EXPORT LWEBootstrappingKeyFFT* alloc_LWEBootstrappingKeyFFT() {
+    return (LWEBootstrappingKeyFFT*) malloc(sizeof(LWEBootstrappingKeyFFT));
+}
+EXPORT LWEBootstrappingKeyFFT* alloc_LWEBootstrappingKeyFFT_array(int nbelts) {
+    return (LWEBootstrappingKeyFFT*) malloc(nbelts*sizeof(LWEBootstrappingKeyFFT));
+}
+
+//free memory space for a LWEKey
+EXPORT void free_LWEBootstrappingKeyFFT(LWEBootstrappingKeyFFT* ptr) {
+    free(ptr);
+}
+EXPORT void free_LWEBootstrappingKeyFFT_array(int nbelts, LWEBootstrappingKeyFFT* ptr) {
+    free(ptr);
+}
+
+//initialize the key structure
+//(equivalent of the C++ constructor)
+EXPORT void init_LWEBootstrappingKeyFFT(LWEBootstrappingKeyFFT* obj, const LWEParams* in_out_params, const RingGSWParams* bk_params) {
+    new(obj) LWEBootstrappingKeyFFT(in_out_params,bk_params);
+}
+EXPORT void init_LWEBootstrappingKeyFFT_array(int nbelts, LWEBootstrappingKeyFFT* obj, const LWEParams* in_out_params, const RingGSWParams* bk_params) {
+    for (int i=0; i<nbelts; i++) {
+	new(obj+i) LWEBootstrappingKeyFFT(in_out_params,bk_params);
+    }
+}
+
+//destroys the LWEBootstrappingKeyFFT structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_LWEBootstrappingKeyFFT(LWEBootstrappingKeyFFT* obj) {
+    obj->~LWEBootstrappingKeyFFT();
+}
+EXPORT void destroy_LWEBootstrappingKeyFFT_array(int nbelts, LWEBootstrappingKeyFFT* obj) {
+    for (int i=0; i<nbelts; i++) {
+	(obj+i)->~LWEBootstrappingKeyFFT();
+    }
+}
+ 
+//allocates and initialize the LWEBootstrappingKeyFFT structure
+//(equivalent of the C++ new)
+EXPORT LWEBootstrappingKeyFFT* new_LWEBootstrappingKeyFFT(const LWEParams* in_out_params, const RingGSWParams* bk_params) {
+    return new LWEBootstrappingKeyFFT(in_out_params,bk_params);
+}
+EXPORT LWEBootstrappingKeyFFT* new_LWEBootstrappingKeyFFT_array(int nbelts, const LWEParams* in_out_params, const RingGSWParams* bk_params) {
+    LWEBootstrappingKeyFFT* obj = alloc_LWEBootstrappingKeyFFT_array(nbelts);
+    init_LWEBootstrappingKeyFFT_array(nbelts,obj,in_out_params,bk_params);
+    return obj;
+}
+
+//destroys and frees the LWEBootstrappingKeyFFT structure
+//(equivalent of the C++ delete)
+EXPORT void delete_LWEBootstrappingKeyFFT(LWEBootstrappingKeyFFT* obj) {
+    delete obj;
+}
+EXPORT void delete_LWEBootstrappingKeyFFT_array(int nbelts, LWEBootstrappingKeyFFT* obj) {
+    destroy_LWEBootstrappingKeyFFT_array(nbelts,obj);
+    free_LWEBootstrappingKeyFFT_array(nbelts,obj);
+}
 #include "lwekey.h" 
 //allocate memory space for a LWEKey
 

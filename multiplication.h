@@ -49,9 +49,14 @@ EXPORT void torusPolynomialMultKaratsuba(TorusPolynomial* result, const IntPolyn
 EXPORT void addMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
 EXPORT void subMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
 
-#define mulRTorusPolynomial torusPolynomialMultKaratsuba
-#define addMulRToTorusPolynomial addMultKaratsuba
-#define subMulRToTorusPolynomial subMultKaratsuba
+//#define mulRTorusPolynomial torusPolynomialMultKaratsuba
+//#define addMulRToTorusPolynomial addMultKaratsuba
+//#define subMulRToTorusPolynomial subMultKaratsuba
+
+#include "polynomials.h"
+#define mulRTorusPolynomial multFFT
+#define addMulRToTorusPolynomial addMultToFFT
+#define subMulRToTorusPolynomial subMultToFFT
 
 
 #endif //MULTILICATION_H

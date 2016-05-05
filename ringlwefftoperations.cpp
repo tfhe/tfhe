@@ -2,6 +2,7 @@
 #include <iostream>
 #include <random>
 #include <cassert>
+#include <ccomplex>
 #include "lwe.h"
 #include "lweparams.h"
 #include "lwekey.h"
@@ -9,6 +10,7 @@
 #include "ringlwe.h"
 #include "ringgsw.h"
 #include "polynomials.h"
+#include "lwebootstrappingkey.h"
 
 using namespace std;
 
@@ -129,32 +131,37 @@ EXPORT void ringGswFromFFTConvert(RingGSWSample* result, const RingGSWSampleFFT*
 }
 
 struct GlobalsVars {
-    LagrangeHalfCPolynomial* XaiMinusOneFFT;
-    LagrangeHalfCPolynomial* hlsPolFFT;
-    uint32_t* decompOffset1;
-    uint32_t* decompOffset2;
-    uint32_t* decompModMask;
+    cplx* omegaxminus1;
+
+    GlobalsVars() {
+	const int N=1024;
+	const int _2N=2*N;
+	omegaxminus1 = new cplx[_2N];
+	for (int x=0; x<_2N; x++) {
+	    omegaxminus1[x]=cos(x*M_PI/N)-1. + sin(x*M_PI/N) * I;
+	    //exp(i.x.pi/N)-1
+	}
+    }
 };
 GlobalsVars globals;
 
 
 
-EXPORT void ringGswFFTMulXaiMinusOne(RingGSWSampleFFT* result, const int ai, const RingGSWSampleFFT* sample, const RingGSWParams* params) {
-    const LagrangeHalfCPolynomial* xaim1 = globals.XaiMinusOneFFT+ai;
-    const int kpl = params->kpl;
-
-    for (int p=0; p<kpl; p++)
-	ringLweFFTMulR(result->all_samples+p, xaim1, sample->all_samples+p, params->ringlwe_params);
-}
-
 EXPORT void ringGswFFTAddH(RingGSWSampleFFT* result, const RingGSWParams* params) {
-    const LagrangeHalfCPolynomial* hls = globals.hlsPolFFT;
     const int k = params->ringlwe_params->k;
+    const int N = params->ringlwe_params->N;
     const int l = params->l;
+    const int Ns2 = N/2;
 
-    for (int i=0; i<=k; i++)
-	for (int j=0; j<l; j++)
-	    LagrangeHalfCPolynomial_addto(result->sample[i][j].a+i, hls+j);
+    for (int j=0; j<l; j++) {
+	double hj = t32tod(params->h[j]);
+	for (int i=0; i<=k; i++) {
+	    cplx* pol = result->sample[i][j].a[i].coefsC;
+	    for (int t=0; t<Ns2; t++) {
+		pol[t] += hj;
+	    }
+	}
+    }
 }
 
 EXPORT void ringGswFFTClear(RingGSWSampleFFT* result, const RingGSWParams* params) {
@@ -164,30 +171,15 @@ EXPORT void ringGswFFTClear(RingGSWSampleFFT* result, const RingGSWParams* param
 	ringLweFFTClear(result->all_samples+p, params->ringlwe_params);
 }    
 
-EXPORT void LagrangeHalfCPolynomial_decompH(LagrangeHalfCPolynomial* reps, const LagrangeHalfCPolynomial* pol, const int BgBits, const int l) {
-    static uint32_t offset1 = globals.decompOffset1[BgBits];
-    static int32_t offset2 = globals.decompOffset2[BgBits];
-    static uint32_t mask = globals.decompModMask[BgBits];
+EXPORT void LagrangeHalfCPolynomial_decompH(LagrangeHalfCPolynomial* reps, const LagrangeHalfCPolynomial* pol, const RingGSWParams* params) {
+    const int l = params->l;
     const int N = pol->N;
     //TODO attention, this prevents parallelization...
     static TorusPolynomial* a = new_TorusPolynomial(N);
     static IntPolynomial* deca = new_IntPolynomial_array(l,N);
 
     TorusPolynomial_ifft(a,pol);
-    for (int i=0; i<N; i++) {
-	const uint32_t ai = offset1 + a->coefsT[i];
-	for (int j=1; j<l; j++) {
-	    uint32_t aid = ai >> (32-j*BgBits);
-	    int32_t aidm = aid & mask;
-	    aidm -= offset2;
-	    deca[j-1].coefs[i]=aidm;
-	}
-	//Attention, le dernier est un left shift car l*BgBits>=32!
-	uint32_t aid = ai << (l*BgBits-32);
-	int32_t aidm = aid & mask;
-	aidm -= offset2;
-	deca[l-1].coefs[i]=aidm;
-    }
+    Torus32PolynomialDecompH(deca, a, params);
     for (int j=0; j<l; j++) {
 	IntPolynomial_fft(reps+j,deca+j);
     }
@@ -198,16 +190,112 @@ EXPORT void ringLweFFTExternMulGSWTo(RingLWESampleFFT* accum, RingGSWSampleFFT* 
     const int k = ringlwe_params->k;
     const int l = params->l;
     const int kpl = params->kpl;
-    const int BgBits = params->Bgbit;
     const int N = ringlwe_params->N;
     //TODO attention, this prevents parallelization...
-    LagrangeHalfCPolynomial* decomps=new_LagrangeHalfCPolynomial_array(kpl,N);
+    static LagrangeHalfCPolynomial* decomps=new_LagrangeHalfCPolynomial_array(kpl,N);
 
     for (int i=0; i<=k; i++)
-	LagrangeHalfCPolynomial_decompH(decomps+i*l,accum->a+i, BgBits, l);
+	LagrangeHalfCPolynomial_decompH(decomps+i*l,accum->a+i, params);
     ringLweFFTClear(accum, ringlwe_params);
     for (int p=0; p<kpl; p++)
 	ringLweFFTAddMulRTo(accum, decomps+p, gsw->all_samples+p, ringlwe_params);
 }
 
+EXPORT void ringGSWFFTMulByXaiMinusOne(RingGSWSampleFFT* result, const int ai, const RingGSWSampleFFT* bki, const RingGSWParams* params) {
+    const RingLWEParams* ringlwe_params=params->ringlwe_params;
+    const int k = ringlwe_params->k;
+    //const int l = params->l;
+    const int kpl = params->kpl;
+    const int N = ringlwe_params->N;
+    const int Ns2 = N/2;
+    const int _2N = 2*N;
+    //on calcule x^ai-1 en fft
+    //TODO attention, this prevents parallelization...
+    static LagrangeHalfCPolynomial* xaim1=new_LagrangeHalfCPolynomial(N);
+    for (int i=0; i<Ns2; i++)
+	xaim1->coefsC[i]=globals.omegaxminus1[((2*i+1)*ai)%_2N];
+    for (int p=0; p<kpl; p++) {
+	const LagrangeHalfCPolynomial* in_s = bki->all_samples[p].a;
+	LagrangeHalfCPolynomial* out_s = result->all_samples[p].a;
+	for (int j=0; j<=k; j++)
+	   LagrangeHalfCPolynomial_mul(&out_s[j], xaim1, &in_s[j]); 
+    }
+}
+
+EXPORT void createBootstrappingKeyFFT(
+	LWEBootstrappingKeyFFT* bk, 
+	const LWEKey* key_in, 
+	const RingGSWKey* rgsw_key) {
+    assert(bk->bk_params==rgsw_key->params);
+    assert(bk->in_out_params==key_in->params);
+
+    const LWEParams* in_out_params = bk->in_out_params; 
+    const RingGSWParams* bk_params = bk->bk_params;
+    const RingLWEParams* accum_params = bk_params->ringlwe_params;
+    const LWEParams* extract_params = &accum_params->extracted_lweparams;
+    
+    //LWEKeySwitchKey* ks; ///< the keyswitch key (s'->s)
+    const RingLWEKey* accum_key = &rgsw_key->ringlwe_key;
+    LWEKey* extracted_key = new_LWEKey(extract_params);
+    ringLweExtractKey(extracted_key, accum_key);
+    lweCreateKeySwitchKey(bk->ks, extracted_key, key_in);
+    delete_LWEKey(extracted_key);
+    
+    //RingGSWSample* bk; ///< the bootstrapping key (s->s")
+    RingGSWSample* tmpsample = new_RingGSWSample(bk_params);
+    int* kin = key_in->key;
+    const double alpha = accum_params->alpha_min;
+    const int n = in_out_params->n;
+    for (int i=0; i<n; i++) {
+	ringGswSymEncryptInt(tmpsample, kin[i], alpha, rgsw_key);
+	ringGswToFFTConvert(&bk->bk[i], tmpsample, bk_params);
+    }
+    delete_RingGSWSample(tmpsample);
+}
+
+
+EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, Torus32 mu1, Torus32 mu0, const LWESample* x){
+    const Torus32 ab=(mu1+mu0)/2;
+    const Torus32 aa=(mu1-mu0)/2;
+    const RingGSWParams* bk_params = bk->bk_params;
+    const RingLWEParams* accum_params = bk->accum_params;
+    const LWEParams* extract_params = &accum_params->extracted_lweparams;
+    const LWEParams* in_params = bk->in_out_params;
+    const int N=accum_params->N;
+    const int Ns2=N/2;
+    const int Nx2= 2*N;
+    const int n = in_params->n;
+
+    int barb=modSwitchFromTorus32(x->b,Nx2);
+    const RingLWEParams* accum_par=bk->accum_params;
+    //je definis le test vector (multiplié par a inclus !
+    TorusPolynomial* testvect=new_TorusPolynomial(N);
+    for (int i=0;i<Ns2;i++)
+	   testvect->coefsT[i]=aa;
+    for (int i=Ns2;i<N;i++)
+	   testvect->coefsT[i]=-aa;
+    TorusPolynomial* testvectbis=new_TorusPolynomial(N);
+    for (int i=0;i< barb;i++)
+	   testvectbis->coefsT[i]=-testvect->coefsT[N+i-barb];
+    for (int i=barb;i<N;i++)
+	   testvectbis->coefsT[i]=testvect->coefsT[i-barb];
+
+    RingLWESample* acc = new_RingLWESample(accum_par);
+    RingLWESampleFFT* accFFT = new_RingLWESampleFFT(accum_par);
+    ringLweNoiselessTrivial(acc, testvectbis, accum_par);
+    ringLweToFFTConvert(accFFT, acc, accum_params);
+    RingGSWSampleFFT* tempFFT = new_RingGSWSampleFFT(bk_params);
+    for (int i=0; i<n; i++) {
+	int bara=modSwitchFromTorus32(x->a[i],Nx2);
+	if (bara==0) continue; //indeed, this is an easy case!
+	ringGSWFFTMulByXaiMinusOne(tempFFT, bara, bk->bk+i, bk_params);
+	ringGswFFTAddH(tempFFT, bk->bk_params);
+	ringLweFFTExternMulGSWTo(accFFT, tempFFT, bk_params);
+    }
+    ringLweFromFFTConvert(acc, accFFT, accum_params);
+    LWESample* u = new_LWESample(extract_params);
+    sampleExtract(u, acc, extract_params, accum_par);
+    u->b += ab;
+    lweKeySwitch(result, bk->ks, u);
+}
 

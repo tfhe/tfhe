@@ -7,8 +7,8 @@ LWEKeySwitchKey::LWEKeySwitchKey(int basebit, int kslength, const LWEParams* in_
     this->in_params=in_params; 
     this->out_params=out_params; 
     this->mask= base-1;
-    int n=in_params->n;
-    int l=kslength;
+    this->n=in_params->n;
+    this->l=kslength;
     ks0_raw = new_LWESample_array(n*l*base,out_params);
     ks1_raw = new LWESample*[n*l];
     ks = new LWESample**[n];
