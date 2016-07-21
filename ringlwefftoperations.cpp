@@ -277,11 +277,7 @@ EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, To
 	   testvect->coefsT[i]=-aa;
 
     TorusPolynomial* testvectbis=new_TorusPolynomial(N);
-    for (int i=0;i< barb;i++)
-	   testvectbis->coefsT[i]=-testvect->coefsT[N+i-barb];
-    for (int i=barb;i<N;i++)
-	   testvectbis->coefsT[i]=testvect->coefsT[i-barb];
-    // TorusPolynomialMulByXai(testvectbis, barb, testvect);
+    TorusPolynomialMulByXai(testvectbis, barb, testvect);
     
     // Accumulateur 
     RingLWESample* acc = new_RingLWESample(accum_par);
