@@ -256,7 +256,7 @@ EXPORT void createBootstrappingKeyFFT(
 
 EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, Torus32 mu1, Torus32 mu0, const LWESample* x){
     const Torus32 ab=(mu1+mu0)/2;
-    const Torus32 aa=(mu1-mu0)/2;
+    const Torus32 aa = mu0-ab; // aa=(mu1-mu0)/2;
     const RingGSWParams* bk_params = bk->bk_params;
     const RingLWEParams* accum_params = bk->accum_params;
     const LWEParams* extract_params = &accum_params->extracted_lweparams;
@@ -268,34 +268,49 @@ EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, To
 
     int barb=modSwitchFromTorus32(x->b,Nx2);
     const RingLWEParams* accum_par=bk->accum_params;
+    
     //je definis le test vector (multiplié par a inclus !
     TorusPolynomial* testvect=new_TorusPolynomial(N);
     for (int i=0;i<Ns2;i++)
 	   testvect->coefsT[i]=aa;
     for (int i=Ns2;i<N;i++)
 	   testvect->coefsT[i]=-aa;
+
     TorusPolynomial* testvectbis=new_TorusPolynomial(N);
     for (int i=0;i< barb;i++)
 	   testvectbis->coefsT[i]=-testvect->coefsT[N+i-barb];
     for (int i=barb;i<N;i++)
 	   testvectbis->coefsT[i]=testvect->coefsT[i-barb];
-
+    // TorusPolynomialMulByXai(testvectbis, barb, testvect);
+    
+    // Accumulateur 
     RingLWESample* acc = new_RingLWESample(accum_par);
     RingLWESampleFFT* accFFT = new_RingLWESampleFFT(accum_par);
     ringLweNoiselessTrivial(acc, testvectbis, accum_par);
     ringLweToFFTConvert(accFFT, acc, accum_params);
+
     RingGSWSampleFFT* tempFFT = new_RingGSWSampleFFT(bk_params);
     for (int i=0; i<n; i++) {
-	int bara=modSwitchFromTorus32(x->a[i],Nx2);
-	if (bara==0) continue; //indeed, this is an easy case!
-	ringGSWFFTMulByXaiMinusOne(tempFFT, bara, bk->bk+i, bk_params);
-	ringGswFFTAddH(tempFFT, bk->bk_params);
-	ringLweFFTExternMulGSWTo(accFFT, tempFFT, bk_params);
+        // int bara=modSwitchFromTorus32(-x->a[i],Nx2);
+        int bara=modSwitchFromTorus32(x->a[i],Nx2);
+        if (bara==0) continue; //indeed, this is an easy case!
+        ringGSWFFTMulByXaiMinusOne(tempFFT, bara, bk->bk+i, bk_params);
+        ringGswFFTAddH(tempFFT, bk->bk_params);
+        ringLweFFTExternMulGSWTo(accFFT, tempFFT, bk_params);
     }
     ringLweFromFFTConvert(acc, accFFT, accum_params);
+
     LWESample* u = new_LWESample(extract_params);
     sampleExtract(u, acc, extract_params, accum_par);
     u->b += ab;
+    
     lweKeySwitch(result, bk->ks, u);
+    
+    delete_LWESample(u);
+    delete_RingGSWSampleFFT(tempFFT); 
+    delete_RingLWESampleFFT(accFFT);
+    delete_RingLWESample(acc);
+    delete_TorusPolynomial(testvectbis);
+    delete_TorusPolynomial(testvect);
 }
 
