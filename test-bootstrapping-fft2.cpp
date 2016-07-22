@@ -8,6 +8,10 @@
 #include "multiplication.h"
 #include "polynomials.h"
 #include "lwesamples.h"
+#include "lwekey.h"
+#include "lweparams.h"
+#include "ringlwe.h"
+#include "ringgsw.h"
 
 using namespace std;
 
@@ -30,7 +34,17 @@ EXPORT void createBootstrappingKeyFFT(
 	const RingGSWKey* rgsw_key);
 EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, Torus32 mu1, Torus32 mu0, const LWESample* x);
 
+
+#ifndef NDEBUG
+extern const RingLWEKey* debug_accum_key;
+extern const LWEKey* debug_extract_key;
+extern const LWEKey* debug_in_key;
+#endif
+
 int main(int argc, char** argv) {
+#ifndef NDEBUG
+    cout << "DEBUG MODE!" << endl;
+#endif
     //const int count = 1000; //number of tests to compare the 3 types of multiplication
 
     const int N = 1024;
@@ -69,6 +83,14 @@ int main(int argc, char** argv) {
     Torus32 mu_in = modSwitchToTorus32(1,2);
     lweSymEncrypt(test, mu_in, alpha_in, key);
     
+#ifndef NDEBUG
+    debug_accum_key=&key_bk->ringlwe_key;
+    LWEKey* debug_extract_key2=new_LWEKey(&params_accum->extracted_lweparams);
+    ringLweExtractKey(debug_extract_key2, debug_accum_key);
+    debug_extract_key=debug_extract_key2;
+    debug_in_key=key;
+#endif
+
     cout << "starting bootstrapping..." << endl;
 
     clock_t begin = clock();

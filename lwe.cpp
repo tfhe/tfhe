@@ -400,26 +400,22 @@ EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWE
     const uint32_t mask=ks->mask;
 
     lweNoiselessTrivial(result,sample->b,par);
-/*
 #ifndef NDEBUG
     Torus32 expected = sample->b;
     Torus32 actual = lwePhase(result, debug_in_key);
     printf("initialization: actual=%d, expected=%d\n",actual, expected);
 #endif
-*/
     for (int i=0;i<n;i++){
     	uint32_t ai=sample->a[i];
     	for (int j=0;j<l;j++){
     	    uint32_t aij=(ai>>(32-(j+1)*basebit))& mask;
     	    lweSubTo(result,&ks->ks[i][j][aij],par);	
     	}
-/*
 #ifndef NDEBUG
     expected -= ai*debug_extract_key->key[i];
     actual = lwePhase(result, debug_in_key);
     printf("iter %d: ai=%d, ki=%d, actual=%d, expected=%d\n", i, ai, debug_extract_key->key[i], actual, expected);
 #endif
-*/
     }
 }
 

@@ -258,7 +258,7 @@ EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, To
     const Torus32 ab=(mu1+mu0)/2;
     const Torus32 aa = mu0-ab; // aa=(mu1-mu0)/2;
     const RingGSWParams* bk_params = bk->bk_params;
-    const RingLWEParams* accum_par=bk->accum_params;
+    const RingLWEParams* accum_params=bk->accum_params;
     const LWEParams* extract_params = &accum_params->extracted_lweparams;
     const LWEParams* in_params = bk->in_out_params;
     const int N=accum_params->N;
@@ -267,8 +267,7 @@ EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, To
     const int n = in_params->n;
 
     int barb=modSwitchFromTorus32(x->b,Nx2);
-    
-    
+        
     //je definis le test vector (multiplié par a inclus !
     TorusPolynomial* testvect=new_TorusPolynomial(N);
     for (int i=0;i<Ns2;i++)
@@ -280,9 +279,9 @@ EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, To
     TorusPolynomialMulByXai(testvectbis, barb, testvect);
     
     // Accumulateur 
-    RingLWESample* acc = new_RingLWESample(accum_par);
-    RingLWESampleFFT* accFFT = new_RingLWESampleFFT(accum_par);
-    ringLweNoiselessTrivial(acc, testvectbis, accum_par);
+    RingLWESample* acc = new_RingLWESample(accum_params);
+    RingLWESampleFFT* accFFT = new_RingLWESampleFFT(accum_params);
+    ringLweNoiselessTrivial(acc, testvectbis, accum_params);
     ringLweToFFTConvert(accFFT, acc, accum_params);
 
     RingGSWSampleFFT* tempFFT = new_RingGSWSampleFFT(bk_params);
@@ -297,7 +296,7 @@ EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, To
     ringLweFromFFTConvert(acc, accFFT, accum_params);
 
     LWESample* u = new_LWESample(extract_params);
-    sampleExtract(u, acc, extract_params, accum_par);
+    sampleExtract(u, acc, extract_params, accum_params);
     u->b += ab;
     
     lweKeySwitch(result, bk->ks, u);
