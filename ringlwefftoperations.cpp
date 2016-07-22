@@ -305,7 +305,6 @@ EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, To
     {
         for (int j = 0; j < N; ++j)
         {
-            cout << "ci sono" << endl;
             if (acc->a[i].coefsT[j] != acc1->a[i].coefsT[j])
                 cout << acc->a[i].coefsT[j] << ", " << acc1->a[i].coefsT[j] << endl;
         }
