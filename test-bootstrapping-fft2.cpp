@@ -82,7 +82,6 @@ int main(int argc, char** argv) {
 
     Torus32 mu_in = modSwitchToTorus32(1,2);
     lweSymEncrypt(test, mu_in, alpha_in, key);
-    
 #ifndef NDEBUG
     debug_accum_key=&key_bk->ringlwe_key;
     LWEKey* debug_extract_key2=new_LWEKey(&params_accum->extracted_lweparams);

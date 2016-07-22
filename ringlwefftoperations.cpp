@@ -283,6 +283,24 @@ EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, To
     RingLWESampleFFT* accFFT = new_RingLWESampleFFT(accum_params);
     ringLweNoiselessTrivial(acc, testvectbis, accum_params);
     ringLweToFFTConvert(accFFT, acc, accum_params);
+    
+    /*
+    // test fft
+    RingLWESample* acc1 = new_RingLWESample(accum_params);
+    ringLweFromFFTConvert(acc1, accFFT, accum_params);
+    // cout << "TEST " << (acc == acc1) << endl;
+    int k = accum_params->k;
+    for (int i = 0; i < k+1; ++i)
+    {
+        for (int j = 0; j < N; ++i)
+        {
+            cout << "ci sono" << endl;
+            if (acc->a[i].coefsT[j] != acc1->a[i].coefsT[j])
+                cout << acc->a[i].coefsT[j] << ", " << acc1->a[i].coefsT[j] << endl;
+        }
+    }
+    delete_RingLWESample(acc1);
+    */
 
     RingGSWSampleFFT* tempFFT = new_RingGSWSampleFFT(bk_params);
     for (int i=0; i<n; i++) {
