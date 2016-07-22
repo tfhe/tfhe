@@ -258,33 +258,44 @@ EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, To
     const Torus32 ab=(mu1+mu0)/2;
     const Torus32 aa = mu0-ab; // aa=(mu1-mu0)/2;
     const RingGSWParams* bk_params = bk->bk_params;
-    const RingLWEParams* accum_params=bk->accum_params;
+    const RingLWEParams* accum_params = bk->accum_params;
     const LWEParams* extract_params = &accum_params->extracted_lweparams;
     const LWEParams* in_params = bk->in_out_params;
     const int N=accum_params->N;
     const int Ns2=N/2;
     const int Nx2= 2*N;
     const int n = in_params->n;
+    
+    TorusPolynomial* testvect=new_TorusPolynomial(N);
+    TorusPolynomial* testvectbis=new_TorusPolynomial(N);
+#ifdef NDEBUG
+    Torus32 ph = lwePhase(x, debug_in_key);
+    printf("Phase before loop: %d\n",ph);
+    printf("aa (enc 0) before loop: %d\n",aa);
+#endif
 
     int barb=modSwitchFromTorus32(x->b,Nx2);
-        
     //je definis le test vector (multiplié par a inclus !
-    TorusPolynomial* testvect=new_TorusPolynomial(N);
     for (int i=0;i<Ns2;i++)
 	   testvect->coefsT[i]=aa;
     for (int i=Ns2;i<N;i++)
 	   testvect->coefsT[i]=-aa;
-
-    TorusPolynomial* testvectbis=new_TorusPolynomial(N);
     TorusPolynomialMulByXai(testvectbis, barb, testvect);
-    
+
     // Accumulateur 
     RingLWESample* acc = new_RingLWESample(accum_params);
     RingLWESampleFFT* accFFT = new_RingLWESampleFFT(accum_params);
     ringLweNoiselessTrivial(acc, testvectbis, accum_params);
     ringLweToFFTConvert(accFFT, acc, accum_params);
+//#ifndef NDEBUG
+//    ringLweSymDecrypt(testvectbis, acc, accum_params);
+//
+//    int accum
+//    Torus32 ph = lwePhase(x, debug_in_key);
+//    printf("Phase before loop: %d\n",ph);
+//    printf("aa (enc 0) before loop: %d\n",aa);
+//#endif
     
-    /*
     // test fft
     RingLWESample* acc1 = new_RingLWESample(accum_params);
     ringLweFromFFTConvert(acc1, accFFT, accum_params);
@@ -292,7 +303,7 @@ EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, To
     int k = accum_params->k;
     for (int i = 0; i < k+1; ++i)
     {
-        for (int j = 0; j < N; ++i)
+        for (int j = 0; j < N; ++j)
         {
             cout << "ci sono" << endl;
             if (acc->a[i].coefsT[j] != acc1->a[i].coefsT[j])
@@ -300,7 +311,6 @@ EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, To
         }
     }
     delete_RingLWESample(acc1);
-    */
 
     RingGSWSampleFFT* tempFFT = new_RingGSWSampleFFT(bk_params);
     for (int i=0; i<n; i++) {
