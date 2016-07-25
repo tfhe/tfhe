@@ -296,6 +296,7 @@ EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, To
 //    printf("aa (enc 0) before loop: %d\n",aa);
 //#endif
     
+    /*
     // test fft
     RingLWESample* acc1 = new_RingLWESample(accum_params);
     ringLweFromFFTConvert(acc1, accFFT, accum_params);
@@ -310,6 +311,7 @@ EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, To
         }
     }
     delete_RingLWESample(acc1);
+    */
 
     RingGSWSampleFFT* tempFFT = new_RingGSWSampleFFT(bk_params);
     for (int i=0; i<n; i++) {
