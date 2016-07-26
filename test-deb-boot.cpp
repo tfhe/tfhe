@@ -202,6 +202,12 @@ int main(int argc, char** argv) {
     RingGSWSample* temp = new_RingGSWSample(bk_params);
     RingGSWSampleFFT* tempFFT = new_RingGSWSampleFFT(bk_params);
 
+//NICOLAS: j'ai ajouté ce bloc
+#ifndef NDEBUG
+    TorusPolynomial* phase = new_TorusPolynomial(N);
+    TorusPolynomial* phase1 = new_TorusPolynomial(N);
+    int correctOffset = barb;
+#endif
 
     cout << "starting the test..." << endl;
     // the index 1 is given when we don't use the fft
@@ -221,8 +227,20 @@ int main(int argc, char** argv) {
             ringGSWAddH(temp, bk_params);
             ringLWEExternMulRGSWTo(acc1, temp, bk_params);
         }
-        
-        /*
+
+//NICOLAS: et surtout, j'ai ajouté celui-ci!
+#ifndef NDEBUG
+        //EXPORT void ringLwePhase(TorusPolynomial* phase, const RingLWESample* sample, const RingLWEKey* key);
+        ringLwePhase(phase,acc,debug_accum_key);  //celui-ci, c'est la phase de acc (FFT)
+	ringLwePhase(phase1,acc1,debug_accum_key); //celui-ci, c'est la phase de acc1 (Normal)
+	if (debug_in_key->key[i]==1) correctOffset = (correctOffset+bara1)%Nx2; 
+        TorusPolynomialMulByXai(testvectbis, correctOffset, testvect); //celui-ci, c'est la phase idéale (calculée sans bruit avec la clé privée)
+	for (int j=0; j<N; j++) {
+	     printf("Iteration %d, index %d: phase %d vs expected %d vs noiseless %d\n",i,j,phase->coefsT[j],phase1->coefsT[j], testvectbis->coefsT[j]);
+	}
+#endif
+
+	/*
         for (int j = 0; j < 5; ++j) { //for (int j = 0; j < N; ++j) {
             if (acc1->a[i].coefsT[j] != acc->a[i].coefsT[j])
                 cout << i << "," << j << " - " << (acc1->a[i].coefsT[j] - acc->a[i].coefsT[j]) << endl;
