@@ -154,13 +154,13 @@ EXPORT void ringGswFFTAddH(RingGSWSampleFFT* result, const RingGSWParams* params
     const int Ns2 = N/2;
 
     for (int j=0; j<l; j++) {
-	double hj = t32tod(params->h[j]);
-	for (int i=0; i<=k; i++) {
-	    cplx* pol = result->sample[i][j].a[i].coefsC;
-	    for (int t=0; t<Ns2; t++) {
-		pol[t] += hj;
-	    }
-	}
+    	double hj = t32tod(params->h[j]);
+    	for (int i=0; i<=k; i++) {
+    	    cplx* pol = result->sample[i][j].a[i].coefsC;
+    	    for (int t=0; t<Ns2; t++) {
+                pol[t] += hj;
+    	    }
+    	}
     }
 }
 
@@ -215,10 +215,10 @@ EXPORT void ringGSWFFTMulByXaiMinusOne(RingGSWSampleFFT* result, const int ai, c
     for (int i=0; i<Ns2; i++)
 	xaim1->coefsC[i]=globals.omegaxminus1[((2*i+1)*ai)%_2N];
     for (int p=0; p<kpl; p++) {
-	const LagrangeHalfCPolynomial* in_s = bki->all_samples[p].a;
-	LagrangeHalfCPolynomial* out_s = result->all_samples[p].a;
-	for (int j=0; j<=k; j++)
-	   LagrangeHalfCPolynomial_mul(&out_s[j], xaim1, &in_s[j]); 
+        const LagrangeHalfCPolynomial* in_s = bki->all_samples[p].a;
+        LagrangeHalfCPolynomial* out_s = result->all_samples[p].a;
+        for (int j=0; j<=k; j++)
+            LagrangeHalfCPolynomial_mul(&out_s[j], xaim1, &in_s[j]); 
     }
 }
 

@@ -74,7 +74,19 @@ EXPORT void ringLweFFTExternMulGSWTo(RingLWESampleFFT* accum, RingGSWSampleFFT* 
 // **********************************************************************************
 
 
+
+#ifndef NDEBUG
+extern const RingLWEKey* debug_accum_key;
+extern const LWEKey* debug_extract_key;
+extern const LWEKey* debug_in_key;
+#endif
+
+
 int main(int argc, char** argv) {
+
+#ifndef NDEBUG
+    cout << "DEBUG MODE!" << endl;
+#endif
 
     const int N = 1024;
     const int k = 1;
@@ -102,6 +114,7 @@ int main(int argc, char** argv) {
         ringGswFromFFTConvert(&bk1->bk[i], &bk->bk[i], bk_params);
     }
 
+    
     /*
     // test fft
     cplx r;
@@ -111,14 +124,12 @@ int main(int argc, char** argv) {
         ringGswToFFTConvert(&bk2->bk[i], &bk1->bk[i], bk_params);      
     
         for (int p=0; p<kpl; p++){
-            for (int j = 0; j < k+1; ++j)
-            {
-                for (int t = 0; t < N; ++t)
-                {
-                    if (((&bk2->bk[i])->all_samples+p)->a[j].coefsC[N] != ((&bk->bk[i])->all_samples+p)->a[j].coefsC[N])
+            for (int j = 0; j < k+1; ++j) {
+                for (int t = 0; t < N; ++t) {
+                    r = ((&bk2->bk[i])->all_samples+p)->a[j].coefsC[N] - ((&bk->bk[i])->all_samples+p)->a[j].coefsC[N];
+                    if (abs(creal(r))>alpha_bk && abs(cimag(r))>alpha_bk) 
                     {
-                        r = ((&bk2->bk[i])->all_samples+p)->a[j].coefsC[N] - ((&bk->bk[i])->all_samples+p)->a[j].coefsC[N];
-                        printf("%f + i%f\n", creal(r), cimag(r));
+                        printf("%.20f + i%.20f\n", creal(r), cimag(r));
                     }
                 }
             }
@@ -134,6 +145,7 @@ int main(int argc, char** argv) {
     // LWESample* test_out = new_LWESample(in_params);
     LWESample* x = new_LWESample(in_params);
     LWESample* result = new_LWESample(in_params);
+    LWESample* result1 = new_LWESample(in_params);
     
     const Torus32 mu1 = modSwitchToTorus32(1,2);
     const Torus32 mu0 = modSwitchToTorus32(0,2);
@@ -141,6 +153,14 @@ int main(int argc, char** argv) {
     Torus32 mu_in = modSwitchToTorus32(1,2);
     lweSymEncrypt(x, mu_in, alpha_in, key);
 
+
+#ifndef NDEBUG
+    debug_accum_key=&key_bk->ringlwe_key;
+    LWEKey* debug_extract_key2=new_LWEKey(&accum_params->extracted_lweparams);
+    ringLweExtractKey(debug_extract_key2, debug_accum_key);
+    debug_extract_key=debug_extract_key2;
+    debug_in_key=key;
+#endif
 
 
 
@@ -171,7 +191,7 @@ int main(int argc, char** argv) {
     RingLWESample* acc1 = new_RingLWESample(accum_params);
     RingLWESampleFFT* accFFT = new_RingLWESampleFFT(accum_params);
 
-    // acc and accFFt will be used for the bootstrapFFT, acc1=acc will be used for bootstrap
+    // acc and accFFt will be used for bootstrapFFT, acc1=acc will be used for bootstrap
     ringLweNoiselessTrivial(acc, testvectbis, accum_params);
     for (int i = 0; i < k+1; ++i)
         for (int j = 0; j < N; ++j)
@@ -182,51 +202,63 @@ int main(int argc, char** argv) {
     RingGSWSample* temp = new_RingGSWSample(bk_params);
     RingGSWSampleFFT* tempFFT = new_RingGSWSampleFFT(bk_params);
 
+
+    cout << "starting the test..." << endl;
+    // the index 1 is given when we don't use the fft
     for (int i=0; i<n; i++) {
         int bara=modSwitchFromTorus32(-x->a[i],Nx2);
-        if (bara==0) continue; //indeed, this is an easy case!
+        int bara1=modSwitchFromTorus32(-x->a[i],Nx2);
+        
+        if (bara!=0) {
+            ringGSWFFTMulByXaiMinusOne(tempFFT, bara, bk->bk+i, bk_params);
+            ringGswFFTAddH(tempFFT, bk_params);
+            ringLweFFTExternMulGSWTo(accFFT, tempFFT, bk_params);
+            ringLweFromFFTConvert(acc, accFFT, accum_params);
+        }
 
-        ringGSWFFTMulByXaiMinusOne(tempFFT, bara, bk->bk+i, bk_params);
-        ringGswFFTAddH(tempFFT, bk_params);
-        ringLweFFTExternMulGSWTo(accFFT, tempFFT, bk_params);
-        ringLweFromFFTConvert(acc, accFFT, accum_params);
-
-        ringGSWMulByXaiMinusOne(temp, bara, bk1->bk+i, bk_params);
-        ringGSWAddH(temp, bk_params);
-        ringLWEExternMulRGSWTo(acc1, temp, bk_params);
-
-        for (int j = 0; j < N; ++j)
+        if (bara1!=0) {
+            ringGSWMulByXaiMinusOne(temp, bara1, bk1->bk+i, bk_params);
+            ringGSWAddH(temp, bk_params);
+            ringLWEExternMulRGSWTo(acc1, temp, bk_params);
+        }
+        
+        /*
+        for (int j = 0; j < 5; ++j) { //for (int j = 0; j < N; ++j) {
             if (acc1->a[i].coefsT[j] != acc->a[i].coefsT[j])
                 cout << i << "," << j << " - " << (acc1->a[i].coefsT[j] - acc->a[i].coefsT[j]) << endl;
-                    
-        // ringLweToFFTConvert(accFFT, acc, accum_params);
+        }
+        */
+        //ringLweToFFTConvert(accFFT, acc, accum_params);
     }
     ringLweFromFFTConvert(acc, accFFT, accum_params);
 
 
 
 
-    // LWESample* u = new_LWESample(extract_params);
+    LWESample* u = new_LWESample(extract_params);
     LWESample* u1 = new_LWESample(extract_params);
-    // sampleExtract(u, acc, extract_params, accum_params);
+    sampleExtract(u, acc, extract_params, accum_params);
     sampleExtract(u1, acc1, extract_params, accum_params);
-    // u->b += ab;
+    u->b += ab;
     u1->b += ab;
     
-    // lweKeySwitch(result, bk->ks, u);
-    lweKeySwitch(result, bk1->ks, u1);
+    lweKeySwitch(result, bk->ks, u);
+    lweKeySwitch(result1, bk->ks, u1);
     
     
     
 
     Torus32 mu_out = lweSymDecrypt(result, key, 2);
-    cout << "end_variance: " << result->current_variance << endl;
-    if (mu_in != mu_out) dieDramatically("et Zut!");
+    Torus32 mu_out1 = lweSymDecrypt(result1, key, 2);
+    cout << "end_variance FFT: " << result->current_variance << endl;
+    cout << "end_variance: " << result1->current_variance << endl;
+    if (mu_in != mu_out) cout << "Erreur bootstrapFFT!" << endl;
+    if (mu_in != mu_out1) cout << "Erreur bootstrap!" << endl;
 
 
 
     delete_LWESample(u1);
-    // delete_LWESample(u);
+    delete_LWESample(u);
     delete_RingGSWSampleFFT(tempFFT); 
     delete_RingGSWSample(temp);
     delete_RingLWESampleFFT(accFFT);
@@ -237,6 +269,7 @@ int main(int argc, char** argv) {
 
     // delete_LWESample(test_out);
     // delete_LWESample(test);
+    delete_LWESample(result1);
     delete_LWESample(result);
     delete_LWESample(x);
     delete_LWEBootstrappingKey(bk1);

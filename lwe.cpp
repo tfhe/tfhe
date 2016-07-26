@@ -244,8 +244,8 @@ EXPORT void ringGSWAddH(RingGSWSample* result, const RingGSWParams* params){
 
     // compute result += H
     for (int bloc = 0; bloc <= k; ++bloc)
-	for (int i=0; i<l; i++) 
-	    result->bloc_sample[bloc][i].a[bloc].coefsT[0]+=h[i];
+    	for (int i=0; i<l; i++) 
+    	    result->bloc_sample[bloc][i].a[bloc].coefsT[0]+=h[i];
 }
 
 // Result += mu*H
