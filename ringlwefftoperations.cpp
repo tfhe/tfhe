@@ -138,7 +138,7 @@ struct GlobalsVars {
 	const int _2N=2*N;
 	omegaxminus1 = new cplx[_2N];
 	for (int x=0; x<_2N; x++) {
-	    omegaxminus1[x]=cos(x*M_PI/N)-1. + sin(x*M_PI/N) * I;
+	    omegaxminus1[x]=cos(x*M_PI/N)-1. - sin(x*M_PI/N) * I; // instead of cos(x*M_PI/N)-1. + sin(x*M_PI/N) * I
 	    //exp(i.x.pi/N)-1
 	}
     }

@@ -89,6 +89,7 @@ int main(int argc, char** argv) {
 #endif
 
     const int N = 1024;
+
     const int k = 1;
     const int n = 500;
     const int l_bk = 3;
@@ -137,6 +138,30 @@ int main(int argc, char** argv) {
     }
     delete_LWEBootstrappingKeyFFT(bk2);
     */
+
+
+
+    // test omega
+    IntPolynomial* X = new_IntPolynomial(N); 
+    LagrangeHalfCPolynomial* resultFFT = new_LagrangeHalfCPolynomial(N);
+    cplx rFFT;
+    X->coefs[0] = 1;
+    for (int i = 1; i < N; ++i) X->coefs[i] = 0;
+
+    IntPolynomial_fft(resultFFT, X);
+    rFFT = resultFFT->coefsC[0];
+    printf("%.20f + i%.20f\n", creal(rFFT), cimag(rFFT));
+
+
+    double omega_re, omega_im;
+    omega_re = cos(M_PI/1024);
+    omega_im = sin(M_PI/1024);
+    printf("%.20f + i%.20f\n", omega_re, omega_im);
+
+    delete_IntPolynomial(X);
+    delete_LagrangeHalfCPolynomial(resultFFT);
+
+
 
 
 
@@ -236,17 +261,17 @@ int main(int argc, char** argv) {
 	if (debug_in_key->key[i]==1) correctOffset = (correctOffset+bara1)%Nx2; 
         TorusPolynomialMulByXai(testvectbis, correctOffset, testvect); //celui-ci, c'est la phase idéale (calculée sans bruit avec la clé privée)
 	for (int j=0; j<N; j++) {
-	     printf("Iteration %d, index %d: phase %d vs expected %d vs noiseless %d\n",i,j,phase->coefsT[j],phase1->coefsT[j], testvectbis->coefsT[j]);
+	       // printf("Iteration %d, index %d: phase %d vs expected %d vs noiseless %d\n",i,j,phase->coefsT[j],phase1->coefsT[j], testvectbis->coefsT[j]);
 	}
 #endif
 
-	/*
+        /*
         for (int j = 0; j < 5; ++j) { //for (int j = 0; j < N; ++j) {
             if (acc1->a[i].coefsT[j] != acc->a[i].coefsT[j])
                 cout << i << "," << j << " - " << (acc1->a[i].coefsT[j] - acc->a[i].coefsT[j]) << endl;
         }
         */
-        //ringLweToFFTConvert(accFFT, acc, accum_params);
+        //ringLweToFFTConvert(accFFT, acc, accum_params); 
     }
     ringLweFromFFTConvert(acc, accFFT, accum_params);
 
