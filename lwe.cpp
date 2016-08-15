@@ -244,8 +244,8 @@ EXPORT void ringGSWAddH(RingGSWSample* result, const RingGSWParams* params){
 
     // compute result += H
     for (int bloc = 0; bloc <= k; ++bloc)
-	for (int i=0; i<l; i++) 
-	    result->bloc_sample[bloc][i].a[bloc].coefsT[0]+=h[i];
+    	for (int i=0; i<l; i++) 
+    	    result->bloc_sample[bloc][i].a[bloc].coefsT[0]+=h[i];
 }
 
 // Result += mu*H
@@ -400,22 +400,26 @@ EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWE
     const uint32_t mask=ks->mask;
 
     lweNoiselessTrivial(result,sample->b,par);
+/*
 #ifndef NDEBUG
     Torus32 expected = sample->b;
     Torus32 actual = lwePhase(result, debug_in_key);
     printf("initialization: actual=%d, expected=%d\n",actual, expected);
 #endif
+*/
     for (int i=0;i<n;i++){
     	uint32_t ai=sample->a[i];
     	for (int j=0;j<l;j++){
     	    uint32_t aij=(ai>>(32-(j+1)*basebit))& mask;
     	    lweSubTo(result,&ks->ks[i][j][aij],par);	
     	}
+/*
 #ifndef NDEBUG
     expected -= ai*debug_extract_key->key[i];
     actual = lwePhase(result, debug_in_key);
     printf("iter %d: ai=%d, ki=%d, actual=%d, expected=%d\n", i, ai, debug_extract_key->key[i], actual, expected);
 #endif
+*/
     }
 }
 
@@ -642,11 +646,11 @@ EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 
 //#endif
     RingGSWSample* temp = new_RingGSWSample(bk_params);
     for (int i=0; i<n; i++) {
-	int bara=modSwitchFromTorus32(-x->a[i],Nx2);
-	if (bara==0) continue; //indeed, this is an easy case!
-	ringGSWMulByXaiMinusOne(temp, bara, bk->bk+i, bk_params);
-	ringGSWAddH(temp, bk->bk_params);
-	ringLWEExternMulRGSWTo(acc, temp, bk_params);
+	   int bara=modSwitchFromTorus32(-x->a[i],Nx2);
+	   if (bara==0) continue; //indeed, this is an easy case!
+	   ringGSWMulByXaiMinusOne(temp, bara, bk->bk+i, bk_params);
+	   ringGSWAddH(temp, bk->bk_params);
+	   ringLWEExternMulRGSWTo(acc, temp, bk_params);
     }
 #ifndef NDEBUG
     ringLwePhase(testvectbis, acc, debug_accum_key);

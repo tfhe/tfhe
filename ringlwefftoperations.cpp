@@ -14,6 +14,12 @@
 
 using namespace std;
 
+#ifndef NDEBUG
+extern const RingLWEKey* debug_accum_key;
+extern const LWEKey* debug_extract_key;
+extern const LWEKey* debug_in_key;
+#endif
+
 
 EXPORT void ringLweToFFTConvert(RingLWESampleFFT* result, const RingLWESample* source, const RingLWEParams* params){
     const int k = params->k;
@@ -138,7 +144,7 @@ struct GlobalsVars {
 	const int _2N=2*N;
 	omegaxminus1 = new cplx[_2N];
 	for (int x=0; x<_2N; x++) {
-	    omegaxminus1[x]=cos(x*M_PI/N)-1. + sin(x*M_PI/N) * I;
+	    omegaxminus1[x]=cos(x*M_PI/N)-1. - sin(x*M_PI/N) * I; // instead of cos(x*M_PI/N)-1. + sin(x*M_PI/N) * I
 	    //exp(i.x.pi/N)-1
 	}
     }
@@ -154,13 +160,13 @@ EXPORT void ringGswFFTAddH(RingGSWSampleFFT* result, const RingGSWParams* params
     const int Ns2 = N/2;
 
     for (int j=0; j<l; j++) {
-	double hj = t32tod(params->h[j]);
-	for (int i=0; i<=k; i++) {
-	    cplx* pol = result->sample[i][j].a[i].coefsC;
-	    for (int t=0; t<Ns2; t++) {
-		pol[t] += hj;
-	    }
-	}
+    	double hj = t32tod(params->h[j]);
+    	for (int i=0; i<=k; i++) {
+    	    cplx* pol = result->sample[i][j].a[i].coefsC;
+    	    for (int t=0; t<Ns2; t++) {
+                pol[t] += hj;
+    	    }
+    	}
     }
 }
 
@@ -215,10 +221,10 @@ EXPORT void ringGSWFFTMulByXaiMinusOne(RingGSWSampleFFT* result, const int ai, c
     for (int i=0; i<Ns2; i++)
 	xaim1->coefsC[i]=globals.omegaxminus1[((2*i+1)*ai)%_2N];
     for (int p=0; p<kpl; p++) {
-	const LagrangeHalfCPolynomial* in_s = bki->all_samples[p].a;
-	LagrangeHalfCPolynomial* out_s = result->all_samples[p].a;
-	for (int j=0; j<=k; j++)
-	   LagrangeHalfCPolynomial_mul(&out_s[j], xaim1, &in_s[j]); 
+        const LagrangeHalfCPolynomial* in_s = bki->all_samples[p].a;
+        LagrangeHalfCPolynomial* out_s = result->all_samples[p].a;
+        for (int j=0; j<=k; j++)
+            LagrangeHalfCPolynomial_mul(&out_s[j], xaim1, &in_s[j]); 
     }
 }
 
@@ -256,46 +262,85 @@ EXPORT void createBootstrappingKeyFFT(
 
 EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, Torus32 mu1, Torus32 mu0, const LWESample* x){
     const Torus32 ab=(mu1+mu0)/2;
-    const Torus32 aa=(mu1-mu0)/2;
+    const Torus32 aa = mu0-ab; // aa=(mu1-mu0)/2;
     const RingGSWParams* bk_params = bk->bk_params;
-    const RingLWEParams* accum_params = bk->accum_params;
+    const RingLWEParams* accum_params = bk_params->ringlwe_params;
     const LWEParams* extract_params = &accum_params->extracted_lweparams;
-    const LWEParams* in_params = bk->in_out_params;
+    const LWEParams* in_out_params = bk->in_out_params;
+    const int n=in_out_params->n;
     const int N=accum_params->N;
     const int Ns2=N/2;
     const int Nx2= 2*N;
-    const int n = in_params->n;
+    
+    
+    TorusPolynomial* testvect=new_TorusPolynomial(N);
+    TorusPolynomial* testvectbis=new_TorusPolynomial(N);
+
 
     int barb=modSwitchFromTorus32(x->b,Nx2);
-    const RingLWEParams* accum_par=bk->accum_params;
     //je definis le test vector (multiplié par a inclus !
-    TorusPolynomial* testvect=new_TorusPolynomial(N);
     for (int i=0;i<Ns2;i++)
-	   testvect->coefsT[i]=aa;
+       testvect->coefsT[i]=aa;
     for (int i=Ns2;i<N;i++)
-	   testvect->coefsT[i]=-aa;
-    TorusPolynomial* testvectbis=new_TorusPolynomial(N);
-    for (int i=0;i< barb;i++)
-	   testvectbis->coefsT[i]=-testvect->coefsT[N+i-barb];
-    for (int i=barb;i<N;i++)
-	   testvectbis->coefsT[i]=testvect->coefsT[i-barb];
+       testvect->coefsT[i]=-aa;
+    TorusPolynomialMulByXai(testvectbis, barb, testvect);
 
-    RingLWESample* acc = new_RingLWESample(accum_par);
-    RingLWESampleFFT* accFFT = new_RingLWESampleFFT(accum_par);
-    ringLweNoiselessTrivial(acc, testvectbis, accum_par);
+    // Accumulateur 
+    RingLWESample* acc = new_RingLWESample(accum_params);
+    RingLWESampleFFT* accFFT = new_RingLWESampleFFT(accum_params);
+
+    // acc and accFFt will be used for bootstrapFFT, acc1=acc will be used for bootstrap
+    ringLweNoiselessTrivial(acc, testvectbis, accum_params);
     ringLweToFFTConvert(accFFT, acc, accum_params);
+
+    RingGSWSample* temp = new_RingGSWSample(bk_params);
     RingGSWSampleFFT* tempFFT = new_RingGSWSampleFFT(bk_params);
+
+//NICOLAS: j'ai ajouté ce bloc
+#ifndef NDEBUG
+    TorusPolynomial* phase = new_TorusPolynomial(N);
+    int correctOffset = barb;
+#endif
+
+    cout << "starting the test..." << endl;
+    // the index 1 is given when we don't use the fft
     for (int i=0; i<n; i++) {
-	int bara=modSwitchFromTorus32(x->a[i],Nx2);
-	if (bara==0) continue; //indeed, this is an easy case!
-	ringGSWFFTMulByXaiMinusOne(tempFFT, bara, bk->bk+i, bk_params);
-	ringGswFFTAddH(tempFFT, bk->bk_params);
-	ringLweFFTExternMulGSWTo(accFFT, tempFFT, bk_params);
+        int bara=modSwitchFromTorus32(-x->a[i],Nx2);
+        
+        if (bara!=0) {
+            ringGSWFFTMulByXaiMinusOne(tempFFT, bara, bk->bk+i, bk_params);
+            ringGswFFTAddH(tempFFT, bk_params);
+            ringLweFFTExternMulGSWTo(accFFT, tempFFT, bk_params);
+        }
+
+//NICOLAS: et surtout, j'ai ajouté celui-ci!
+#ifndef NDEBUG
+            ringLweFromFFTConvert(acc, accFFT, accum_params);
+        ringLwePhase(phase,acc,debug_accum_key);  //celui-ci, c'est la phase de acc (FFT)
+	if (debug_in_key->key[i]==1) correctOffset = (correctOffset+bara)%Nx2; 
+        TorusPolynomialMulByXai(testvectbis, correctOffset, testvect); //celui-ci, c'est la phase idéale (calculée sans bruit avec la clé privée)
+	for (int j=0; j<N; j++) {
+	       printf("Iteration %d, index %d: phase %d vs noiseless %d\n",i,j,phase->coefsT[j], testvectbis->coefsT[j]);
+	}
+#endif
+
     }
     ringLweFromFFTConvert(acc, accFFT, accum_params);
-    LWESample* u = new_LWESample(extract_params);
-    sampleExtract(u, acc, extract_params, accum_par);
-    u->b += ab;
-    lweKeySwitch(result, bk->ks, u);
-}
 
+
+    LWESample* u = new_LWESample(extract_params);
+    sampleExtract(u, acc, extract_params, accum_params);
+    u->b += ab;
+    
+    lweKeySwitch(result, bk->ks, u);
+    
+
+
+    delete_LWESample(u);
+    delete_RingGSWSampleFFT(tempFFT); 
+    delete_RingGSWSample(temp);
+    delete_RingLWESampleFFT(accFFT);
+    delete_RingLWESample(acc);
+    delete_TorusPolynomial(testvectbis);
+    delete_TorusPolynomial(testvect);
+}
