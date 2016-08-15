@@ -24,19 +24,27 @@ OPTIM_O_FILES=$(patsubst %,optim/%,${O_FILES})
 OPTIM_LIB_O_FILES=$(patsubst %,optim/%,${LIB_O_FILES})
 OPTIM_MAIN_FILES=$(patsubst %,%-optim,${MAIN_FILES})
 
-OPTIMFLAGS=-O2 -DNDEBUG -funroll-loops -funroll-all-loops
-DEBUGFLAGS=-O0 -g3 -Wall -Werror
+FFT_PROCESSOR=NAYUKI_FFT_PROCESSOR
+#FFT_PROCESSOR=FFTW_FFT_PROCESSOR
+OPTIMFLAGS=-O2 -DNDEBUG -D${FFT_PROCESSOR} -funroll-loops -funroll-all-loops
+DEBUGFLAGS=-O0 -D${FFT_PROCESSOR} -g3 -Wall -Werror
 LIBS=-lfftw3 -lm
 
 all: ${DEBUG_O_FILES} ${DEBUG_MAIN_FILES}
 
-pre:
-	mkdir -p optim/fft_x86_assembly debug/fft_x86_assembly 2>/dev/null >/dev/null || true
+pre: optim/fft_x86_assembly debug/fft_x86_assembly
+	touch pre
 	
+optim/fft_x86_assembly:
+	mkdir -p optim/fft_x86_assembly 2>/dev/null >/dev/null || true
+
+debug/fft_x86_assembly:
+	mkdir -p debug/fft_x86_assembly 2>/dev/null >/dev/null || true
+
 optim: ${OPTIM_O_FILES} ${OPTIM_MAIN_FILES}
 
 clean:
-	rm ${OPTIM_O_FILES} ${OPTIM_MAIN_FILES} ${DEBUG_MAIN_FILES} ${DEBUG_O_FILES} 2>/dev/null >/dev/null || true
+	rm pre ${OPTIM_O_FILES} ${OPTIM_MAIN_FILES} ${DEBUG_MAIN_FILES} ${DEBUG_O_FILES} 2>/dev/null >/dev/null || true
 
 
 debug/%.o:  %.cpp pre ${H_FILES}

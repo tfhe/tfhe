@@ -156,7 +156,7 @@ class FFT_Processor_Nayuki {
 
 static FFT_Processor_Nayuki fftp1024(1024);
 
-#if 0
+#ifdef NAYUKI_FFT_PROCESSOR
 /**
  * FFT functions 
  */

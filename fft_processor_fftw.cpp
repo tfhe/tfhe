@@ -77,7 +77,7 @@ class FFT_Processor {
 
 static FFT_Processor fftp1024(1024);
 
-#if 1
+#ifdef FFTW_FFT_PROCESSOR
 /**
  * FFT functions 
  */
