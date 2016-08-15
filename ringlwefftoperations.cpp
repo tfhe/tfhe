@@ -14,6 +14,12 @@
 
 using namespace std;
 
+#ifndef NDEBUG
+extern const RingLWEKey* debug_accum_key;
+extern const LWEKey* debug_extract_key;
+extern const LWEKey* debug_in_key;
+#endif
+
 
 EXPORT void ringLweToFFTConvert(RingLWESampleFFT* result, const RingLWESample* source, const RingLWEParams* params){
     const int k = params->k;
@@ -258,71 +264,69 @@ EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, To
     const Torus32 ab=(mu1+mu0)/2;
     const Torus32 aa = mu0-ab; // aa=(mu1-mu0)/2;
     const RingGSWParams* bk_params = bk->bk_params;
-    const RingLWEParams* accum_params = bk->accum_params;
+    const RingLWEParams* accum_params = bk_params->ringlwe_params;
     const LWEParams* extract_params = &accum_params->extracted_lweparams;
-    const LWEParams* in_params = bk->in_out_params;
+    const LWEParams* in_out_params = bk->in_out_params;
+    const int n=in_out_params->n;
     const int N=accum_params->N;
     const int Ns2=N/2;
     const int Nx2= 2*N;
-    const int n = in_params->n;
+    
     
     TorusPolynomial* testvect=new_TorusPolynomial(N);
     TorusPolynomial* testvectbis=new_TorusPolynomial(N);
-#ifdef NDEBUG
-    Torus32 ph = lwePhase(x, debug_in_key);
-    printf("Phase before loop: %d\n",ph);
-    printf("aa (enc 0) before loop: %d\n",aa);
-#endif
+
 
     int barb=modSwitchFromTorus32(x->b,Nx2);
     //je definis le test vector (multiplié par a inclus !
     for (int i=0;i<Ns2;i++)
-	   testvect->coefsT[i]=aa;
+       testvect->coefsT[i]=aa;
     for (int i=Ns2;i<N;i++)
-	   testvect->coefsT[i]=-aa;
+       testvect->coefsT[i]=-aa;
     TorusPolynomialMulByXai(testvectbis, barb, testvect);
 
     // Accumulateur 
     RingLWESample* acc = new_RingLWESample(accum_params);
     RingLWESampleFFT* accFFT = new_RingLWESampleFFT(accum_params);
+
+    // acc and accFFt will be used for bootstrapFFT, acc1=acc will be used for bootstrap
     ringLweNoiselessTrivial(acc, testvectbis, accum_params);
     ringLweToFFTConvert(accFFT, acc, accum_params);
-//#ifndef NDEBUG
-//    ringLweSymDecrypt(testvectbis, acc, accum_params);
-//
-//    int accum
-//    Torus32 ph = lwePhase(x, debug_in_key);
-//    printf("Phase before loop: %d\n",ph);
-//    printf("aa (enc 0) before loop: %d\n",aa);
-//#endif
-    
-    /*
-    // test fft
-    RingLWESample* acc1 = new_RingLWESample(accum_params);
-    ringLweFromFFTConvert(acc1, accFFT, accum_params);
-    // cout << "TEST " << (acc == acc1) << endl;
-    int k = accum_params->k;
-    for (int i = 0; i < k+1; ++i)
-    {
-        for (int j = 0; j < N; ++j)
-        {
-            if (acc->a[i].coefsT[j] != acc1->a[i].coefsT[j])
-                cout << acc->a[i].coefsT[j] << ", " << acc1->a[i].coefsT[j] << endl;
-        }
-    }
-    delete_RingLWESample(acc1);
-    */
 
+    RingGSWSample* temp = new_RingGSWSample(bk_params);
     RingGSWSampleFFT* tempFFT = new_RingGSWSampleFFT(bk_params);
+
+//NICOLAS: j'ai ajouté ce bloc
+#ifndef NDEBUG
+    TorusPolynomial* phase = new_TorusPolynomial(N);
+    int correctOffset = barb;
+#endif
+
+    cout << "starting the test..." << endl;
+    // the index 1 is given when we don't use the fft
     for (int i=0; i<n; i++) {
-        // int bara=modSwitchFromTorus32(-x->a[i],Nx2);
-        int bara=modSwitchFromTorus32(x->a[i],Nx2);
-        if (bara==0) continue; //indeed, this is an easy case!
-        ringGSWFFTMulByXaiMinusOne(tempFFT, bara, bk->bk+i, bk_params);
-        ringGswFFTAddH(tempFFT, bk->bk_params);
-        ringLweFFTExternMulGSWTo(accFFT, tempFFT, bk_params);
+        int bara=modSwitchFromTorus32(-x->a[i],Nx2);
+        
+        if (bara!=0) {
+            ringGSWFFTMulByXaiMinusOne(tempFFT, bara, bk->bk+i, bk_params);
+            ringGswFFTAddH(tempFFT, bk_params);
+            ringLweFFTExternMulGSWTo(accFFT, tempFFT, bk_params);
+        }
+
+//NICOLAS: et surtout, j'ai ajouté celui-ci!
+#ifndef NDEBUG
+            ringLweFromFFTConvert(acc, accFFT, accum_params);
+        ringLwePhase(phase,acc,debug_accum_key);  //celui-ci, c'est la phase de acc (FFT)
+	if (debug_in_key->key[i]==1) correctOffset = (correctOffset+bara)%Nx2; 
+        TorusPolynomialMulByXai(testvectbis, correctOffset, testvect); //celui-ci, c'est la phase idéale (calculée sans bruit avec la clé privée)
+	for (int j=0; j<N; j++) {
+	       printf("Iteration %d, index %d: phase %d vs noiseless %d\n",i,j,phase->coefsT[j], testvectbis->coefsT[j]);
+	}
+#endif
+
     }
     ringLweFromFFTConvert(acc, accFFT, accum_params);
+
 
     LWESample* u = new_LWESample(extract_params);
     sampleExtract(u, acc, extract_params, accum_params);
@@ -330,11 +334,13 @@ EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, To
     
     lweKeySwitch(result, bk->ks, u);
     
+
+
     delete_LWESample(u);
     delete_RingGSWSampleFFT(tempFFT); 
+    delete_RingGSWSample(temp);
     delete_RingLWESampleFFT(accFFT);
     delete_RingLWESample(acc);
     delete_TorusPolynomial(testvectbis);
     delete_TorusPolynomial(testvect);
 }
-

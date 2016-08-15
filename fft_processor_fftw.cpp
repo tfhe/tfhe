@@ -1,6 +1,7 @@
 #include <complex.h>
 #define complex _Complex
 #include <fftw3.h>
+#include "polynomials.h"
 #include <cassert>
 #include <cmath>
 
@@ -74,8 +75,9 @@ class FFT_Processor {
     }
 };
 
-FFT_Processor fftp1024(1024);
+static FFT_Processor fftp1024(1024);
 
+#if 1
 /**
  * FFT functions 
  */
@@ -88,4 +90,4 @@ EXPORT void TorusPolynomial_fft(LagrangeHalfCPolynomial* result, const TorusPoly
 EXPORT void TorusPolynomial_ifft(TorusPolynomial* result, const LagrangeHalfCPolynomial* p) {
     fftp1024.execute_reverse_Torus32(result->coefsT, p->coefsC);
 }
-
+#endif
