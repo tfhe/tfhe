@@ -22,11 +22,16 @@
  *   Software.
  */
 
-#pragma once
+#ifndef FFT_NAYUKI_H
+#define FFT_NAYUKI_H
 
 
-void *fft_init(size_t n);
+void* fft_init(size_t n);
+
+void* fft_init_reverse(size_t n);
 
 void fft_transform(const void *tables, double *real, double *imag);
 
 void fft_destroy(void *tables);
+
+#endif //FFT_NAYUKI_H

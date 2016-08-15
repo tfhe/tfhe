@@ -92,6 +92,54 @@ void *fft_init(size_t n) {
 	return tables;
 }
 
+// Returns a pointer to an opaque structure of FFT tables. n must be a power of 2 and n >= 4.
+void *fft_init_reverse(size_t n) {
+	// Check size argument
+	if (n < 4 || n > UINT64_MAX || (n & (n - 1)) != 0)
+		return NULL;  // Error: Size is too small or is not a power of 2
+	if (n - 4 > SIZE_MAX / sizeof(double) / 2 || n > SIZE_MAX / sizeof(size_t))
+		return NULL;  // Error: Size is too large, which makes memory allocation impossible
+	
+	// Allocate structure
+	struct FftTables *tables = malloc(sizeof(struct FftTables));
+	if (tables == NULL)
+		return NULL;
+	tables->n = n;
+	
+	// Allocate arrays
+	tables->bit_reversed = malloc(n * sizeof(size_t));
+	tables->trig_tables = malloc((n - 4) * 2 * sizeof(double));
+	if (tables->bit_reversed == NULL || tables->trig_tables == NULL) {
+		free(tables->bit_reversed);
+		free(tables->trig_tables);
+		free(tables);
+		return NULL;
+	}
+	
+	// Precompute bit reversal table
+	int levels = floor_log2(n);
+	uint64_t i;
+	for (i = 0; i < n; i++)
+		tables->bit_reversed[i] = reverse_bits(i, levels);
+	
+	// Precompute the packed trigonometric table for each FFT internal level
+	uint64_t size;
+	uint64_t k = 0;
+	for (size = 8; size <= n; size *= 2) {
+		for (i = 0; i < size / 2; i += 4) {
+			uint64_t j;
+			for (j = 0; j < 4; j++, k++)
+				tables->trig_tables[k] = accurate_sine(i + j + size / 4, size);  // Cosine
+			for (j = 0; j < 4; j++, k++)
+				tables->trig_tables[k] = -accurate_sine(i + j, size);  // Sine
+		}
+		if (size == n)
+			break;
+	}
+	return tables;
+}
+
+
 
 // Deallocates the given structure of FFT tables.
 void fft_destroy(void *tables) {
