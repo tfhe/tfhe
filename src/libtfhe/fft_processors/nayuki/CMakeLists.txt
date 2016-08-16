@@ -1,0 +1,28 @@
+cmake_minimum_required(VERSION 3.0)
+
+# This is the nayuki fft processor for the tfhe library
+project(libtfhe-fft-nayuki)
+
+include_directories(../../../include/)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
+enable_language(ASM)
+
+set(SRCS_PORTABLE
+    fft-x8664-avx-aux.c
+    fft-model-of-x8664-avx.c
+    fft_processor_nayuki.cpp
+    )
+    
+set(SRCS_AVX
+    fft-x8664-avx-aux.c
+    fft-x8664-avx.s
+    fft-x8664-avx-reverse.s
+    fft_processor_nayuki.cpp
+    )
+    
+set(HEADERS
+    fft.h
+    )
+
+add_library(tfhe-fft-nayuki-portable ${SRCS_PORTABLE} ${HEADERS})
+add_library(tfhe-fft-nayuki-avx ${SRCS_AVX} ${HEADERS})
