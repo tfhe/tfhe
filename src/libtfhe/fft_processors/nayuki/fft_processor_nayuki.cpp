@@ -156,7 +156,6 @@ class FFT_Processor_Nayuki {
 
 static FFT_Processor_Nayuki fftp1024(1024);
 
-#ifdef NAYUKI_FFT_PROCESSOR
 /**
  * FFT functions 
  */
@@ -169,4 +168,3 @@ EXPORT void TorusPolynomial_fft(LagrangeHalfCPolynomial* result, const TorusPoly
 EXPORT void TorusPolynomial_ifft(TorusPolynomial* result, const LagrangeHalfCPolynomial* p) {
     fftp1024.execute_reverse_Torus32(result->coefsT, p->coefsC);
 }
-#endif
