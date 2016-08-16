@@ -22,10 +22,21 @@ set(HEADERS
     ../include/toruspolynomial-functions.h
     )
 
+if (DEFAULT_FFT_PROCESSOR STREQUAL "fftw")
 set(RUNTIME_LIBS
     tfhe-fftw
     -lfftw3
     )
+elseif (DEFAULT_FFT_PROCESSOR STREQUAL "nayuki-portable")
+set(RUNTIME_LIBS
+    tfhe-nayuki-portable
+    )
+elseif (DEFAULT_FFT_PROCESSOR STREQUAL "nayuki-avx")
+set(RUNTIME_LIBS
+    tfhe-nayuki-avx
+    )
+endif (DEFAULT_FFT_PROCESSOR STREQUAL "fftw") 
+
 
 add_executable(test-bootstrapping test-bootstrapping.cpp ${HEADERS})
 add_executable(test-bootstrapping-fft2 test-bootstrapping-fft2.cpp ${HEADERS})

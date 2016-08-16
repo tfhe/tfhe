@@ -43,7 +43,14 @@ set(HEADERS
     ../include/toruspolynomial-functions.h
     )
 
-add_library(tfhe-fftw ${SRCS} ${HEADERS} $<TARGET_OBJECTS:tfhe-fft-fftw>)
-add_library(tfhe-nayuki-avx ${SRCS} ${HEADERS} $<TARGET_OBJECTS:tfhe-fft-nayuki-avx>)
-add_library(tfhe-nayuki-portable ${SRCS} ${HEADERS} $<TARGET_OBJECTS:tfhe-fft-nayuki-portable>)
+if (ENABLE_FFTW) 
+    add_library(tfhe-fftw ${SRCS} ${HEADERS} $<TARGET_OBJECTS:tfhe-fft-fftw>)
+endif (ENABLE_FFTW) 
 
+if (ENABLE_NAYUKI_AVX) 
+    add_library(tfhe-nayuki-avx ${SRCS} ${HEADERS} $<TARGET_OBJECTS:tfhe-fft-nayuki-avx>)
+endif (ENABLE_NAYUKI_AVX)
+
+if (ENABLE_NAYUKI_PORTABLE) 
+    add_library(tfhe-nayuki-portable ${SRCS} ${HEADERS} $<TARGET_OBJECTS:tfhe-fft-nayuki-portable>)
+endif (ENABLE_NAYUKI_PORTABLE) 

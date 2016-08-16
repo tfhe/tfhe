@@ -594,8 +594,7 @@ return (xx>>32)%Nx2;
 EXPORT void sampleExtract(LWESample* result, const RingLWESample* x, const LWEParams* params,  const RingLWEParams* rparams) {
     const int N = rparams->N;
     const int k = rparams->k;
-    const int n = params->n;
-    assert(n == k*N);
+    assert(params->n == k*N);
     for (int i=0; i<k; i++) {
 	result->a[i*N]=x->a[i].coefsT[0];
     	for (int j=1; j<N; j++)
@@ -736,8 +735,7 @@ EXPORT void ringLweExtractKey(LWEKey* result, const RingLWEKey* key) //sans dout
 {
     const int N = key->params->N;
     const int k = key->params->k;
-    const int n = result->params->n;
-    assert(n == k*N);
+    assert(result->params->n == k*N);
     for (int i=0; i<k; i++) {
     	for (int j=0; j<N; j++)
     	    result->key[i*N+j]=key->key[i].coefs[j];

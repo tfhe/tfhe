@@ -4,7 +4,6 @@ cmake_minimum_required(VERSION 3.0)
 project(libtfhe-fft-nayuki)
 
 include_directories(../../../include/)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++11")
 enable_language(ASM)
 
 set(SRCS_PORTABLE
@@ -24,5 +23,10 @@ set(HEADERS
     fft.h
     )
 
-add_library(tfhe-fft-nayuki-portable OBJECT ${SRCS_PORTABLE} ${HEADERS})
-add_library(tfhe-fft-nayuki-avx OBJECT ${SRCS_AVX} ${HEADERS})
+if (ENABLE_NAYUKI_PORTABLE) 
+    add_library(tfhe-fft-nayuki-portable OBJECT ${SRCS_PORTABLE} ${HEADERS})
+endif (ENABLE_NAYUKI_PORTABLE) 
+
+if (ENABLE_NAYUKI_AVX) 
+    add_library(tfhe-fft-nayuki-avx OBJECT ${SRCS_AVX} ${HEADERS})
+endif (ENABLE_NAYUKI_AVX) 
