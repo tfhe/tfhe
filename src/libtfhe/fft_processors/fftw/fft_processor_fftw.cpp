@@ -5,6 +5,7 @@
 #include <cassert>
 #include <cmath>
 
+namespace {
 class FFT_Processor {
     const int _2N;
     const int N;    
@@ -75,9 +76,8 @@ class FFT_Processor {
     }
 };
 
-static FFT_Processor fftp1024(1024);
-
-#ifdef FFTW_FFT_PROCESSOR
+FFT_Processor fftp1024(1024);
+}
 /**
  * FFT functions 
  */
@@ -90,4 +90,3 @@ EXPORT void TorusPolynomial_fft(LagrangeHalfCPolynomial* result, const TorusPoly
 EXPORT void TorusPolynomial_ifft(TorusPolynomial* result, const LagrangeHalfCPolynomial* p) {
     fftp1024.execute_reverse_Torus32(result->coefsT, p->coefsC);
 }
-#endif
