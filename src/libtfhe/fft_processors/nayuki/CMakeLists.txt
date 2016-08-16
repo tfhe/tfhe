@@ -24,5 +24,5 @@ set(HEADERS
     fft.h
     )
 
-add_library(tfhe-fft-nayuki-portable ${SRCS_PORTABLE} ${HEADERS})
-add_library(tfhe-fft-nayuki-avx ${SRCS_AVX} ${HEADERS})
+add_library(tfhe-fft-nayuki-portable OBJECT ${SRCS_PORTABLE} ${HEADERS})
+add_library(tfhe-fft-nayuki-avx OBJECT ${SRCS_AVX} ${HEADERS})

@@ -22,6 +22,11 @@ set(HEADERS
     ../include/toruspolynomial-functions.h
     )
 
+set(RUNTIME_LIBS
+    tfhe-fftw
+    -lfftw3
+    )
+
 add_executable(test-bootstrapping test-bootstrapping.cpp ${HEADERS})
 add_executable(test-bootstrapping-fft2 test-bootstrapping-fft2.cpp ${HEADERS})
 add_executable(test-deb-boot test-deb-boot.cpp ${HEADERS})
@@ -29,14 +34,6 @@ add_executable(test-decomp-ringgsw test-decomp-ringgsw.cpp ${HEADERS})
 add_executable(test-lwe test-lwe.cpp ${HEADERS})
 add_executable(test-multiplication test-multiplication.cpp ${HEADERS})
 add_executable(test-ringlwe test-ringlwe.cpp ${HEADERS})
-
-
-#find_package(FFTW REQUIRED)
-set(RUNTIME_LIBS
-    tfhe
-    tfhe-fft-fftw
-    -lfftw3
-    )
 
 target_link_libraries(test-bootstrapping ${RUNTIME_LIBS})
 target_link_libraries(test-bootstrapping-fft2 ${RUNTIME_LIBS})

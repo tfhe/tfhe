@@ -14,4 +14,4 @@ set(SRCS
 set(HEADERS
     )
 
-add_library(tfhe-fft-fftw ${SRCS} ${HEADERS})
+add_library(tfhe-fft-fftw OBJECT ${SRCS} ${HEADERS})
