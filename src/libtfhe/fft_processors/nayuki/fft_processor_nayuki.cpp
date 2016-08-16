@@ -1,6 +1,6 @@
 #include <complex.h>
 #include "polynomials.h"
-#include "fft_x86_assembly/fft.h"
+#include "fft.h"
 #include <cassert>
 #include <cmath>
 
