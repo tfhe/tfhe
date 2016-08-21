@@ -1,10 +1,7 @@
------------------------------------------------------------------
-https://www.nayuki.io/page/fast-fourier-transform-in-x86-assembly
------------------------------------------------------------------
+-------------------------------------------------------
+Fast Fourier transform in x86 assembly - Project Nayuki
+-------------------------------------------------------
 
-Project Nayuki
-
-Fast Fourier transform in x86 assembly
 
 This library calculates the fast Fourier transform. It uses the same equation as the implementation on the page Free small FFT in multiple languages, and the FFT is unscaled. The key feature is that a hand-optimized assembly language implementation is provided for x86-64 AVX (supported by Intel Sandy Bridge CPUs and later).
 Source code
@@ -80,4 +77,5 @@ Categories: Programming, C/C++, x86 assembly
 
 Last updated: 2015-05-11
 
-Copyright © 2016 Project Nayuki
+Copyright © Project Nayuki  
+https://www.nayuki.io/page/fast-fourier-transform-in-x86-assembly
