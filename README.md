@@ -16,8 +16,8 @@ Currently, the project has been tested with the g++ compiler under Linux. In the
 
 At least one FFT processor is needed to run the project:
 
-* The default processor comes from Project Nayuki, who proposes two implementations of the fast Fourier transform - one in portable C, and the other using the AVX assembly instructions. https://www.nayuki.io/page/fast-fourier-transform-in-x86-assembly
-This component is licensed under the MIT license, and we added the code of the reverse FFT (both in C and in assembly).
+* The default processor comes from Project Nayuki, who proposes two implementations of the fast Fourier transform - one in portable C, and the other using the AVX assembly instructions.
+This component is licensed under the MIT license, and we added the code of the reverse FFT (both in C and in assembly). Original source: https://www.nayuki.io/page/fast-fourier-transform-in-x86-assembly
 * We also provide a connector for the FFTW3 library: http://www.fftw.org. With this library, the performance of the FFT is between 2 and 3 times faster than the default Nayuki implementation. However, you should keep in mind that the library FFTW is published under the GPL License. If you choose to use this library in a final product, this product will have to be under GPL License as well (other commercial licenses are available on their web site)
 * We plan to add other connectors in the future (for instance the Intel’s IPP Fourier Transform, which should be 1.5× faster than FFTW for 1D real data)
 
