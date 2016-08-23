@@ -1,14 +1,7 @@
------------------------------------------------------------------
-https://www.nayuki.io/page/fast-fourier-transform-in-x86-assembly
------------------------------------------------------------------
+-------------------------------------------------------
+Fast Fourier transform in x86 assembly - Project Nayuki
+-------------------------------------------------------
 
-Project Nayuki
-
-    RecentProgrammingMathRandom
-
-    About/ContactGitHub
-
-Fast Fourier transform in x86 assembly
 
 This library calculates the fast Fourier transform. It uses the same equation as the implementation on the page Free small FFT in multiple languages, and the FFT is unscaled. The key feature is that a hand-optimized assembly language implementation is provided for x86-64 AVX (supported by Intel Sandy Bridge CPUs and later).
 Source code
@@ -43,32 +36,32 @@ Source code notes:
 Benchmark
 
 For each implementation and FFT size, the number is the execution time in nanoseconds per iteration.
-FFT size 	C impl, -O0 	C impl, -O1 	C model of AVX, -O1 	AVX impl 	Speedup
-4		81		33		15			19		0.79×
-8		195		66		35			29		1.21×
-16		468		134		87			46		1.89×
-32		1 087		278		210			92		2.28×
-64		2 500		594		494			207		2.39×
-128		5 638		1 298		1 138			507		2.24×
-256		13 542		2 949		2 634			1 680		1.57×
-512		29 910		6 997		6 560			3 277		2.00×
-1 024		65 865		15 715		15 005			7 286		2.06×
-2 048		144 452		36 746		33 859			17 075		1.98×
-4 096		317 598		86 162		80 733			47 581		1.70×
-8 192		687 521		198 965		189 643			112 089		1.69×
-16 384		1 497 747	405 952		410 043			256 435		1.60×
-32 768		3 330 258	1 055 371	928 485			666 325		1.39×
-65 536		7 282 305	2 426 037	1 951 704		1 435 606	1.36×
-131 072		16 035 397	5 546 165	4 142 270		3 028 641	1.37×
-262 144		34 795 636	11 811 311	8 978 397		6 598 887	1.36×
-524 288		90 042 669	35 911 574	23 751 996		18 866 343	1.26×
-1 048 576	270 490 724	151 551 517	71 873 200		65 876 359	1.09×
-2 097 152	658 375 195	375 815 597	155 215 482		152 884 652	1.02×
-4 194 304	1 361 986 528	782 913 943	329 475 964		323 074 038	1.02×
-8 388 608	3 225 336 375	1 879 716 450	685 629 776		660 085 400	1.04×
-16 777 216	7 300 920 662	4 457 742 453	1 427 182 753		1 379 910 712	1.03×
-33 554 432	15 711 324 858	9 599 613 860	2 982 921 542		2 808 719 671	1.06×
-67 108 864	34 594 570 323	21 420 158 806	6 379 494 508		5 967 280 476	1.07×
+FFT size        C impl, -O0     C impl, -O1     C model of AVX, -O1     AVX impl        Speedup
+4               81              33              15                      19              0.79×
+8               195             66              35                      29              1.21×
+16              468             134             87                      46              1.89×
+32              1 087           278             210                     92              2.28×
+64              2 500           594             494                     207             2.39×
+128             5 638           1 298           1 138                   507             2.24×
+256             13 542          2 949           2 634                   1 680           1.57×
+512             29 910          6 997           6 560                   3 277           2.00×
+1 024           65 865          15 715          15 005                  7 286           2.06×
+2 048           144 452         36 746          33 859                  17 075          1.98×
+4 096           317 598         86 162          80 733                  47 581          1.70×
+8 192           687 521         198 965         189 643                 112 089         1.69×
+16 384          1 497 747       405 952         410 043                 256 435         1.60×
+32 768          3 330 258       1 055 371       928 485                 666 325         1.39×
+65 536          7 282 305       2 426 037       1 951 704               1 435 606       1.36×
+131 072         16 035 397      5 546 165       4 142 270               3 028 641       1.37×
+262 144         34 795 636      11 811 311      8 978 397               6 598 887       1.36×
+524 288         90 042 669      35 911 574      23 751 996              18 866 343      1.26×
+1 048 576       270 490 724     151 551 517     71 873 200              65 876 359      1.09×
+2 097 152       658 375 195     375 815 597     155 215 482             152 884 652     1.02×
+4 194 304       1 361 986 528   782 913 943     329 475 964             323 074 038     1.02×
+8 388 608       3 225 336 375   1 879 716 450   685 629 776             660 085 400     1.04×
+16 777 216      7 300 920 662   4 457 742 453   1 427 182 753           1 379 910 712   1.03×
+33 554 432      15 711 324 858  9 599 613 860   2 982 921 542           2 808 719 671   1.06×
+67 108 864      34 594 570 323  21 420 158 806  6 379 494 508           5 967 280 476   1.07×
 
 The benchmark results are a mixed bag, but a few conclusions can be drawn from the numbers:
 
@@ -83,40 +76,6 @@ The benchmark results are a mixed bag, but a few conclusions can be drawn from t
 Categories: Programming, C/C++, x86 assembly
 
 Last updated: 2015-05-11
-Related / browse
 
-    Free small FFT in multiple languages
-    Automatic Caesar cipher breaker (JavaScript)
-    Fast SHA-1 hash implementation in x86 assembly
-    Frog Fractions guide
-    Overwriting confidential handwritten text
-
-Recent
-	
-GIF optimizer (Java)
-	
-Supplement to my résumé
-	
-DEFLATE library (Java)
-	
-Project Euler solutions
-	
-Poor feedback from readers
-	
-(more)
-
-Random
-	
-Transcription of Crystal Energy – Guitar solo
-	
-Calculate prime factorization (JavaScript)
-	
-Java Native Interface compared to Python/C API
-	
-(more)
-
-Feedback: Question/comment? Contact me
-
-ProjectNayuki: Like, comment, follow updates on Facebook
-
-Copyright © 2016 Project Nayuki
+Copyright © Project Nayuki  
+https://www.nayuki.io/page/fast-fourier-transform-in-x86-assembly
