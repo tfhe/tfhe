@@ -6,6 +6,87 @@
 #include <cmath>
 
 namespace {
+#if 0
+    This code does not work, because we cannot get rid of the bit-reversed permut in fftw
+class FFT_Processor {
+    const int _2N;
+    const int N;    
+    const int Ns2;
+    fftw_complex* powomb;
+    fftw_complex* powom;
+    fftw_complex* in;
+    fftw_complex* out;
+    fftw_complex* rev_in;
+    fftw_complex* rev_out;
+    fftw_plan p;
+    fftw_plan rev_p;
+    public:
+
+    FFT_Processor(const int N): _2N(2*N),N(N),Ns2(N/2) {
+         powom = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * Ns2);
+         powomb = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * Ns2);
+         in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * Ns2);
+         out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * Ns2);
+         rev_in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * Ns2);
+         rev_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * Ns2);
+         p = fftw_plan_dft_1d(Ns2, in, out, FFTW_FORWARD, FFTW_ESTIMATE);	
+         rev_p = fftw_plan_dft_1d(Ns2, rev_in, rev_out, FFTW_BACKWARD, FFTW_ESTIMATE);
+	 for (int i=0; i<Ns2; i++) powom[i] = cos(2.*M_PI*i/N)+I*sin(2.*M_PI*i/N);
+	 for (int i=0; i<Ns2; i++) powomb[i] = cos(2.*M_PI*i/N)-I*sin(2.*M_PI*i/N);
+    }
+
+    void execute_direct(cplx* res, const double* a) {
+	for (int i=0; i<Ns2; i++) in[i]=powomb[i]*(a[i]+I*a[Ns2+i]);
+	fftw_execute(p);
+	for (int i=0; i<Ns2; i++) res[i]=out[i];
+    }
+    void execute_direct_int(cplx* res, const int* a) {
+	for (int i=0; i<Ns2; i++) in[i]=powomb[i]*(a[i]+I*a[Ns2+i]);
+	fftw_execute(p);
+	for (int i=0; i<Ns2; i++) res[i]=out[i];
+    }
+    void execute_direct_torus32(cplx* res, const Torus32* a) {
+	static const double _2pm32 = 1./double(INT64_C(1)<<32);
+	int32_t* aa = (int32_t*) a;
+	for (int i=0; i<Ns2; i++) in[i]=powomb[i]*(aa[i]+I*aa[Ns2+i])*_2pm32;
+	fftw_execute(p);
+	for (int i=0; i<Ns2; i++) res[i]=out[i];
+    }
+    void execute_reverse(double* res, const cplx* a) {
+        static const double _2sN = 2./N;
+	for (int i=0; i<Ns2; i++) rev_in[i]=a[i];
+	fftw_execute(rev_p);
+	for (int i=0; i<Ns2; i++) {
+	    cplx x = rev_out[i]*powom[i]*_2sN;
+	    res[i]=creal(x);
+	    res[i+Ns2]=cimag(x);
+	}
+    }
+    void execute_reverse_Torus32(Torus32* res, const cplx* a) {
+	static const double _2p32 = double(INT64_C(1)<<32);
+	static const double _2sN = double(2)/double(N);
+	for (int i=0; i<Ns2; i++) rev_in[i]=a[i];
+	fftw_execute(rev_p);
+	for (int i=0; i<Ns2; i++) {
+	    cplx x = rev_out[i]*powom[i]*(_2sN*_2p32);
+	    res[i]=creal(x);
+	    res[i+Ns2]=cimag(x);
+	}
+    }
+
+    ~FFT_Processor() {
+         fftw_destroy_plan(p);
+         fftw_destroy_plan(rev_p);
+         fftw_free(rev_in); 
+	 fftw_free(out);	
+         fftw_free(in); 
+	 fftw_free(rev_out);	
+	 fftw_free(powom);	
+         fftw_free(powomb); 
+    }
+};
+#endif
+
 class FFT_Processor {
     const int _2N;
     const int N;    
@@ -76,8 +157,10 @@ class FFT_Processor {
     }
 };
 
-FFT_Processor fftp1024(1024);
 }
+
+FFT_Processor fftp1024(1024);
+
 /**
  * FFT functions 
  */
