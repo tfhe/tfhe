@@ -35,6 +35,10 @@ elseif (DEFAULT_FFT_PROCESSOR STREQUAL "nayuki-avx")
 set(RUNTIME_LIBS
     tfhe-nayuki-avx
     )
+elseif (DEFAULT_FFT_PROCESSOR STREQUAL "poc-avx")
+set(RUNTIME_LIBS
+    tfhe-poc-avx
+    )
 endif (DEFAULT_FFT_PROCESSOR STREQUAL "fftw") 
 
 

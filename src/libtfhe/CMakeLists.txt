@@ -54,3 +54,5 @@ endif (ENABLE_NAYUKI_AVX)
 if (ENABLE_NAYUKI_PORTABLE) 
     add_library(tfhe-nayuki-portable ${SRCS} ${HEADERS} $<TARGET_OBJECTS:tfhe-fft-nayuki-portable>)
 endif (ENABLE_NAYUKI_PORTABLE) 
+
+add_library(tfhe-poc-avx ${SRCS} ${HEADERS} $<TARGET_OBJECTS:tfhe-fft-poc-avx>)

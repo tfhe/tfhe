@@ -10,3 +10,5 @@ if (ENABLE_NAYUKI_AVX OR ENABLE_NAYUKI_PORTABLE)
     add_subdirectory(nayuki)
 endif (ENABLE_NAYUKI_AVX OR ENABLE_NAYUKI_PORTABLE)
 
+    add_subdirectory(poc)
+
