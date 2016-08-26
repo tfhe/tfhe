@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.0)
 # This is the nayuki fft processor for the tfhe library
 project(libtfhe-fft-nayuki)
 
-include_directories(../../../include/)
 enable_language(ASM)
 
 set(SRCS_PORTABLE

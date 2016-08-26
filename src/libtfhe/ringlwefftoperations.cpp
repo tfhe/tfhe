@@ -300,9 +300,8 @@ EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, To
 #ifndef NDEBUG
     TorusPolynomial* phase = new_TorusPolynomial(N);
     int correctOffset = barb;
-#endif
-
     cout << "starting the test..." << endl;
+#endif
     // the index 1 is given when we don't use the fft
     for (int i=0; i<n; i++) {
         int bara=modSwitchFromTorus32(-x->a[i],Nx2);

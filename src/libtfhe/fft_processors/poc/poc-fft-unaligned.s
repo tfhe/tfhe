@@ -68,8 +68,8 @@ fft:
 	movq	%rdi,%r10
 	movq	%rsi,%r11
 fftsize2loop:
-	vmovapd (%r10),%ymm0 /* r0 r1 r2 r3 */
-	vmovapd (%r11),%ymm1 /* i0 i1 i2 i3 */
+	vmovupd (%r10),%ymm0 /* r0 r1 r2 r3 */
+	vmovupd (%r11),%ymm1 /* i0 i1 i2 i3 */
 	vshufpd $0,%ymm0,%ymm0,%ymm2  /* r0 r0 r2 r2 */
 	vshufpd $15,%ymm0,%ymm0,%ymm3 /* r1 r1 r3 r3 */
 	vshufpd $0,%ymm1,%ymm1,%ymm4  /* i0 i0 i2 i2 */
@@ -78,8 +78,8 @@ fftsize2loop:
 	vmulpd  %ymm5,%ymm12,%ymm5    /* i1 -i1 i3 -i3 */
 	vaddpd  %ymm2,%ymm3,%ymm0
 	vaddpd  %ymm4,%ymm5,%ymm1
-	vmovapd %ymm0,(%r10)
-	vmovapd %ymm1,(%r11)
+	vmovupd %ymm0,(%r10)
+	vmovupd %ymm1,(%r11)
 	/* end of loop */
         leaq 32(%r10),%r10
         leaq 32(%r11),%r11
@@ -125,8 +125,8 @@ fftsize2loop:
 	movq	%rdi,%r10
 	movq	%rsi,%r11
 fftsize4loop:
-	vmovapd (%r10),%ymm0 /* r0 r1 r2 r3 */
-	vmovapd (%r11),%ymm1 /* i0 i1 i2 i3 */
+	vmovupd (%r10),%ymm0 /* r0 r1 r2 r3 */
+	vmovupd (%r11),%ymm1 /* i0 i1 i2 i3 */
 	vperm2f128 $32,%ymm0,%ymm0,%ymm4 /* r0 r1 r0 r1 */
 	vperm2f128 $32,%ymm1,%ymm1,%ymm5 /* i0 i1 i0 i1 */
 	vperm2f128 $49,%ymm0,%ymm0,%ymm6 /* r2 r3 r2 r3 */
@@ -137,8 +137,8 @@ fftsize4loop:
 	vmulpd %ymm9,%ymm14,%ymm9        /* i2 -r3 -i2 r3 */
 	vaddpd %ymm4,%ymm8,%ymm0
 	vaddpd %ymm5,%ymm9,%ymm1
-	vmovapd %ymm0,(%r10)
-  	vmovapd %ymm1,(%r11)
+	vmovupd %ymm0,(%r10)
+  	vmovupd %ymm1,(%r11)
         /* end of loop */
         leaq 32(%r10),%r10
         leaq 32(%r11),%r11
@@ -191,12 +191,12 @@ fftblockloop:
 	movq %rdx,%r14          /* tcs pointer */
 	movq $0,%rcx /* rcx: off */
 fftoffloop:
-	vmovapd (%r10),%ymm0 /* re0 */
-	vmovapd (%r11),%ymm1 /* im0 */
-	vmovapd (%r12),%ymm2 /* re1 */
-	vmovapd (%r13),%ymm3 /* im1 */
-	vmovapd (%r14),%ymm4 /* cos */
-	vmovapd 32(%r14),%ymm5 /* sin */
+	vmovupd (%r10),%ymm0 /* re0 */
+	vmovupd (%r11),%ymm1 /* im0 */
+	vmovupd (%r12),%ymm2 /* re1 */
+	vmovupd (%r13),%ymm3 /* im1 */
+	vmovupd (%r14),%ymm4 /* cos */
+	vmovupd 32(%r14),%ymm5 /* sin */
 	vmulpd	%ymm2,%ymm4,%ymm6 /* re1.cos */
 	vmulpd	%ymm2,%ymm5,%ymm7 /* re1.sin */
 	vmulpd	%ymm3,%ymm4,%ymm8 /* im1.cos */
@@ -207,10 +207,10 @@ fftoffloop:
 	vsubpd	%ymm7,%ymm1,%ymm3
 	vaddpd	%ymm6,%ymm0,%ymm0
 	vaddpd	%ymm7,%ymm1,%ymm1
-	vmovapd %ymm0,(%r10)
-	vmovapd %ymm1,(%r11)
-	vmovapd %ymm2,(%r12)
-	vmovapd %ymm3,(%r13)
+	vmovupd %ymm0,(%r10)
+	vmovupd %ymm1,(%r11)
+	vmovupd %ymm2,(%r12)
+	vmovupd %ymm3,(%r13)
         /* end of off loop */
     	leaq 	32(%r10),%r10
     	leaq	32(%r11),%r11
@@ -250,18 +250,18 @@ fftoffloop:
 	movq %rdi,%r10
 	movq %rsi,%r11
 fftfinalloop:
-	vmovapd	(%r10),%ymm0 /* re */
-	vmovapd	(%r11),%ymm1 /* im */
-	vmovapd (%rdx),%ymm2 /* cos */
-	vmovapd 32(%rdx),%ymm3 /* sin */
+	vmovupd	(%r10),%ymm0 /* re */
+	vmovupd	(%r11),%ymm1 /* im */
+	vmovupd (%rdx),%ymm2 /* cos */
+	vmovupd 32(%rdx),%ymm3 /* sin */
 	vmulpd %ymm0,%ymm2,%ymm4
 	vmulpd %ymm0,%ymm3,%ymm5
 	vmulpd %ymm1,%ymm2,%ymm6
 	vmulpd %ymm1,%ymm3,%ymm7
 	vsubpd %ymm7,%ymm4,%ymm0
 	vaddpd %ymm6,%ymm5,%ymm1
-	vmovapd %ymm0,(%r10)
-	vmovapd %ymm1,(%r11)
+	vmovupd %ymm0,(%r10)
+	vmovupd %ymm1,(%r11)
     	/* end of final loop */
     	leaq	32(%r10),%r10
     	leaq	32(%r11),%r11

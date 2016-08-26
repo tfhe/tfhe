@@ -47,12 +47,16 @@ bool very_close(const double& a,const double& b) {
 
 typedef struct  {
     uint64_t n;
-    double* trig_tables;
+    double* aligned_trig_tables;
+    double* aligned_data;
+    void* buf;
 } FFT_PRECOMP;
 
 typedef struct  {
     uint64_t n;
-    double* trig_tables;
+    double* aligned_trig_tables;
+    double* aligned_data;
+    void* buf;
 } IFFT_PRECOMP;
 
 //trig_tables:
@@ -157,10 +161,14 @@ extern "C" void* new_fft_table(int nn) {
     int n = 2*nn;
     int ns4 = n/4;
     FFT_PRECOMP* reps = new FFT_PRECOMP;
+    void* buf = malloc(32+n*8+nn*8);
+    uint64_t aligned_addr = (uint64_t(buf)+31) & 0xFFFFFFFFFFFFFFE0l;
     //assert(((uint64_t)reps)%32==0); //verify alignment
     reps->n = n;
-    reps->trig_tables = new double[ns4*2*2];
-    double* ptr = reps->trig_tables;
+    reps->aligned_trig_tables=(double*)aligned_addr;
+    reps->aligned_data=(double*)(aligned_addr+n*8);
+    reps->buf=buf;
+    double* ptr = reps->aligned_trig_tables;
     //subsequent iterations
     for (int halfnn=4; halfnn<ns4; halfnn*=2) {
 	int nn = 2*halfnn;
@@ -183,16 +191,25 @@ extern "C" void* new_fft_table(int nn) {
     }
     return reps;
 }
+extern "C" double* fft_table_get_buffer(const void* tables) {
+    FFT_PRECOMP* reps = (FFT_PRECOMP*) tables;
+    return reps->aligned_data;
+}
+extern "C" double* ifft_table_get_buffer(const void* tables) {
+    IFFT_PRECOMP* reps = (IFFT_PRECOMP*) tables;
+    return reps->aligned_data;
+}
 
 //c has size n/2
-extern "C" void fft_model(const void* tables, double* c) {
+extern "C" void fft_model(const void* tables) {
     double tmp0[4];
     double tmp1[4];
     double tmp2[4];
     double tmp3[4];
     FFT_PRECOMP* fft_tables = (FFT_PRECOMP*) tables;
     const int n = fft_tables->n;
-    const double* trig_tables = fft_tables->trig_tables;
+    const double* trig_tables = fft_tables->aligned_trig_tables;
+    double* c = fft_tables->aligned_data;
 
     int ns4 = n/4;
     double* pre = c;     //size n/4
@@ -387,9 +404,15 @@ extern "C" void* new_ifft_table(int nn) {
     int ns4 = n/4;
     IFFT_PRECOMP* reps = new IFFT_PRECOMP;
     //assert(((uint64_t)reps)%32==0); //verify alignment
+    void* buf = malloc(32+n*8+nn*8);
+    uint64_t aligned_addr = (uint64_t(buf)+31) & 0xFFFFFFFFFFFFFFE0l;
+    //assert(((uint64_t)reps)%32==0); //verify alignment
     reps->n = n;
-    reps->trig_tables = new double[ns4*2*2];
-    double* ptr = reps->trig_tables;
+    reps->aligned_trig_tables=(double*)aligned_addr;
+    reps->aligned_data=(double*)(aligned_addr+n*8);
+    reps->buf=buf;
+    reps->n = n;
+    double* ptr = reps->aligned_trig_tables;
     //first iteration
     for (int j=0; j<ns4; j+=4) {
 	for (int k=0; k<4; k++)
@@ -443,14 +466,15 @@ void ifft_check(int n, int nn, int table_offset, const double* are, const double
 #endif
 }
 //c has size n/2
-extern "C" void ifft_model(void* tables, double* c) {
+extern "C" void ifft_model(void* tables) {
     double tmp0[4];
     double tmp1[4];
     double tmp2[4];
     double tmp3[4];
     IFFT_PRECOMP* fft_tables = (IFFT_PRECOMP*) tables;
     const int n = fft_tables->n;
-    const double* trig_tables = fft_tables->trig_tables;
+    const double* trig_tables = fft_tables->aligned_trig_tables;
+    double* c = fft_tables->aligned_data;
 
 #ifdef DEBUG_ALL
     vector<complex<double> > a; a.resize(n);

@@ -43,18 +43,34 @@ int main(int argc, char** argv) {
     static const int nn = 1024;
     void* tables = new_fft_table(nn);
     void* itables = new_ifft_table(nn);
+    double* buf_fft = fft_table_get_buffer(tables);
+    double* buf_ifft = ifft_table_get_buffer(itables);
     double* a = new double[nn];
     double* a2 = new double[nn];
     double* b = new double[nn];
     for (int i=0; i<nn; i++) a[i]=i;
     for (int i=0; i<nn; i++) a2[i]=i;
     for (int i=0; i<nn; i++) b[i]=a[i];
-    ifft_model(itables,a);
-    ifft(itables,a2);
+
+    for (int i=0; i<nn; i++) buf_ifft[i]=a[i];
+    ifft_model(itables);
+    for (int i=0; i<nn; i++) a[i]=buf_ifft[i];
+
+    for (int i=0; i<nn; i++) buf_ifft[i]=a2[i];
+    ifft(itables,buf_ifft);
+    for (int i=0; i<nn; i++) a2[i]=buf_ifft[i];
+
     for (int i=0; i<nn; i++) 
 	require(very_close(a[i],a2[i]));
-    fft_model(tables,a);
-    fft(tables,a2);
+    
+    for (int i=0; i<nn; i++) buf_fft[i]=a[i];
+    fft_model(tables);
+    for (int i=0; i<nn; i++) a[i]=buf_fft[i];
+
+    for (int i=0; i<nn; i++) buf_fft[i]=a2[i];
+    fft(tables,buf_fft);
+    for (int i=0; i<nn; i++) a2[i]=buf_fft[i];
+
     for (int i=0; i<nn; i++) 
 	require(very_close(a[i],a2[i]));
     for (int i=0; i<nn; i++) 
@@ -64,22 +80,22 @@ int main(int argc, char** argv) {
     int nbtrials = 10000;
     long begin = clock();
     for (int trials=0; trials<nbtrials; trials++)
-	fft(tables,a);
+	fft(tables,buf_fft);
     long end = clock();
     cout << "fft_time " << double(end-begin)/nbtrials << endl;
     begin = clock();
     for (int trials=0; trials<nbtrials; trials++)
-	ifft(tables,a);
+	ifft(tables,buf_ifft);
     end = clock();
     cout << "ifft_time " << double(end-begin)/nbtrials << endl;
     begin = clock();
     for (int trials=0; trials<nbtrials; trials++)
-	fft_model(tables,a);
+	fft_model(tables);
     end = clock();
     cout << "fft_model_time " << double(end-begin)/nbtrials << endl;
     begin = clock();
     for (int trials=0; trials<nbtrials; trials++)
-	ifft_model(tables,a);
+	ifft_model(tables);
     end = clock();
     cout << "ifft_model_time " << double(end-begin)/nbtrials << endl;
 #endif

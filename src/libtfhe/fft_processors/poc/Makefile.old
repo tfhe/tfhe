@@ -1,0 +1,23 @@
+DCFLAGS=-g3 -O0 -Wall
+OCFLAGS=-O2 -DNDEBUG
+CFLAGS=${OCFLAGS}
+
+n:
+	gcc -c ${CFLAGS} poc-fft.s	-o poc-fft.o
+	gcc -c ${CFLAGS} poc-ifft.s	-o poc-ifft.o
+	g++ -c ${CFLAGS} poc-bench.cpp -o poc-bench.o
+	g++ -c ${CFLAGS} poc-fft-impl.cpp -o poc-fft-impl.o
+	g++  ${CFLAGS} poc-fft.o poc-ifft.o poc-bench.o poc-fft-impl.o -o a.out
+
+newall:
+	g++ -c -O0 -Wall -g3 poc.cpp -o poc.o
+	gcc -c -O0 -Wall -g3 poc.s -o poc-asm.o
+	g++ -O0 -Wall -g3 poc.o poc-asm.o -o test
+
+newall-optim:
+	g++ -c -O2 -Wall -DNDEBUG poc.cpp -o poc.o
+	gcc -c -O2 -Wall -DNDEBUG poc.s -o poc-asm.o
+	g++ -O2 -Wall -DNDEBUG poc.o poc-asm.o -o test-optim
+all:
+	g++ -DNDEBUG -O2 -mavx poc.cpp -o poc
+	g++ -O0 -Wall -mavx poc.cpp -o poc-debug

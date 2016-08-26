@@ -89,10 +89,12 @@ int main(int argc, char** argv) {
 
     cout << "starting bootstrapping..." << endl;
 
+    int nbtrials = 50;
     clock_t begin = clock();
-    bootstrap(test_out, bk, mu1, mu0, test);
+    for (int i=0; i<nbtrials; i++)
+	bootstrap(test_out, bk, mu1, mu0, test);
     clock_t end = clock();
-    cout << "finished bootstrapping... " << end-begin << endl;
+    cout << "finished bootstrapping in (microsecs)... " << (end-begin)/double(nbtrials) << endl;
     Torus32 mu_out = lweSymDecrypt(test_out, key, 2);
     cout << "end_variance: " << test_out->current_variance << endl;
 

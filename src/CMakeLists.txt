@@ -7,16 +7,34 @@ set(CMAKE_BUILD_TYPE "optim" CACHE STRING "Build Type: Debug or Optim")
 set(ENABLE_FFTW ON CACHE BOOL "Enable the FFTW FFT processor (GPL)")
 set(ENABLE_NAYUKI_PORTABLE ON CACHE BOOL "Enable the Nayuki portable FFT processor (MIT)")
 set(ENABLE_NAYUKI_AVX ON CACHE BOOL "Enable the Nayuki AVX assembly FFT processor (MIT)")
-set(DEFAULT_FFT_PROCESSOR "fftw" CACHE String "Choice of the FFT processor for test files")
+set(ENABLE_POC_AVX ON CACHE BOOL "Enable the POC AVX assembly FFT processor")
 
 set(CMAKE_CXX_FLAGS_DEBUG "-std=gnu++11 -g3 -O0 -Wall -Werror")
 set(CMAKE_C_FLAGS_DEBUG "-g3 -O0 -Wall -Werror")
 
-set(CMAKE_CXX_FLAGS_OPTIM "-std=gnu++11 -g0 -O2 -DNDEBUG -funroll-loops -Wall -Werror")
-set(CMAKE_C_FLAGS_OPTIM "-g0 -O2 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_CXX_FLAGS_OPTIM "-std=gnu++11 -g3 -O2 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_C_FLAGS_OPTIM "-g3 -O2 -DNDEBUG -funroll-loops -Wall -Werror")
 
 set(CMAKE_CXX_FLAGS_RELEASE "-std=gnu++11 -g0 -O2 -DNDEBUG -funroll-loops -Wall -Werror")
 set(CMAKE_C_FLAGS_RELEASE "-g0 -O2 -DNDEBUG -funroll-loops -Wall -Werror")
+
+include_directories("include")
+
+if (ENABLE_NAYUKI_PORTABLE)
+list(APPEND FFT_PROCESSORS "nayuki-portable")
+endif(ENABLE_NAYUKI_PORTABLE)
+
+if (ENABLE_FFTW)
+list(APPEND FFT_PROCESSORS "fftw")
+endif(ENABLE_FFTW)
+
+if (ENABLE_NAYUKI_AVX)
+list(APPEND FFT_PROCESSORS "nayuki-avx")
+endif(ENABLE_NAYUKI_AVX)
+
+if (ENABLE_POC_AVX)
+list(APPEND FFT_PROCESSORS "poc-avx")
+endif(ENABLE_POC_AVX)
 
 project(tfhe)
 
