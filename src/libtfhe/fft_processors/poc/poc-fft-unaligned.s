@@ -272,6 +272,7 @@ fftfinalloop:
 
 	/* Restore registers */
 fftend:
+	vzeroall
 	popq        %rbx
 	popq        %r14
 	popq        %r13

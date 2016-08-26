@@ -287,6 +287,7 @@ size2loop:
 
 	/* Restore registers */
 end:
+	vzeroall
 	popq        %rbx
 	popq        %r14
 	popq        %r13
