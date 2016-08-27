@@ -28,6 +28,7 @@ class FFT_Processor_Poc {
 	 imag_inout_rev = real_inout_rev+Ns2;
     }
 
+    /*
     void execute_direct(cplx* res, const double* a) {
 	//double* res_dbl=(double*) res;
 	for (int i=0; i<N; i++) real_inout_rev[i]=a[i];
@@ -38,6 +39,7 @@ class FFT_Processor_Poc {
 	    //res_dbl[2*i+1]=imag_inout[i];
 	}
     }
+    */
 
     void execute_direct_int(cplx* res, const int* a) {
 	//double* res_dbl=(double*) res;
@@ -54,9 +56,10 @@ class FFT_Processor_Poc {
     void execute_direct_torus32(cplx* res, const Torus32* a) {
 	//double* res_dbl=(double*) res;
 	//cplx* res_cplx=(cplx*) res;
-	static const double _2pm32 = 1./double(INT64_C(1)<<32);
+	//static const double _2pm32 = 1./double(INT64_C(1)<<32);
 	int32_t* aa = (int32_t*) a;
-	for (int i=0; i<N; i++) real_inout_rev[i]=aa[i]*_2pm32;
+	//for (int i=0; i<N; i++) real_inout_rev[i]=aa[i]*_2pm32;
+	for (int i=0; i<N; i++) real_inout_rev[i]=aa[i];
 	ifft(tables_reverse,real_inout_rev);
 	for (int i=0; i<Ns2; i++) {
 	    //res[i]=res_cplx[i];
@@ -66,6 +69,7 @@ class FFT_Processor_Poc {
 	}
     }
 
+    /*
     void execute_reverse(double* res, const cplx* a) {
         static const double _2sN = 2./N;
 	for (int i=0; i<Ns2; i++) real_inout_direct[i]=creal(a[i]);
@@ -73,15 +77,18 @@ class FFT_Processor_Poc {
 	fft(tables_direct,real_inout_direct);
 	for (int i=0; i<N; i++) res[i]=real_inout_direct[i]*_2sN;
     }
+    */
+
     void execute_reverse_Torus32(Torus32* res, const cplx* a) {
-	static const double _2p32 = double(INT64_C(1)<<32);
+	//static const double _2p32 = double(INT64_C(1)<<32);
 	static const double _2sN = double(2)/double(N);
-	static const double _2p32_2sN = _2p32*_2sN;
+	//static const double _2p32_2sN = _2p32*_2sN;
 	//double* a_dbl=(double*) a;
 	for (int i=0; i<Ns2; i++) real_inout_direct[i]=creal(a[i]);
 	for (int i=0; i<Ns2; i++) imag_inout_direct[i]=cimag(a[i]);
 	fft(tables_direct,real_inout_direct);
-	for (int i=0; i<N; i++) res[i]=Torus32(int64_t(real_inout_direct[i]*_2p32_2sN));
+	//for (int i=0; i<N; i++) res[i]=Torus32(int64_t(real_inout_direct[i]*_2p32_2sN));
+	for (int i=0; i<N; i++) res[i]=Torus32(int64_t(real_inout_direct[i]*_2sN));
 	//pas besoin du fmod... Torus32(int64_t(fmod(rev_out[i]*_1sN,1.)*_2p32));
     }
 
