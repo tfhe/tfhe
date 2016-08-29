@@ -10,10 +10,13 @@ set(SRCS_AVX
     poc-fft.s
     poc-ifft.s
     fft_processor_poc.cpp
+    lagrangehalfc_impl.cpp
+    lagrangehalfc_impl_asm.s
     )
     
 set(HEADERS
     poc-fft.h
+    lagrangehalfc_impl.h
     )
 
 #if (ENABLE_POC_AVX) 
