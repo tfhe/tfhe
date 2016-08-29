@@ -103,11 +103,42 @@ EXPORT void lweAddTo(LWESample* result, const LWESample* sample, const LWEParams
     result->current_variance += sample->current_variance; 
 }
 
+/** r -= a  using avx instructions (from a to aend, s.t. aend-a is multiple of 8) */
+EXPORT void __attribute__ ((noinline)) intVecSubTo_avx(int* r, const int* a, const int* aend) {
+    __asm(
+	    "pushq %r8\n"               //save clobbered regs
+	    "pushq %r9\n" 
+	    "movq %rdi,%r8\n"           //r
+	    "movq %rsi,%r9\n"           //a
+	    "1:\n"
+	    "vmovdqu (%r8),%ymm0\n"
+	    "vmovdqu (%r9),%ymm1\n"
+	    "vpsubd %ymm1,%ymm0,%ymm0\n"
+	    "vmovdqu %ymm0,(%r8)\n"
+	    "addq $32,%r8\n"            //advance r
+	    "addq $32,%r9\n"            //advance a
+	    "cmpq %rdx,%r9\n"           //until aend
+	    "jb 1b\n"
+	    "vzeroall\n" 
+	    "popq %r9\n"
+	    "popq %r8\n"
+	    "ret"
+	 );
+}
+
 /** result = result - sample */
 EXPORT void lweSubTo(LWESample* result, const LWESample* sample, const LWEParams* params){
     const int n = params->n;
+    const Torus32* __restrict sa = sample->a;
+    Torus32* __restrict ra = result->a;
 
-    for (int i = 0; i < n; ++i) result->a[i] -= sample->a[i];
+#ifdef __AVX2__
+    const int n0 = n & 0xFFFFFFF8;
+    intVecSubTo_avx(ra,sa,sa+n0);
+    for (int i = n0; i < n; ++i) ra[i] -= sa[i];
+#else
+    for (int i = 0; i < n; ++i) ra[i] -= sa[i];
+#endif
     result->b -= sample->b;
     result->current_variance += sample->current_variance; 
 }

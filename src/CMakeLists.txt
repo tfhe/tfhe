@@ -12,11 +12,11 @@ set(ENABLE_POC_AVX ON CACHE BOOL "Enable the POC AVX assembly FFT processor")
 set(CMAKE_CXX_FLAGS_DEBUG "-std=gnu++11 -g3 -O0 -Wall -Werror")
 set(CMAKE_C_FLAGS_DEBUG "-g3 -O0 -Wall -Werror")
 
-set(CMAKE_CXX_FLAGS_OPTIM "-std=gnu++11 -g3 -O2 -DNDEBUG -funroll-loops -Wall -Werror")
-set(CMAKE_C_FLAGS_OPTIM "-g3 -O2 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_CXX_FLAGS_OPTIM "-std=gnu++11 -g3 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_C_FLAGS_OPTIM "-g3 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
 
-set(CMAKE_CXX_FLAGS_RELEASE "-std=gnu++11 -g0 -O2 -DNDEBUG -funroll-loops -Wall -Werror")
-set(CMAKE_C_FLAGS_RELEASE "-g0 -O2 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_CXX_FLAGS_RELEASE "-std=gnu++11 -g0 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_C_FLAGS_RELEASE "-g0 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
 
 include_directories("include")
 
