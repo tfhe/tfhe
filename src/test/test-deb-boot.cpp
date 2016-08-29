@@ -117,6 +117,7 @@ int main(int argc, char** argv) {
 
     
     // test omega
+    /*
     IntPolynomial* X = new_IntPolynomial(N); 
     LagrangeHalfCPolynomial* resultFFT = new_LagrangeHalfCPolynomial(N);
     cplx rFFT;
@@ -127,7 +128,6 @@ int main(int argc, char** argv) {
     rFFT = resultFFT->coefsC[0];
     printf("%.20f + i%.20f\n", creal(rFFT), cimag(rFFT));
 
-
     double omega_re, omega_im;
     omega_re = cos(M_PI/1024);
     omega_im = sin(M_PI/1024);
@@ -135,6 +135,7 @@ int main(int argc, char** argv) {
 
     delete_IntPolynomial(X);
     delete_LagrangeHalfCPolynomial(resultFFT);
+    */
 
 
 
@@ -194,6 +195,12 @@ int main(int argc, char** argv) {
         for (int j = 0; j < N; ++j)
                 acc1->a[i].coefsT[j] = acc->a[i].coefsT[j];
     ringLweToFFTConvert(accFFT, acc, accum_params);
+    //ringLweFromFFTConvert(acc, accFFT, accum_params);
+    //for (int j=0; j<N; j++) {
+    //	printf("Before start: Acc index %d: %d vs expected %d\n",j,acc->b->coefsT[j],acc->b->coefsT[j]);
+    //}
+
+    //verify multiply by
 
 
     RingGSWSample* temp = new_RingGSWSample(bk_params);

@@ -7,9 +7,11 @@ project(libtfhe-fft-fftw)
 
 set(SRCS
     fft_processor_fftw.cpp
+    lagrangehalfc_impl.cpp
     )
     
 set(HEADERS
+    lagrangehalfc_impl.h
     )
 
 add_library(tfhe-fft-fftw OBJECT ${SRCS} ${HEADERS})

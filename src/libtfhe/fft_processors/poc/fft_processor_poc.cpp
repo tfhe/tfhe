@@ -1,6 +1,4 @@
-#include <complex.h>
-#define complex _Complex
-#include <polynomials.h>
+#include "lagrangehalfc_impl.h"
 #include "poc-fft.h"
 #include <cassert>
 #include <cmath>

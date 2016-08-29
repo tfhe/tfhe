@@ -32,6 +32,7 @@ int main(int argc, char** argv) {
     TorusPolynomial* resNaive = new_TorusPolynomial(N);
     TorusPolynomial* resFFT = new_TorusPolynomial(N);
     TorusPolynomial* resKaratsuba = new_TorusPolynomial(N);
+    //LagrangeHalfCPolynomial* test_fft = new_LagrangeHalfCPolynomial(N);
 
     double cycles_naive[count];
     double cycles_karatsuba[count];
@@ -58,7 +59,9 @@ int main(int argc, char** argv) {
         cycles_karatsuba[i] = cend - cstart;
         
         cstart = clock();
-        multFFT(resFFT,a,b);  
+        multFFT(resFFT,a,b);
+	//TorusPolynomial_ifft(test_fft,resNaive);  
+	//TorusPolynomial_fft(resFFT,test_fft);  
         cend = clock();
         cycles_fft[i] = cend - cstart;        
 
