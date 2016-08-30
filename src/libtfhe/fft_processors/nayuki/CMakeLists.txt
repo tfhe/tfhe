@@ -9,6 +9,7 @@ set(SRCS_PORTABLE
     fft-x8664-avx-aux.c
     fft-model-of-x8664-avx.c
     fft_processor_nayuki.cpp
+    lagrangehalfc_impl.cpp
     )
     
 set(SRCS_AVX
@@ -16,10 +17,12 @@ set(SRCS_AVX
     fft-x8664-avx.s
     fft-x8664-avx-reverse.s
     fft_processor_nayuki.cpp
+    lagrangehalfc_impl.cpp
     )
     
 set(HEADERS
     fft.h
+    lagrangehalfc_impl.h
     )
 
 if (ENABLE_NAYUKI_PORTABLE) 
