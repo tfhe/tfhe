@@ -25,14 +25,14 @@ EXPORT void ringLweToFFTConvert(RingLWESampleFFT* result, const RingLWESample* s
     const int k = params->k;
     
     for (int i = 0; i <= k; ++i)
-	TorusPolynomial_fft(result->a+i,source->a+i);
+	TorusPolynomial_ifft(result->a+i,source->a+i);
 }
 
 EXPORT void ringLweFromFFTConvert(RingLWESample* result, const RingLWESampleFFT* source, const RingLWEParams* params){
     const int k = params->k;
     
     for (int i = 0; i <= k; ++i)
-	TorusPolynomial_ifft(result->a+i,source->a+i);
+	TorusPolynomial_fft(result->a+i,source->a+i);
 }
 
 
@@ -42,7 +42,7 @@ EXPORT void ringLweFromFFTConvert(RingLWESample* result, const RingLWESampleFFT*
 EXPORT void ringLweFFTClear(RingLWESampleFFT* result, const RingLWEParams* params){
     int k = params->k;
 
-    for (int i = 0; i <= k; ++i) clearLagrangeHalfCPolynomial(&result->a[i]);
+    for (int i = 0; i <= k; ++i) LagrangeHalfCPolynomial_clear(&result->a[i]);
     result->current_variance = 0.;
 }
 
@@ -50,22 +50,18 @@ EXPORT void ringLweFFTClear(RingLWESampleFFT* result, const RingLWEParams* param
 EXPORT void ringLweFFTNoiselessTrivial(RingLWESampleFFT* result, const TorusPolynomial* mu, const RingLWEParams* params){
     int k = params->k;
 
-    for (int i = 0; i <= k; ++i) clearLagrangeHalfCPolynomial(&result->a[i]);
+    for (int i = 0; i < k; ++i) LagrangeHalfCPolynomial_clear(&result->a[i]);
+    TorusPolynomial_ifft(result->b, mu);
     result->current_variance = 0.;
 }
 
 /** result = (0,mu) where mu is constant*/
 EXPORT void ringLweFFTNoiselessTrivialT(RingLWESampleFFT* result, const Torus32 mu, const RingLWEParams* params){
     const int k = params->k;
-    const int Ns2 = params->N/2;
-    cplx* b = result->b->coefsC;
-    const cplx muc = t32tod(mu);
     
-
     for (int i = 0; i < k; ++i) 
-	clearLagrangeHalfCPolynomial(&result->a[i]);
-    for (int j=0; j<Ns2; j++)
-	b[j]=muc;
+	LagrangeHalfCPolynomial_clear(&result->a[i]);
+    LagrangeHalfCPolynomial_setTorusConstant(result->b,mu);
     result->current_variance = 0.;
 }
 
@@ -136,38 +132,16 @@ EXPORT void ringGswFromFFTConvert(RingGSWSample* result, const RingGSWSampleFFT*
 	ringLweFromFFTConvert(result->all_sample+p, source->all_samples+p, params->ringlwe_params);
 }
 
-struct GlobalsVars {
-    cplx* omegaxminus1;
-
-    GlobalsVars() {
-	const int N=1024;
-	const int _2N=2*N;
-	omegaxminus1 = new cplx[_2N];
-	for (int x=0; x<_2N; x++) {
-	    omegaxminus1[x]=cos(x*M_PI/N)-1. - sin(x*M_PI/N) * I; // instead of cos(x*M_PI/N)-1. + sin(x*M_PI/N) * I
-	    //exp(i.x.pi/N)-1
-	}
-    }
-};
-GlobalsVars globals;
-
-
-
 EXPORT void ringGswFFTAddH(RingGSWSampleFFT* result, const RingGSWParams* params) {
     const int k = params->ringlwe_params->k;
-    const int N = params->ringlwe_params->N;
     const int l = params->l;
-    const int Ns2 = N/2;
 
     for (int j=0; j<l; j++) {
-    	double hj = t32tod(params->h[j]);
-    	for (int i=0; i<=k; i++) {
-    	    cplx* pol = result->sample[i][j].a[i].coefsC;
-    	    for (int t=0; t<Ns2; t++) {
-                pol[t] += hj;
-    	    }
-    	}
+    	Torus32 hj = params->h[j];
+    	for (int i=0; i<=k; i++)
+	   LagrangeHalfCPolynomial_addTorusConstant(&result->sample[i][j].a[i],hj); 
     }
+
 }
 
 EXPORT void ringGswFFTClear(RingGSWSampleFFT* result, const RingGSWParams* params) {
@@ -179,15 +153,15 @@ EXPORT void ringGswFFTClear(RingGSWSampleFFT* result, const RingGSWParams* param
 
 EXPORT void LagrangeHalfCPolynomial_decompH(LagrangeHalfCPolynomial* reps, const LagrangeHalfCPolynomial* pol, const RingGSWParams* params) {
     const int l = params->l;
-    const int N = pol->N;
+    const int N = params->ringlwe_params->N;
     //TODO attention, this prevents parallelization...
     static TorusPolynomial* a = new_TorusPolynomial(N);
     static IntPolynomial* deca = new_IntPolynomial_array(l,N);
 
-    TorusPolynomial_ifft(a,pol);
+    TorusPolynomial_fft(a,pol);
     Torus32PolynomialDecompH(deca, a, params);
     for (int j=0; j<l; j++) {
-	IntPolynomial_fft(reps+j,deca+j);
+	IntPolynomial_ifft(reps+j,deca+j);
     }
 }
 
@@ -213,13 +187,10 @@ EXPORT void ringGSWFFTMulByXaiMinusOne(RingGSWSampleFFT* result, const int ai, c
     //const int l = params->l;
     const int kpl = params->kpl;
     const int N = ringlwe_params->N;
-    const int Ns2 = N/2;
-    const int _2N = 2*N;
     //on calcule x^ai-1 en fft
     //TODO attention, this prevents parallelization...
     static LagrangeHalfCPolynomial* xaim1=new_LagrangeHalfCPolynomial(N);
-    for (int i=0; i<Ns2; i++)
-	xaim1->coefsC[i]=globals.omegaxminus1[((2*i+1)*ai)%_2N];
+    LagrangeHalfCPolynomial_setXaiMinusOne(xaim1,ai);
     for (int p=0; p<kpl; p++) {
         const LagrangeHalfCPolynomial* in_s = bki->all_samples[p].a;
         LagrangeHalfCPolynomial* out_s = result->all_samples[p].a;
@@ -300,9 +271,8 @@ EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, To
 #ifndef NDEBUG
     TorusPolynomial* phase = new_TorusPolynomial(N);
     int correctOffset = barb;
-#endif
-
     cout << "starting the test..." << endl;
+#endif
     // the index 1 is given when we don't use the fft
     for (int i=0; i<n; i++) {
         int bara=modSwitchFromTorus32(-x->a[i],Nx2);

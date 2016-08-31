@@ -103,11 +103,89 @@ EXPORT void lweAddTo(LWESample* result, const LWESample* sample, const LWEParams
     result->current_variance += sample->current_variance; 
 }
 
+/** r -= a  using avx instructions (of size n, not necessarily multiple of 8) */
+EXPORT void __attribute__ ((noinline)) intVecSubTo_avx(int* r, const int* a, long n) {
+    __asm__ __volatile__ (
+	    //"pushq %%r8\n"               //save clobbered regs
+	    //"pushq %%r9\n" 
+	    "movq %%rdx,%%rax\n"
+	    "andq $0xFFFFFFFFFFFFFFF8,%%rax\n"  //r8: n0 = n - n%8
+	    "leaq (%%rsi,%%rax,4),%%rcx\n"       //r9: aend = a + 4n0
+	    "1:\n"
+	    "vmovdqu (%%rdi),%%ymm0\n"
+	    "vmovdqu (%%rsi),%%ymm1\n"
+	    "vpsubd %%ymm1,%%ymm0,%%ymm0\n"
+	    "vmovdqu %%ymm0,(%%rdi)\n"
+	    "addq $32,%%rdi\n"                 //advance r by 8*4
+	    "addq $32,%%rsi\n"                 //advance a by 8*4
+	    "cmpq %%rcx,%%rsi\n"                //until aend
+	    "jb 1b\n"
+	    "vzeroall\n"
+	    "subq %%rax,%%rdx\n"                //n = n - n0 (between 0 and 7)
+	    "cmpq $4,%%rdx\n"                  //last 4 operands?
+	    "jb 2f\n"
+	    "vmovdqu (%%rdi),%%xmm0\n"
+	    "vmovdqu (%%rsi),%%xmm1\n"
+	    "vpsubd %%xmm1,%%xmm0,%%xmm0\n"
+	    "vmovdqu %%xmm0,(%%rdi)\n"
+	    "addq $16,%%rdi\n"                 //advance r by 4*4
+	    "addq $16,%%rsi\n"                 //advance a by 4*4
+	    "subq $4,%%rdx\n"                  //n = n - 4
+	    "2:"
+	    "cmpq $2,%%rdx\n"                  //last 2 operands?
+	    "jb 3f\n"
+	    "movq (%%rdi),%%xmm0\n"
+	    "movq (%%rsi),%%xmm1\n"
+	    "psubd %%xmm1,%%xmm0\n"
+	    "movq %%xmm0,(%%rdi)\n"
+	    "addq $8,%%rdi\n"                 //advance r by 2*4
+	    "addq $8,%%rsi\n"                 //advance a by 2*4
+	    "subq $2,%%rdx\n"                 //n = n - 2
+	    "3:"
+	    "cmpq $1,%%rdx\n"                 //last 1 operand?
+	    "jb 4f\n"
+	    "movl (%%rdi),%%eax\n"
+	    "movl (%%rsi),%%ecx\n"
+	    "subl %%ecx,%%eax\n"
+	    "movl %%eax,(%%rdi)\n"
+	    "4:"
+	    //"popq %%rcx\n"
+	    //"popq %%r8\n"
+	    : "=D"(r),"=S"(a),"=d"(n)  //output
+	    : "D"(r),"S"(a),"d"(n)     //input
+	    : "%rax","%rcx" //clobber list (don't mess up with it)
+	 );
+}
+
+int intVecSubTo_avx_test() {
+    fprintf(stderr,"testint intVecSubTo_avx\n");
+    static int tst[1000];
+    static int tst2[1000];
+    static int tst3[1000];
+    for (int i=0; i<1000; i++) tst[i]=rand();
+    for (int i=0; i<1000; i++) tst2[i]=rand();
+    for (int trial=0; trial<100; trial++) {
+	for (int i=0; i<1000; i++) tst3[i]=tst[i];
+	int dim = 500 + (rand()%500);
+	intVecSubTo_avx(tst,tst2,dim);
+	for (int i=0; i<dim; i++) if (tst[i]!=tst3[i]-tst2[i]) abort();
+	for (int i=dim; i<1000; i++) if (tst[i]!=tst3[i]) abort();
+    }
+    return tst[0];
+}
+int ooo = intVecSubTo_avx_test();
+
 /** result = result - sample */
 EXPORT void lweSubTo(LWESample* result, const LWESample* sample, const LWEParams* params){
     const int n = params->n;
+    const Torus32* __restrict sa = sample->a;
+    Torus32* __restrict ra = result->a;
 
-    for (int i = 0; i < n; ++i) result->a[i] -= sample->a[i];
+#ifdef __AVX2__
+    intVecSubTo_avx(ra,sa,n);
+#else
+    for (int i = 0; i < n; ++i) ra[i] -= sa[i];
+#endif
     result->b -= sample->b;
     result->current_variance += sample->current_variance; 
 }

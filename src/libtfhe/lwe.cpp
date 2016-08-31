@@ -528,7 +528,7 @@ EXPORT void ringLWEDecompH(IntPolynomial* result, const RingLWESample* sample, c
 }
 
 
-EXPORT void Torus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const RingGSWParams* params){
+EXPORT void Torus32PolynomialDecompH_old(IntPolynomial* result, const TorusPolynomial* sample, const RingGSWParams* params){
     const int N = params->ringlwe_params->N;
     const int l = params->l;
     const int Bgbit = params->Bgbit;
@@ -546,7 +546,30 @@ EXPORT void Torus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomia
         }   
     }
 }
+EXPORT void Torus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const RingGSWParams* params){
+    const int N = params->ringlwe_params->N;
+    const int l = params->l;
+    const int Bgbit = params->Bgbit;
+    const uint32_t maskMod = params->maskMod;
+    const int32_t halfBg = params->halfBg;
+    const uint32_t offset = params->offset;
+    uint32_t* buf = (uint32_t*) sample->coefsT;
+    for (int j = 0; j < N; ++j) buf[j]+=offset;
     
+    for (int p = 0; p < l; ++p)
+    {
+	const int decal = (32-(p+1)*Bgbit);
+	int32_t* res_p = result[p].coefs;
+	for (int j = 0; j < N; ++j)
+	{
+	    uint32_t temp1 = (buf[j] >> decal) & maskMod; 
+	    res_p[j] = temp1 - halfBg;
+	}   
+    }
+
+    for (int j = 0; j < N; ++j) buf[j]-=offset;
+}
+
 
 //TODO: Ilaria.
 EXPORT void ringGSWExternProduct(RingLWESample* result, const RingGSWSample* a, const RingLWESample* b, const RingGSWParams* params){
@@ -554,12 +577,12 @@ EXPORT void ringGSWExternProduct(RingLWESample* result, const RingGSWSample* a, 
     const int N = parlwe->N;
     const int kpl = params->kpl;
     IntPolynomial* dec = new_IntPolynomial_array(kpl,N);
-    
+
     ringLWEDecompH(dec, b, params);
-    
+
     ringLweClear(result, parlwe);
     for (int i = 0; i < kpl; i++) 
-        ringLweAddMulRTo(result, &dec[i], &a->all_sample[i], parlwe);
+	ringLweAddMulRTo(result, &dec[i], &a->all_sample[i], parlwe);
 
     result->current_variance += b->current_variance; //todo + the error term?
 
@@ -584,22 +607,21 @@ EXPORT void ringGswExtractSample(RingLWESample* result, const RingGSWSample* x);
 
 
 /*//calcule l'arrondi inférieur d'un élément Torus32
-int bar(uint64_t b, uint64_t Nx2){
-uint64_t xx=b*Nx2+(1l<<31);
-return (xx>>32)%Nx2;
-}*/
+  int bar(uint64_t b, uint64_t Nx2){
+  uint64_t xx=b*Nx2+(1l<<31);
+  return (xx>>32)%Nx2;
+  }*/
 
 
 
 EXPORT void sampleExtract(LWESample* result, const RingLWESample* x, const LWEParams* params,  const RingLWEParams* rparams) {
     const int N = rparams->N;
     const int k = rparams->k;
-    const int n = params->n;
-    assert(n == k*N);
+    assert(params->n == k*N);
     for (int i=0; i<k; i++) {
 	result->a[i*N]=x->a[i].coefsT[0];
-    	for (int j=1; j<N; j++)
-    	    result->a[i*N+j]=-x->a[i].coefsT[N-j];
+	for (int j=1; j<N; j++)
+	    result->a[i*N+j]=-x->a[i].coefsT[N-j];
     }
     result->b=x->b->coefsT[0];
 }
@@ -617,7 +639,7 @@ EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 
     const int Ns2=N/2;
     const int Nx2= 2*N;
     const int n = in_params->n;
-    
+
     TorusPolynomial* testvect=new_TorusPolynomial(N);
     TorusPolynomial* testvectbis=new_TorusPolynomial(N);
 #ifndef NDEBUG
@@ -629,28 +651,28 @@ EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 
     int barb=modSwitchFromTorus32(x->b,Nx2);
     //je definis le test vector (multiplié par a inclus !
     for (int i=0;i<Ns2;i++)
-	   testvect->coefsT[i]=aa;
+	testvect->coefsT[i]=aa;
     for (int i=Ns2;i<N;i++)
-	   testvect->coefsT[i]=-aa;
+	testvect->coefsT[i]=-aa;
     TorusPolynomialMulByXai(testvectbis, barb, testvect);
 
     RingLWESample* acc = new_RingLWESample(accum_params);
     ringLweNoiselessTrivial(acc, testvectbis, accum_params);
-//#ifndef NDEBUG
-//    ringLweSymDecrypt(testvectbis, acc, accum_params);
-//
-//    int accum
-//    Torus32 ph = lwePhase(x, debug_in_key);
-//    printf("Phase before loop: %d\n",ph);
-//    printf("aa (enc 0) before loop: %d\n",aa);
-//#endif
+    //#ifndef NDEBUG
+    //    ringLweSymDecrypt(testvectbis, acc, accum_params);
+    //
+    //    int accum
+    //    Torus32 ph = lwePhase(x, debug_in_key);
+    //    printf("Phase before loop: %d\n",ph);
+    //    printf("aa (enc 0) before loop: %d\n",aa);
+    //#endif
     RingGSWSample* temp = new_RingGSWSample(bk_params);
     for (int i=0; i<n; i++) {
-	   int bara=modSwitchFromTorus32(-x->a[i],Nx2);
-	   if (bara==0) continue; //indeed, this is an easy case!
-	   ringGSWMulByXaiMinusOne(temp, bara, bk->bk+i, bk_params);
-	   ringGSWAddH(temp, bk->bk_params);
-	   ringLWEExternMulRGSWTo(acc, temp, bk_params);
+	int bara=modSwitchFromTorus32(-x->a[i],Nx2);
+	if (bara==0) continue; //indeed, this is an easy case!
+	ringGSWMulByXaiMinusOne(temp, bara, bk->bk+i, bk_params);
+	ringGSWAddH(temp, bk->bk_params);
+	ringLWEExternMulRGSWTo(acc, temp, bk_params);
     }
 #ifndef NDEBUG
     ringLwePhase(testvectbis, acc, debug_accum_key);
@@ -691,14 +713,14 @@ EXPORT void createBootstrappingKey(
     const RingGSWParams* bk_params = bk->bk_params;
     const RingLWEParams* accum_params = bk_params->ringlwe_params;
     const LWEParams* extract_params = &accum_params->extracted_lweparams;
-    
+
     //LWEKeySwitchKey* ks; ///< the keyswitch key (s'->s)
     const RingLWEKey* accum_key = &rgsw_key->ringlwe_key;
     LWEKey* extracted_key = new_LWEKey(extract_params);
     ringLweExtractKey(extracted_key, accum_key);
     lweCreateKeySwitchKey(bk->ks, extracted_key, key_in);
     delete_LWEKey(extracted_key);
-    
+
     //RingGSWSample* bk; ///< the bootstrapping key (s->s")
     int* kin = key_in->key;
     const double alpha = accum_params->alpha_min;
@@ -736,14 +758,13 @@ EXPORT void ringLweExtractKey(LWEKey* result, const RingLWEKey* key) //sans dout
 {
     const int N = key->params->N;
     const int k = key->params->k;
-    const int n = result->params->n;
-    assert(n == k*N);
+    assert(result->params->n == k*N);
     for (int i=0; i<k; i++) {
-    	for (int j=0; j<N; j++)
-    	    result->key[i*N+j]=key->key[i].coefs[j];
+	for (int j=0; j<N; j++)
+	    result->key[i*N+j]=key->key[i].coefs[j];
     }
 }
-    
+
 
 
 //extraction RingGSW -> GSW

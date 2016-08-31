@@ -1,0 +1,23 @@
+DCFLAGS=-g3 -O0 -Wall
+OCFLAGS=-O2 -DNDEBUG
+CFLAGS=${OCFLAGS}
+
+n:
+	gcc -c ${CFLAGS} spqlios-fft.s	-o spqlios-fft.o
+	gcc -c ${CFLAGS} spqlios-ifft.s	-o spqlios-ifft.o
+	g++ -c ${CFLAGS} spqlios-bench.cpp -o spqlios-bench.o
+	g++ -c ${CFLAGS} spqlios-fft-impl.cpp -o spqlios-fft-impl.o
+	g++  ${CFLAGS} spqlios-fft.o spqlios-ifft.o spqlios-bench.o spqlios-fft-impl.o -o a.out
+
+newall:
+	g++ -c -O0 -Wall -g3 spqlios.cpp -o spqlios.o
+	gcc -c -O0 -Wall -g3 spqlios.s -o spqlios-asm.o
+	g++ -O0 -Wall -g3 spqlios.o spqlios-asm.o -o test
+
+newall-optim:
+	g++ -c -O2 -Wall -DNDEBUG spqlios.cpp -o spqlios.o
+	gcc -c -O2 -Wall -DNDEBUG spqlios.s -o spqlios-asm.o
+	g++ -O2 -Wall -DNDEBUG spqlios.o spqlios-asm.o -o test-optim
+all:
+	g++ -DNDEBUG -O2 -mavx spqlios.cpp -o spqlios
+	g++ -O0 -Wall -mavx spqlios.cpp -o spqlios-debug

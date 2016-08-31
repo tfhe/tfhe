@@ -174,6 +174,7 @@ innerloop:   /* For each 4 elements up to halfsize. r9 is the vector start. */
 	
 	/* Restore registers */
 end:
+	vzeroall
 	popq        %r13
 	popq        %r12
 	popq        %r11
