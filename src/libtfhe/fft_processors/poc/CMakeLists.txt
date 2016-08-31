@@ -7,11 +7,20 @@ enable_language(ASM)
 
 set(SRCS_AVX
     poc-fft-impl.cpp
-    poc-fft.s
-    poc-ifft.s
+    poc-fft-avx.s
+    poc-ifft-avx.s
     fft_processor_poc.cpp
     lagrangehalfc_impl.cpp
-    lagrangehalfc_impl_asm.s
+    lagrangehalfc_impl_avx.s
+    )
+    
+set(SRCS_FMA
+    poc-fft-impl.cpp
+    poc-fft-avx.s
+    poc-ifft-avx.s
+    fft_processor_poc.cpp
+    lagrangehalfc_impl.cpp
+    lagrangehalfc_impl_fma.s
     )
     
 set(HEADERS
@@ -19,6 +28,6 @@ set(HEADERS
     lagrangehalfc_impl.h
     )
 
-#if (ENABLE_POC_AVX) 
-    add_library(tfhe-fft-poc-avx OBJECT ${SRCS_AVX} ${HEADERS})
-#endif (ENABLE_POC_AVX) 
+if (ENABLE_POC_AVX) 
+    add_library(tfhe-fft-poc-avx OBJECT ${SRCS_FMA} ${HEADERS})
+endif (ENABLE_POC_AVX) 

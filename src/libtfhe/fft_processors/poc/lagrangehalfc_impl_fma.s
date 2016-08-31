@@ -26,18 +26,16 @@ LagrangeHalfCPolynomial_mul:
 	leaq	(%r12,%rcx,8),%r13 /* r13: base of bim */
 	movq	%r9,%r14           /* r14: end of loop */
 .loopLHCmul:
-	vmovupd (%r10),%ymm0
-	vmovupd (%r11),%ymm1
-	vmovupd (%r12),%ymm2
-	vmovupd (%r13),%ymm3
-	vmulpd	%ymm0,%ymm2,%ymm4
-	vmulpd	%ymm1,%ymm3,%ymm5
-	vmulpd	%ymm0,%ymm3,%ymm6
-	vmulpd	%ymm1,%ymm2,%ymm7
-	vsubpd	%ymm5,%ymm4,%ymm2
-	vaddpd	%ymm7,%ymm6,%ymm3
-	vmovupd	%ymm2,(%r8)
-	vmovupd	%ymm3,(%r9)
+	vmovupd (%r10),%ymm0 /* are */
+	vmovupd (%r11),%ymm1 /* aim */
+	vmovupd (%r12),%ymm2 /* bre */
+	vmovupd (%r13),%ymm3 /* bim */
+	vmulpd	%ymm1,%ymm3,%ymm4 /* aim*bim */
+	vmulpd	%ymm0,%ymm3,%ymm6 /* are*bim */
+	vfmadd231pd	%ymm2,%ymm1,%ymm6
+	vfmsub231pd	%ymm0,%ymm2,%ymm4
+	vmovupd	%ymm4,(%r8)
+	vmovupd	%ymm6,(%r9)
 	/* end of loop */
 	addq	$32,%r8
 	addq	$32,%r9
@@ -97,20 +95,16 @@ LagrangeHalfCPolynomial_addmul:
 	leaq	(%r12,%rcx,8),%r13 /* r13: base of bim */
 	movq	%r9,%r14           /* r14: end of loop */
 .loopLHCaddmul:
-	vmovupd (%r8),%ymm8
-	vmovupd (%r9),%ymm9
+	vmovupd (%r8),%ymm8 /* rre */
+	vmovupd (%r9),%ymm9 /* rim */
 	vmovupd (%r10),%ymm0
 	vmovupd (%r11),%ymm1
 	vmovupd (%r12),%ymm2
 	vmovupd (%r13),%ymm3
-	vmulpd	%ymm0,%ymm2,%ymm4
-	vmulpd	%ymm1,%ymm3,%ymm5
-	vmulpd	%ymm0,%ymm3,%ymm6
-	vmulpd	%ymm1,%ymm2,%ymm7
-	vsubpd	%ymm5,%ymm4,%ymm2
-	vaddpd	%ymm7,%ymm6,%ymm3
-	vaddpd	%ymm8,%ymm2,%ymm8
-	vaddpd	%ymm9,%ymm3,%ymm9
+        vfmsub231pd	%ymm3,%ymm1,%ymm8 /* rre  = -rre + aim.bim */
+        vfmsub231pd	%ymm2,%ymm0,%ymm8 /* rre  = -rre + are.bre */
+	vfmadd231pd	%ymm3,%ymm0,%ymm9 /* rim  += are.bim */
+	vfmadd231pd	%ymm2,%ymm1,%ymm9 /* rim  += aim.bre */
 	vmovupd	%ymm8,(%r8)
 	vmovupd	%ymm9,(%r9)
 	/* end of loop */
@@ -178,14 +172,10 @@ LagrangeHalfCPolynomial_submul:
 	vmovupd (%r11),%ymm1
 	vmovupd (%r12),%ymm2
 	vmovupd (%r13),%ymm3
-	vmulpd	%ymm0,%ymm2,%ymm4
-	vmulpd	%ymm1,%ymm3,%ymm5
-	vmulpd	%ymm0,%ymm3,%ymm6
-	vmulpd	%ymm1,%ymm2,%ymm7
-	vsubpd	%ymm5,%ymm4,%ymm2
-	vaddpd	%ymm7,%ymm6,%ymm3
-	vsubpd	%ymm2,%ymm8,%ymm8
-	vsubpd	%ymm3,%ymm8,%ymm9
+        vfnmsub231pd	%ymm3,%ymm1,%ymm8 /* x  = -rre - aim.bim */
+        vfnmsub231pd	%ymm2,%ymm0,%ymm8 /* rre  = -x - are.bre */
+	vfmsub231pd	%ymm3,%ymm0,%ymm9 /* x  = are.bim - rim */
+	vfnmsub231pd	%ymm2,%ymm1,%ymm9 /* rim  = -aim.bre - x*/
 	vmovupd	%ymm8,(%r8)
 	vmovupd	%ymm9,(%r9)
 	/* end of loop */

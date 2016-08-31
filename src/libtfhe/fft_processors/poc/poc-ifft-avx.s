@@ -1,34 +1,20 @@
+	.file	"poc-ifft-avx.s"
+	.section	.text.unlikely,"ax",@progbits
+.LCOLDB0:
+	.text
+.LHOTB0:
+	.p2align 4,,15
+	.globl	ifft
+	.type	ifft, @function
+ifft:
+.LFB0:
+	.cfi_startproc
 //typedef struct  {
 //    uint64_t n;
 //    double* trig_tables;
 //} IFFT_PRECOMP;
 
-/* 
- * Storage usage:
- *    Bytes  Location  Description
- *        8  rcx       Loop counter
- *        8  rdx       Size of FFT (i.e. number of elements in the vector) (a power of 2), constant
- *        8  rdi       Base of real components array, constant (64-bit floats)
- *        8  rsi       Base of imaginary components array, constant (64-bit floats)
- *        8  r8        Base of trigonometric tables array (64-bit floats)
- *        8  r9        Base of bit reversal array (64-bit ints), loop counter
- *        8  rax       Temporary, loop counter
- *        8  r10       Temporary
- *        8  r11       Temporary
- *        8  r12       Temporary
- *        8  r13       Temporary
- *        8  rsp       x86-64 stack pointer
- *      320  ymm0-9    Temporary (64-bit float vectors)
- *       64  ymm14-15  Multiplication constants (64-bit float vectors)
- *        8  [rsp+ 0]  Caller's value of r13
- *        8  [rsp+ 8]  Caller's value of r12
- *        8  [rsp+16]  Caller's value of r11
- *        8  [rsp+24]  Caller's value of r10
- */
-
 /* void ifft(const void *tables, double *real) */
-.globl ifft
-ifft:
 	/* Save registers */
 	pushq       %r10
 	pushq       %r11
@@ -304,5 +290,14 @@ size4negation1: .double +1.0, +1.0, -1.0, +1.0
 size4negation2: .double +1.0, +1.0, -1.0, -1.0
 size4negation3: .double +1.0, -1.0, +1.0, -1.0
 
+	.cfi_endproc
+.LFE0:
+	.size	ifft, .-ifft
+	.section	.text.unlikely
+.LCOLDE0:
+	.text
+.LHOTE0:
+	.ident	"GCC: (Ubuntu 5.2.1-22ubuntu2) 5.2.1 20151010"
+	.section	.note.GNU-stack,"",@progbits
 
 
