@@ -1,4 +1,4 @@
-	.file	"poc-ifft-avx.s"
+	.file	"spqlios-ifft-avx.s"
 	.section	.text.unlikely,"ax",@progbits
 .LCOLDB0:
 	.text
@@ -67,10 +67,12 @@ firstloop:
 	vmovapd 32(%r11), %ymm3 /* sin */
         vmulpd  %ymm0, %ymm2, %ymm4 /* re*cos */
         vmulpd  %ymm0, %ymm3, %ymm5 /* re*sin */
-	vfnmadd231pd  %ymm1, %ymm3, %ymm4 /* re*cos - im*sin */
-	vfmadd231pd  %ymm1, %ymm2, %ymm5 /* re*sin + im*cos */
-	vmovapd %ymm4, (%rdi,%rcx,8)
-	vmovapd %ymm5, (%rsi,%rcx,8)
+	vmulpd  %ymm1, %ymm2, %ymm6 /* im*cos */
+	vmulpd  %ymm1, %ymm3, %ymm7 /* im*sin */
+	vsubpd  %ymm7, %ymm4, %ymm0 /* y4-y7 -> new re */
+	vaddpd  %ymm5, %ymm6, %ymm1 /* -> new im */
+	vmovapd %ymm0, (%rdi,%rcx,8)
+	vmovapd %ymm1, (%rsi,%rcx,8)
         //next iteration
 	leaq    64(%r11), %r11
 	addq	$4,%rcx
@@ -118,30 +120,32 @@ nnloop:
 	movq $0,%r11   /* r11 (block) */
 blockloop:
 	leaq (%rdi,%r11,8),%rax /* are + block */
-	leaq (%rsi,%r11,8),%rbx /* aim + block */
+	leaq (%rsi,%r11,8),%rbx /* are + block */
 	leaq (%rax,%r13,8),%rcx /* are + block + halfnn */
 	leaq (%rbx,%r13,8),%rdx /* aim + block + halfnn */
 	movq $0,%r9   /* r9 (off) */
 	movq %r8,%r14 /* r14 : cur_tt + 16*off */
 offloop:
-        vmovapd (%rax,%r9,8), %ymm0  /* re0 */
-        vmovapd (%rbx,%r9,8), %ymm1  /* im0 */
-        vmovapd (%rcx,%r9,8), %ymm2  /* re1 */
-        vmovapd (%rdx,%r9,8), %ymm3  /* im1 */
-	vaddpd %ymm0,%ymm2,%ymm4 /* re0+re1 */
-	vaddpd %ymm1,%ymm3,%ymm5 /* im0+im1 */
-	vsubpd %ymm2,%ymm0,%ymm6 /* re2=re0-re1 */
-	vsubpd %ymm3,%ymm1,%ymm7 /* im2=im0-im1 */
+        vmovapd (%rax,%r9,8), %ymm0  /* d00 */
+        vmovapd (%rbx,%r9,8), %ymm1  /* d01 */
+        vmovapd (%rcx,%r9,8), %ymm2  /* d10 */
+        vmovapd (%rdx,%r9,8), %ymm3  /* d11 */
+	vaddpd %ymm0,%ymm2,%ymm4 /* tmp0 */
+	vaddpd %ymm1,%ymm3,%ymm5 /* tmp1 */
+	vsubpd %ymm2,%ymm0,%ymm6 /* tmp2 */
+	vsubpd %ymm3,%ymm1,%ymm7 /* tmp3 */
 	vmovapd %ymm4,(%rax,%r9,8)
         vmovapd %ymm5,(%rbx,%r9,8)
-        vmovapd (%r14),%ymm8 /* cos */
-	vmovapd 32(%r14),%ymm9 /* sin */
-	vmulpd %ymm6,%ymm8,%ymm4 /* re2.cos */
-	vfnmadd231pd %ymm7,%ymm9,%ymm4 /* re2.cos - im2.sin */
-	vmulpd %ymm6,%ymm9,%ymm5 /* re2.sin */
-	vfmadd231pd %ymm7,%ymm8,%ymm5 /* re2.sin + im2.cos */
-	vmovapd %ymm4,(%rcx,%r9,8)
-        vmovapd %ymm5,(%rdx,%r9,8)
+        vmovapd (%r14),%ymm8 /* r0 = cos */
+	vmovapd 32(%r14),%ymm9 /* r1 = sin */
+	vmulpd %ymm6,%ymm8,%ymm4
+	vmulpd %ymm7,%ymm9,%ymm5
+	vsubpd %ymm5,%ymm4,%ymm10
+	vmovapd %ymm10,(%rcx,%r9,8)
+        vmulpd %ymm6,%ymm9,%ymm4
+	vmulpd %ymm7,%ymm8,%ymm5
+	vaddpd %ymm4,%ymm5,%ymm10
+	vmovapd %ymm10,(%rdx,%r9,8)
         /* end of off loop */
        	leaq 64(%r14),%r14
         addq $4,%r9
@@ -201,10 +205,12 @@ size4loop:
 	vperm2f128 $32,%ymm3,%ymm1,%ymm6 /* i0 i1 i0 r1 */
 	vperm2f128 $49,%ymm3,%ymm1,%ymm7 /* i2 i3 i2 r3 */
 	vmulpd	%ymm4,%ymm15,%ymm4 /* r0 r1 r0 -i1 */
-	vfmadd231pd	%ymm5,%ymm14,%ymm4 /* (r0 r1 r0 -i1) + (r2 r3 -r2 i3) */
-	vfmadd231pd	%ymm7,%ymm13,%ymm6 /* (i0 i1 i0 r1) + (i2 i3 -i2 -r3) */
-	vmovapd %ymm4,(%r11) 
-	vmovapd %ymm6,(%r12)
+	vmulpd	%ymm5,%ymm14,%ymm5 /* r2 r3 -r2 i3 */
+	vmulpd	%ymm7,%ymm13,%ymm7 /* i2 i3 -i2 -r3 */
+	vaddpd  %ymm4,%ymm5,%ymm0
+	vaddpd  %ymm6,%ymm7,%ymm1
+	vmovapd %ymm0,(%r11) 
+	vmovapd %ymm1,(%r12)
         /* end of loop */
         leaq 32(%r11),%r11
         leaq 32(%r12),%r12
@@ -251,10 +257,12 @@ size2loop:
 	vshufpd $15,%ymm0,%ymm0,%ymm3 /* r1 r1 r3 r3 */
 	vshufpd $0,%ymm1,%ymm1,%ymm4 /* i0 i0 i2 i2 */
 	vshufpd $15,%ymm1,%ymm1,%ymm5 /* i1 i1 i3 i3 */
-	vfmadd231pd %ymm3,%ymm12,%ymm2 /* (r0 r0 r2 r2) + (r1 -r1 r3 -r3) */
-	vfmadd231pd %ymm5,%ymm12,%ymm4 /* (i0 i0 i2 i2) + (i1 -i1 i3 -i3) */ 
-	vmovapd %ymm2,(%r11)
-	vmovapd %ymm4,(%r12)
+	vmulpd  %ymm3,%ymm12,%ymm3
+	vmulpd  %ymm5,%ymm12,%ymm5
+	vaddpd  %ymm2,%ymm3,%ymm0
+	vaddpd  %ymm4,%ymm5,%ymm1
+	vmovapd %ymm0,(%r11)
+	vmovapd %ymm1,(%r12)
 	/* end of loop */
         leaq 32(%r11),%r11
         leaq 32(%r12),%r12

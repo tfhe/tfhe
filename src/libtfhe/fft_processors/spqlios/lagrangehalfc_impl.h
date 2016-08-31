@@ -1,12 +1,12 @@
-#ifndef LAGRANGEHALFC_IMPL_POC_H
-#define LAGRANGEHALFC_IMPL_POC_H
+#ifndef LAGRANGEHALFC_IMPL_SPQLIOS_H
+#define LAGRANGEHALFC_IMPL_SPQLIOS_H
 
 #include <cassert>
 #include <cmath>
 #include <lwe.h>
 #include <polynomials.h>
 
-class FFT_Processor_Poc {
+class FFT_Processor_Spqlios {
     public:
     const int _2N;
     const int N;    
@@ -23,16 +23,16 @@ class FFT_Processor_Poc {
     double* sinomegaxminus1;
     int* reva; //rev(2i+1,_2N)
 
-    FFT_Processor_Poc(const int N);
+    FFT_Processor_Spqlios(const int N);
 
     void execute_reverse_int(double* res, const int* a);
     void execute_reverse_torus32(double* res, const Torus32* a);
     void execute_direct_torus32(Torus32* res, const double* a);
 
-    ~FFT_Processor_Poc();
+    ~FFT_Processor_Spqlios();
 };
 
-extern FFT_Processor_Poc fftp1024;
+extern FFT_Processor_Spqlios fftp1024;
 
 /**
  * structure that represents a real polynomial P mod X^N+1
@@ -43,10 +43,10 @@ extern FFT_Processor_Poc fftp1024;
 struct LagrangeHalfCPolynomial_IMPL
 {
    double* coefsC;
-   FFT_Processor_Poc* proc;
+   FFT_Processor_Spqlios* proc;
 
    LagrangeHalfCPolynomial_IMPL(int N);
    ~LagrangeHalfCPolynomial_IMPL();
 };
 
-#endif // LAGRANGEHALFC_IMPL_POC_H
+#endif // LAGRANGEHALFC_IMPL_SPQLIOS_H

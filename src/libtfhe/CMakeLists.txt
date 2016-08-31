@@ -54,11 +54,11 @@ if (ENABLE_NAYUKI_PORTABLE)
     add_library(tfhe-nayuki-portable $<TARGET_OBJECTS:tfhe-core> $<TARGET_OBJECTS:tfhe-fft-nayuki-portable>)
 endif (ENABLE_NAYUKI_PORTABLE) 
 
-if (ENABLE_POC_AVX) 
-    add_library(tfhe-poc-avx $<TARGET_OBJECTS:tfhe-core> $<TARGET_OBJECTS:tfhe-fft-poc-avx>)
-endif (ENABLE_POC_AVX) 
+if (ENABLE_SPQLIOS_AVX) 
+    add_library(tfhe-spqlios-avx $<TARGET_OBJECTS:tfhe-core> $<TARGET_OBJECTS:tfhe-fft-spqlios-avx>)
+endif (ENABLE_SPQLIOS_AVX) 
 
-if (ENABLE_POC_FMA) 
-    add_library(tfhe-poc-fma $<TARGET_OBJECTS:tfhe-core> $<TARGET_OBJECTS:tfhe-fft-poc-fma>)
-endif (ENABLE_POC_FMA) 
+if (ENABLE_SPQLIOS_FMA) 
+    add_library(tfhe-spqlios-fma $<TARGET_OBJECTS:tfhe-core> $<TARGET_OBJECTS:tfhe-fft-spqlios-fma>)
+endif (ENABLE_SPQLIOS_FMA) 
 

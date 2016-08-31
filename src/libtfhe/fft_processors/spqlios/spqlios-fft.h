@@ -1,5 +1,5 @@
-#ifndef POC_FFT_H
-#define POC_FFT_H
+#ifndef SPQLIOS_FFT_H
+#define SPQLIOS_FFT_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,4 +18,4 @@ void ifft(const void* tables, double* data);
 }
 #endif
 
-#endif //POC_FFT_H
+#endif //SPQLIOS_FFT_H

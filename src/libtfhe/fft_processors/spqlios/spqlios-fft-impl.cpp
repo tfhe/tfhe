@@ -11,7 +11,7 @@
 #include <complex>
 #endif
 
-#include "poc-fft.h"
+#include "spqlios-fft.h"
 
 using namespace std;
 

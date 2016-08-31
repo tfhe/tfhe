@@ -8,7 +8,7 @@
 #include <cstdlib>
 #include <complex>
 
-#include "poc-fft.h"
+#include "spqlios-fft.h"
 
 using namespace std;
 

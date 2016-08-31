@@ -1,5 +1,5 @@
 #include "lagrangehalfc_impl.h"
-#include "poc-fft.h"
+#include "spqlios-fft.h"
 #include <cassert>
 #include <cmath>
 
@@ -14,7 +14,7 @@ int rev(int x, int M) {
     return reps;   	
 }
 
-FFT_Processor_Poc::FFT_Processor_Poc(const int N): _2N(2*N),N(N),Ns2(N/2) {
+FFT_Processor_Spqlios::FFT_Processor_Spqlios(const int N): _2N(2*N),N(N),Ns2(N/2) {
     tables_direct = new_fft_table(N);
     tables_reverse = new_ifft_table(N);
     real_inout_direct = fft_table_get_buffer(tables_direct);
@@ -35,7 +35,7 @@ FFT_Processor_Poc::FFT_Processor_Poc(const int N): _2N(2*N),N(N),Ns2(N/2) {
     }      
 }
 
-void FFT_Processor_Poc::execute_reverse_int(double* res, const int* a) {
+void FFT_Processor_Spqlios::execute_reverse_int(double* res, const int* a) {
     //for (int i=0; i<N; i++) real_inout_rev[i]=(double)a[i];
     {
     	double* dst = real_inout_rev;
@@ -77,7 +77,7 @@ void FFT_Processor_Poc::execute_reverse_int(double* res, const int* a) {
     }
 }
 
-void FFT_Processor_Poc::execute_reverse_torus32(double* res, const Torus32* a) {
+void FFT_Processor_Spqlios::execute_reverse_torus32(double* res, const Torus32* a) {
     int32_t* aa = (int32_t*) a;
     //for (int i=0; i<N; i++) real_inout_rev[i]=aa[i]; //we do not rescale
     //ifft(tables_reverse,real_inout_rev);
@@ -85,7 +85,7 @@ void FFT_Processor_Poc::execute_reverse_torus32(double* res, const Torus32* a) {
     execute_reverse_int(res,aa); 
 }
 
-void FFT_Processor_Poc::execute_direct_torus32(Torus32* res, const double* a) {
+void FFT_Processor_Spqlios::execute_direct_torus32(Torus32* res, const double* a) {
     static const double _2sN = double(2)/double(N);
     //for (int i=0; i<N; i++) real_inout_direct[i]=a[i]*_2sn;
     {
@@ -113,13 +113,13 @@ void FFT_Processor_Poc::execute_direct_torus32(Torus32* res, const double* a) {
     for (int i=0; i<N; i++) res[i]=Torus32(int64_t(real_inout_direct[i]));
 }
 
-FFT_Processor_Poc::~FFT_Processor_Poc() {
+FFT_Processor_Spqlios::~FFT_Processor_Spqlios() {
     //delete (tables_direct);
     //delete (tables_reverse);
     delete[] cosomegaxminus1;
 }
 
-FFT_Processor_Poc fftp1024(1024);
+FFT_Processor_Spqlios fftp1024(1024);
 
 /**
  * FFT functions 

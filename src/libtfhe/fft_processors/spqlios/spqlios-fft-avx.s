@@ -1,4 +1,4 @@
-	.file	"poc-fft-avx.s"
+	.file	"spqlios-fft-avx.s"
 	.section	.text.unlikely,"ax",@progbits
 .LCOLDB0:
 	.text
