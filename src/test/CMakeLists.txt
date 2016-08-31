@@ -103,6 +103,26 @@ target_link_libraries(test-lwe-poc-avx ${RUNTIME_LIBS})
 target_link_libraries(test-multiplication-poc-avx ${RUNTIME_LIBS})
 target_link_libraries(test-ringlwe-poc-avx ${RUNTIME_LIBS})
 
+elseif (FFT_PROCESSOR STREQUAL "poc-fma")
+set(RUNTIME_LIBS
+    tfhe-poc-fma
+    )
+add_executable(test-bootstrapping-poc-fma test-bootstrapping.cpp ${HEADERS})
+add_executable(test-bootstrapping-fft2-poc-fma test-bootstrapping-fft2.cpp ${HEADERS})
+add_executable(test-deb-boot-poc-fma test-deb-boot.cpp ${HEADERS})
+add_executable(test-decomp-ringgsw-poc-fma test-decomp-ringgsw.cpp ${HEADERS})
+add_executable(test-lwe-poc-fma test-lwe.cpp ${HEADERS})
+add_executable(test-multiplication-poc-fma test-multiplication.cpp ${HEADERS})
+add_executable(test-ringlwe-poc-fma test-ringlwe.cpp ${HEADERS})
+
+target_link_libraries(test-bootstrapping-poc-fma ${RUNTIME_LIBS})
+target_link_libraries(test-bootstrapping-fft2-poc-fma ${RUNTIME_LIBS})
+target_link_libraries(test-deb-boot-poc-fma ${RUNTIME_LIBS})
+target_link_libraries(test-decomp-ringgsw-poc-fma ${RUNTIME_LIBS})
+target_link_libraries(test-lwe-poc-fma ${RUNTIME_LIBS})
+target_link_libraries(test-multiplication-poc-fma ${RUNTIME_LIBS})
+target_link_libraries(test-ringlwe-poc-fma ${RUNTIME_LIBS})
+
 endif (FFT_PROCESSOR STREQUAL "fftw") 
 
 endforeach (FFT_PROCESSOR IN LISTS FFT_PROCESSORS) 

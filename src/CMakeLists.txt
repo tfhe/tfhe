@@ -8,6 +8,7 @@ set(ENABLE_FFTW ON CACHE BOOL "Enable the FFTW FFT processor (GPL)")
 set(ENABLE_NAYUKI_PORTABLE ON CACHE BOOL "Enable the Nayuki portable FFT processor (MIT)")
 set(ENABLE_NAYUKI_AVX ON CACHE BOOL "Enable the Nayuki AVX assembly FFT processor (MIT)")
 set(ENABLE_POC_AVX ON CACHE BOOL "Enable the POC AVX assembly FFT processor")
+set(ENABLE_POC_FMA ON CACHE BOOL "Enable the POC FMA assembly FFT processor")
 
 set(CMAKE_CXX_FLAGS_DEBUG "-std=gnu++11 -g3 -O0 -Wall -Werror")
 set(CMAKE_C_FLAGS_DEBUG "-g3 -O0 -Wall -Werror")
@@ -34,6 +35,10 @@ endif(ENABLE_NAYUKI_AVX)
 
 if (ENABLE_POC_AVX)
 list(APPEND FFT_PROCESSORS "poc-avx")
+endif(ENABLE_POC_AVX)
+
+if (ENABLE_POC_AVX)
+list(APPEND FFT_PROCESSORS "poc-fma")
 endif(ENABLE_POC_AVX)
 
 project(tfhe)

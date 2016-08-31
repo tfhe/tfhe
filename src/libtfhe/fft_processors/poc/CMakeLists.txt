@@ -16,8 +16,8 @@ set(SRCS_AVX
     
 set(SRCS_FMA
     poc-fft-impl.cpp
-    poc-fft-avx.s
-    poc-ifft-avx.s
+    poc-fft-fma.s
+    poc-ifft-fma.s
     fft_processor_poc.cpp
     lagrangehalfc_impl.cpp
     lagrangehalfc_impl_fma.s
@@ -29,5 +29,9 @@ set(HEADERS
     )
 
 if (ENABLE_POC_AVX) 
-    add_library(tfhe-fft-poc-avx OBJECT ${SRCS_FMA} ${HEADERS})
+    add_library(tfhe-fft-poc-avx OBJECT ${SRCS_AVX} ${HEADERS})
 endif (ENABLE_POC_AVX) 
+
+if (ENABLE_POC_FMA) 
+    add_library(tfhe-fft-poc-fma OBJECT ${SRCS_FMA} ${HEADERS})
+endif (ENABLE_POC_FMA) 

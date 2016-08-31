@@ -58,3 +58,7 @@ if (ENABLE_POC_AVX)
     add_library(tfhe-poc-avx $<TARGET_OBJECTS:tfhe-core> $<TARGET_OBJECTS:tfhe-fft-poc-avx>)
 endif (ENABLE_POC_AVX) 
 
+if (ENABLE_POC_FMA) 
+    add_library(tfhe-poc-fma $<TARGET_OBJECTS:tfhe-core> $<TARGET_OBJECTS:tfhe-fft-poc-fma>)
+endif (ENABLE_POC_FMA) 
+
