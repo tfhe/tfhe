@@ -4,7 +4,7 @@
 ///@file
 ///@brief This file contains the operations on numerical types (especially Torus32)
 
-#include "tfhe.h"
+#include "tfhe_core.h"
 
 #ifdef __cplusplus
 #include <random>

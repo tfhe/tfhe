@@ -27,11 +27,11 @@ void dieDramatically(string message) {
 }
 
 EXPORT void tLweExtractKey(LweKey* result, const TLweKey* key); //TODO: change the name and put in a .h
-EXPORT void createBootstrappingKeyFFT(
+EXPORT void tfhe_createLweBootstrappingKeyFFT(
 	LweBootstrappingKeyFFT* bk, 
 	const LweKey* key_in, 
 	const TGswKey* rgsw_key);
-EXPORT void bootstrapFFT(LweSample* result, const LweBootstrappingKeyFFT* bk, Torus32 mu1, Torus32 mu0, const LweSample* x);
+EXPORT void tfhe_bootstrapFFT(LweSample* result, const LweBootstrappingKeyFFT* bk, Torus32 mu1, Torus32 mu0, const LweSample* x);
 
 
 #ifndef NDEBUG
@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
     tGswKeyGen(key_bk);
 
     LweBootstrappingKeyFFT* bk = new_LweBootstrappingKeyFFT(params_in, params_bk);
-    createBootstrappingKeyFFT(bk, key, key_bk);
+    tfhe_createLweBootstrappingKeyFFT(bk, key, key_bk);
 
     LweSample* test = new_LweSample(params_in);
     LweSample* test_out = new_LweSample(params_in);
@@ -95,7 +95,7 @@ int main(int argc, char** argv) {
     int nbtrials = 50;
     clock_t begin = clock();
     for (int i=0; i<nbtrials; i++)
-	bootstrapFFT(test_out, bk, mu1, mu0, test);
+	tfhe_bootstrapFFT(test_out, bk, mu1, mu0, test);
     clock_t end = clock();
     cout << "finished bootstrapping (microsecs)... " << (end-begin)/double(nbtrials) << endl;
     Torus32 mu_out = lweSymDecrypt(test_out, key, 2);

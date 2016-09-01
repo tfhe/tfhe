@@ -1,7 +1,7 @@
 #ifndef POLYNOMIALS_ARITHMETIC_H
 #define POLYNOMIALS_ARITHMETIC_H
 
-#include "tfhe.h"
+#include "tfhe_core.h"
 #include "polynomials.h"
 
 ///@file
@@ -41,6 +41,9 @@ EXPORT void torusPolynomialSubMulZ(TorusPolynomial* result, const TorusPolynomia
 
 /**  TorusPolynomial -= p*TorusPolynomial */
 EXPORT void torusPolynomialSubMulZTo(TorusPolynomial* result, int p, const TorusPolynomial* poly2);
+
+/**  TorusPolynomial = X^a * TorusPolynomial */
+EXPORT void TorusPolynomialMulByXai(TorusPolynomial* result, int a, const TorusPolynomial* bk);
 
 /**  Norme Euclidienne d'un IntPolynomial */
 EXPORT double intPolynomialNormSq2(const IntPolynomial* poly);

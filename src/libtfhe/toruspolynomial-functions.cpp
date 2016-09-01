@@ -3,7 +3,8 @@
 #include <fftw3.h>
 #include <cassert>
 #include <cmath>
-#include "tfhe.h"
+#include "tfhe_core.h"
+#include "numeric_functions.h"
 #include "polynomials.h"
 
 using namespace std;

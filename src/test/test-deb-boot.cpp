@@ -32,19 +32,19 @@ void dieDramatically(string message) {
 
 
 EXPORT void tLweExtractKey(LweKey* result, const TLweKey* key); //TODO: change the name and put in a .h
-EXPORT void createBootstrappingKeyFFT(
+EXPORT void tfhe_createLweBootstrappingKeyFFT(
 	LweBootstrappingKeyFFT* bk, 
 	const LweKey* key_in, 
 	const TGswKey* rgsw_key);
-EXPORT void bootstrapFFT(LweSample* result, const LweBootstrappingKeyFFT* bk, Torus32 mu1, Torus32 mu0, const LweSample* x);
+EXPORT void tfhe_bootstrapFFT(LweSample* result, const LweBootstrappingKeyFFT* bk, Torus32 mu1, Torus32 mu0, const LweSample* x);
 
 
 EXPORT void tLweExtractKey(LweKey* result, const TLweKey* key); //TODO: change the name and put in a .h
-EXPORT void createBootstrappingKey(
+EXPORT void tfhe_createLweBootstrappingKey(
     LweBootstrappingKey* bk, 
     const LweKey* key_in, 
     const TGswKey* rgsw_key);
-EXPORT void bootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LweSample* x);
+EXPORT void tfhe_bootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LweSample* x);
 
 
 
@@ -106,9 +106,9 @@ int main(int argc, char** argv) {
     TGswKey* key_bk = new_TGswKey(bk_params);
     tGswKeyGen(key_bk);
 
-    // bk used for bootstrapFFT, bk1 used for bootstrap
+    // bk used for tfhe_bootstrapFFT, bk1 used for tfhe_bootstrap
     LweBootstrappingKeyFFT* bk = new_LweBootstrappingKeyFFT(in_params, bk_params);
-    createBootstrappingKeyFFT(bk, key, key_bk);
+    tfhe_createLweBootstrappingKeyFFT(bk, key, key_bk);
     LweBootstrappingKey* bk1 = new_LweBootstrappingKey(in_params, bk_params);
     for (int i=0; i<n; i++) {
         tGswFromFFTConvert(&bk1->bk[i], &bk->bk[i], bk_params);
@@ -188,7 +188,7 @@ int main(int argc, char** argv) {
     TLweSample* acc1 = new_TLweSample(accum_params);
     TLweSampleFFT* accFFT = new_TLweSampleFFT(accum_params);
 
-    // acc and accFFt will be used for bootstrapFFT, acc1=acc will be used for bootstrap
+    // acc and accFFt will be used for tfhe_bootstrapFFT, acc1=acc will be used for tfhe_bootstrap
     tLweNoiselessTrivial(acc, testvectbis, accum_params);
     for (int i = 0; i < k+1; ++i)
         for (int j = 0; j < N; ++j)
@@ -273,8 +273,8 @@ int main(int argc, char** argv) {
     Torus32 mu_out1 = lweSymDecrypt(result1, key, 2);
     cout << "end_variance FFT: " << result->current_variance << endl;
     cout << "end_variance: " << result1->current_variance << endl;
-    if (mu_in != mu_out) cout << "Erreur bootstrapFFT!" << endl;
-    if (mu_in != mu_out1) cout << "Erreur bootstrap!" << endl;
+    if (mu_in != mu_out) cout << "Erreur tfhe_bootstrapFFT!" << endl;
+    if (mu_in != mu_out1) cout << "Erreur tfhe_bootstrap!" << endl;
 
 
 

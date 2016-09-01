@@ -1,7 +1,9 @@
 #include <cassert>
 #include <cmath>
-#include "tfhe.h"
-#include "polynomials.h"
+#include <cstdlib>
+#include "tfhe_core.h"
+#include "polynomials_arithmetic.h"
+#include "lagrangehalfc_arithmetic.h"
 
 using namespace std;
 

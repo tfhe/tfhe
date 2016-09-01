@@ -1,7 +1,8 @@
 #include <cstdlib>
 #include <iostream>
-#include "tfhe.h"
+#include "tfhe_core.h"
 #include "lwebootstrappingkey.h"
+#include "lwekeyswitch.h"
 #include "tgsw.h"
 
 const int basebit = 2;

@@ -1,6 +1,8 @@
 #ifndef LwePARAMS_H
 #define LwePARAMS_H
 
+#include "tfhe_core.h"
+
 //this structure contains Lwe parameters
 //this structure is constant (cannot be modified once initialized): 
 //the pointer to the param can be passed directly
@@ -21,5 +23,33 @@ struct LweParams {
 	LweParams& operator=(const LweParams& ) = delete; //forbidden
 #endif
 };
+
+//allocate memory space for a LweParams
+EXPORT LweParams* alloc_LweParams();
+EXPORT LweParams* alloc_LweParams_array(int nbelts);
+
+//free memory space for a LweParams
+EXPORT void free_LweParams(LweParams* ptr);
+EXPORT void free_LweParams_array(int nbelts, LweParams* ptr);
+
+//initialize the LweParams structure
+//(equivalent of the C++ constructor)
+EXPORT void init_LweParams(LweParams* obj, int n, double alpha_min, double alpha_max);
+EXPORT void init_LweParams_array(int nbelts, LweParams* obj, int n, double alpha_min, double alpha_max);
+
+//destroys the LweParams structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_LweParams(LweParams* obj);
+EXPORT void destroy_LweParams_array(int nbelts, LweParams* obj);
+ 
+//allocates and initialize the LweParams structure
+//(equivalent of the C++ new)
+EXPORT LweParams* new_LweParams(int n, double alpha_min, double alpha_max);
+EXPORT LweParams* new_LweParams_array(int nbelts, int n, double alpha_min, double alpha_max);
+
+//destroys and frees the LweParams structure
+//(equivalent of the C++ delete)
+EXPORT void delete_LweParams(LweParams* obj);
+EXPORT void delete_LweParams_array(int nbelts, LweParams* obj);
 
 #endif //LwePARAMS_H

@@ -1,6 +1,6 @@
 //THIS  FILE IS AUTOMATICALLY GENERATED
 //DO NOT EDIT BY HANDS
-#include "tfhe.h"
+#include "tfhe_core.h"
 #include <cstdlib>
 #include <new>
 using namespace std;

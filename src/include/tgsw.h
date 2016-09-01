@@ -1,7 +1,7 @@
 #ifndef TGSW_H
 #define TGSW_H
 
-#include "tfhe.h"
+#include "tfhe_core.h"
 #include "tlwe.h"
 #include "polynomials.h"
 
@@ -69,5 +69,115 @@ struct TGswSampleFFT {
     void operator=(const TGswSampleFFT&) = delete;
 #endif
 };
+
+//allocate memory space for a TGswKey
+EXPORT TGswKey* alloc_TGswKey();
+EXPORT TGswKey* alloc_TGswKey_array(int nbelts);
+
+//free memory space for a TGswKey
+EXPORT void free_TGswKey(TGswKey* ptr);
+EXPORT void free_TGswKey_array(int nbelts, TGswKey* ptr);
+
+//initialize the TGswKey structure
+//(equivalent of the C++ constructor)
+EXPORT void init_TGswKey(TGswKey* obj, const TGswParams* params);
+EXPORT void init_TGswKey_array(int nbelts, TGswKey* obj, const TGswParams* params);
+
+//destroys the TGswKey structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_TGswKey(TGswKey* obj);
+EXPORT void destroy_TGswKey_array(int nbelts, TGswKey* obj);
+ 
+//allocates and initialize the TGswKey structure
+//(equivalent of the C++ new)
+EXPORT TGswKey* new_TGswKey(const TGswParams* params);
+EXPORT TGswKey* new_TGswKey_array(int nbelts, const TGswParams* params);
+
+//destroys and frees the TGswKey structure
+//(equivalent of the C++ delete)
+EXPORT void delete_TGswKey(TGswKey* obj);
+EXPORT void delete_TGswKey_array(int nbelts, TGswKey* obj);
+//allocate memory space for a TGswParams
+EXPORT TGswParams* alloc_TGswParams();
+EXPORT TGswParams* alloc_TGswParams_array(int nbelts);
+
+//free memory space for a TGswParams
+EXPORT void free_TGswParams(TGswParams* ptr);
+EXPORT void free_TGswParams_array(int nbelts, TGswParams* ptr);
+
+//initialize the TGswParams structure
+//(equivalent of the C++ constructor)
+EXPORT void init_TGswParams(TGswParams* obj, int l, int Bgbit, TLweParams* tlwe_params);
+EXPORT void init_TGswParams_array(int nbelts, TGswParams* obj, int l, int Bgbit, TLweParams* tlwe_params);
+
+//destroys the TGswParams structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_TGswParams(TGswParams* obj);
+EXPORT void destroy_TGswParams_array(int nbelts, TGswParams* obj);
+ 
+//allocates and initialize the TGswParams structure
+//(equivalent of the C++ new)
+EXPORT TGswParams* new_TGswParams(int l, int Bgbit, TLweParams* tlwe_params);
+EXPORT TGswParams* new_TGswParams_array(int nbelts, int l, int Bgbit, TLweParams* tlwe_params);
+
+//destroys and frees the TGswParams structure
+//(equivalent of the C++ delete)
+EXPORT void delete_TGswParams(TGswParams* obj);
+EXPORT void delete_TGswParams_array(int nbelts, TGswParams* obj);
+//allocate memory space for a TGswSample
+EXPORT TGswSample* alloc_TGswSample();
+EXPORT TGswSample* alloc_TGswSample_array(int nbelts);
+
+//free memory space for a TGswSample
+EXPORT void free_TGswSample(TGswSample* ptr);
+EXPORT void free_TGswSample_array(int nbelts, TGswSample* ptr);
+
+//initialize the TGswSample structure
+//(equivalent of the C++ constructor)
+EXPORT void init_TGswSample(TGswSample* obj, const TGswParams* params);
+EXPORT void init_TGswSample_array(int nbelts, TGswSample* obj, const TGswParams* params);
+
+//destroys the TGswSample structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_TGswSample(TGswSample* obj);
+EXPORT void destroy_TGswSample_array(int nbelts, TGswSample* obj);
+ 
+//allocates and initialize the TGswSample structure
+//(equivalent of the C++ new)
+EXPORT TGswSample* new_TGswSample(const TGswParams* params);
+EXPORT TGswSample* new_TGswSample_array(int nbelts, const TGswParams* params);
+
+//destroys and frees the TGswSample structure
+//(equivalent of the C++ delete)
+EXPORT void delete_TGswSample(TGswSample* obj);
+EXPORT void delete_TGswSample_array(int nbelts, TGswSample* obj);
+
+//allocate memory space for a TGswSampleFFT
+EXPORT TGswSampleFFT* alloc_TGswSampleFFT();
+EXPORT TGswSampleFFT* alloc_TGswSampleFFT_array(int nbelts);
+
+//free memory space for a TGswSampleFFT
+EXPORT void free_TGswSampleFFT(TGswSampleFFT* ptr);
+EXPORT void free_TGswSampleFFT_array(int nbelts, TGswSampleFFT* ptr);
+
+//initialize the TGswSampleFFT structure
+//(equivalent of the C++ constructor)
+EXPORT void init_TGswSampleFFT(TGswSampleFFT* obj, const TGswParams* params);
+EXPORT void init_TGswSampleFFT_array(int nbelts, TGswSampleFFT* obj, const TGswParams* params);
+
+//destroys the TGswSampleFFT structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_TGswSampleFFT(TGswSampleFFT* obj);
+EXPORT void destroy_TGswSampleFFT_array(int nbelts, TGswSampleFFT* obj);
+ 
+//allocates and initialize the TGswSampleFFT structure
+//(equivalent of the C++ new)
+EXPORT TGswSampleFFT* new_TGswSampleFFT(const TGswParams* params);
+EXPORT TGswSampleFFT* new_TGswSampleFFT_array(int nbelts, const TGswParams* params);
+
+//destroys and frees the TGswSampleFFT structure
+//(equivalent of the C++ delete)
+EXPORT void delete_TGswSampleFFT(TGswSampleFFT* obj);
+EXPORT void delete_TGswSampleFFT_array(int nbelts, TGswSampleFFT* obj);
 
 #endif // TGSW_H

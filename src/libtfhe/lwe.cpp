@@ -2,14 +2,18 @@
 #include <iostream>
 #include <random>
 #include <cassert>
-#include "tfhe.h"
+#include "tfhe_core.h"
+#include "numeric_functions.h"
 #include "lweparams.h"
 #include "lwekey.h"
 #include "lwesamples.h"
-#include "tlwe.h"
-#include "tgsw.h"
+#include "lwe-functions.h"
+#include "tlwe_functions.h"
+#include "tgsw_functions.h"
 #include "lwekeyswitch.h"
 #include "lwebootstrappingkey.h"
+#include "polynomials_arithmetic.h"
+#include "lagrangehalfc_arithmetic.h"
 
 using namespace std;
 
@@ -719,7 +723,7 @@ EXPORT void sampleExtract(LweSample* result, const TLweSample* x, const LweParam
 
 //Lwe to Lwe Single gate bootstrapping
 //TODO: Malika
-EXPORT void bootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LweSample* x){
+EXPORT void tfhe_bootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LweSample* x){
     const Torus32 ab=(mu0+mu1)/2;
     const Torus32 aa=mu0-ab; //it is important to define it like this and not (mu0-mu1)/2!
     const TGswParams* bk_params = bk->bk_params;
@@ -793,7 +797,7 @@ EXPORT void bootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 
     delete_TorusPolynomial(testvect);
 }
 
-EXPORT void createBootstrappingKey(
+EXPORT void tfhe_createLweBootstrappingKey(
 	LweBootstrappingKey* bk, 
 	const LweKey* key_in, 
 	const TGswKey* rgsw_key) {
@@ -863,4 +867,4 @@ EXPORT void tLweExtractKey(LweKey* result, const TLweKey* key) //sans doute un p
 // EXPORT void gswSampleExtract(TLweSample* result, const TGswSample* x);
 
 //bootstrapping
-// EXPORT void bootstrap(LweSample* result, const LweBootstrappingKey* bk, double mu1, double mu0, const LweSample* x);
+// EXPORT void tfhe_bootstrap(LweSample* result, const LweBootstrappingKey* bk, double mu1, double mu0, const LweSample* x);

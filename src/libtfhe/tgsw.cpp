@@ -1,4 +1,4 @@
-#include "tfhe.h"
+#include "tfhe_core.h"
 #include "tlwe.h"
 #include "tgsw.h"
 #include "polynomials_arithmetic.h"

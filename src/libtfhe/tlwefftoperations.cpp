@@ -3,13 +3,16 @@
 #include <random>
 #include <cassert>
 #include <ccomplex>
-#include "tfhe.h"
+#include "tfhe_core.h"
+#include "numeric_functions.h"
 #include "lweparams.h"
 #include "lwekey.h"
 #include "lwesamples.h"
-#include "tlwe.h"
-#include "tgsw.h"
-#include "polynomials.h"
+#include "lwe-functions.h"
+#include "tlwe_functions.h"
+#include "tgsw_functions.h"
+#include "polynomials_arithmetic.h"
+#include "lagrangehalfc_arithmetic.h"
 #include "lwebootstrappingkey.h"
 
 using namespace std;
@@ -199,7 +202,7 @@ EXPORT void tGswFFTMulByXaiMinusOne(TGswSampleFFT* result, const int ai, const T
     }
 }
 
-EXPORT void createBootstrappingKeyFFT(
+EXPORT void tfhe_createLweBootstrappingKeyFFT(
 	LweBootstrappingKeyFFT* bk, 
 	const LweKey* key_in, 
 	const TGswKey* rgsw_key) {
@@ -231,7 +234,7 @@ EXPORT void createBootstrappingKeyFFT(
 }
 
 
-EXPORT void bootstrapFFT(LweSample* result, const LweBootstrappingKeyFFT* bk, Torus32 mu1, Torus32 mu0, const LweSample* x){
+EXPORT void tfhe_bootstrapFFT(LweSample* result, const LweBootstrappingKeyFFT* bk, Torus32 mu1, Torus32 mu0, const LweSample* x){
     const Torus32 ab=(mu1+mu0)/2;
     const Torus32 aa = mu0-ab; // aa=(mu1-mu0)/2;
     const TGswParams* bk_params = bk->bk_params;
@@ -260,7 +263,7 @@ EXPORT void bootstrapFFT(LweSample* result, const LweBootstrappingKeyFFT* bk, To
     TLweSample* acc = new_TLweSample(accum_params);
     TLweSampleFFT* accFFT = new_TLweSampleFFT(accum_params);
 
-    // acc and accFFt will be used for bootstrapFFT, acc1=acc will be used for bootstrap
+    // acc and accFFt will be used for tfhe_bootstrapFFT, acc1=acc will be used for tfhe_bootstrap
     tLweNoiselessTrivial(acc, testvectbis, accum_params);
     tLweToFFTConvert(accFFT, acc, accum_params);
 

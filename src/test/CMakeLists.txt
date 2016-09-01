@@ -11,7 +11,7 @@ set(HEADERS
     ../include/lwekeyswitch.h
     ../include/lweparams.h
     ../include/lwesamples.h
-    ../include/numeric-functions.h
+    ../include/numeric_functions.h
     ../include/polynomials.h
     ../include/polynomials_arithmetic.h
     ../include/lagrangehalfc_arithmetic.h
