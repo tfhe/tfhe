@@ -13,7 +13,7 @@ EXPORT LagrangeHalfCPolynomial* alloc_LagrangeHalfCPolynomial_array(int nbelts) 
     return (LagrangeHalfCPolynomial*) malloc(nbelts*sizeof(LagrangeHalfCPolynomial));
 }
 
-//free memory space for a LWEKey
+//free memory space for a LweKey
 EXPORT void free_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* ptr) {
     free(ptr);
 }

@@ -1,20 +1,20 @@
-#ifndef LWEKEY_H
-#define LWEKEY_H
+#ifndef LweKEY_H
+#define LweKEY_H
 
 #include "lwe.h"
 //#include "lweparams.h"
 
 
-struct LWEKey {
-   const LWEParams* params;
+struct LweKey {
+   const LweParams* params;
    int* key;
 
 #ifdef __cplusplus   
-   LWEKey(const LWEParams* params);
-   ~LWEKey();
-   LWEKey(const LWEKey&) = delete; //forbidden 
-   LWEKey* operator=(const LWEKey&) = delete; //forbidden
+   LweKey(const LweParams* params);
+   ~LweKey();
+   LweKey(const LweKey&) = delete; //forbidden 
+   LweKey* operator=(const LweKey&) = delete; //forbidden
 #endif
 };
 
-#endif //LWEKEY_H
+#endif //LweKEY_H

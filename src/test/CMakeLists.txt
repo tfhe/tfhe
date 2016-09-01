@@ -14,8 +14,8 @@ set(HEADERS
     ../include/multiplication.h
     ../include/numeric-functions.h
     ../include/polynomials.h
-    ../include/ringgsw.h
-    ../include/ringlwe.h
+    ../include/tgsw.h
+    ../include/tlwe.h
     ../include/toruspolynomial-functions.h
     )
 
@@ -29,18 +29,18 @@ set(RUNTIME_LIBS
 add_executable(test-bootstrapping-fftw test-bootstrapping.cpp ${HEADERS})
 add_executable(test-bootstrapping-fft2-fftw test-bootstrapping-fft2.cpp ${HEADERS})
 add_executable(test-deb-boot-fftw test-deb-boot.cpp ${HEADERS})
-add_executable(test-decomp-ringgsw-fftw test-decomp-ringgsw.cpp ${HEADERS})
+add_executable(test-decomp-tgsw-fftw test-decomp-tgsw.cpp ${HEADERS})
 add_executable(test-lwe-fftw test-lwe.cpp ${HEADERS})
 add_executable(test-multiplication-fftw test-multiplication.cpp ${HEADERS})
-add_executable(test-ringlwe-fftw test-ringlwe.cpp ${HEADERS})
+add_executable(test-tlwe-fftw test-tlwe.cpp ${HEADERS})
 
 target_link_libraries(test-bootstrapping-fftw ${RUNTIME_LIBS})
 target_link_libraries(test-bootstrapping-fft2-fftw ${RUNTIME_LIBS})
 target_link_libraries(test-deb-boot-fftw ${RUNTIME_LIBS})
-target_link_libraries(test-decomp-ringgsw-fftw ${RUNTIME_LIBS})
+target_link_libraries(test-decomp-tgsw-fftw ${RUNTIME_LIBS})
 target_link_libraries(test-lwe-fftw ${RUNTIME_LIBS})
 target_link_libraries(test-multiplication-fftw ${RUNTIME_LIBS})
-target_link_libraries(test-ringlwe-fftw ${RUNTIME_LIBS})
+target_link_libraries(test-tlwe-fftw ${RUNTIME_LIBS})
 
 elseif (FFT_PROCESSOR STREQUAL "nayuki-portable")
 set(RUNTIME_LIBS
@@ -49,18 +49,18 @@ set(RUNTIME_LIBS
 add_executable(test-bootstrapping-nayuki-portable test-bootstrapping.cpp ${HEADERS})
 add_executable(test-bootstrapping-fft2-nayuki-portable test-bootstrapping-fft2.cpp ${HEADERS})
 add_executable(test-deb-boot-nayuki-portable test-deb-boot.cpp ${HEADERS})
-add_executable(test-decomp-ringgsw-nayuki-portable test-decomp-ringgsw.cpp ${HEADERS})
+add_executable(test-decomp-tgsw-nayuki-portable test-decomp-tgsw.cpp ${HEADERS})
 add_executable(test-lwe-nayuki-portable test-lwe.cpp ${HEADERS})
 add_executable(test-multiplication-nayuki-portable test-multiplication.cpp ${HEADERS})
-add_executable(test-ringlwe-nayuki-portable test-ringlwe.cpp ${HEADERS})
+add_executable(test-tlwe-nayuki-portable test-tlwe.cpp ${HEADERS})
 
 target_link_libraries(test-bootstrapping-nayuki-portable ${RUNTIME_LIBS})
 target_link_libraries(test-bootstrapping-fft2-nayuki-portable ${RUNTIME_LIBS})
 target_link_libraries(test-deb-boot-nayuki-portable ${RUNTIME_LIBS})
-target_link_libraries(test-decomp-ringgsw-nayuki-portable ${RUNTIME_LIBS})
+target_link_libraries(test-decomp-tgsw-nayuki-portable ${RUNTIME_LIBS})
 target_link_libraries(test-lwe-nayuki-portable ${RUNTIME_LIBS})
 target_link_libraries(test-multiplication-nayuki-portable ${RUNTIME_LIBS})
-target_link_libraries(test-ringlwe-nayuki-portable ${RUNTIME_LIBS})
+target_link_libraries(test-tlwe-nayuki-portable ${RUNTIME_LIBS})
 
 elseif (FFT_PROCESSOR STREQUAL "nayuki-avx")
 set(RUNTIME_LIBS
@@ -69,18 +69,18 @@ set(RUNTIME_LIBS
 add_executable(test-bootstrapping-nayuki-avx test-bootstrapping.cpp ${HEADERS})
 add_executable(test-bootstrapping-fft2-nayuki-avx test-bootstrapping-fft2.cpp ${HEADERS})
 add_executable(test-deb-boot-nayuki-avx test-deb-boot.cpp ${HEADERS})
-add_executable(test-decomp-ringgsw-nayuki-avx test-decomp-ringgsw.cpp ${HEADERS})
+add_executable(test-decomp-tgsw-nayuki-avx test-decomp-tgsw.cpp ${HEADERS})
 add_executable(test-lwe-nayuki-avx test-lwe.cpp ${HEADERS})
 add_executable(test-multiplication-nayuki-avx test-multiplication.cpp ${HEADERS})
-add_executable(test-ringlwe-nayuki-avx test-ringlwe.cpp ${HEADERS})
+add_executable(test-tlwe-nayuki-avx test-tlwe.cpp ${HEADERS})
 
 target_link_libraries(test-bootstrapping-nayuki-avx ${RUNTIME_LIBS})
 target_link_libraries(test-bootstrapping-fft2-nayuki-avx ${RUNTIME_LIBS})
 target_link_libraries(test-deb-boot-nayuki-avx ${RUNTIME_LIBS})
-target_link_libraries(test-decomp-ringgsw-nayuki-avx ${RUNTIME_LIBS})
+target_link_libraries(test-decomp-tgsw-nayuki-avx ${RUNTIME_LIBS})
 target_link_libraries(test-lwe-nayuki-avx ${RUNTIME_LIBS})
 target_link_libraries(test-multiplication-nayuki-avx ${RUNTIME_LIBS})
-target_link_libraries(test-ringlwe-nayuki-avx ${RUNTIME_LIBS})
+target_link_libraries(test-tlwe-nayuki-avx ${RUNTIME_LIBS})
 
 
 elseif (FFT_PROCESSOR STREQUAL "spqlios-avx")
@@ -90,18 +90,18 @@ set(RUNTIME_LIBS
 add_executable(test-bootstrapping-spqlios-avx test-bootstrapping.cpp ${HEADERS})
 add_executable(test-bootstrapping-fft2-spqlios-avx test-bootstrapping-fft2.cpp ${HEADERS})
 add_executable(test-deb-boot-spqlios-avx test-deb-boot.cpp ${HEADERS})
-add_executable(test-decomp-ringgsw-spqlios-avx test-decomp-ringgsw.cpp ${HEADERS})
+add_executable(test-decomp-tgsw-spqlios-avx test-decomp-tgsw.cpp ${HEADERS})
 add_executable(test-lwe-spqlios-avx test-lwe.cpp ${HEADERS})
 add_executable(test-multiplication-spqlios-avx test-multiplication.cpp ${HEADERS})
-add_executable(test-ringlwe-spqlios-avx test-ringlwe.cpp ${HEADERS})
+add_executable(test-tlwe-spqlios-avx test-tlwe.cpp ${HEADERS})
 
 target_link_libraries(test-bootstrapping-spqlios-avx ${RUNTIME_LIBS})
 target_link_libraries(test-bootstrapping-fft2-spqlios-avx ${RUNTIME_LIBS})
 target_link_libraries(test-deb-boot-spqlios-avx ${RUNTIME_LIBS})
-target_link_libraries(test-decomp-ringgsw-spqlios-avx ${RUNTIME_LIBS})
+target_link_libraries(test-decomp-tgsw-spqlios-avx ${RUNTIME_LIBS})
 target_link_libraries(test-lwe-spqlios-avx ${RUNTIME_LIBS})
 target_link_libraries(test-multiplication-spqlios-avx ${RUNTIME_LIBS})
-target_link_libraries(test-ringlwe-spqlios-avx ${RUNTIME_LIBS})
+target_link_libraries(test-tlwe-spqlios-avx ${RUNTIME_LIBS})
 
 elseif (FFT_PROCESSOR STREQUAL "spqlios-fma")
 set(RUNTIME_LIBS
@@ -110,18 +110,18 @@ set(RUNTIME_LIBS
 add_executable(test-bootstrapping-spqlios-fma test-bootstrapping.cpp ${HEADERS})
 add_executable(test-bootstrapping-fft2-spqlios-fma test-bootstrapping-fft2.cpp ${HEADERS})
 add_executable(test-deb-boot-spqlios-fma test-deb-boot.cpp ${HEADERS})
-add_executable(test-decomp-ringgsw-spqlios-fma test-decomp-ringgsw.cpp ${HEADERS})
+add_executable(test-decomp-tgsw-spqlios-fma test-decomp-tgsw.cpp ${HEADERS})
 add_executable(test-lwe-spqlios-fma test-lwe.cpp ${HEADERS})
 add_executable(test-multiplication-spqlios-fma test-multiplication.cpp ${HEADERS})
-add_executable(test-ringlwe-spqlios-fma test-ringlwe.cpp ${HEADERS})
+add_executable(test-tlwe-spqlios-fma test-tlwe.cpp ${HEADERS})
 
 target_link_libraries(test-bootstrapping-spqlios-fma ${RUNTIME_LIBS})
 target_link_libraries(test-bootstrapping-fft2-spqlios-fma ${RUNTIME_LIBS})
 target_link_libraries(test-deb-boot-spqlios-fma ${RUNTIME_LIBS})
-target_link_libraries(test-decomp-ringgsw-spqlios-fma ${RUNTIME_LIBS})
+target_link_libraries(test-decomp-tgsw-spqlios-fma ${RUNTIME_LIBS})
 target_link_libraries(test-lwe-spqlios-fma ${RUNTIME_LIBS})
 target_link_libraries(test-multiplication-spqlios-fma ${RUNTIME_LIBS})
-target_link_libraries(test-ringlwe-spqlios-fma ${RUNTIME_LIBS})
+target_link_libraries(test-tlwe-spqlios-fma ${RUNTIME_LIBS})
 
 endif (FFT_PROCESSOR STREQUAL "fftw") 
 

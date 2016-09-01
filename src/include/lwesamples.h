@@ -1,20 +1,20 @@
-#ifndef LWESAMPLES_H
-#define LWESAMPLES_H
+#ifndef LweSAMPLES_H
+#define LweSAMPLES_H
 
 #include "lwe.h"
 
-struct LWESample {
+struct LweSample {
 	Torus32* a; //-- the n coefs of the mask
     Torus32 b;  //
    	double current_variance; //-- average noise of the sample
 
 #ifdef __cplusplus
-   LWESample(const LWEParams* params);
-   ~LWESample();
-   LWESample(const LWESample&)=delete;
-   LWESample& operator=(const LWESample&)=delete;
+   LweSample(const LweParams* params);
+   ~LweSample();
+   LweSample(const LweSample&)=delete;
+   LweSample& operator=(const LweSample&)=delete;
 #endif
 };
 
-#endif //LWESAMPLES_H
+#endif //LweSAMPLES_H
 

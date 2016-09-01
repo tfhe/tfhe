@@ -6,8 +6,8 @@
 #include "lweparams.h"
 #include "lwekey.h"
 #include "lwesamples.h"
-#include "ringlwe.h"
-#include "ringgsw.h"
+#include "tlwe.h"
+#include "tgsw.h"
 #include "lwekeyswitch.h"
 #include "lwebootstrappingkey.h"
 
@@ -15,17 +15,17 @@ using namespace std;
 
 
 #ifndef NDEBUG
-const RingLWEKey* debug_accum_key;
-const LWEKey* debug_extract_key;
-const LWEKey* debug_in_key;
+const TLweKey* debug_accum_key;
+const LweKey* debug_extract_key;
+const LweKey* debug_in_key;
 #endif
 
 
 
 
 
-// RingLWE
-EXPORT void ringLweKeyGen(RingLWEKey* result){
+// TLwe
+EXPORT void tLweKeyGen(TLweKey* result){
     const int N = result->params->N;
     const int k = result->params->k;
     uniform_int_distribution<int> distribution(0,1);
@@ -36,7 +36,7 @@ EXPORT void ringLweKeyGen(RingLWEKey* result){
 }
 
 
-EXPORT void ringLweSymEncryptZero(RingLWESample* result, double alpha, const RingLWEKey* key){
+EXPORT void tLweSymEncryptZero(TLweSample* result, double alpha, const TLweKey* key){
     const int N = key->params->N;
     const int k = key->params->k;
     
@@ -52,10 +52,10 @@ EXPORT void ringLweSymEncryptZero(RingLWESample* result, double alpha, const Rin
     result->current_variance = alpha*alpha;
 }
 
-EXPORT void ringLweSymEncrypt(RingLWESample* result, TorusPolynomial* message, double alpha, const RingLWEKey* key){
+EXPORT void tLweSymEncrypt(TLweSample* result, TorusPolynomial* message, double alpha, const TLweKey* key){
     const int N = key->params->N;
     
-    ringLweSymEncryptZero(result, alpha, key);
+    tLweSymEncryptZero(result, alpha, key);
 
     for (int j = 0; j < N; ++j)
         result->b->coefsT[j] += message->coefsT[j];   
@@ -64,8 +64,8 @@ EXPORT void ringLweSymEncrypt(RingLWESample* result, TorusPolynomial* message, d
 /**
  * encrypts a constant message
  */
-EXPORT void ringLweSymEncryptT(RingLWESample* result, Torus32 message, double alpha, const RingLWEKey* key){
-    ringLweSymEncryptZero(result, alpha, key);
+EXPORT void tLweSymEncryptT(TLweSample* result, Torus32 message, double alpha, const TLweKey* key){
+    tLweSymEncryptZero(result, alpha, key);
 
     result->b->coefsT[0] += message;
 }
@@ -75,7 +75,7 @@ EXPORT void ringLweSymEncryptT(RingLWESample* result, Torus32 message, double al
 /**
  * This function computes the phase of sample by using key : phi = b - a.s
  */
-EXPORT void ringLwePhase(TorusPolynomial* phase, const RingLWESample* sample, const RingLWEKey* key){
+EXPORT void tLwePhase(TorusPolynomial* phase, const TLweSample* sample, const TLweKey* key){
     const int k = key->params->k;
 
     torusPolynomialCopy(phase, sample->b); // phi = b
@@ -89,23 +89,23 @@ EXPORT void ringLwePhase(TorusPolynomial* phase, const RingLWESample* sample, co
  * This function computes the approximation of the phase 
  * à revoir, surtout le Msize
  */
-EXPORT void ringLweApproxPhase(TorusPolynomial* message, const TorusPolynomial* phase, int Msize, int N){
+EXPORT void tLweApproxPhase(TorusPolynomial* message, const TorusPolynomial* phase, int Msize, int N){
     for (int i = 0; i < N; ++i) message->coefsT[i] = approxPhase(phase->coefsT[i], Msize);
 }
 
 
 
 
-EXPORT void ringLweSymDecrypt(TorusPolynomial* result, const RingLWESample* sample, const RingLWEKey* key, int Msize){
-    ringLwePhase(result, sample, key);
-    ringLweApproxPhase(result, result, Msize, key->params->N);
+EXPORT void tLweSymDecrypt(TorusPolynomial* result, const TLweSample* sample, const TLweKey* key, int Msize){
+    tLwePhase(result, sample, key);
+    tLweApproxPhase(result, result, Msize, key->params->N);
 }
 
 
-EXPORT Torus32 ringLweSymDecryptT(const RingLWESample* sample, const RingLWEKey* key, int Msize){
+EXPORT Torus32 tLweSymDecryptT(const TLweSample* sample, const TLweKey* key, int Msize){
     TorusPolynomial* phase = new_TorusPolynomial(key->params->N);
 
-    ringLwePhase(phase, sample, key);
+    tLwePhase(phase, sample, key);
     Torus32 result = approxPhase(phase->coefsT[0], Msize);
 
     delete_TorusPolynomial(phase);
@@ -115,9 +115,9 @@ EXPORT Torus32 ringLweSymDecryptT(const RingLWESample* sample, const RingLWEKey*
 
 
 
-//Arithmetic operations on RingLWE samples
+//Arithmetic operations on TLwe samples
 /** result = (0,0) */
-EXPORT void ringLweClear(RingLWESample* result, const RingLWEParams* params){
+EXPORT void tLweClear(TLweSample* result, const TLweParams* params){
     const int k = params->k;
 
     for (int i = 0; i < k; ++i) torusPolynomialClear(&result->a[i]);
@@ -127,7 +127,7 @@ EXPORT void ringLweClear(RingLWESample* result, const RingLWEParams* params){
 
 
 /** result = sample */
-EXPORT void ringLweCopy(RingLWESample* result, const RingLWESample* sample, const RingLWEParams* params){
+EXPORT void tLweCopy(TLweSample* result, const TLweSample* sample, const TLweParams* params){
     const int k = params->k;
     const int N = params->N;
 
@@ -141,7 +141,7 @@ EXPORT void ringLweCopy(RingLWESample* result, const RingLWESample* sample, cons
 
 
 /** result = (0,mu) */
-EXPORT void ringLweNoiselessTrivial(RingLWESample* result, const TorusPolynomial* mu, const RingLWEParams* params){
+EXPORT void tLweNoiselessTrivial(TLweSample* result, const TorusPolynomial* mu, const TLweParams* params){
     const int k = params->k;
 
     for (int i = 0; i < k; ++i) torusPolynomialClear(&result->a[i]);
@@ -150,7 +150,7 @@ EXPORT void ringLweNoiselessTrivial(RingLWESample* result, const TorusPolynomial
 }
 
 /** result = (0,mu) where mu is constant*/
-EXPORT void ringLweNoiselessTrivialT(RingLWESample* result, const Torus32 mu, const RingLWEParams* params){
+EXPORT void tLweNoiselessTrivialT(TLweSample* result, const Torus32 mu, const TLweParams* params){
     const int k = params->k;
 
     for (int i = 0; i < k; ++i) torusPolynomialClear(&result->a[i]);
@@ -160,7 +160,7 @@ EXPORT void ringLweNoiselessTrivialT(RingLWESample* result, const Torus32 mu, co
 }
 
 /** result = result + sample */
-EXPORT void ringLweAddTo(RingLWESample* result, const RingLWESample* sample, const RingLWEParams* params){
+EXPORT void tLweAddTo(TLweSample* result, const TLweSample* sample, const TLweParams* params){
     const int k = params->k;
 
     for (int i = 0; i < k; ++i) 
@@ -170,7 +170,7 @@ EXPORT void ringLweAddTo(RingLWESample* result, const RingLWESample* sample, con
 }
 
 /** result = result - sample */
-EXPORT void ringLweSubTo(RingLWESample* result, const RingLWESample* sample, const RingLWEParams* params){
+EXPORT void tLweSubTo(TLweSample* result, const TLweSample* sample, const TLweParams* params){
     const int k = params->k;
 
     for (int i = 0; i < k; ++i) 
@@ -180,7 +180,7 @@ EXPORT void ringLweSubTo(RingLWESample* result, const RingLWESample* sample, con
 }
 
 /** result = result + p.sample */
-EXPORT void ringLweAddMulTo(RingLWESample* result, int p, const RingLWESample* sample, const RingLWEParams* params){
+EXPORT void tLweAddMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params){
     const int k = params->k;
 
     for (int i = 0; i < k; ++i) 
@@ -190,7 +190,7 @@ EXPORT void ringLweAddMulTo(RingLWESample* result, int p, const RingLWESample* s
 }
 
 /** result = result - p.sample */
-EXPORT void ringLweSubMulTo(RingLWESample* result, int p, const RingLWESample* sample, const RingLWEParams* params){
+EXPORT void tLweSubMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params){
     const int k = params->k;
 
     for (int i = 0; i < k; ++i) 
@@ -201,7 +201,7 @@ EXPORT void ringLweSubMulTo(RingLWESample* result, int p, const RingLWESample* s
 
 
 /** result = result + p.sample */
-EXPORT void ringLweAddMulRTo(RingLWESample* result, const IntPolynomial* p, const RingLWESample* sample, const RingLWEParams* params){
+EXPORT void tLweAddMulRTo(TLweSample* result, const IntPolynomial* p, const TLweSample* sample, const TLweParams* params){
     const int k = params->k;
     
     for (int i = 0; i <= k; ++i)
@@ -219,26 +219,26 @@ EXPORT void ringLweAddMulRTo(RingLWESample* result, const IntPolynomial* p, cons
 
 
 
-// RingGSW
-/** generate a ringgsw key (in fact, a ringlwe key) */
-EXPORT void ringGswKeyGen(RingGSWKey* result){
-    ringLweKeyGen(&result->ringlwe_key);
+// TGsw
+/** generate a tgsw key (in fact, a tlwe key) */
+EXPORT void tGswKeyGen(TGswKey* result){
+    tLweKeyGen(&result->tlwe_key);
 }
 
 
 
-// support Functions for RingGSW
+// support Functions for TGsw
 // Result = 0
-EXPORT void ringGSWClear(RingGSWSample* result, const RingGSWParams* params){
+EXPORT void tGswClear(TGswSample* result, const TGswParams* params){
     const int kpl = params->kpl;
 
     for (int p = 0; p < kpl; ++p)
-        ringLweClear(&result->all_sample[p], params->ringlwe_params);
+        tLweClear(&result->all_sample[p], params->tlwe_params);
 }
 
 // Result += H
-EXPORT void ringGSWAddH(RingGSWSample* result, const RingGSWParams* params){
-    const int k = params->ringlwe_params->k;
+EXPORT void tGswAddH(TGswSample* result, const TGswParams* params){
+    const int k = params->tlwe_params->k;
     const int l = params->l;
     const Torus32* h = params->h;
 
@@ -249,9 +249,9 @@ EXPORT void ringGSWAddH(RingGSWSample* result, const RingGSWParams* params){
 }
 
 // Result += mu*H
-EXPORT void ringGSWAddMuH(RingGSWSample* result, const IntPolynomial* message, const RingGSWParams* params) {
-    const int k = params->ringlwe_params->k;
-    const int N = params->ringlwe_params->N;
+EXPORT void tGswAddMuH(TGswSample* result, const IntPolynomial* message, const TGswParams* params) {
+    const int k = params->tlwe_params->k;
+    const int N = params->tlwe_params->N;
     const int l = params->l;
     const Torus32* h = params->h;
     const int* mu = message->coefs;
@@ -269,9 +269,9 @@ EXPORT void ringGSWAddMuH(RingGSWSample* result, const IntPolynomial* message, c
 }
 
 // Result += mu*H, mu integer
-EXPORT void ringGSWAddMuIntH(RingGSWSample* result, const int message, const RingGSWParams* params)
+EXPORT void tGswAddMuIntH(TGswSample* result, const int message, const TGswParams* params)
 {
-    const int k = params->ringlwe_params->k;
+    const int k = params->tlwe_params->k;
     const int l = params->l;
     const Torus32* h = params->h;
 
@@ -281,15 +281,15 @@ EXPORT void ringGSWAddMuIntH(RingGSWSample* result, const int message, const Rin
 	    result->bloc_sample[bloc][i].a[bloc].coefsT[0]+=message*h[i];
 }
 
-// Result = ringGsw(0)
-EXPORT void ringGSWEncryptZero(RingGSWSample* result, double alpha, const RingGSWKey* key){
-    const RingLWEKey* rlkey = &key->ringlwe_key;
+// Result = tGsw(0)
+EXPORT void tGswEncryptZero(TGswSample* result, double alpha, const TGswKey* key){
+    const TLweKey* rlkey = &key->tlwe_key;
     const int kpl = key->params->kpl;
         
-    for (int p = 0; p < kpl; ++p) // each line of the RingGSWSample is a RingLWESample (on aurait pu appeler la fonction ringLweSymEncrypt)
+    for (int p = 0; p < kpl; ++p) // each line of the TGswSample is a TLweSample (on aurait pu appeler la fonction tLweSymEncrypt)
 	//Indeed!!
     {
-	ringLweSymEncryptZero(&result->all_sample[p], alpha, rlkey);
+	tLweSymEncryptZero(&result->all_sample[p], alpha, rlkey);
     }
 }
 
@@ -341,38 +341,38 @@ void TorusPolynomialMulByXai(TorusPolynomial* result, int a, const TorusPolynomi
 
 
 //mult externe de X^ai-1 par bki
-EXPORT void ringLWEMulByXaiMinusOne(RingLWESample* result, int ai, const RingLWESample* bk, const RingLWEParams* params){
+EXPORT void tLweMulByXaiMinusOne(TLweSample* result, int ai, const TLweSample* bk, const TLweParams* params){
     const int k=params->k;
     for(int i=0;i<=k;i++)
         TorusPolynomialMulByXaiMinusOne(&result->a[i],ai,&bk->a[i]);
 }
 
 //mult externe de X^{a_i} par bki
-EXPORT void ringGSWMulByXaiMinusOne(RingGSWSample* result, int ai, const RingGSWSample* bk, const RingGSWParams* params){
-    const RingLWEParams* par=params->ringlwe_params;
+EXPORT void tGswMulByXaiMinusOne(TGswSample* result, int ai, const TGswSample* bk, const TGswParams* params){
+    const TLweParams* par=params->tlwe_params;
     const int kpl=params->kpl;
     for (int i=0;i<kpl;i++)
-        ringLWEMulByXaiMinusOne(&result->all_sample[i],ai,&bk->all_sample[i],par);
+        tLweMulByXaiMinusOne(&result->all_sample[i],ai,&bk->all_sample[i],par);
 }
 
 //Update l'accumulateur ligne 5 de l'algo toujours
-//void ringLWEDecompH(IntPolynomial* result, const RingLWESample* sample,const RingGSWParams* params);	
-EXPORT void ringLWEExternMulRGSWTo(RingLWESample* accum, const RingGSWSample* sample,const RingGSWParams* params){
-    const RingLWEParams* par=params->ringlwe_params;
+//void tLweDecompH(IntPolynomial* result, const TLweSample* sample,const TGswParams* params);	
+EXPORT void tLweExternMulRGswTo(TLweSample* accum, const TGswSample* sample,const TGswParams* params){
+    const TLweParams* par=params->tlwe_params;
     const int N=par->N;
     const int kpl=params->kpl;
     IntPolynomial* dec =new_IntPolynomial_array(kpl,N);
 
-    ringLWEDecompH(dec,accum,params);
-    ringLweClear(accum,par);
+    tLweDecompH(dec,accum,params);
+    tLweClear(accum,par);
     for (int i=0; i<kpl;i++) 
-        ringLweAddMulRTo(accum,&dec[i],&sample->all_sample[i],par);
+        tLweAddMulRTo(accum,&dec[i],&sample->all_sample[i],par);
 
     delete_IntPolynomial_array(kpl, dec);
 }
 
 //crée la clé de KeySwitching
-EXPORT void lweCreateKeySwitchKey(LWEKeySwitchKey* result, const LWEKey* in_key, const LWEKey* out_key){
+EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key){
     const int n=result->n;
     const int basebit=result->basebit;
     const int l=result->l;
@@ -392,8 +392,8 @@ EXPORT void lweCreateKeySwitchKey(LWEKeySwitchKey* result, const LWEKey* in_key,
 }
 
 //sample=(a',b')
-EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWESample* sample){
-    const LWEParams* par=ks->out_params;
+EXPORT void lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, const LweSample* sample){
+    const LweParams* par=ks->out_params;
     const int n=ks->in_params->n;
     const int basebit=ks->basebit;
     const int l=ks->l;
@@ -427,28 +427,28 @@ EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWE
 /**
  * encrypts a poly message
  */
-EXPORT void ringGswSymEncrypt(RingGSWSample* result, const IntPolynomial* message, double alpha, const RingGSWKey* key){
-    ringGSWEncryptZero(result, alpha, key);
-    ringGSWAddMuH(result, message, key->params);
+EXPORT void tGswSymEncrypt(TGswSample* result, const IntPolynomial* message, double alpha, const TGswKey* key){
+    tGswEncryptZero(result, alpha, key);
+    tGswAddMuH(result, message, key->params);
 }
 
 
 /**
  * encrypts a constant message
  */
-EXPORT void ringGswSymEncryptInt(RingGSWSample* result, const int message, double alpha, const RingGSWKey* key){
-    ringGSWEncryptZero(result, alpha, key);
-    ringGSWAddMuIntH(result, message, key->params);
+EXPORT void tGswSymEncryptInt(TGswSample* result, const int message, double alpha, const TGswKey* key){
+    tGswEncryptZero(result, alpha, key);
+    tGswAddMuIntH(result, message, key->params);
 }
 
 
 /**
  * encrypts a message = 0 ou 1
  */
-EXPORT void ringGSWEncryptB(RingGSWSample* result, const int message, double alpha, const RingGSWKey* key){
-    ringGSWEncryptZero(result, alpha, key);
+EXPORT void tGswEncryptB(TGswSample* result, const int message, double alpha, const TGswKey* key){
+    tGswEncryptZero(result, alpha, key);
     if (message == 1)
-        ringGSWAddH(result, key->params);    
+        tGswAddH(result, key->params);    
 }
 
 
@@ -456,8 +456,8 @@ EXPORT void ringGSWEncryptB(RingGSWSample* result, const int message, double alp
 
 /*
 // à revoir
-EXPORT void ringGswPhase(TorusPolynomial* phase, const RingGSWSample* sample, const RingGSWKey* key){
-    const int k = key->params->ringlwe_params->k;
+EXPORT void tGswPhase(TorusPolynomial* phase, const TGswSample* sample, const TGswKey* key){
+    const int k = key->params->tlwe_params->k;
 
     torusPolynomialCopy(phase, sample[0]->b); // phi = b
 
@@ -466,15 +466,15 @@ EXPORT void ringGswPhase(TorusPolynomial* phase, const RingGSWSample* sample, co
 }
 
 // à revoir
-EXPORT void ringGswApproxPhase(IntPolynomial* message, const TorusPolynomial* phase, int Msize, int N){
+EXPORT void tGswApproxPhase(IntPolynomial* message, const TorusPolynomial* phase, int Msize, int N){
     for (int i = 0; i < N; ++i) message->coefsT[i] = modSwitchFromTorus32(phase->coefsT[i], Msize);
 }
 */
 
 // à revoir
-EXPORT void ringGswSymDecrypt(IntPolynomial* result, const RingGSWSample* sample, const RingGSWKey* key, const int Msize){
-    const RingGSWParams* params = key->params;
-    const RingLWEParams* rlwe_params = params->ringlwe_params;
+EXPORT void tGswSymDecrypt(IntPolynomial* result, const TGswSample* sample, const TGswKey* key, const int Msize){
+    const TGswParams* params = key->params;
+    const TLweParams* rlwe_params = params->tlwe_params;
     const int N = rlwe_params->N;
     const int l = params->l;
     const int k = rlwe_params->k;
@@ -490,7 +490,7 @@ EXPORT void ringGswSymDecrypt(IntPolynomial* result, const RingGSWSample* sample
     torusPolynomialClear(testvec);
     for (int i=0; i<l; i++) {
 	for (int j=1; j<N; j++) assert(decomp[i].coefs[j]==0);
-	ringLwePhase(tmp, &sample->bloc_sample[k][i], &key->ringlwe_key);
+	tLwePhase(tmp, &sample->bloc_sample[k][i], &key->tlwe_key);
 	addMulRToTorusPolynomial(testvec, decomp+i, tmp);
     }
     for (int i=0; i<N; i++)
@@ -503,24 +503,24 @@ EXPORT void ringGswSymDecrypt(IntPolynomial* result, const RingGSWSample* sample
 
 /*
 // à revoir
-EXPORT int ringGswSymDecryptInt(const RingGSWSample* sample, const RingGSWKey* key){
-    TorusPolynomial* phase = new_TorusPolynomial(key->params->ringlwe_params->N);
+EXPORT int tGswSymDecryptInt(const TGswSample* sample, const TGswKey* key){
+    TorusPolynomial* phase = new_TorusPolynomial(key->params->tlwe_params->N);
 
-    ringGswPhase(phase, sample, key);
+    tGswPhase(phase, sample, key);
     int result = modSwitchFromTorus32(phase->coefsT[0], Msize);
 
     delete_TorusPolynomial(phase);
     return result;
 }
 */
-//do we really decrypt GSW samples?
-// EXPORT void ringGSWMulByXaiMinusOne(GSW* result, int ai, const GSW* bk);
-// EXPORT void ringLWEExternMulRLWETo(RLWE* accum, GSW* a); //  accum = a \odot accum
+//do we really decrypt Gsw samples?
+// EXPORT void tGswMulByXaiMinusOne(Gsw* result, int ai, const Gsw* bk);
+// EXPORT void tLweExternMulRLweTo(RLwe* accum, Gsw* a); //  accum = a \odot accum
 
 
 //fonction de decomposition
-EXPORT void ringLWEDecompH(IntPolynomial* result, const RingLWESample* sample, const RingGSWParams* params){
-    const int k = params->ringlwe_params->k;
+EXPORT void tLweDecompH(IntPolynomial* result, const TLweSample* sample, const TGswParams* params){
+    const int k = params->tlwe_params->k;
     const int l = params->l;
 
     for (int i = 0; i <= k; ++i) // b=a[k]
@@ -528,8 +528,8 @@ EXPORT void ringLWEDecompH(IntPolynomial* result, const RingLWESample* sample, c
 }
 
 
-EXPORT void Torus32PolynomialDecompH_old(IntPolynomial* result, const TorusPolynomial* sample, const RingGSWParams* params){
-    const int N = params->ringlwe_params->N;
+EXPORT void Torus32PolynomialDecompH_old(IntPolynomial* result, const TorusPolynomial* sample, const TGswParams* params){
+    const int N = params->tlwe_params->N;
     const int l = params->l;
     const int Bgbit = params->Bgbit;
     const uint32_t maskMod = params->maskMod;
@@ -546,8 +546,8 @@ EXPORT void Torus32PolynomialDecompH_old(IntPolynomial* result, const TorusPolyn
         }   
     }
 }
-EXPORT void Torus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const RingGSWParams* params){
-    const int N = params->ringlwe_params->N;
+EXPORT void Torus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const TGswParams* params){
+    const int N = params->tlwe_params->N;
     const int l = params->l;
     const int Bgbit = params->Bgbit;
     uint32_t* buf = (uint32_t*) sample->coefsT;
@@ -663,17 +663,17 @@ EXPORT void Torus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomia
 
 
 //TODO: Ilaria.
-EXPORT void ringGSWExternProduct(RingLWESample* result, const RingGSWSample* a, const RingLWESample* b, const RingGSWParams* params){
-    const RingLWEParams* parlwe = params->ringlwe_params;
+EXPORT void tGswExternProduct(TLweSample* result, const TGswSample* a, const TLweSample* b, const TGswParams* params){
+    const TLweParams* parlwe = params->tlwe_params;
     const int N = parlwe->N;
     const int kpl = params->kpl;
     IntPolynomial* dec = new_IntPolynomial_array(kpl,N);
 
-    ringLWEDecompH(dec, b, params);
+    tLweDecompH(dec, b, params);
 
-    ringLweClear(result, parlwe);
+    tLweClear(result, parlwe);
     for (int i = 0; i < kpl; i++) 
-	ringLweAddMulRTo(result, &dec[i], &a->all_sample[i], parlwe);
+	tLweAddMulRTo(result, &dec[i], &a->all_sample[i], parlwe);
 
     result->current_variance += b->current_variance; //todo + the error term?
 
@@ -685,16 +685,16 @@ EXPORT void ringGSWExternProduct(RingLWESample* result, const RingGSWSample* a, 
 
 
 
-//TODO: mettre les mêmes fonctions arithmétiques que pour LWE
+//TODO: mettre les mêmes fonctions arithmétiques que pour Lwe
 //      pour les opérations externes, prévoir int et intPolynomial
 
-//extractions RingLWE -> LWE
-EXPORT void ringLweExtractKey(LWEKey* result, const RingLWEKey*); //sans doute un param supplémentaire
-EXPORT void ringLweExtractSample(LWESample* result, const RingLWESample* x);
+//extractions TLwe -> Lwe
+EXPORT void tLweExtractKey(LweKey* result, const TLweKey*); //sans doute un param supplémentaire
+EXPORT void tLweExtractSample(LweSample* result, const TLweSample* x);
 
-//extraction RingGSW -> SemiRingGSW
-EXPORT void ringGswExtractKey(SemiRingGSWSample* result, const RingGSWKey* key);
-EXPORT void ringGswExtractSample(RingLWESample* result, const RingGSWSample* x);
+//extraction TGsw -> SemiTGsw
+EXPORT void tGswExtractKey(SemiTGswSample* result, const TGswKey* key);
+EXPORT void tGswExtractSample(TLweSample* result, const TGswSample* x);
 
 
 /*//calcule l'arrondi inférieur d'un élément Torus32
@@ -705,7 +705,7 @@ EXPORT void ringGswExtractSample(RingLWESample* result, const RingGSWSample* x);
 
 
 
-EXPORT void sampleExtract(LWESample* result, const RingLWESample* x, const LWEParams* params,  const RingLWEParams* rparams) {
+EXPORT void sampleExtract(LweSample* result, const TLweSample* x, const LweParams* params,  const TLweParams* rparams) {
     const int N = rparams->N;
     const int k = rparams->k;
     assert(params->n == k*N);
@@ -717,15 +717,15 @@ EXPORT void sampleExtract(LWESample* result, const RingLWESample* x, const LWEPa
     result->b=x->b->coefsT[0];
 }
 
-//LWE to LWE Single gate bootstrapping
+//Lwe to Lwe Single gate bootstrapping
 //TODO: Malika
-EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LWESample* x){
+EXPORT void bootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LweSample* x){
     const Torus32 ab=(mu0+mu1)/2;
     const Torus32 aa=mu0-ab; //it is important to define it like this and not (mu0-mu1)/2!
-    const RingGSWParams* bk_params = bk->bk_params;
-    const RingLWEParams* accum_params = bk->accum_params;
-    const LWEParams* extract_params = &accum_params->extracted_lweparams;
-    const LWEParams* in_params = bk->in_out_params;
+    const TGswParams* bk_params = bk->bk_params;
+    const TLweParams* accum_params = bk->accum_params;
+    const LweParams* extract_params = &accum_params->extracted_lweparams;
+    const LweParams* in_params = bk->in_out_params;
     const int N=accum_params->N;
     const int Ns2=N/2;
     const int Nx2= 2*N;
@@ -747,29 +747,29 @@ EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 
 	testvect->coefsT[i]=-aa;
     TorusPolynomialMulByXai(testvectbis, barb, testvect);
 
-    RingLWESample* acc = new_RingLWESample(accum_params);
-    ringLweNoiselessTrivial(acc, testvectbis, accum_params);
+    TLweSample* acc = new_TLweSample(accum_params);
+    tLweNoiselessTrivial(acc, testvectbis, accum_params);
     //#ifndef NDEBUG
-    //    ringLweSymDecrypt(testvectbis, acc, accum_params);
+    //    tLweSymDecrypt(testvectbis, acc, accum_params);
     //
     //    int accum
     //    Torus32 ph = lwePhase(x, debug_in_key);
     //    printf("Phase before loop: %d\n",ph);
     //    printf("aa (enc 0) before loop: %d\n",aa);
     //#endif
-    RingGSWSample* temp = new_RingGSWSample(bk_params);
+    TGswSample* temp = new_TGswSample(bk_params);
     for (int i=0; i<n; i++) {
 	int bara=modSwitchFromTorus32(-x->a[i],Nx2);
 	if (bara==0) continue; //indeed, this is an easy case!
-	ringGSWMulByXaiMinusOne(temp, bara, bk->bk+i, bk_params);
-	ringGSWAddH(temp, bk->bk_params);
-	ringLWEExternMulRGSWTo(acc, temp, bk_params);
+	tGswMulByXaiMinusOne(temp, bara, bk->bk+i, bk_params);
+	tGswAddH(temp, bk->bk_params);
+	tLweExternMulRGswTo(acc, temp, bk_params);
     }
 #ifndef NDEBUG
-    ringLwePhase(testvectbis, acc, debug_accum_key);
+    tLwePhase(testvectbis, acc, debug_accum_key);
     printf("Phase after loop: %d\n",testvectbis->coefsT[0]);
 #endif
-    LWESample* u = new_LWESample(extract_params);
+    LweSample* u = new_LweSample(extract_params);
     sampleExtract(u, acc, extract_params, accum_params);
 #ifndef NDEBUG
     ph = lwePhase(u, debug_extract_key);
@@ -786,33 +786,33 @@ EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 
     printf("Phase after keySwitch: %d\n",ph);
 #endif
 
-    delete_LWESample(u);
-    delete_RingGSWSample(temp);
-    delete_RingLWESample(acc);
+    delete_LweSample(u);
+    delete_TGswSample(temp);
+    delete_TLweSample(acc);
     delete_TorusPolynomial(testvectbis);
     delete_TorusPolynomial(testvect);
 }
 
 EXPORT void createBootstrappingKey(
-	LWEBootstrappingKey* bk, 
-	const LWEKey* key_in, 
-	const RingGSWKey* rgsw_key) {
+	LweBootstrappingKey* bk, 
+	const LweKey* key_in, 
+	const TGswKey* rgsw_key) {
     assert(bk->bk_params==rgsw_key->params);
     assert(bk->in_out_params==key_in->params);
 
-    const LWEParams* in_out_params = bk->in_out_params; 
-    const RingGSWParams* bk_params = bk->bk_params;
-    const RingLWEParams* accum_params = bk_params->ringlwe_params;
-    const LWEParams* extract_params = &accum_params->extracted_lweparams;
+    const LweParams* in_out_params = bk->in_out_params; 
+    const TGswParams* bk_params = bk->bk_params;
+    const TLweParams* accum_params = bk_params->tlwe_params;
+    const LweParams* extract_params = &accum_params->extracted_lweparams;
 
-    //LWEKeySwitchKey* ks; ///< the keyswitch key (s'->s)
-    const RingLWEKey* accum_key = &rgsw_key->ringlwe_key;
-    LWEKey* extracted_key = new_LWEKey(extract_params);
-    ringLweExtractKey(extracted_key, accum_key);
+    //LweKeySwitchKey* ks; ///< the keyswitch key (s'->s)
+    const TLweKey* accum_key = &rgsw_key->tlwe_key;
+    LweKey* extracted_key = new_LweKey(extract_params);
+    tLweExtractKey(extracted_key, accum_key);
     lweCreateKeySwitchKey(bk->ks, extracted_key, key_in);
-    delete_LWEKey(extracted_key);
+    delete_LweKey(extracted_key);
 
-    //RingGSWSample* bk; ///< the bootstrapping key (s->s")
+    //TGswSample* bk; ///< the bootstrapping key (s->s")
     int* kin = key_in->key;
     const double alpha = accum_params->alpha_min;
     const int n = in_out_params->n;
@@ -822,30 +822,30 @@ EXPORT void createBootstrappingKey(
     cout << "create the bootstrapping key bk ("  << "  " << n*kpl*(k+1)*N*4 << " bytes)" << endl;
     cout << "  with noise_stdev: " << alpha << endl;
     for (int i=0; i<n; i++) {
-	ringGswSymEncryptInt(&bk->bk[i], kin[i], alpha, rgsw_key);
+	tGswSymEncryptInt(&bk->bk[i], kin[i], alpha, rgsw_key);
     }
 }
 //these functions call the bootstrapping, assuming that the message space is {0,1/4} 
-EXPORT void lweNand(LWESample* result, const LWEBootstrappingKey* bk, const LWESample* a, const LWESample* b);
-EXPORT void lweOr(LWESample* result, const LWEBootstrappingKey* bk, const LWESample* a, const LWESample* b);
-EXPORT void lweAnd(LWESample* result, const LWEBootstrappingKey* bk, const LWESample* a, const LWESample* b);
-EXPORT void lweXor(LWESample* result, const LWEBootstrappingKey* bk, const LWESample* a, const LWESample* b);
+EXPORT void lweNand(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b);
+EXPORT void lweOr(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b);
+EXPORT void lweAnd(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b);
+EXPORT void lweXor(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b);
 // mux(a,b,c) = a?b:c = a et b + not(a) et c 
-EXPORT void lweMux(LWESample* result, const LWEBootstrappingKey* bk, const LWESample* a, const LWESample* b, const LWESample* c);
-EXPORT void lweNot(LWESample* result, LWESample* a);
+EXPORT void lweMux(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b, const LweSample* c);
+EXPORT void lweNot(LweSample* result, LweSample* a);
 
 
 //leveled functions
 
-//LWE to SemiRing Bootstrapping
-EXPORT void semiRingBootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LWESample* x);
+//Lwe to SemiRing Bootstrapping
+EXPORT void semiRingBootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LweSample* x);
 
 
 
-// EXPORT void ringGswPolyCombination(LWESample* result, const int* combi, const LWESample* samples, const LWEParams* params);
+// EXPORT void tGswPolyCombination(LweSample* result, const int* combi, const LweSample* samples, const LweParams* params);
 
-//extractions Ring LWE -> LWE
-EXPORT void ringLweExtractKey(LWEKey* result, const RingLWEKey* key) //sans doute un param supplémentaire
+//extractions Ring Lwe -> Lwe
+EXPORT void tLweExtractKey(LweKey* result, const TLweKey* key) //sans doute un param supplémentaire
 {
     const int N = key->params->N;
     const int k = key->params->k;
@@ -858,9 +858,9 @@ EXPORT void ringLweExtractKey(LWEKey* result, const RingLWEKey* key) //sans dout
 
 
 
-//extraction RingGSW -> GSW
-// EXPORT void gswKeyExtract(RingLWEKey* result, const RingGSWKey* key); //sans doute un param supplémentaire
-// EXPORT void gswSampleExtract(RingLWESample* result, const RingGSWSample* x);
+//extraction TGsw -> Gsw
+// EXPORT void gswKeyExtract(TLweKey* result, const TGswKey* key); //sans doute un param supplémentaire
+// EXPORT void gswSampleExtract(TLweSample* result, const TGswSample* x);
 
 //bootstrapping
-// EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, double mu1, double mu0, const LWESample* x);
+// EXPORT void bootstrap(LweSample* result, const LweBootstrappingKey* bk, double mu1, double mu0, const LweSample* x);

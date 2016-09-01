@@ -10,8 +10,8 @@
 #include "lwesamples.h"
 #include "lwekey.h"
 #include "lweparams.h"
-#include "ringlwe.h"
-#include "ringgsw.h"
+#include "tlwe.h"
+#include "tgsw.h"
 
 using namespace std;
 
@@ -27,18 +27,18 @@ void dieDramatically(string message) {
     abort();
 }
 
-EXPORT void ringLweExtractKey(LWEKey* result, const RingLWEKey* key); //TODO: change the name and put in a .h
+EXPORT void tLweExtractKey(LweKey* result, const TLweKey* key); //TODO: change the name and put in a .h
 EXPORT void createBootstrappingKey(
-	LWEBootstrappingKey* bk, 
-	const LWEKey* key_in, 
-	const RingGSWKey* rgsw_key);
-EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LWESample* x);
+	LweBootstrappingKey* bk, 
+	const LweKey* key_in, 
+	const TGswKey* rgsw_key);
+EXPORT void bootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LweSample* x);
 
 
 #ifndef NDEBUG
-extern const RingLWEKey* debug_accum_key;
-extern const LWEKey* debug_extract_key;
-extern const LWEKey* debug_in_key;
+extern const TLweKey* debug_accum_key;
+extern const LweKey* debug_extract_key;
+extern const LweKey* debug_in_key;
 #endif
 
 int main(int argc, char** argv) {
@@ -57,21 +57,21 @@ int main(int argc, char** argv) {
     const double alpha_bk = 1e-8;
     //const int alpha_ks = 1e-6;
 
-    LWEParams* params_in = new_LWEParams(n, alpha_in, 1./16.);
-    RingLWEParams* params_accum = new_RingLWEParams(N, k, alpha_bk, 1./16.);
-    RingGSWParams* params_bk = new_RingGSWParams(l_bk, Bgbit_bk, params_accum);
+    LweParams* params_in = new_LweParams(n, alpha_in, 1./16.);
+    TLweParams* params_accum = new_TLweParams(N, k, alpha_bk, 1./16.);
+    TGswParams* params_bk = new_TGswParams(l_bk, Bgbit_bk, params_accum);
 
-    LWEKey* key = new_LWEKey(params_in);
+    LweKey* key = new_LweKey(params_in);
     lweKeyGen(key);
 
-    RingGSWKey* key_bk = new_RingGSWKey(params_bk);
-    ringGswKeyGen(key_bk);
+    TGswKey* key_bk = new_TGswKey(params_bk);
+    tGswKeyGen(key_bk);
 
-    LWEBootstrappingKey* bk = new_LWEBootstrappingKey(params_in, params_bk);
+    LweBootstrappingKey* bk = new_LweBootstrappingKey(params_in, params_bk);
     createBootstrappingKey(bk, key, key_bk);
 
-    LWESample* test = new_LWESample(params_in);
-    LWESample* test_out = new_LWESample(params_in);
+    LweSample* test = new_LweSample(params_in);
+    LweSample* test_out = new_LweSample(params_in);
     
     const Torus32 mu1 = modSwitchToTorus32(1,2);
     const Torus32 mu0 = modSwitchToTorus32(0,2);
@@ -80,9 +80,9 @@ int main(int argc, char** argv) {
     lweSymEncrypt(test, mu_in, alpha_in, key);
     
 #ifndef NDEBUG
-    debug_accum_key=&key_bk->ringlwe_key;
-    LWEKey* debug_extract_key2=new_LWEKey(&params_accum->extracted_lweparams);
-    ringLweExtractKey(debug_extract_key2, debug_accum_key);
+    debug_accum_key=&key_bk->tlwe_key;
+    LweKey* debug_extract_key2=new_LweKey(&params_accum->extracted_lweparams);
+    tLweExtractKey(debug_extract_key2, debug_accum_key);
     debug_extract_key=debug_extract_key2;
     debug_in_key=key;
 #endif
@@ -102,13 +102,13 @@ int main(int argc, char** argv) {
 	dieDramatically("et Zut!");
 
 
-    delete_LWESample(test_out);
-    delete_LWESample(test);
-    delete_LWEBootstrappingKey(bk);
-    delete_RingGSWKey(key_bk);
-    delete_LWEKey(key);
-    delete_RingGSWParams(params_bk);
-    delete_RingLWEParams(params_accum);
-    delete_LWEParams(params_in);
+    delete_LweSample(test_out);
+    delete_LweSample(test);
+    delete_LweBootstrappingKey(bk);
+    delete_TGswKey(key_bk);
+    delete_LweKey(key);
+    delete_TGswParams(params_bk);
+    delete_TLweParams(params_accum);
+    delete_LweParams(params_in);
     return 0;
 }

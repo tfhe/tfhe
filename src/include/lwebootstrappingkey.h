@@ -1,23 +1,23 @@
-#ifndef LWEBOOTSTRAPPINGKEY_H
-#define LWEBOOTSTRAPPINGKEY_H
+#ifndef LweBOOTSTRAPPINGKEY_H
+#define LweBOOTSTRAPPINGKEY_H
 
 #include "lwe.h"
 
 
-struct LWEBootstrappingKey{
-    const LWEParams* in_out_params; ///< paramètre de l'input et de l'output. key: s
-    const RingGSWParams* bk_params; ///< params of the GSW elems in bk. key: s"
-    const RingLWEParams* accum_params; ///< params of the accum variable key: s"
-    const LWEParams* extract_params; ///< params after extraction: key: s' 
-    RingGSWSample* bk; ///< the bootstrapping key (s->s")
-    LWEKeySwitchKey* ks; ///< the keyswitch key (s'->s)
+struct LweBootstrappingKey{
+    const LweParams* in_out_params; ///< paramètre de l'input et de l'output. key: s
+    const TGswParams* bk_params; ///< params of the Gsw elems in bk. key: s"
+    const TLweParams* accum_params; ///< params of the accum variable key: s"
+    const LweParams* extract_params; ///< params after extraction: key: s' 
+    TGswSample* bk; ///< the bootstrapping key (s->s")
+    LweKeySwitchKey* ks; ///< the keyswitch key (s'->s)
 
 
 #ifdef __cplusplus
-   LWEBootstrappingKey(const LWEParams* in_out_params, const RingGSWParams* bk_params);
-    ~LWEBootstrappingKey();
-    LWEBootstrappingKey(const LWEBootstrappingKey&) = delete;
-    void operator=(const LWEBootstrappingKey&) = delete;
+   LweBootstrappingKey(const LweParams* in_out_params, const TGswParams* bk_params);
+    ~LweBootstrappingKey();
+    LweBootstrappingKey(const LweBootstrappingKey&) = delete;
+    void operator=(const LweBootstrappingKey&) = delete;
   
 #endif
 
@@ -25,20 +25,20 @@ struct LWEBootstrappingKey{
 };
 
 
-struct LWEBootstrappingKeyFFT {
-    const LWEParams* in_out_params; ///< paramètre de l'input et de l'output. key: s
-    const RingGSWParams* bk_params; ///< params of the GSW elems in bk. key: s"
-    const RingLWEParams* accum_params; ///< params of the accum variable key: s"
-    const LWEParams* extract_params; ///< params after extraction: key: s' 
-    RingGSWSampleFFT* bk; ///< the bootstrapping key (s->s")
-    LWEKeySwitchKey* ks; ///< the keyswitch key (s'->s)
+struct LweBootstrappingKeyFFT {
+    const LweParams* in_out_params; ///< paramètre de l'input et de l'output. key: s
+    const TGswParams* bk_params; ///< params of the Gsw elems in bk. key: s"
+    const TLweParams* accum_params; ///< params of the accum variable key: s"
+    const LweParams* extract_params; ///< params after extraction: key: s' 
+    TGswSampleFFT* bk; ///< the bootstrapping key (s->s")
+    LweKeySwitchKey* ks; ///< the keyswitch key (s'->s)
 
 
 #ifdef __cplusplus
-   LWEBootstrappingKeyFFT(const LWEParams* in_out_params, const RingGSWParams* bk_params);
-    ~LWEBootstrappingKeyFFT();
-    LWEBootstrappingKeyFFT(const LWEBootstrappingKeyFFT&) = delete;
-    void operator=(const LWEBootstrappingKeyFFT&) = delete;
+   LweBootstrappingKeyFFT(const LweParams* in_out_params, const TGswParams* bk_params);
+    ~LweBootstrappingKeyFFT();
+    LweBootstrappingKeyFFT(const LweBootstrappingKeyFFT&) = delete;
+    void operator=(const LweBootstrappingKeyFFT&) = delete;
   
 #endif
 

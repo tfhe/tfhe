@@ -17,9 +17,9 @@ set(SRCS
     multiplication.cpp
     numeric-functions.cpp
     polynomials.cpp
-    ringgsw.cpp
-    ringlwe.cpp
-    ringlwefftoperations.cpp
+    tgsw.cpp
+    tlwe.cpp
+    tlwefftoperations.cpp
     toruspolynomial-functions.cpp
     )
 
@@ -35,8 +35,8 @@ set(HEADERS
     ../include/multiplication.h
     ../include/numeric-functions.h
     ../include/polynomials.h
-    ../include/ringgsw.h
-    ../include/ringlwe.h
+    ../include/tgsw.h
+    ../include/tlwe.h
     ../include/toruspolynomial-functions.h
     )
 

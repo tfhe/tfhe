@@ -3,13 +3,13 @@
 
 using namespace std;
 
-LWESample::LWESample(const LWEParams* params) 
+LweSample::LweSample(const LweParams* params) 
 {
 	this->a = new Torus32[params->n];
     this->b = 0;
     this->current_variance = 0.;
 }
 
-LWESample::~LWESample() {
+LweSample::~LweSample() {
     delete[] a;
 }

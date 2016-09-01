@@ -8,13 +8,13 @@
 #include "lwe.h"
 #include "multiplication.h"
 #include "polynomials.h"
-#include "ringlwe.h"
-#include "ringgsw.h"
+#include "tlwe.h"
+#include "tgsw.h"
 
 using namespace std;
 
 
-EXPORT void Torus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const RingGSWParams* params);
+EXPORT void Torus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const TGswParams* params);
 
 // **********************************************************************************
 // ********************************* MAIN *******************************************
@@ -36,15 +36,15 @@ int main(int argc, char** argv) {
     static uniform_int_distribution<int> unift(0,Msize-1);
 
     // PARAMETERS
-    RingLWEParams* rlwe_params = new_RingLWEParams(N, k, alpha_min_gsw, alpha_max_gsw); //les deux alpha mis un peu au hasard
-    RingGSWParams* rgsw_params = new_RingGSWParams(l,Bgbits, rlwe_params);
+    TLweParams* rlwe_params = new_TLweParams(N, k, alpha_min_gsw, alpha_max_gsw); //les deux alpha mis un peu au hasard
+    TGswParams* rgsw_params = new_TGswParams(l,Bgbits, rlwe_params);
     // KEY
-    RingGSWKey* rgsw_key = new_RingGSWKey(rgsw_params);
-    RingLWEKey* rlwe_key = &rgsw_key->ringlwe_key;
+    TGswKey* rgsw_key = new_TGswKey(rgsw_params);
+    TLweKey* rlwe_key = &rgsw_key->tlwe_key;
     // CIPHERTEXTS
-    RingGSWSample* cipherA = new_RingGSWSample(rgsw_params);
-    RingLWESample* cipherB = new_RingLWESample(rlwe_params);
-    RingLWESample* cipherAB = new_RingLWESample(rlwe_params);
+    TGswSample* cipherA = new_TGswSample(rgsw_params);
+    TLweSample* cipherB = new_TLweSample(rlwe_params);
+    TLweSample* cipherAB = new_TLweSample(rlwe_params);
 
 
     //the probability that a sample with stdev alpha decrypts wrongly on
@@ -59,7 +59,7 @@ int main(int argc, char** argv) {
     cout << "-------------" << endl;
 
 
-    //MESSAGE RLWE
+    //MESSAGE RLwe
     TorusPolynomial* muB = new_TorusPolynomial(N);
     
     //test decompH
@@ -85,7 +85,7 @@ int main(int argc, char** argv) {
         muB->coefsT[i] = modSwitchToTorus32(temp, Msize);
         //cout << mu->coefsT[i] << endl;
     }
-    //MESSAGE RLWE
+    //MESSAGE RLwe
     IntPolynomial* muA = new_IntPolynomial(N);
     for (int i = 0; i < N; ++i){
         int temp = unift(generator);
@@ -99,24 +99,24 @@ int main(int argc, char** argv) {
     TorusPolynomial* muAB = new_TorusPolynomial(N);
 
     
-    ringGswKeyGen(rgsw_key); // KEY GENERATION
-    ringLweSymEncrypt(cipherB, muB, alpha, rlwe_key); // ENCRYPTION
+    tGswKeyGen(rgsw_key); // KEY GENERATION
+    tLweSymEncrypt(cipherB, muB, alpha, rlwe_key); // ENCRYPTION
     
-    //decryption test ringlwe
-    cout << "Test RingLweSymDecrypt on muB:" << endl;
+    //decryption test tlwe
+    cout << "Test TLweSymDecrypt on muB:" << endl;
     cout << " variance: " << cipherB->current_variance << endl;
-    ringLweSymDecrypt(dechifB, cipherB, rlwe_key, Msize); // DECRYPTION
+    tLweSymDecrypt(dechifB, cipherB, rlwe_key, Msize); // DECRYPTION
     for (int i=0; i<N; i++) {
 	int expected = modSwitchFromTorus32(muB->coefsT[i],Msize);
 	int actual = modSwitchFromTorus32(dechifB->coefsT[i],Msize);
 	if (expected!=actual)
-	    printf("ringlwe decryption error %d: %d != %d\n",i,actual,expected);
+	    printf("tlwe decryption error %d: %d != %d\n",i,actual,expected);
     }
 	
-    //test decompH on ringLWE
-    cout << "Test decompH on RingLWE(muB)" << endl;
+    //test decompH on tLwe
+    cout << "Test decompH on TLwe(muB)" << endl;
     IntPolynomial* cipherBDecH = new_IntPolynomial_array(l*(k+1),N);
-    ringLWEDecompH(cipherBDecH, cipherB, rgsw_params);
+    tLweDecompH(cipherBDecH, cipherB, rgsw_params);
     for (int p = 0; p <=k ; ++p) {
 	for (int i = 0; i < N; ++i) {
 	    Torus32 expected = cipherB->a[p].coefsT[i];
@@ -134,9 +134,9 @@ int main(int argc, char** argv) {
 
     
     //test externProduct with H
-    ringGSWClear(cipherA, rgsw_params);
-    ringGSWAddH(cipherA, rgsw_params);
-    ringGSWExternProduct(cipherAB, cipherA, cipherB, rgsw_params);
+    tGswClear(cipherA, rgsw_params);
+    tGswAddH(cipherA, rgsw_params);
+    tGswExternProduct(cipherAB, cipherA, cipherB, rgsw_params);
     cout << "Test cipher after product 3.5 H*muB:" << endl;
     for (int p = 0; p <=k ; ++p) {
 	for (int i = 0; i < N; ++i) {
@@ -150,42 +150,42 @@ int main(int argc, char** argv) {
 		printf("modswitch error %d: %d != %d\n",i,actual2,expected2);
 	}
     }
-    ringLweSymDecrypt(dechifAB, cipherAB, rlwe_key, Msize); // DECRYPTION
+    tLweSymDecrypt(dechifAB, cipherAB, rlwe_key, Msize); // DECRYPTION
     cout << "Test LweSymDecrypt after product 3.5 H*muB:" << endl;
     cout << " variance: " << cipherAB->current_variance << endl;
     for (int i=0; i<N; i++) {
 	int expected = modSwitchFromTorus32(muB->coefsT[i],Msize);
 	int actual = modSwitchFromTorus32(dechifAB->coefsT[i],Msize);
 	if (expected!=actual)
-	    printf("ringlwe decryption error %d: %d != %d\n",i,actual,expected);
+	    printf("tlwe decryption error %d: %d != %d\n",i,actual,expected);
     }
     cout << "----------------------" << endl;
 
 
-    //decryption test ringgsw
-    cout << "decryption test ringgsw:"<< endl;
-    ringGswSymEncrypt(cipherA, muA, alpha, rgsw_key); // ENCRYPTION
-    ringLwePhase(dechifB, &cipherA->bloc_sample[k][0], rlwe_key);
+    //decryption test tgsw
+    cout << "decryption test tgsw:"<< endl;
+    tGswSymEncrypt(cipherA, muA, alpha, rgsw_key); // ENCRYPTION
+    tLwePhase(dechifB, &cipherA->bloc_sample[k][0], rlwe_key);
     cout << "manual decryption test:"<< endl;
     for (int i=0; i<N; i++) {
     	int expected = muA->coefs[i];
     	int actual = modSwitchFromTorus32(-512*dechifB->coefsT[i],2);
     	if (expected!=actual)
-    	    printf("ringgsw encryption error %d: %d != %d\n",i,actual,expected);
+    	    printf("tgsw encryption error %d: %d != %d\n",i,actual,expected);
     }
 
-    ringGswSymDecrypt(dechifA, cipherA, rgsw_key, Msize);
+    tGswSymDecrypt(dechifA, cipherA, rgsw_key, Msize);
     cout << "automatic decryption test:"<< endl;
     for (int i=0; i<N; i++) {
     	int expected = muA->coefs[i];
     	int actual = dechifA->coefs[i];
     	if (expected!=actual)
-    	    printf("ringgsw decryption error %d: %d != %d\n",i,actual,expected);
+    	    printf("tgsw decryption error %d: %d != %d\n",i,actual,expected);
     }
 
     mulRTorusPolynomial(muAB, muA, muB);
-    ringGSWExternProduct(cipherAB, cipherA, cipherB, rgsw_params);
-    ringLweSymDecrypt(dechifAB, cipherAB, rlwe_key, Msize); // DECRYPTION
+    tGswExternProduct(cipherAB, cipherA, cipherB, rgsw_params);
+    tLweSymDecrypt(dechifAB, cipherAB, rlwe_key, Msize); // DECRYPTION
 
     cout << "Test LweSymDecrypt after product 3.5:" << endl;
     cout << " variance: " << cipherAB->current_variance << endl;
@@ -193,16 +193,16 @@ int main(int argc, char** argv) {
 	int expected = modSwitchFromTorus32(muAB->coefsT[i],Msize);
 	int actual = modSwitchFromTorus32(dechifAB->coefsT[i],Msize);
 	if (expected!=actual)
-	    printf("ringlwe decryption error %d: %d != %d\n",i,actual,expected);
+	    printf("tlwe decryption error %d: %d != %d\n",i,actual,expected);
     }
     cout << "----------------------" << endl;
 
 
 
-    delete_RingGSWKey(rgsw_key);
-    delete_RingGSWSample(cipherA);
-    delete_RingLWESample(cipherB);
-    delete_RingLWESample(cipherAB);
+    delete_TGswKey(rgsw_key);
+    delete_TGswSample(cipherA);
+    delete_TLweSample(cipherB);
+    delete_TLweSample(cipherAB);
     delete_TorusPolynomial(muB);
     delete_IntPolynomial(muA);
     delete_IntPolynomial(dechifA);
@@ -211,8 +211,8 @@ int main(int argc, char** argv) {
     delete_TorusPolynomial(muAB);
 
     //ATTENTION, le params est utilisé dans divers destructeurs, il faut l'effacer en dernier 
-    delete_RingLWEParams(rlwe_params); //les deux alpha mis un peu au hasard
-    delete_RingGSWParams(rgsw_params);
+    delete_TLweParams(rlwe_params); //les deux alpha mis un peu au hasard
+    delete_TGswParams(rgsw_params);
     
     return 0;
 }
