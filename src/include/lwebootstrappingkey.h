@@ -1,6 +1,9 @@
 #ifndef LweBOOTSTRAPPINGKEY_H
 #define LweBOOTSTRAPPINGKEY_H
 
+///@file
+///@brief This file contains the declaration of bootstrapping key structures
+
 #include "tfhe_core.h"
 
 

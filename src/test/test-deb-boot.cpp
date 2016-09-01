@@ -55,7 +55,7 @@ EXPORT void tGswToFFTConvert(TGswSampleFFT* result, const TGswSample* source, co
 EXPORT void tGswFromFFTConvert(TGswSample* result, const TGswSampleFFT* source, const TGswParams* params);
 EXPORT void tGswFFTMulByXaiMinusOne(TGswSampleFFT* result, const int ai, const TGswSampleFFT* bki, const TGswParams* params);
 EXPORT void tGswFFTAddH(TGswSampleFFT* result, const TGswParams* params);
-EXPORT void tLweFFTExternMulGswTo(TLweSampleFFT* accum, TGswSampleFFT* gsw, const TGswParams* params);
+EXPORT void tGswFFTExternMulToTLwe(TLweSampleFFT* accum, TGswSampleFFT* gsw, const TGswParams* params);
 
 
 
@@ -181,7 +181,7 @@ int main(int argc, char** argv) {
        testvect->coefsT[i]=aa;
     for (int i=Ns2;i<N;i++)
        testvect->coefsT[i]=-aa;
-    TorusPolynomialMulByXai(testvectbis, barb, testvect);
+    torusPolynomialMulByXai(testvectbis, barb, testvect);
 
     // Accumulateur 
     TLweSample* acc = new_TLweSample(accum_params);
@@ -221,14 +221,14 @@ int main(int argc, char** argv) {
         if (bara!=0) {
             tGswFFTMulByXaiMinusOne(tempFFT, bara, bk->bk+i, bk_params);
             tGswFFTAddH(tempFFT, bk_params);
-            tLweFFTExternMulGswTo(accFFT, tempFFT, bk_params);
+            tGswFFTExternMulToTLwe(accFFT, tempFFT, bk_params);
             tLweFromFFTConvert(acc, accFFT, accum_params);
         }
 
         if (bara1!=0) {
             tGswMulByXaiMinusOne(temp, bara1, bk1->bk+i, bk_params);
             tGswAddH(temp, bk_params);
-            tLweExternMulRGswTo(acc1, temp, bk_params);
+            tGswExternMulToTLwe(acc1, temp, bk_params);
         }
 
 //NICOLAS: et surtout, j'ai ajouté celui-ci!
@@ -237,7 +237,7 @@ int main(int argc, char** argv) {
         tLwePhase(phase,acc,debug_accum_key);  //celui-ci, c'est la phase de acc (FFT)
 	tLwePhase(phase1,acc1,debug_accum_key); //celui-ci, c'est la phase de acc1 (Normal)
 	if (debug_in_key->key[i]==1) correctOffset = (correctOffset+bara1)%Nx2; 
-        TorusPolynomialMulByXai(testvectbis, correctOffset, testvect); //celui-ci, c'est la phase idéale (calculée sans bruit avec la clé privée)
+        torusPolynomialMulByXai(testvectbis, correctOffset, testvect); //celui-ci, c'est la phase idéale (calculée sans bruit avec la clé privée)
 	for (int j=0; j<N; j++) {
 	       printf("Iteration %d, index %d: phase %d vs expected %d vs noiseless %d\n",i,j,phase->coefsT[j],phase1->coefsT[j], testvectbis->coefsT[j]);
 	}
@@ -258,8 +258,8 @@ int main(int argc, char** argv) {
 
     LweSample* u = new_LweSample(extract_params);
     LweSample* u1 = new_LweSample(extract_params);
-    sampleExtract(u, acc, extract_params, accum_params);
-    sampleExtract(u1, acc1, extract_params, accum_params);
+    tLweExtractLweSample(u, acc, extract_params, accum_params);
+    tLweExtractLweSample(u1, acc1, extract_params, accum_params);
     u->b += ab;
     u1->b += ab;
     

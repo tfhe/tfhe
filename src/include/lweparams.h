@@ -1,6 +1,9 @@
 #ifndef LwePARAMS_H
 #define LwePARAMS_H
 
+///@file
+///@brief This file contains the declaration of lwe parameters structures
+
 #include "tfhe_core.h"
 
 //this structure contains Lwe parameters

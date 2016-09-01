@@ -41,7 +41,7 @@ EXPORT void destroy_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolyn
 
 //MISC OPERATIONS
 /** sets to zero */
-EXPORT void LagrangeHalfCPolynomial_clear(
+EXPORT void LagrangeHalfCPolynomialClear(
 	LagrangeHalfCPolynomial* reps) {
     LagrangeHalfCPolynomial_IMPL* reps1 = (LagrangeHalfCPolynomial_IMPL*) reps;
     const int N = reps1->proc->N;
@@ -49,7 +49,7 @@ EXPORT void LagrangeHalfCPolynomial_clear(
 	reps1->coefsC[i] = 0;
 }
 
-EXPORT void LagrangeHalfCPolynomial_setTorusConstant(LagrangeHalfCPolynomial* result, const Torus32 mu) {
+EXPORT void LagrangeHalfCPolynomialSetTorusConstant(LagrangeHalfCPolynomial* result, const Torus32 mu) {
     LagrangeHalfCPolynomial_IMPL* result1 = (LagrangeHalfCPolynomial_IMPL*) result;
     const int Ns2 = result1->proc->Ns2;
     double* b = result1->coefsC;
@@ -59,7 +59,7 @@ EXPORT void LagrangeHalfCPolynomial_setTorusConstant(LagrangeHalfCPolynomial* re
     for (int j=0; j<Ns2; j++) c[j]=0;
 }
 
-EXPORT void LagrangeHalfCPolynomial_addTorusConstant(LagrangeHalfCPolynomial* result, const Torus32 mu) {
+EXPORT void LagrangeHalfCPolynomialAddTorusConstant(LagrangeHalfCPolynomial* result, const Torus32 mu) {
     LagrangeHalfCPolynomial_IMPL* result1 = (LagrangeHalfCPolynomial_IMPL*) result;
     const int Ns2 = result1->proc->Ns2;
     double* b = result1->coefsC;
@@ -67,7 +67,7 @@ EXPORT void LagrangeHalfCPolynomial_addTorusConstant(LagrangeHalfCPolynomial* re
     for (int j=0; j<Ns2; j++) b[j]+=muc;
 }
 
-EXPORT void LagrangeHalfCPolynomial_setXaiMinusOne(LagrangeHalfCPolynomial* result, const int ai) {
+EXPORT void LagrangeHalfCPolynomialSetXaiMinusOne(LagrangeHalfCPolynomial* result, const int ai) {
     LagrangeHalfCPolynomial_IMPL* result1 = (LagrangeHalfCPolynomial_IMPL*) result;
     const int Ns2 = result1->proc->Ns2;
     const int _2Nm1 = result1->proc->_2N-1;
@@ -82,7 +82,7 @@ EXPORT void LagrangeHalfCPolynomial_setXaiMinusOne(LagrangeHalfCPolynomial* resu
 	c[i]=sinomegaxminus1[(reva[i]*ai)&_2Nm1];
 }
 
-EXPORT void LagrangeHalfCPolynomial_addto(
+EXPORT void LagrangeHalfCPolynomialAddTo(
 	LagrangeHalfCPolynomial* accum, 
 	const LagrangeHalfCPolynomial* a) {
     LagrangeHalfCPolynomial_IMPL* result1 = (LagrangeHalfCPolynomial_IMPL*) accum;

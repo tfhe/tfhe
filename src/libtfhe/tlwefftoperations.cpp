@@ -45,7 +45,7 @@ EXPORT void tLweFromFFTConvert(TLweSample* result, const TLweSampleFFT* source, 
 EXPORT void tLweFFTClear(TLweSampleFFT* result, const TLweParams* params){
     int k = params->k;
 
-    for (int i = 0; i <= k; ++i) LagrangeHalfCPolynomial_clear(&result->a[i]);
+    for (int i = 0; i <= k; ++i) LagrangeHalfCPolynomialClear(&result->a[i]);
     result->current_variance = 0.;
 }
 
@@ -53,7 +53,7 @@ EXPORT void tLweFFTClear(TLweSampleFFT* result, const TLweParams* params){
 EXPORT void tLweFFTNoiselessTrivial(TLweSampleFFT* result, const TorusPolynomial* mu, const TLweParams* params){
     int k = params->k;
 
-    for (int i = 0; i < k; ++i) LagrangeHalfCPolynomial_clear(&result->a[i]);
+    for (int i = 0; i < k; ++i) LagrangeHalfCPolynomialClear(&result->a[i]);
     TorusPolynomial_ifft(result->b, mu);
     result->current_variance = 0.;
 }
@@ -63,8 +63,8 @@ EXPORT void tLweFFTNoiselessTrivialT(TLweSampleFFT* result, const Torus32 mu, co
     const int k = params->k;
     
     for (int i = 0; i < k; ++i) 
-	LagrangeHalfCPolynomial_clear(&result->a[i]);
-    LagrangeHalfCPolynomial_setTorusConstant(result->b,mu);
+	LagrangeHalfCPolynomialClear(&result->a[i]);
+    LagrangeHalfCPolynomialSetTorusConstant(result->b,mu);
     result->current_variance = 0.;
 }
 
@@ -103,21 +103,21 @@ EXPORT void tLweFFTAddMulRTo(TLweSampleFFT* result, const LagrangeHalfCPolynomia
     const int k = params->k;
     
     for (int i=0; i<=k; i++)
-	LagrangeHalfCPolynomial_addmul(result->a+i,p,sample->a+i);
+	LagrangeHalfCPolynomialAddMul(result->a+i,p,sample->a+i);
 }
 
 EXPORT void tLweFFTMulR(TLweSampleFFT* result, const LagrangeHalfCPolynomial* p, const TLweSampleFFT* sample, const TLweParams* params) {
     const int k = params->k;
     
     for (int i=0; i<=k; i++)
-	LagrangeHalfCPolynomial_mul(result->a+i,p,sample->a+i);
+	LagrangeHalfCPolynomialMul(result->a+i,p,sample->a+i);
 }
 
 EXPORT void tLweFFTSubMulRTo(TLweSampleFFT* result, const LagrangeHalfCPolynomial* p, const TLweSampleFFT* sample, const TLweParams* params) {
     const int k = params->k;
     
     for (int i=0; i<=k; i++)
-	LagrangeHalfCPolynomial_submul(result->a+i,p,sample->a+i);
+	LagrangeHalfCPolynomialSubMul(result->a+i,p,sample->a+i);
 }
 
     
@@ -142,7 +142,7 @@ EXPORT void tGswFFTAddH(TGswSampleFFT* result, const TGswParams* params) {
     for (int j=0; j<l; j++) {
     	Torus32 hj = params->h[j];
     	for (int i=0; i<=k; i++)
-	   LagrangeHalfCPolynomial_addTorusConstant(&result->sample[i][j].a[i],hj); 
+	   LagrangeHalfCPolynomialAddTorusConstant(&result->sample[i][j].a[i],hj); 
     }
 
 }
@@ -154,7 +154,7 @@ EXPORT void tGswFFTClear(TGswSampleFFT* result, const TGswParams* params) {
 	tLweFFTClear(result->all_samples+p, params->tlwe_params);
 }    
 
-EXPORT void LagrangeHalfCPolynomial_decompH(LagrangeHalfCPolynomial* reps, const LagrangeHalfCPolynomial* pol, const TGswParams* params) {
+EXPORT void tGswLagrangeHalfCPolynomialDecompH(LagrangeHalfCPolynomial* reps, const LagrangeHalfCPolynomial* pol, const TGswParams* params) {
     const int l = params->l;
     const int N = params->tlwe_params->N;
     //TODO attention, this prevents parallelization...
@@ -162,13 +162,13 @@ EXPORT void LagrangeHalfCPolynomial_decompH(LagrangeHalfCPolynomial* reps, const
     static IntPolynomial* deca = new_IntPolynomial_array(l,N);
 
     TorusPolynomial_fft(a,pol);
-    Torus32PolynomialDecompH(deca, a, params);
+    tGswTorus32PolynomialDecompH(deca, a, params);
     for (int j=0; j<l; j++) {
 	IntPolynomial_ifft(reps+j,deca+j);
     }
 }
 
-EXPORT void tLweFFTExternMulGswTo(TLweSampleFFT* accum, TGswSampleFFT* gsw, const TGswParams* params) {
+EXPORT void tGswFFTExternMulToTLwe(TLweSampleFFT* accum, TGswSampleFFT* gsw, const TGswParams* params) {
     const TLweParams* tlwe_params=params->tlwe_params;
     const int k = tlwe_params->k;
     const int l = params->l;
@@ -178,7 +178,7 @@ EXPORT void tLweFFTExternMulGswTo(TLweSampleFFT* accum, TGswSampleFFT* gsw, cons
     static LagrangeHalfCPolynomial* decomps=new_LagrangeHalfCPolynomial_array(kpl,N);
 
     for (int i=0; i<=k; i++)
-	LagrangeHalfCPolynomial_decompH(decomps+i*l,accum->a+i, params);
+	tGswLagrangeHalfCPolynomialDecompH(decomps+i*l,accum->a+i, params);
     tLweFFTClear(accum, tlwe_params);
     for (int p=0; p<kpl; p++)
 	tLweFFTAddMulRTo(accum, decomps+p, gsw->all_samples+p, tlwe_params);
@@ -193,12 +193,12 @@ EXPORT void tGswFFTMulByXaiMinusOne(TGswSampleFFT* result, const int ai, const T
     //on calcule x^ai-1 en fft
     //TODO attention, this prevents parallelization...
     static LagrangeHalfCPolynomial* xaim1=new_LagrangeHalfCPolynomial(N);
-    LagrangeHalfCPolynomial_setXaiMinusOne(xaim1,ai);
+    LagrangeHalfCPolynomialSetXaiMinusOne(xaim1,ai);
     for (int p=0; p<kpl; p++) {
         const LagrangeHalfCPolynomial* in_s = bki->all_samples[p].a;
         LagrangeHalfCPolynomial* out_s = result->all_samples[p].a;
         for (int j=0; j<=k; j++)
-            LagrangeHalfCPolynomial_mul(&out_s[j], xaim1, &in_s[j]); 
+            LagrangeHalfCPolynomialMul(&out_s[j], xaim1, &in_s[j]); 
     }
 }
 
@@ -257,7 +257,7 @@ EXPORT void tfhe_bootstrapFFT(LweSample* result, const LweBootstrappingKeyFFT* b
        testvect->coefsT[i]=aa;
     for (int i=Ns2;i<N;i++)
        testvect->coefsT[i]=-aa;
-    TorusPolynomialMulByXai(testvectbis, barb, testvect);
+    torusPolynomialMulByXai(testvectbis, barb, testvect);
 
     // Accumulateur 
     TLweSample* acc = new_TLweSample(accum_params);
@@ -283,7 +283,7 @@ EXPORT void tfhe_bootstrapFFT(LweSample* result, const LweBootstrappingKeyFFT* b
         if (bara!=0) {
             tGswFFTMulByXaiMinusOne(tempFFT, bara, bk->bk+i, bk_params);
             tGswFFTAddH(tempFFT, bk_params);
-            tLweFFTExternMulGswTo(accFFT, tempFFT, bk_params);
+            tGswFFTExternMulToTLwe(accFFT, tempFFT, bk_params);
         }
 
 //NICOLAS: et surtout, j'ai ajouté celui-ci!
@@ -291,7 +291,7 @@ EXPORT void tfhe_bootstrapFFT(LweSample* result, const LweBootstrappingKeyFFT* b
             tLweFromFFTConvert(acc, accFFT, accum_params);
         tLwePhase(phase,acc,debug_accum_key);  //celui-ci, c'est la phase de acc (FFT)
 	if (debug_in_key->key[i]==1) correctOffset = (correctOffset+bara)%Nx2; 
-        TorusPolynomialMulByXai(testvectbis, correctOffset, testvect); //celui-ci, c'est la phase idéale (calculée sans bruit avec la clé privée)
+        torusPolynomialMulByXai(testvectbis, correctOffset, testvect); //celui-ci, c'est la phase idéale (calculée sans bruit avec la clé privée)
 	for (int j=0; j<N; j++) {
 	       printf("Iteration %d, index %d: phase %d vs noiseless %d\n",i,j,phase->coefsT[j], testvectbis->coefsT[j]);
 	}
@@ -302,7 +302,7 @@ EXPORT void tfhe_bootstrapFFT(LweSample* result, const LweBootstrappingKeyFFT* b
 
 
     LweSample* u = new_LweSample(extract_params);
-    sampleExtract(u, acc, extract_params, accum_params);
+    tLweExtractLweSample(u, acc, extract_params, accum_params);
     u->b += ab;
     
     lweKeySwitch(result, bk->ks, u);

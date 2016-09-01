@@ -1,6 +1,9 @@
 #ifndef TGSW_FUNCTIONS_H
 #define TGSW_FUNCTIONS_H
 
+///@file
+///@brief This file contains the declaration of TGSW related functions
+
 #include "tfhe_core.h"
 #include "tgsw.h"
 #include "tlwe.h"
@@ -27,20 +30,19 @@ EXPORT void tGswAddMuIntH(TGswSample* result, const int message, const TGswParam
 EXPORT void tGswEncryptZero(TGswSample* result, double alpha, const TGswKey* key);
 
 //fonction de decomposition
-EXPORT void tLweDecompH(IntPolynomial* result, const TLweSample* sample, const TGswParams* params);
+EXPORT void tGswTLweDecompH(IntPolynomial* result, const TLweSample* sample, const TGswParams* params);
 
-EXPORT void Torus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const TGswParams* params);
-EXPORT void tLweDecompH(IntPolynomial* result, const TLweSample* sample,const TGswParams* params);	
+EXPORT void tGswTorus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const TGswParams* params);
+EXPORT void tGswTLweDecompH(IntPolynomial* result, const TLweSample* sample,const TGswParams* params);	
 
 //TODO: Ilaria.Theoreme3.5
 EXPORT void tGswExternProduct(TLweSample* result, const TGswSample* a, const TLweSample* b, const TGswParams* params);
 
 // result=result+ (X^ai-1)*bi (ligne 5 de l'algo)
 EXPORT void tGswMulByXaiMinusOne(TGswSample* result, int ai, const TGswSample* bk, const TGswParams* params);
-EXPORT void tLweMulByXaiMinusOne(TLweSample* result, int ai, const TLweSample* bk, const TLweParams* params);
 
 //ligne 5 algo,mult externe
-EXPORT void tLweExternMulRGswTo(TLweSample* accum, const TGswSample* sample,const TGswParams* params);
+EXPORT void tGswExternMulToTLwe(TLweSample* accum, const TGswSample* sample,const TGswParams* params);
 
 /** result = (0,mu) */
 EXPORT void tGswNoiselessTrivial(TGswSample* result, const TorusPolynomial* mu, const TGswParams* params);
@@ -62,8 +64,8 @@ EXPORT void tGswToFFTConvert(TGswSampleFFT* result, const TGswSample* source, co
 EXPORT void tGswFromFFTConvert(TGswSample* result, const TGswSampleFFT* source, const TGswParams* params);
 EXPORT void tGswFFTAddH(TGswSampleFFT* result, const TGswParams* params);
 EXPORT void tGswFFTClear(TGswSampleFFT* result, const TGswParams* params);
-EXPORT void LagrangeHalfCPolynomial_decompH(LagrangeHalfCPolynomial* reps, const LagrangeHalfCPolynomial* pol, const TGswParams* params);
-EXPORT void tLweFFTExternMulGswTo(TLweSampleFFT* accum, TGswSampleFFT* gsw, const TGswParams* params);
+EXPORT void tGswLagrangeHalfCPolynomialDecompH(LagrangeHalfCPolynomial* reps, const LagrangeHalfCPolynomial* pol, const TGswParams* params);
+EXPORT void tGswFFTExternMulToTLwe(TLweSampleFFT* accum, TGswSampleFFT* gsw, const TGswParams* params);
 EXPORT void tGswFFTMulByXaiMinusOne(TGswSampleFFT* result, const int ai, const TGswSampleFFT* bki, const TGswParams* params);
 
 EXPORT void tfhe_createLweBootstrappingKeyFFT(LweBootstrappingKeyFFT* bk, const LweKey* key_in, const TGswKey* rgsw_key);

@@ -43,7 +43,7 @@ EXPORT void torusPolynomialSubMulZ(TorusPolynomial* result, const TorusPolynomia
 EXPORT void torusPolynomialSubMulZTo(TorusPolynomial* result, int p, const TorusPolynomial* poly2);
 
 /**  TorusPolynomial = X^a * TorusPolynomial */
-EXPORT void TorusPolynomialMulByXai(TorusPolynomial* result, int a, const TorusPolynomial* bk);
+EXPORT void torusPolynomialMulByXai(TorusPolynomial* result, int a, const TorusPolynomial* bk);
 
 /**  Norme Euclidienne d'un IntPolynomial */
 EXPORT double intPolynomialNormSq2(const IntPolynomial* poly);
@@ -70,16 +70,16 @@ EXPORT void torusPolynomialMultNaive(TorusPolynomial* result, const IntPolynomia
  * by using Karatsuba
  */
 EXPORT void torusPolynomialMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
-EXPORT void addMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
-EXPORT void subMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+EXPORT void torusPolynomialAddMulRKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+EXPORT void torusPolynomialSubMulRKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
 
-//#define mulRTorusPolynomial torusPolynomialMultKaratsuba
-//#define addMulRToTorusPolynomial addMultKaratsuba
-//#define subMulRToTorusPolynomial subMultKaratsuba
+//#define torusPolynomialMulR torusPolynomialMultKaratsuba
+//#define torusPolynomialAddMulR torusPolynomialAddMulRKaratsuba
+//#define torusPolynomialSubMulR torusPolynomialSubMulRKaratsuba
 
-#define mulRTorusPolynomial multFFT
-#define addMulRToTorusPolynomial addMultToFFT
-#define subMulRToTorusPolynomial subMultToFFT
+#define torusPolynomialMulR torusPolynomialMultFFT
+#define torusPolynomialAddMulR torusPolynomialAddMulRFFT
+#define torusPolynomialSubMulR torusPolynomialSubMulRFFT
 
 
 #endif //POLYNOMIALS_ARITHMETIC_H

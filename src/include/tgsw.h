@@ -1,6 +1,9 @@
 #ifndef TGSW_H
 #define TGSW_H
 
+///@file
+///@brief This file contains the declaration of TGSW structures
+
 #include "tfhe_core.h"
 #include "tlwe.h"
 #include "polynomials.h"

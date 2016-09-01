@@ -1,6 +1,9 @@
 #ifndef POLYNOMIALS_H
 #define POLYNOMIALS_H
 
+///@file
+///@brief This file contains the declaration of polynomials structures
+
 #include "tfhe_core.h"
 
 /** This structure represents an integer polynomial modulo X^N+1 */

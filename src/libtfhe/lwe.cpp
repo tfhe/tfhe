@@ -50,7 +50,7 @@ EXPORT void tLweSymEncryptZero(TLweSample* result, double alpha, const TLweKey* 
     for (int i = 0; i < k; ++i)
     {
 	torusPolynomialUniform(&result->a[i]);
-	addMulRToTorusPolynomial(result->b, &key->key[i], &result->a[i]);
+	torusPolynomialAddMulR(result->b, &key->key[i], &result->a[i]);
     }
 
     result->current_variance = alpha*alpha;
@@ -85,7 +85,7 @@ EXPORT void tLwePhase(TorusPolynomial* phase, const TLweSample* sample, const TL
     torusPolynomialCopy(phase, sample->b); // phi = b
 
     for (int i = 0; i < k; ++i)
-        subMulRToTorusPolynomial(phase, &key->key[i], &sample->a[i]);
+        torusPolynomialSubMulR(phase, &key->key[i], &sample->a[i]);
 }
 
 
@@ -209,7 +209,7 @@ EXPORT void tLweAddMulRTo(TLweSample* result, const IntPolynomial* p, const TLwe
     const int k = params->k;
     
     for (int i = 0; i <= k; ++i)
-       addMulRToTorusPolynomial(result->a+i, p, sample->a+i);	
+       torusPolynomialAddMulR(result->a+i, p, sample->a+i);	
     result->current_variance += intPolynomialNormSq2(p)*sample->current_variance; 
 }
 
@@ -320,7 +320,7 @@ void TorusPolynomialMulByXaiMinusOne(TorusPolynomial* result, int a, const Torus
     }
 }
 
-void TorusPolynomialMulByXai(TorusPolynomial* result, int a, const TorusPolynomial* bk){
+void torusPolynomialMulByXai(TorusPolynomial* result, int a, const TorusPolynomial* bk){
     const int N=bk->N;
     Torus32* out=result->coefsT;
     Torus32* in =bk->coefsT; 
@@ -360,14 +360,14 @@ EXPORT void tGswMulByXaiMinusOne(TGswSample* result, int ai, const TGswSample* b
 }
 
 //Update l'accumulateur ligne 5 de l'algo toujours
-//void tLweDecompH(IntPolynomial* result, const TLweSample* sample,const TGswParams* params);	
-EXPORT void tLweExternMulRGswTo(TLweSample* accum, const TGswSample* sample,const TGswParams* params){
+//void tGswTLweDecompH(IntPolynomial* result, const TLweSample* sample,const TGswParams* params);	
+EXPORT void tGswExternMulToTLwe(TLweSample* accum, const TGswSample* sample,const TGswParams* params){
     const TLweParams* par=params->tlwe_params;
     const int N=par->N;
     const int kpl=params->kpl;
     IntPolynomial* dec =new_IntPolynomial_array(kpl,N);
 
-    tLweDecompH(dec,accum,params);
+    tGswTLweDecompH(dec,accum,params);
     tLweClear(accum,par);
     for (int i=0; i<kpl;i++) 
         tLweAddMulRTo(accum,&dec[i],&sample->all_sample[i],par);
@@ -466,7 +466,7 @@ EXPORT void tGswPhase(TorusPolynomial* phase, const TGswSample* sample, const TG
     torusPolynomialCopy(phase, sample[0]->b); // phi = b
 
     for (int i = 0; i < k; ++i)
-        subMulRToTorusPolynomial(phase, &key->key[i], &sample[0]->a[i]);
+        torusPolynomialSubMulR(phase, &key->key[i], &sample[0]->a[i]);
 }
 
 // à revoir
@@ -489,13 +489,13 @@ EXPORT void tGswSymDecrypt(IntPolynomial* result, const TGswSample* sample, cons
     const Torus32 indic = modSwitchToTorus32(1, Msize);
     torusPolynomialClear(testvec);
     testvec->coefsT[0]=indic;
-    Torus32PolynomialDecompH(decomp, testvec, params);
+    tGswTorus32PolynomialDecompH(decomp, testvec, params);
 
     torusPolynomialClear(testvec);
     for (int i=0; i<l; i++) {
 	for (int j=1; j<N; j++) assert(decomp[i].coefs[j]==0);
 	tLwePhase(tmp, &sample->bloc_sample[k][i], &key->tlwe_key);
-	addMulRToTorusPolynomial(testvec, decomp+i, tmp);
+	torusPolynomialAddMulR(testvec, decomp+i, tmp);
     }
     for (int i=0; i<N; i++)
 	result->coefs[i]=modSwitchFromTorus32(testvec->coefsT[i], Msize);
@@ -523,12 +523,12 @@ EXPORT int tGswSymDecryptInt(const TGswSample* sample, const TGswKey* key){
 
 
 //fonction de decomposition
-EXPORT void tLweDecompH(IntPolynomial* result, const TLweSample* sample, const TGswParams* params){
+EXPORT void tGswTLweDecompH(IntPolynomial* result, const TLweSample* sample, const TGswParams* params){
     const int k = params->tlwe_params->k;
     const int l = params->l;
 
     for (int i = 0; i <= k; ++i) // b=a[k]
-        Torus32PolynomialDecompH(result+(i*l), &sample->a[i], params);
+        tGswTorus32PolynomialDecompH(result+(i*l), &sample->a[i], params);
 }
 
 
@@ -550,7 +550,7 @@ EXPORT void Torus32PolynomialDecompH_old(IntPolynomial* result, const TorusPolyn
         }   
     }
 }
-EXPORT void Torus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const TGswParams* params){
+EXPORT void tGswTorus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const TGswParams* params){
     const int N = params->tlwe_params->N;
     const int l = params->l;
     const int Bgbit = params->Bgbit;
@@ -673,7 +673,7 @@ EXPORT void tGswExternProduct(TLweSample* result, const TGswSample* a, const TLw
     const int kpl = params->kpl;
     IntPolynomial* dec = new_IntPolynomial_array(kpl,N);
 
-    tLweDecompH(dec, b, params);
+    tGswTLweDecompH(dec, b, params);
 
     tLweClear(result, parlwe);
     for (int i = 0; i < kpl; i++) 
@@ -709,7 +709,7 @@ EXPORT void tGswExtractSample(TLweSample* result, const TGswSample* x);
 
 
 
-EXPORT void sampleExtract(LweSample* result, const TLweSample* x, const LweParams* params,  const TLweParams* rparams) {
+EXPORT void tLweExtractLweSample(LweSample* result, const TLweSample* x, const LweParams* params,  const TLweParams* rparams) {
     const int N = rparams->N;
     const int k = rparams->k;
     assert(params->n == k*N);
@@ -749,7 +749,7 @@ EXPORT void tfhe_bootstrap(LweSample* result, const LweBootstrappingKey* bk, Tor
 	testvect->coefsT[i]=aa;
     for (int i=Ns2;i<N;i++)
 	testvect->coefsT[i]=-aa;
-    TorusPolynomialMulByXai(testvectbis, barb, testvect);
+    torusPolynomialMulByXai(testvectbis, barb, testvect);
 
     TLweSample* acc = new_TLweSample(accum_params);
     tLweNoiselessTrivial(acc, testvectbis, accum_params);
@@ -767,14 +767,14 @@ EXPORT void tfhe_bootstrap(LweSample* result, const LweBootstrappingKey* bk, Tor
 	if (bara==0) continue; //indeed, this is an easy case!
 	tGswMulByXaiMinusOne(temp, bara, bk->bk+i, bk_params);
 	tGswAddH(temp, bk->bk_params);
-	tLweExternMulRGswTo(acc, temp, bk_params);
+	tGswExternMulToTLwe(acc, temp, bk_params);
     }
 #ifndef NDEBUG
     tLwePhase(testvectbis, acc, debug_accum_key);
     printf("Phase after loop: %d\n",testvectbis->coefsT[0]);
 #endif
     LweSample* u = new_LweSample(extract_params);
-    sampleExtract(u, acc, extract_params, accum_params);
+    tLweExtractLweSample(u, acc, extract_params, accum_params);
 #ifndef NDEBUG
     ph = lwePhase(u, debug_extract_key);
     printf("Phase after extract: %d\n",ph);

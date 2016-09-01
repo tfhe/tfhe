@@ -1,6 +1,9 @@
 #ifndef LweSAMPLES_H
 #define LweSAMPLES_H
 
+///@file
+///@brief This file contains the declaration of lwesamples structures
+
 #include "tfhe_core.h"
 
 struct LweSample {

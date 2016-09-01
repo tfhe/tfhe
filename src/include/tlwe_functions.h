@@ -1,6 +1,9 @@
 #ifndef TLWE_FUNCTIONS_H
 #define TLWE_FUNCTIONS_H
 
+///@file
+///@brief This file contains the declaration of TLWE related functions
+
 // Ring
 EXPORT void tLweKeyGen(TLweKey* result);
 EXPORT void tLweSymEncrypt(TLweSample* result, TorusPolynomial* message, double alpha, const TLweKey* key);
@@ -28,8 +31,9 @@ EXPORT void tLweSubMulTo(TLweSample* result, int p, const TLweSample* sample, co
 
 // EXPORT void tLwePolyCombination(TLweSample* result, const int* combi, const TLweSample* samples, const TLweParams* params);
 
+EXPORT void tLweMulByXaiMinusOne(TLweSample* result, int ai, const TLweSample* bk, const TLweParams* params);
 
-EXPORT void sampleExtract(LweSample* result, const TLweSample* x, const LweParams* params,  const TLweParams* rparams);
+EXPORT void tLweExtractLweSample(LweSample* result, const TLweSample* x, const LweParams* params,  const TLweParams* rparams);
 
 //extractions TLwe -> Lwe
 EXPORT void tLweExtractKey(LweKey* result, const TLweKey*); //sans doute un param supplémentaire

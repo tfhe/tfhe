@@ -237,7 +237,7 @@ int main(int argc, char** argv) {
         tLweAddMulRTo(cipher, poly, cipher1, params);
         // mu = mu0 + poly.mu1
         torusPolynomialCopy(mu, mu0);
-        addMultKaratsuba(mu, poly, mu1);
+        torusPolynomialAddMulRKaratsuba(mu, poly, mu1);
 
         tLweSymDecrypt(dechif, cipher, key, Msize); // DECRYPTION
         

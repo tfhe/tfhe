@@ -13,7 +13,7 @@
 using namespace std;
 
 
-EXPORT void Torus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const TGswParams* params);
+EXPORT void tGswTorus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const TGswParams* params);
 
 // **********************************************************************************
 // ********************************* MAIN *******************************************
@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
     for (int i = 0; i < N; ++i) {
 	muB->coefsT[i] = uniformTorus32_distrib(generator);
     }
-    Torus32PolynomialDecompH(muBDecH, muB, rgsw_params);
+    tGswTorus32PolynomialDecompH(muBDecH, muB, rgsw_params);
     for (int i = 0; i < N; ++i) {
 	Torus32 expected = muB->coefsT[i];
 	Torus32 actual = 0;
@@ -115,7 +115,7 @@ int main(int argc, char** argv) {
     //test decompH on tLwe
     cout << "Test decompH on TLwe(muB)" << endl;
     IntPolynomial* cipherBDecH = new_IntPolynomial_array(l*(k+1),N);
-    tLweDecompH(cipherBDecH, cipherB, rgsw_params);
+    tGswTLweDecompH(cipherBDecH, cipherB, rgsw_params);
     for (int p = 0; p <=k ; ++p) {
 	for (int i = 0; i < N; ++i) {
 	    Torus32 expected = cipherB->a[p].coefsT[i];
@@ -182,7 +182,7 @@ int main(int argc, char** argv) {
     	    printf("tgsw decryption error %d: %d != %d\n",i,actual,expected);
     }
 
-    mulRTorusPolynomial(muAB, muA, muB);
+    torusPolynomialMulR(muAB, muA, muB);
     tGswExternProduct(cipherAB, cipherA, cipherB, rgsw_params);
     tLweSymDecrypt(dechifAB, cipherAB, rlwe_key, Msize); // DECRYPTION
 

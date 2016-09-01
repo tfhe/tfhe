@@ -4,9 +4,9 @@
 	.text
 .LHOTB0:
 	.p2align 4,,15
-	.globl	LagrangeHalfCPolynomial_mul
-	.type	LagrangeHalfCPolynomial_mul, @function
-LagrangeHalfCPolynomial_mul:
+	.globl	LagrangeHalfCPolynomialMul
+	.type	LagrangeHalfCPolynomialMul, @function
+LagrangeHalfCPolynomialMul:
 .LFB7134:
 	.cfi_startproc
 	pushq	%r12
@@ -14,7 +14,7 @@ LagrangeHalfCPolynomial_mul:
 	pushq	%r14
 	pushq	%r15
 
-	/* LagrangeHalfCPolynomial_mul(HCP* r, HCP* a, HCP* b) */
+	/* LagrangeHalfCPolynomialMul(HCP* r, HCP* a, HCP* b) */
 	movq	8(%rdi), %rax /* rax: proc */
 	movq	$0,%rcx
 	movl	8(%rax), %ecx /* ecx: Ns2 */
@@ -63,7 +63,7 @@ LagrangeHalfCPolynomial_mul:
 	rep ret
 	.cfi_endproc
 .LFE7134:
-	.size	LagrangeHalfCPolynomial_mul, .-LagrangeHalfCPolynomial_mul
+	.size	LagrangeHalfCPolynomialMul, .-LagrangeHalfCPolynomialMul
 	.section	.text.unlikely
 .LCOLDE0:
 	.text
@@ -73,9 +73,9 @@ LagrangeHalfCPolynomial_mul:
 	.text
 .LHOTB1:
 	.p2align 4,,15
-	.globl	LagrangeHalfCPolynomial_addmul
-	.type	LagrangeHalfCPolynomial_addmul, @function
-LagrangeHalfCPolynomial_addmul:
+	.globl	LagrangeHalfCPolynomialAddMul
+	.type	LagrangeHalfCPolynomialAddMul, @function
+LagrangeHalfCPolynomialAddMul:
 .LFB7135:
 	.cfi_startproc
 	pushq	%r12
@@ -83,7 +83,7 @@ LagrangeHalfCPolynomial_addmul:
 	pushq	%r14
 	pushq	%r15
 
-	/* LagrangeHalfCPolynomial_addmul(HCP* r, HCP* a, HCP* b) */
+	/* LagrangeHalfCPolynomialAddMul(HCP* r, HCP* a, HCP* b) */
 	movq	8(%rdi), %rax /* rax: proc */
 	movq	$0,%rcx
 	movl	8(%rax), %ecx /* ecx: Ns2 */
@@ -134,7 +134,7 @@ LagrangeHalfCPolynomial_addmul:
 	rep ret
 	.cfi_endproc
 .LFE7135:
-	.size	LagrangeHalfCPolynomial_addmul, .-LagrangeHalfCPolynomial_addmul
+	.size	LagrangeHalfCPolynomialAddMul, .-LagrangeHalfCPolynomialAddMul
 	.section	.text.unlikely
 .LCOLDE1:
 	.text
@@ -144,9 +144,9 @@ LagrangeHalfCPolynomial_addmul:
 	.text
 .LHOTB2:
 	.p2align 4,,15
-	.globl	LagrangeHalfCPolynomial_submul
-	.type	LagrangeHalfCPolynomial_submul, @function
-LagrangeHalfCPolynomial_submul:
+	.globl	LagrangeHalfCPolynomialSubMul
+	.type	LagrangeHalfCPolynomialSubMul, @function
+LagrangeHalfCPolynomialSubMul:
 .LFB7136:
 	.cfi_startproc
 	pushq	%r12
@@ -154,7 +154,7 @@ LagrangeHalfCPolynomial_submul:
 	pushq	%r14
 	pushq	%r15
 
-	/* LagrangeHalfCPolynomial_submul(HCP* r, HCP* a, HCP* b) */
+	/* LagrangeHalfCPolynomialSubMul(HCP* r, HCP* a, HCP* b) */
 	movq	8(%rdi), %rax /* rax: proc */
 	movq	$0,%rcx
 	movl	8(%rax), %ecx /* ecx: Ns2 */
@@ -205,7 +205,7 @@ LagrangeHalfCPolynomial_submul:
 	rep ret
 	.cfi_endproc
 .LFE7136:
-	.size	LagrangeHalfCPolynomial_submul, .-LagrangeHalfCPolynomial_submul
+	.size	LagrangeHalfCPolynomialSubMul, .-LagrangeHalfCPolynomialSubMul
 	.section	.text.unlikely
 .LCOLDE2:
 	.text

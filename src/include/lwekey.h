@@ -1,6 +1,9 @@
 #ifndef LweKEY_H
 #define LweKEY_H
 
+///@file
+///@brief This file contains the declaration of LWE key structures
+
 #include "tfhe_core.h"
 //#include "lweparams.h"
 
