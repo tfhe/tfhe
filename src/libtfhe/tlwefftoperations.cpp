@@ -3,7 +3,7 @@
 #include <random>
 #include <cassert>
 #include <ccomplex>
-#include "lwe.h"
+#include "tfhe.h"
 #include "lweparams.h"
 #include "lwekey.h"
 #include "lwesamples.h"

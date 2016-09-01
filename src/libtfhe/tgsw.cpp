@@ -1,7 +1,7 @@
-#include "lwe.h"
+#include "tfhe.h"
 #include "tlwe.h"
 #include "tgsw.h"
-#include "multiplication.h"
+#include "polynomials_arithmetic.h"
 
 
 

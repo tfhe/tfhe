@@ -4,7 +4,7 @@
 ///@file
 ///@brief This file contains the operations on Lwe samples
 
-#include "lwe.h"
+#include "tfhe.h"
 
 /**
  * This function generates a random Lwe key for the given parameters.

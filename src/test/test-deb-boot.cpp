@@ -5,8 +5,7 @@
 #include <cmath>
 #include <ccomplex>
 #include <sys/time.h>
-#include "lwe.h"
-#include "multiplication.h"
+#include "tfhe.h"
 #include "polynomials.h"
 #include "lwesamples.h"
 #include "lwekey.h"

@@ -1,6 +1,5 @@
-#include "lwe.h"
+#include "tfhe.h"
 #include "tlwe.h"
-#include "multiplication.h"
 #include "polynomials.h"
 
 //struct TLweParams {

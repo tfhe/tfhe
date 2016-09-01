@@ -1,6 +1,6 @@
 #include <cstdlib>
 #include <iostream>
-#include "lwe.h"
+#include "tfhe.h"
 #include "lwebootstrappingkey.h"
 #include "tgsw.h"
 

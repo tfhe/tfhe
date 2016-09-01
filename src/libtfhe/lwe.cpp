@@ -2,7 +2,7 @@
 #include <iostream>
 #include <random>
 #include <cassert>
-#include "lwe.h"
+#include "tfhe.h"
 #include "lweparams.h"
 #include "lwekey.h"
 #include "lwesamples.h"

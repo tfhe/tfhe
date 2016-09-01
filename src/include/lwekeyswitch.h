@@ -1,7 +1,7 @@
 #ifndef LweKEYSWITCH_H
 #define LweKEYSWITCH_H
 
-#include "lwe.h"
+#include "tfhe.h"
 #include "lweparams.h"
 #include "lwesamples.h"
 

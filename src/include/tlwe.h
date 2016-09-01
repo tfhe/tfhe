@@ -1,8 +1,8 @@
 #ifndef RINGLWE_H
 #define RINGLWE_H
 
-#include "lwe.h"
-#include "multiplication.h"
+#include "tfhe.h"
+#include "polynomials.h"
 #include "lweparams.h"
 
 struct TLweParams {

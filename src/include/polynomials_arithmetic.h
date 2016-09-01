@@ -1,12 +1,12 @@
-#ifndef TORUSPOLYNOMIAL_FUNCTIONS_H
-#define TORUSPOLYNOMIAL_FUNCTIONS_H
+#ifndef POLYNOMIALS_ARITHMETIC_H
+#define POLYNOMIALS_ARITHMETIC_H
+
+#include "tfhe.h"
+#include "polynomials.h"
 
 ///@file
 ///@brief This file contains the operations on polynomials
 
-
-#include "lwe.h"
-#include "polynomials.h"
 
 /**  TorusPolynomial = 0 */
 EXPORT void torusPolynomialClear(TorusPolynomial* result);
@@ -52,4 +52,31 @@ EXPORT void torusPolynomialMultKaratsuba(TorusPolynomial* result, const IntPolyn
 EXPORT void torusPolynomialMultNaive(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
 
 
-#endif //TORUSPOLYNOMIAL_FUNCTIONS_H
+
+/**
+ * This is the naive external multiplication of an integer polynomial
+ * with a torus polynomial. (this function should yield exactly the same
+ * result as the karatsuba or fft version, but should be slower) 
+ */
+EXPORT void torusPolynomialMultNaive(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+
+
+
+/**
+ * This function multiplies 2 polynomials (an integer poly and a torus poly)
+ * by using Karatsuba
+ */
+EXPORT void torusPolynomialMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+EXPORT void addMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+EXPORT void subMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+
+//#define mulRTorusPolynomial torusPolynomialMultKaratsuba
+//#define addMulRToTorusPolynomial addMultKaratsuba
+//#define subMulRToTorusPolynomial subMultKaratsuba
+
+#define mulRTorusPolynomial multFFT
+#define addMulRToTorusPolynomial addMultToFFT
+#define subMulRToTorusPolynomial subMultToFFT
+
+
+#endif //POLYNOMIALS_ARITHMETIC_H

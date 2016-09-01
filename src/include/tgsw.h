@@ -1,9 +1,8 @@
 #ifndef TGSW_H
 #define TGSW_H
 
-#include "lwe.h"
+#include "tfhe.h"
 #include "tlwe.h"
-#include "multiplication.h"
 #include "polynomials.h"
 
 struct TGswParams {

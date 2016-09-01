@@ -3,7 +3,7 @@
 #include <random>
 #include <cassert>
 #include <limits.h>
-#include "lwe.h"
+#include "tfhe.h"
 
 using namespace std;
 

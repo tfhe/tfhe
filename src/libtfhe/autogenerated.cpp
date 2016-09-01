@@ -1,10 +1,10 @@
 //THIS  FILE IS AUTOMATICALLY GENERATED
 //DO NOT EDIT BY HANDS
-#include "lwe.h"
+#include "tfhe.h"
 #include <cstdlib>
 #include <new>
 using namespace std;
-#include "multiplication.h" 
+#include "polynomials.h" 
 //allocate memory space for a IntPolynomial
 
 EXPORT IntPolynomial* alloc_IntPolynomial() {
@@ -905,7 +905,7 @@ EXPORT void delete_TLweSampleFFT_array(int nbelts, TLweSampleFFT* obj) {
     destroy_TLweSampleFFT_array(nbelts,obj);
     free_TLweSampleFFT_array(nbelts,obj);
 }
-#include "multiplication.h" 
+#include "polynomials.h" 
 //allocate memory space for a TorusPolynomial
 
 EXPORT TorusPolynomial* alloc_TorusPolynomial() {

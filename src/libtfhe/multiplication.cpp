@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <cassert>
-#include "multiplication.h"
+#include "polynomials_arithmetic.h"
 
 
 

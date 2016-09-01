@@ -1,7 +1,7 @@
 #ifndef LweSAMPLES_H
 #define LweSAMPLES_H
 
-#include "lwe.h"
+#include "tfhe.h"
 
 struct LweSample {
 	Torus32* a; //-- the n coefs of the mask

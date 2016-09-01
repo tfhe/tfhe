@@ -3,7 +3,7 @@
 
 #include <cassert>
 #include <cmath>
-#include <lwe.h>
+#include <tfhe.h>
 #include <polynomials.h>
 
 class FFT_Processor_Spqlios {

@@ -1,7 +1,7 @@
 #ifndef LweBOOTSTRAPPINGKEY_H
 #define LweBOOTSTRAPPINGKEY_H
 
-#include "lwe.h"
+#include "tfhe.h"
 
 
 struct LweBootstrappingKey{

@@ -5,8 +5,7 @@
 #include <cmath>
 #include <sys/time.h>
 #include <random>
-#include "lwe.h"
-#include "multiplication.h"
+#include "tfhe.h"
 #include "polynomials.h"
 #include "tlwe.h"
 #include "tgsw.h"

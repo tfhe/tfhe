@@ -1,7 +1,7 @@
 #ifndef LweKEY_H
 #define LweKEY_H
 
-#include "lwe.h"
+#include "tfhe.h"
 //#include "lweparams.h"
 
 

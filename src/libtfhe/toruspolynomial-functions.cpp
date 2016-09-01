@@ -3,7 +3,7 @@
 #include <fftw3.h>
 #include <cassert>
 #include <cmath>
-#include "lwe.h"
+#include "tfhe.h"
 #include "polynomials.h"
 
 using namespace std;
