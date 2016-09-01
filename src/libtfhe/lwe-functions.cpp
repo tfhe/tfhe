@@ -174,7 +174,7 @@ int intVecSubTo_avx_test() {
     }
     return tst[0];
 }
-int ooo = intVecSubTo_avx_test();
+//int ooo = intVecSubTo_avx_test();
 
 /** result = result - sample */
 EXPORT void lweSubTo(LweSample* result, const LweSample* sample, const LweParams* params){
