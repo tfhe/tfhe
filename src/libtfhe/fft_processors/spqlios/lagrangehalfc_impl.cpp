@@ -76,10 +76,11 @@ EXPORT void LagrangeHalfCPolynomialSetXaiMinusOne(LagrangeHalfCPolynomial* resul
     const int* reva = result1->proc->reva;
     double* b = result1->coefsC;
     double* c = b+Ns2;
-    for (int i=0; i<Ns2; i++) 
-	b[i]=cosomegaxminus1[(reva[i]*ai)&_2Nm1];
-    for (int i=0; i<Ns2; i++) 
-	c[i]=sinomegaxminus1[(reva[i]*ai)&_2Nm1];
+    for (int i=0; i<Ns2; i++) {
+	int ii = (reva[i]*ai)&_2Nm1;
+	b[i]=cosomegaxminus1[ii];
+	c[i]=sinomegaxminus1[ii];
+    }
 }
 
 EXPORT void LagrangeHalfCPolynomialAddTo(
