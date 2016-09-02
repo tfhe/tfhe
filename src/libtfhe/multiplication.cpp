@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <cassert>
-#include "multiplication.h"
+#include "polynomials_arithmetic.h"
 
 
 
@@ -141,7 +141,7 @@ EXPORT void torusPolynomialMultKaratsuba(TorusPolynomial* result, const IntPolyn
 }
 
 // poly1, poly2 and result are polynomials mod X^N+1
-EXPORT void addMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2){
+EXPORT void torusPolynomialAddMulRKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2){
 	const int N = poly1->N;
 	Torus32* R = new Torus32[2*N-1];
 	char* buf = new char[16*N]; //that's large enough to store every tmp variables (2*2*N*4)
@@ -159,7 +159,7 @@ EXPORT void addMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1
 }
 
 // poly1, poly2 and result are polynomials mod X^N+1
-EXPORT void subMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2){
+EXPORT void torusPolynomialSubMulRKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2){
 	const int N = poly1->N;
 	Torus32* R = new Torus32[2*N-1];
 	char* buf = new char[16*N]; //that's large enough to store every tmp variables (2*2*N*4)

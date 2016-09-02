@@ -1,12 +1,12 @@
-#ifndef TORUSPOLYNOMIAL_FUNCTIONS_H
-#define TORUSPOLYNOMIAL_FUNCTIONS_H
+#ifndef POLYNOMIALS_ARITHMETIC_H
+#define POLYNOMIALS_ARITHMETIC_H
+
+#include "tfhe_core.h"
+#include "polynomials.h"
 
 ///@file
 ///@brief This file contains the operations on polynomials
 
-
-#include "lwe.h"
-#include "polynomials.h"
 
 /**  TorusPolynomial = 0 */
 EXPORT void torusPolynomialClear(TorusPolynomial* result);
@@ -42,6 +42,9 @@ EXPORT void torusPolynomialSubMulZ(TorusPolynomial* result, const TorusPolynomia
 /**  TorusPolynomial -= p*TorusPolynomial */
 EXPORT void torusPolynomialSubMulZTo(TorusPolynomial* result, int p, const TorusPolynomial* poly2);
 
+/**  TorusPolynomial = X^a * TorusPolynomial */
+EXPORT void torusPolynomialMulByXai(TorusPolynomial* result, int a, const TorusPolynomial* bk);
+
 /**  Norme Euclidienne d'un IntPolynomial */
 EXPORT double intPolynomialNormSq2(const IntPolynomial* poly);
 
@@ -52,4 +55,31 @@ EXPORT void torusPolynomialMultKaratsuba(TorusPolynomial* result, const IntPolyn
 EXPORT void torusPolynomialMultNaive(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
 
 
-#endif //TORUSPOLYNOMIAL_FUNCTIONS_H
+
+/**
+ * This is the naive external multiplication of an integer polynomial
+ * with a torus polynomial. (this function should yield exactly the same
+ * result as the karatsuba or fft version, but should be slower) 
+ */
+EXPORT void torusPolynomialMultNaive(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+
+
+
+/**
+ * This function multiplies 2 polynomials (an integer poly and a torus poly)
+ * by using Karatsuba
+ */
+EXPORT void torusPolynomialMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+EXPORT void torusPolynomialAddMulRKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+EXPORT void torusPolynomialSubMulRKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+
+//#define torusPolynomialMulR torusPolynomialMultKaratsuba
+//#define torusPolynomialAddMulR torusPolynomialAddMulRKaratsuba
+//#define torusPolynomialSubMulR torusPolynomialSubMulRKaratsuba
+
+#define torusPolynomialMulR torusPolynomialMultFFT
+#define torusPolynomialAddMulR torusPolynomialAddMulRFFT
+#define torusPolynomialSubMulR torusPolynomialSubMulRFFT
+
+
+#endif //POLYNOMIALS_ARITHMETIC_H

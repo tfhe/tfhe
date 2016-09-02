@@ -1,15 +1,106 @@
 #ifndef POLYNOMIALS_H
 #define POLYNOMIALS_H
 
-#include "lwe.h"
-#include "multiplication.h"
+///@file
+///@brief This file contains the declaration of polynomials structures
+
+#include "tfhe_core.h"
+
+/** This structure represents an integer polynomial modulo X^N+1 */
+struct IntPolynomial {
+   const int N;
+   int* coefs;
+
+#ifdef __cplusplus   
+   IntPolynomial(const int N);
+   ~IntPolynomial();
+   IntPolynomial(const IntPolynomial&) = delete; //forbidden 
+   IntPolynomial* operator=(const IntPolynomial&) = delete; //forbidden
+#endif
+};
 
 
+/** This structure represents an torus polynomial modulo X^N+1 */
+struct TorusPolynomial {
+   const int N;
+   Torus32* coefsT;
+
+#ifdef __cplusplus   
+   TorusPolynomial(const int N);
+   ~TorusPolynomial();
+   TorusPolynomial(const TorusPolynomial&) = delete; //forbidden 
+   TorusPolynomial* operator=(const TorusPolynomial&) = delete; //forbidden
+#endif
+};
+
+
+/** 
+ * This structure is used for FFT operations, and is a representation
+ * over C of a polynomial in R[X]/X^N+1
+ * This type is meant to be specialized, and all implementations of the structure must be compatible 
+ * (reinterpret_cast) with this one. Namely, they should contain at most 2 pointers 
+ */
 struct LagrangeHalfCPolynomial
 {
    void* data;
    void* precomp;
 };
+
+//allocate memory space for a IntPolynomial
+EXPORT IntPolynomial* alloc_IntPolynomial();
+EXPORT IntPolynomial* alloc_IntPolynomial_array(int nbelts);
+
+//free memory space for a IntPolynomial
+EXPORT void free_IntPolynomial(IntPolynomial* ptr);
+EXPORT void free_IntPolynomial_array(int nbelts, IntPolynomial* ptr);
+
+//initialize the IntPolynomial structure
+//(equivalent of the C++ constructor)
+EXPORT void init_IntPolynomial(IntPolynomial* obj, const int N);
+EXPORT void init_IntPolynomial_array(int nbelts, IntPolynomial* obj, const int N);
+
+//destroys the IntPolynomial structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_IntPolynomial(IntPolynomial* obj);
+EXPORT void destroy_IntPolynomial_array(int nbelts, IntPolynomial* obj);
+ 
+//allocates and initialize the IntPolynomial structure
+//(equivalent of the C++ new)
+EXPORT IntPolynomial* new_IntPolynomial(const int N);
+EXPORT IntPolynomial* new_IntPolynomial_array(int nbelts, const int N);
+
+//destroys and frees the IntPolynomial structure
+//(equivalent of the C++ delete)
+EXPORT void delete_IntPolynomial(IntPolynomial* obj);
+EXPORT void delete_IntPolynomial_array(int nbelts, IntPolynomial* obj);
+
+//allocate memory space for a TorusPolynomial
+EXPORT TorusPolynomial* alloc_TorusPolynomial();
+EXPORT TorusPolynomial* alloc_TorusPolynomial_array(int nbelts);
+
+//free memory space for a TorusPolynomial
+EXPORT void free_TorusPolynomial(TorusPolynomial* ptr);
+EXPORT void free_TorusPolynomial_array(int nbelts, TorusPolynomial* ptr);
+
+//initialize the TorusPolynomial structure
+//(equivalent of the C++ constructor)
+EXPORT void init_TorusPolynomial(TorusPolynomial* obj, const int N);
+EXPORT void init_TorusPolynomial_array(int nbelts, TorusPolynomial* obj, const int N);
+
+//destroys the TorusPolynomial structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_TorusPolynomial(TorusPolynomial* obj);
+EXPORT void destroy_TorusPolynomial_array(int nbelts, TorusPolynomial* obj);
+ 
+//allocates and initialize the TorusPolynomial structure
+//(equivalent of the C++ new)
+EXPORT TorusPolynomial* new_TorusPolynomial(const int N);
+EXPORT TorusPolynomial* new_TorusPolynomial_array(int nbelts, const int N);
+
+//destroys and frees the TorusPolynomial structure
+//(equivalent of the C++ delete)
+EXPORT void delete_TorusPolynomial(TorusPolynomial* obj);
+EXPORT void delete_TorusPolynomial_array(int nbelts, TorusPolynomial* obj);
 
 //allocate memory space for a LagrangeHalfCPolynomial
 EXPORT LagrangeHalfCPolynomial* alloc_LagrangeHalfCPolynomial();
@@ -38,54 +129,5 @@ EXPORT LagrangeHalfCPolynomial* new_LagrangeHalfCPolynomial_array(int nbelts, co
 //(equivalent of the C++ delete)
 EXPORT void delete_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* obj);
 EXPORT void delete_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolynomial* obj);
-
-
-/**
- * FFT functions 
- */
-EXPORT void IntPolynomial_ifft(LagrangeHalfCPolynomial* result, const IntPolynomial* p);
-EXPORT void TorusPolynomial_ifft(LagrangeHalfCPolynomial* result, const TorusPolynomial* p);
-EXPORT void TorusPolynomial_fft(TorusPolynomial* result, const LagrangeHalfCPolynomial* p);
-
-//MISC OPERATIONS
-/** sets to zero */
-EXPORT void LagrangeHalfCPolynomial_clear(LagrangeHalfCPolynomial* result);
-
-/** sets to this torus32 constant */
-EXPORT void LagrangeHalfCPolynomial_setTorusConstant(LagrangeHalfCPolynomial* result, const Torus32 mu);
-EXPORT void LagrangeHalfCPolynomial_addTorusConstant(LagrangeHalfCPolynomial* result, const Torus32 cst);
-
-/** sets to X^ai-1 */
-EXPORT void LagrangeHalfCPolynomial_setXaiMinusOne(LagrangeHalfCPolynomial* result, const int ai);
-
-
-/** multiplication via direct FFT */
-EXPORT void multFFT(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
-EXPORT void addMultToFFT(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
-EXPORT void subMultToFFT(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
-
-/** termwise multiplication in Lagrange space */
-EXPORT void LagrangeHalfCPolynomial_mul(
-	LagrangeHalfCPolynomial* result, 
-	const LagrangeHalfCPolynomial* a, 
-	const LagrangeHalfCPolynomial* b);
-
-/** termwise multiplication and addTo in Lagrange space */
-EXPORT void LagrangeHalfCPolynomial_clear(
-	LagrangeHalfCPolynomial* reps);
-
-EXPORT void LagrangeHalfCPolynomial_addto(
-	LagrangeHalfCPolynomial* accum, 
-	const LagrangeHalfCPolynomial* a);
-
-EXPORT void LagrangeHalfCPolynomial_addmul(
-	LagrangeHalfCPolynomial* accum, 
-	const LagrangeHalfCPolynomial* a, 
-	const LagrangeHalfCPolynomial* b);
-
-EXPORT void LagrangeHalfCPolynomial_submul(
-	LagrangeHalfCPolynomial* accum, 
-	const LagrangeHalfCPolynomial* a, 
-	const LagrangeHalfCPolynomial* b);
 
 #endif //POLYNOMIALS_H

@@ -1,68 +1,71 @@
-#ifndef LWE_FUNCTIONS_H
-#define LWE_FUNCTIONS_H
+#ifndef Lwe_FUNCTIONS_H
+#define Lwe_FUNCTIONS_H
 
 ///@file
-///@brief This file contains the operations on LWE samples
+///@brief This file contains the operations on Lwe samples
 
-#include "lwe.h"
+#include "tfhe_core.h"
+#include "lwekey.h"
+#include "lweparams.h"
+#include "lwesamples.h"
 
 /**
- * This function generates a random LWE key for the given parameters.
- * The LWE key for the result must be allocated and initialized
+ * This function generates a random Lwe key for the given parameters.
+ * The Lwe key for the result must be allocated and initialized
  * (this means that the parameters are already in the result)
  */
-EXPORT void lweKeyGen(LWEKey* result);
+EXPORT void lweKeyGen(LweKey* result);
 
 
 /**
  * This function encrypts message by using key, with stdev alpha
- * The LWE sample for the result must be allocated and initialized
+ * The Lwe sample for the result must be allocated and initialized
  * (this means that the parameters are already in the result)
  */
-EXPORT void lweSymEncrypt(LWESample* result, Torus32 message, double alpha, const LWEKey* key);
+EXPORT void lweSymEncrypt(LweSample* result, Torus32 message, double alpha, const LweKey* key);
 
 
 /**
  * This function computes the phase of sample by using key : phi = b - a.s
  */
-EXPORT Torus32 lwePhase(const LWESample* sample, const LWEKey* key);
+EXPORT Torus32 lwePhase(const LweSample* sample, const LweKey* key);
 
 
 /**
  * This function computes the decryption of sample by using key
  * The constant Msize indicates the message space and is used to approximate the phase
  */
-EXPORT Torus32 lweSymDecrypt(const LWESample* sample, const LWEKey* key, const int Msize);
+EXPORT Torus32 lweSymDecrypt(const LweSample* sample, const LweKey* key, const int Msize);
 
 
-//Arithmetic operations on LWE samples
+//Arithmetic operations on Lwe samples
 /** result = (0,0) */
-EXPORT void lweClear(LWESample* result, const LWEParams* params);
+EXPORT void lweClear(LweSample* result, const LweParams* params);
 
 /** result = (0,mu) */
-EXPORT void lweNoiselessTrivial(LWESample* result, Torus32 mu, const LWEParams* params);
+EXPORT void lweNoiselessTrivial(LweSample* result, Torus32 mu, const LweParams* params);
 
 /** result = result + sample */
-EXPORT void lweAddTo(LWESample* result, const LWESample* sample, const LWEParams* params);
+EXPORT void lweAddTo(LweSample* result, const LweSample* sample, const LweParams* params);
 
 /** result = result - sample */
-EXPORT void lweSubTo(LWESample* result, const LWESample* sample, const LWEParams* params);
+EXPORT void lweSubTo(LweSample* result, const LweSample* sample, const LweParams* params);
 
 /** result = result + p.sample */
-EXPORT void lweAddMulTo(LWESample* result, int p, const LWESample* sample, const LWEParams* params);
+EXPORT void lweAddMulTo(LweSample* result, int p, const LweSample* sample, const LweParams* params);
 
 /** result = result - p.sample */
-EXPORT void lweSubMulTo(LWESample* result, int p, const LWESample* sample, const LWEParams* params);
+EXPORT void lweSubMulTo(LweSample* result, int p, const LweSample* sample, const LweParams* params);
 
 /** 
  * creates a Key Switching Key between the two keys
  */
-EXPORT void lweCreateKeySwitchKey(LWEKeySwitchKey* result, const LWEKey* in_key, const LWEKey* out_key);
+EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key);
 
 
 /**
  * applies keySwitching
  */
-EXPORT void lweKeySwitch(LWESample* result, const LWEKeySwitchKey* ks, const LWESample* sample);
+EXPORT void lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, const LweSample* sample);
 
-#endif //LWE_FUNCTIONS_H
+#endif //Lwe_FUNCTIONS_H

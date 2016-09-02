@@ -4,8 +4,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <sys/time.h>
-#include "lwe.h"
-#include "multiplication.h"
+#include "tfhe.h"
 #include "polynomials.h"
 
 #include "lwesamples.h"
@@ -22,10 +21,10 @@ double approxEquals(Torus32 a, Torus32 b) { return abs(a-b)<10; }
 
 int main(int argc, char** argv) {
     
-    LWEParams* params = new_LWEParams(512, 0.2, 0.5); //les deux alpha mis un peu au hasard
+    LweParams* params = new_LweParams(512, 0.2, 0.5); //les deux alpha mis un peu au hasard
     int n = params->n;
-    LWEKey* key = new_LWEKey(params);
-    LWESample* cipher = new_LWESample(params);
+    LweKey* key = new_LweKey(params);
+    LweSample* cipher = new_LweSample(params);
     Torus32 mu = dtot32(0.5);
     //Attention, 1<<30 correspond au message 0.25!! Ila: t'as raison!
     double alpha = 0.0625;
@@ -62,9 +61,9 @@ int main(int argc, char** argv) {
     cout << "There were " << failures << " failures out of " << trials << " trials" << endl;
     cout << "(it might be normal)" << endl;
 
-    delete_LWEParams(params); //les deux alpha mis un peu au hasard
-    delete_LWEKey(key);
-    delete_LWESample(cipher);
+    delete_LweParams(params); //les deux alpha mis un peu au hasard
+    delete_LweKey(key);
+    delete_LweSample(cipher);
 
     return 0;
 }

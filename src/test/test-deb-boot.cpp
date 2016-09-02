@@ -5,14 +5,13 @@
 #include <cmath>
 #include <ccomplex>
 #include <sys/time.h>
-#include "lwe.h"
-#include "multiplication.h"
+#include "tfhe.h"
 #include "polynomials.h"
 #include "lwesamples.h"
 #include "lwekey.h"
 #include "lweparams.h"
-#include "ringlwe.h"
-#include "ringgsw.h"
+#include "tlwe.h"
+#include "tgsw.h"
 #include "lwebootstrappingkey.h"
 
 
@@ -32,31 +31,31 @@ void dieDramatically(string message) {
 }
 
 
-EXPORT void ringLweExtractKey(LWEKey* result, const RingLWEKey* key); //TODO: change the name and put in a .h
-EXPORT void createBootstrappingKeyFFT(
-	LWEBootstrappingKeyFFT* bk, 
-	const LWEKey* key_in, 
-	const RingGSWKey* rgsw_key);
-EXPORT void bootstrapFFT(LWESample* result, const LWEBootstrappingKeyFFT* bk, Torus32 mu1, Torus32 mu0, const LWESample* x);
+EXPORT void tLweExtractKey(LweKey* result, const TLweKey* key); //TODO: change the name and put in a .h
+EXPORT void tfhe_createLweBootstrappingKeyFFT(
+	LweBootstrappingKeyFFT* bk, 
+	const LweKey* key_in, 
+	const TGswKey* rgsw_key);
+EXPORT void tfhe_bootstrapFFT(LweSample* result, const LweBootstrappingKeyFFT* bk, Torus32 mu1, Torus32 mu0, const LweSample* x);
 
 
-EXPORT void ringLweExtractKey(LWEKey* result, const RingLWEKey* key); //TODO: change the name and put in a .h
-EXPORT void createBootstrappingKey(
-    LWEBootstrappingKey* bk, 
-    const LWEKey* key_in, 
-    const RingGSWKey* rgsw_key);
-EXPORT void bootstrap(LWESample* result, const LWEBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LWESample* x);
+EXPORT void tLweExtractKey(LweKey* result, const TLweKey* key); //TODO: change the name and put in a .h
+EXPORT void tfhe_createLweBootstrappingKey(
+    LweBootstrappingKey* bk, 
+    const LweKey* key_in, 
+    const TGswKey* rgsw_key);
+EXPORT void tfhe_bootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LweSample* x);
 
 
 
 
-EXPORT void ringLweToFFTConvert(RingLWESampleFFT* result, const RingLWESample* source, const RingLWEParams* params);
-EXPORT void ringLweFromFFTConvert(RingLWESample* result, const RingLWESampleFFT* source, const RingLWEParams* params);
-EXPORT void ringGswToFFTConvert(RingGSWSampleFFT* result, const RingGSWSample* source, const RingGSWParams* params);
-EXPORT void ringGswFromFFTConvert(RingGSWSample* result, const RingGSWSampleFFT* source, const RingGSWParams* params);
-EXPORT void ringGSWFFTMulByXaiMinusOne(RingGSWSampleFFT* result, const int ai, const RingGSWSampleFFT* bki, const RingGSWParams* params);
-EXPORT void ringGswFFTAddH(RingGSWSampleFFT* result, const RingGSWParams* params);
-EXPORT void ringLweFFTExternMulGSWTo(RingLWESampleFFT* accum, RingGSWSampleFFT* gsw, const RingGSWParams* params);
+EXPORT void tLweToFFTConvert(TLweSampleFFT* result, const TLweSample* source, const TLweParams* params);
+EXPORT void tLweFromFFTConvert(TLweSample* result, const TLweSampleFFT* source, const TLweParams* params);
+EXPORT void tGswToFFTConvert(TGswSampleFFT* result, const TGswSample* source, const TGswParams* params);
+EXPORT void tGswFromFFTConvert(TGswSample* result, const TGswSampleFFT* source, const TGswParams* params);
+EXPORT void tGswFFTMulByXaiMinusOne(TGswSampleFFT* result, const int ai, const TGswSampleFFT* bki, const TGswParams* params);
+EXPORT void tGswFFTAddH(TGswSampleFFT* result, const TGswParams* params);
+EXPORT void tGswFFTExternMulToTLwe(TLweSampleFFT* accum, TGswSampleFFT* gsw, const TGswParams* params);
 
 
 
@@ -76,9 +75,9 @@ EXPORT void ringLweFFTExternMulGSWTo(RingLWESampleFFT* accum, RingGSWSampleFFT* 
 
 
 #ifndef NDEBUG
-extern const RingLWEKey* debug_accum_key;
-extern const LWEKey* debug_extract_key;
-extern const LWEKey* debug_in_key;
+extern const TLweKey* debug_accum_key;
+extern const LweKey* debug_extract_key;
+extern const LweKey* debug_in_key;
 #endif
 
 
@@ -97,22 +96,22 @@ int main(int argc, char** argv) {
     const double alpha_in = 5e-4;
     const double alpha_bk = 1e-8;
     
-    LWEParams* in_params = new_LWEParams(n, alpha_in, 1./16.);
-    RingLWEParams* accum_params = new_RingLWEParams(N, k, alpha_bk, 1./16.);
-    RingGSWParams* bk_params = new_RingGSWParams(l_bk, Bgbit_bk, accum_params);
+    LweParams* in_params = new_LweParams(n, alpha_in, 1./16.);
+    TLweParams* accum_params = new_TLweParams(N, k, alpha_bk, 1./16.);
+    TGswParams* bk_params = new_TGswParams(l_bk, Bgbit_bk, accum_params);
     
-    LWEKey* key = new_LWEKey(in_params);
+    LweKey* key = new_LweKey(in_params);
     lweKeyGen(key);
 
-    RingGSWKey* key_bk = new_RingGSWKey(bk_params);
-    ringGswKeyGen(key_bk);
+    TGswKey* key_bk = new_TGswKey(bk_params);
+    tGswKeyGen(key_bk);
 
-    // bk used for bootstrapFFT, bk1 used for bootstrap
-    LWEBootstrappingKeyFFT* bk = new_LWEBootstrappingKeyFFT(in_params, bk_params);
-    createBootstrappingKeyFFT(bk, key, key_bk);
-    LWEBootstrappingKey* bk1 = new_LWEBootstrappingKey(in_params, bk_params);
+    // bk used for tfhe_bootstrapFFT, bk1 used for tfhe_bootstrap
+    LweBootstrappingKeyFFT* bk = new_LweBootstrappingKeyFFT(in_params, bk_params);
+    tfhe_createLweBootstrappingKeyFFT(bk, key, key_bk);
+    LweBootstrappingKey* bk1 = new_LweBootstrappingKey(in_params, bk_params);
     for (int i=0; i<n; i++) {
-        ringGswFromFFTConvert(&bk1->bk[i], &bk->bk[i], bk_params);
+        tGswFromFFTConvert(&bk1->bk[i], &bk->bk[i], bk_params);
     }
 
     
@@ -139,11 +138,11 @@ int main(int argc, char** argv) {
 
 
 
-    // LWESample* test = new_LWESample(in_params);
-    // LWESample* test_out = new_LWESample(in_params);
-    LWESample* x = new_LWESample(in_params);
-    LWESample* result = new_LWESample(in_params);
-    LWESample* result1 = new_LWESample(in_params);
+    // LweSample* test = new_LweSample(in_params);
+    // LweSample* test_out = new_LweSample(in_params);
+    LweSample* x = new_LweSample(in_params);
+    LweSample* result = new_LweSample(in_params);
+    LweSample* result1 = new_LweSample(in_params);
     
     const Torus32 mu1 = modSwitchToTorus32(1,2);
     const Torus32 mu0 = modSwitchToTorus32(0,2);
@@ -153,9 +152,9 @@ int main(int argc, char** argv) {
 
 
 #ifndef NDEBUG
-    debug_accum_key=&key_bk->ringlwe_key;
-    LWEKey* debug_extract_key2=new_LWEKey(&accum_params->extracted_lweparams);
-    ringLweExtractKey(debug_extract_key2, debug_accum_key);
+    debug_accum_key=&key_bk->tlwe_key;
+    LweKey* debug_extract_key2=new_LweKey(&accum_params->extracted_lweparams);
+    tLweExtractKey(debug_extract_key2, debug_accum_key);
     debug_extract_key=debug_extract_key2;
     debug_in_key=key;
 #endif
@@ -167,7 +166,7 @@ int main(int argc, char** argv) {
 
     const Torus32 ab=(mu1+mu0)/2;
     const Torus32 aa = mu0-ab; // aa=(mu1-mu0)/2;
-    const LWEParams* extract_params = &accum_params->extracted_lweparams;
+    const LweParams* extract_params = &accum_params->extracted_lweparams;
     const int Ns2=N/2;
     const int Nx2= 2*N;
     
@@ -182,20 +181,20 @@ int main(int argc, char** argv) {
        testvect->coefsT[i]=aa;
     for (int i=Ns2;i<N;i++)
        testvect->coefsT[i]=-aa;
-    TorusPolynomialMulByXai(testvectbis, barb, testvect);
+    torusPolynomialMulByXai(testvectbis, barb, testvect);
 
     // Accumulateur 
-    RingLWESample* acc = new_RingLWESample(accum_params);
-    RingLWESample* acc1 = new_RingLWESample(accum_params);
-    RingLWESampleFFT* accFFT = new_RingLWESampleFFT(accum_params);
+    TLweSample* acc = new_TLweSample(accum_params);
+    TLweSample* acc1 = new_TLweSample(accum_params);
+    TLweSampleFFT* accFFT = new_TLweSampleFFT(accum_params);
 
-    // acc and accFFt will be used for bootstrapFFT, acc1=acc will be used for bootstrap
-    ringLweNoiselessTrivial(acc, testvectbis, accum_params);
+    // acc and accFFt will be used for tfhe_bootstrapFFT, acc1=acc will be used for tfhe_bootstrap
+    tLweNoiselessTrivial(acc, testvectbis, accum_params);
     for (int i = 0; i < k+1; ++i)
         for (int j = 0; j < N; ++j)
                 acc1->a[i].coefsT[j] = acc->a[i].coefsT[j];
-    ringLweToFFTConvert(accFFT, acc, accum_params);
-    //ringLweFromFFTConvert(acc, accFFT, accum_params);
+    tLweToFFTConvert(accFFT, acc, accum_params);
+    //tLweFromFFTConvert(acc, accFFT, accum_params);
     //for (int j=0; j<N; j++) {
     //	printf("Before start: Acc index %d: %d vs expected %d\n",j,acc->b->coefsT[j],acc->b->coefsT[j]);
     //}
@@ -203,8 +202,8 @@ int main(int argc, char** argv) {
     //verify multiply by
 
 
-    RingGSWSample* temp = new_RingGSWSample(bk_params);
-    RingGSWSampleFFT* tempFFT = new_RingGSWSampleFFT(bk_params);
+    TGswSample* temp = new_TGswSample(bk_params);
+    TGswSampleFFT* tempFFT = new_TGswSampleFFT(bk_params);
 
 //NICOLAS: j'ai ajouté ce bloc
 #ifndef NDEBUG
@@ -220,25 +219,25 @@ int main(int argc, char** argv) {
         int bara1=modSwitchFromTorus32(-x->a[i],Nx2);
         
         if (bara!=0) {
-            ringGSWFFTMulByXaiMinusOne(tempFFT, bara, bk->bk+i, bk_params);
-            ringGswFFTAddH(tempFFT, bk_params);
-            ringLweFFTExternMulGSWTo(accFFT, tempFFT, bk_params);
-            ringLweFromFFTConvert(acc, accFFT, accum_params);
+            tGswFFTMulByXaiMinusOne(tempFFT, bara, bk->bk+i, bk_params);
+            tGswFFTAddH(tempFFT, bk_params);
+            tGswFFTExternMulToTLwe(accFFT, tempFFT, bk_params);
+            tLweFromFFTConvert(acc, accFFT, accum_params);
         }
 
         if (bara1!=0) {
-            ringGSWMulByXaiMinusOne(temp, bara1, bk1->bk+i, bk_params);
-            ringGSWAddH(temp, bk_params);
-            ringLWEExternMulRGSWTo(acc1, temp, bk_params);
+            tGswMulByXaiMinusOne(temp, bara1, bk1->bk+i, bk_params);
+            tGswAddH(temp, bk_params);
+            tGswExternMulToTLwe(acc1, temp, bk_params);
         }
 
 //NICOLAS: et surtout, j'ai ajouté celui-ci!
 #ifndef NDEBUG
-        //EXPORT void ringLwePhase(TorusPolynomial* phase, const RingLWESample* sample, const RingLWEKey* key);
-        ringLwePhase(phase,acc,debug_accum_key);  //celui-ci, c'est la phase de acc (FFT)
-	ringLwePhase(phase1,acc1,debug_accum_key); //celui-ci, c'est la phase de acc1 (Normal)
+        //EXPORT void tLwePhase(TorusPolynomial* phase, const TLweSample* sample, const TLweKey* key);
+        tLwePhase(phase,acc,debug_accum_key);  //celui-ci, c'est la phase de acc (FFT)
+	tLwePhase(phase1,acc1,debug_accum_key); //celui-ci, c'est la phase de acc1 (Normal)
 	if (debug_in_key->key[i]==1) correctOffset = (correctOffset+bara1)%Nx2; 
-        TorusPolynomialMulByXai(testvectbis, correctOffset, testvect); //celui-ci, c'est la phase idéale (calculée sans bruit avec la clé privée)
+        torusPolynomialMulByXai(testvectbis, correctOffset, testvect); //celui-ci, c'est la phase idéale (calculée sans bruit avec la clé privée)
 	for (int j=0; j<N; j++) {
 	       printf("Iteration %d, index %d: phase %d vs expected %d vs noiseless %d\n",i,j,phase->coefsT[j],phase1->coefsT[j], testvectbis->coefsT[j]);
 	}
@@ -250,17 +249,17 @@ int main(int argc, char** argv) {
                 cout << i << "," << j << " - " << (acc1->a[i].coefsT[j] - acc->a[i].coefsT[j]) << endl;
         }
         */
-        //ringLweToFFTConvert(accFFT, acc, accum_params); 
+        //tLweToFFTConvert(accFFT, acc, accum_params); 
     }
-    ringLweFromFFTConvert(acc, accFFT, accum_params);
+    tLweFromFFTConvert(acc, accFFT, accum_params);
 
 
 
 
-    LWESample* u = new_LWESample(extract_params);
-    LWESample* u1 = new_LWESample(extract_params);
-    sampleExtract(u, acc, extract_params, accum_params);
-    sampleExtract(u1, acc1, extract_params, accum_params);
+    LweSample* u = new_LweSample(extract_params);
+    LweSample* u1 = new_LweSample(extract_params);
+    tLweExtractLweSample(u, acc, extract_params, accum_params);
+    tLweExtractLweSample(u1, acc1, extract_params, accum_params);
     u->b += ab;
     u1->b += ab;
     
@@ -274,33 +273,33 @@ int main(int argc, char** argv) {
     Torus32 mu_out1 = lweSymDecrypt(result1, key, 2);
     cout << "end_variance FFT: " << result->current_variance << endl;
     cout << "end_variance: " << result1->current_variance << endl;
-    if (mu_in != mu_out) cout << "Erreur bootstrapFFT!" << endl;
-    if (mu_in != mu_out1) cout << "Erreur bootstrap!" << endl;
+    if (mu_in != mu_out) cout << "Erreur tfhe_bootstrapFFT!" << endl;
+    if (mu_in != mu_out1) cout << "Erreur tfhe_bootstrap!" << endl;
 
 
 
-    delete_LWESample(u1);
-    delete_LWESample(u);
-    delete_RingGSWSampleFFT(tempFFT); 
-    delete_RingGSWSample(temp);
-    delete_RingLWESampleFFT(accFFT);
-    delete_RingLWESample(acc1);
-    delete_RingLWESample(acc);
+    delete_LweSample(u1);
+    delete_LweSample(u);
+    delete_TGswSampleFFT(tempFFT); 
+    delete_TGswSample(temp);
+    delete_TLweSampleFFT(accFFT);
+    delete_TLweSample(acc1);
+    delete_TLweSample(acc);
     delete_TorusPolynomial(testvectbis);
     delete_TorusPolynomial(testvect);
 
-    // delete_LWESample(test_out);
-    // delete_LWESample(test);
-    delete_LWESample(result1);
-    delete_LWESample(result);
-    delete_LWESample(x);
-    delete_LWEBootstrappingKey(bk1);
-    delete_LWEBootstrappingKeyFFT(bk);
-    delete_RingGSWKey(key_bk);
-    delete_LWEKey(key);
-    delete_RingGSWParams(bk_params);
-    delete_RingLWEParams(accum_params);
-    delete_LWEParams(in_params);
+    // delete_LweSample(test_out);
+    // delete_LweSample(test);
+    delete_LweSample(result1);
+    delete_LweSample(result);
+    delete_LweSample(x);
+    delete_LweBootstrappingKey(bk1);
+    delete_LweBootstrappingKeyFFT(bk);
+    delete_TGswKey(key_bk);
+    delete_LweKey(key);
+    delete_TGswParams(bk_params);
+    delete_TLweParams(accum_params);
+    delete_LweParams(in_params);
 
     return 0;
 }

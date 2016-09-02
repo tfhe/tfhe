@@ -4,12 +4,12 @@
 
 using namespace std;
 
-LWEKey::LWEKey(const LWEParams* params) {
+LweKey::LweKey(const LweParams* params) {
     this->params = params;
     this->key = new int[params->n];
 }
 
-LWEKey::~LWEKey() {
+LweKey::~LweKey() {
     delete[] key;
 }
 

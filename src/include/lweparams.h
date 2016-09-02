@@ -1,11 +1,16 @@
-#ifndef LWEPARAMS_H
-#define LWEPARAMS_H
+#ifndef LwePARAMS_H
+#define LwePARAMS_H
 
-//this structure contains LWE parameters
+///@file
+///@brief This file contains the declaration of lwe parameters structures
+
+#include "tfhe_core.h"
+
+//this structure contains Lwe parameters
 //this structure is constant (cannot be modified once initialized): 
 //the pointer to the param can be passed directly
-//to all the LWE keys that use these params.
-struct LWEParams {
+//to all the Lwe keys that use these params.
+struct LweParams {
 	const int n;
 	const double alpha_min;//le plus petit bruit tq sur
 	const double alpha_max;//le plus gd bruit qui permet le déchiffrement
@@ -15,11 +20,39 @@ struct LWEParams {
 //since all members are declared constant, a constructor is 
 //required in the structure.
 #ifdef __cplusplus
-	LWEParams(int n, double alpha_min, double alpha_max);
-	~LWEParams();
-	LWEParams(const LWEParams&) = delete; //forbidden
-	LWEParams& operator=(const LWEParams& ) = delete; //forbidden
+	LweParams(int n, double alpha_min, double alpha_max);
+	~LweParams();
+	LweParams(const LweParams&) = delete; //forbidden
+	LweParams& operator=(const LweParams& ) = delete; //forbidden
 #endif
 };
 
-#endif //LWEPARAMS_H
+//allocate memory space for a LweParams
+EXPORT LweParams* alloc_LweParams();
+EXPORT LweParams* alloc_LweParams_array(int nbelts);
+
+//free memory space for a LweParams
+EXPORT void free_LweParams(LweParams* ptr);
+EXPORT void free_LweParams_array(int nbelts, LweParams* ptr);
+
+//initialize the LweParams structure
+//(equivalent of the C++ constructor)
+EXPORT void init_LweParams(LweParams* obj, int n, double alpha_min, double alpha_max);
+EXPORT void init_LweParams_array(int nbelts, LweParams* obj, int n, double alpha_min, double alpha_max);
+
+//destroys the LweParams structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_LweParams(LweParams* obj);
+EXPORT void destroy_LweParams_array(int nbelts, LweParams* obj);
+ 
+//allocates and initialize the LweParams structure
+//(equivalent of the C++ new)
+EXPORT LweParams* new_LweParams(int n, double alpha_min, double alpha_max);
+EXPORT LweParams* new_LweParams_array(int nbelts, int n, double alpha_min, double alpha_max);
+
+//destroys and frees the LweParams structure
+//(equivalent of the C++ delete)
+EXPORT void delete_LweParams(LweParams* obj);
+EXPORT void delete_LweParams_array(int nbelts, LweParams* obj);
+
+#endif //LwePARAMS_H

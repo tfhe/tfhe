@@ -4,8 +4,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <sys/time.h>
-#include "lwe.h"
-#include "multiplication.h"
+#include "tfhe.h"
 #include "polynomials.h"
 
 using namespace std;
@@ -59,7 +58,7 @@ int main(int argc, char** argv) {
         cycles_karatsuba[i] = cend - cstart;
         
         cstart = clock();
-        multFFT(resFFT,a,b);
+        torusPolynomialMultFFT(resFFT,a,b);
 	//TorusPolynomial_ifft(test_fft,resNaive);  
 	//TorusPolynomial_fft(resFFT,test_fft);  
         cend = clock();
@@ -99,8 +98,8 @@ int main(int argc, char** argv) {
     cout << "torusPolynomialMultKaratsuba: " << cyc_karatsuba << " clock cycles (average)" << endl;
     cout << "torusPolynomialMultKaratsuba time: " << (cyc_karatsuba/CLOCKS_PER_SEC) << " seconds" << endl;
     cout << endl;
-    cout << "multFFT: " << cyc_fft << " clock cycles (average)" << endl;
-    cout << "multFFT time: " << (cyc_fft/CLOCKS_PER_SEC) << " seconds" << endl;
+    cout << "torusPolynomialMultFFT: " << cyc_fft << " clock cycles (average)" << endl;
+    cout << "torusPolynomialMultFFT time: " << (cyc_fft/CLOCKS_PER_SEC) << " seconds" << endl;
     cout << endl;
 
     delete_IntPolynomial(a);

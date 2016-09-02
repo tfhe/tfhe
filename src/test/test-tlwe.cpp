@@ -5,10 +5,9 @@
 #include <cmath>
 #include <sys/time.h>
 #include <random>
-#include "lwe.h"
-#include "multiplication.h"
+#include "tfhe.h"
 #include "polynomials.h"
-#include "ringlwe.h"
+#include "tlwe.h"
 
 using namespace std;
 
@@ -31,12 +30,12 @@ int main(int argc, char** argv) {
     static uniform_int_distribution<int> distribution(0,Msize-1);
 
     // PARAMETERS
-    RingLWEParams* params = new_RingLWEParams(N, k, alpha_min, alpha_max); //les deux alpha mis un peu au hasard
+    TLweParams* params = new_TLweParams(N, k, alpha_min, alpha_max); //les deux alpha mis un peu au hasard
     // KEY
-    RingLWEKey* key = new_RingLWEKey(params);
+    TLweKey* key = new_TLweKey(params);
     // CIPHERTEXTS
-    RingLWESample* cipher = new_RingLWESample(params);
-    RingLWESample* cipherT = new_RingLWESample(params);
+    TLweSample* cipher = new_TLweSample(params);
+    TLweSample* cipherT = new_TLweSample(params);
 
 
     //the probability that a sample with stdev alpha decrypts wrongly on
@@ -62,10 +61,10 @@ int main(int argc, char** argv) {
     TorusPolynomial* dechif = new_TorusPolynomial(N);
 
     
-    ringLweKeyGen(key); // KEY GENERATION
-    ringLweSymEncrypt(cipher, mu, alpha, key); // ENCRYPTION
-    ringLwePhase(phi, cipher, key); // PHASE COMUPTATION
-    ringLweSymDecrypt(dechif, cipher, key, Msize); // DECRYPTION
+    tLweKeyGen(key); // KEY GENERATION
+    tLweSymEncrypt(cipher, mu, alpha, key); // ENCRYPTION
+    tLwePhase(phi, cipher, key); // PHASE COMUPTATION
+    tLweSymDecrypt(dechif, cipher, key, Msize); // DECRYPTION
 
     cout << "Test LweSymDecrypt :" << endl;
     for (int i = 0; i < N; ++i)
@@ -83,9 +82,9 @@ int main(int argc, char** argv) {
         Torus32 muT = modSwitchToTorus32(distribution(generator), Msize);
         Torus32 dechifT = 0;
 
-        ringLweSymEncryptT(cipherT, muT, alpha, key);
-        ringLwePhase(phiT, cipherT, key);
-        dechifT = ringLweSymDecryptT(cipherT, key, Msize);
+        tLweSymEncryptT(cipherT, muT, alpha, key);
+        tLwePhase(phiT, cipherT, key);
+        dechifT = tLweSymDecryptT(cipherT, key, Msize);
         
         if (dechifT != muT) {
         	cout << "Test LweSymDecryptT: trial " << trial << endl;
@@ -117,12 +116,12 @@ int main(int argc, char** argv) {
     cout << endl;
     cout << endl;
     cout << "-------------------------" << endl;
-    cout << "TEST Operations RingLWE :" << endl;
+    cout << "TEST Operations TLwe :" << endl;
     cout << "-------------------------" << endl;
 
     // CIPHERTEXTS
-    RingLWESample* cipher0 = new_RingLWESample(params);
-    RingLWESample* cipher1 = new_RingLWESample(params);
+    TLweSample* cipher0 = new_TLweSample(params);
+    TLweSample* cipher1 = new_TLweSample(params);
             
     // MESSAGES
     TorusPolynomial* mu0 = new_TorusPolynomial(N);
@@ -152,17 +151,17 @@ int main(int argc, char** argv) {
 
     for (int trial=1; trial<2; trial++) {
 
-        ringLweSymEncrypt(cipher0, mu0, alpha, key); // ENCRYPTION
-        ringLweSymEncrypt(cipher1, mu1, alpha, key); // ENCRYPTION
+        tLweSymEncrypt(cipher0, mu0, alpha, key); // ENCRYPTION
+        tLweSymEncrypt(cipher1, mu1, alpha, key); // ENCRYPTION
 
 
         // cipher = cipher0 + cipher1 
-        ringLweCopy(cipher, cipher0, params);
-        ringLweAddTo(cipher, cipher1, params);
+        tLweCopy(cipher, cipher0, params);
+        tLweAddTo(cipher, cipher1, params);
         torusPolynomialAdd(mu, mu0, mu1); // mu = mu0 + mu1
-        ringLweSymDecrypt(dechif, cipher, key, Msize); // DECRYPTION
+        tLweSymDecrypt(dechif, cipher, key, Msize); // DECRYPTION
         
-        cout << "Test ringLweAddTo Trial : " << trial << endl;
+        cout << "Test tLweAddTo Trial : " << trial << endl;
         for (int i = 0; i < N; ++i)
         {
             decInt = modSwitchFromTorus32(dechif->coefsT[i], Msize);
@@ -176,12 +175,12 @@ int main(int argc, char** argv) {
 
 
         // cipher = cipher0 - cipher1 
-        ringLweCopy(cipher, cipher0, params);
-        ringLweSubTo(cipher, cipher1, params);
+        tLweCopy(cipher, cipher0, params);
+        tLweSubTo(cipher, cipher1, params);
         torusPolynomialSub(mu, mu0, mu1); // mu = mu0 - mu1
-        ringLweSymDecrypt(dechif, cipher, key, Msize); // DECRYPTION
+        tLweSymDecrypt(dechif, cipher, key, Msize); // DECRYPTION
         
-        cout << "Test ringLweSubTo Trial : " << trial << endl;
+        cout << "Test tLweSubTo Trial : " << trial << endl;
         for (int i = 0; i < N; ++i)
         {
             decInt = modSwitchFromTorus32(dechif->coefsT[i], Msize);
@@ -195,12 +194,12 @@ int main(int argc, char** argv) {
 
         
         // cipher = cipher0 + p.cipher1 
-        ringLweCopy(cipher, cipher0, params);
-        ringLweAddMulTo(cipher, p, cipher1, params);
+        tLweCopy(cipher, cipher0, params);
+        tLweAddMulTo(cipher, p, cipher1, params);
         torusPolynomialAddMulZ(mu, mu0, p, mu1); // mu = mu0 + p.mu1
-        ringLweSymDecrypt(dechif, cipher, key, Msize); // DECRYPTION
+        tLweSymDecrypt(dechif, cipher, key, Msize); // DECRYPTION
         
-        cout << "Test ringLweAddMulTo Trial :" << trial << endl;
+        cout << "Test tLweAddMulTo Trial :" << trial << endl;
         for (int i = 0; i < N; ++i)
         {
             decInt = modSwitchFromTorus32(dechif->coefsT[i], Msize);
@@ -215,12 +214,12 @@ int main(int argc, char** argv) {
 
 
         // cipher = cipher0 - p.cipher1 
-        ringLweCopy(cipher, cipher0, params);
-        ringLweSubMulTo(cipher, p, cipher1, params);
+        tLweCopy(cipher, cipher0, params);
+        tLweSubMulTo(cipher, p, cipher1, params);
         torusPolynomialSubMulZ(mu, mu0, p, mu1); // mu = mu0 - p.mu1
-        ringLweSymDecrypt(dechif, cipher, key, Msize); // DECRYPTION
+        tLweSymDecrypt(dechif, cipher, key, Msize); // DECRYPTION
         
-        cout << "Test ringLweSubMulTo Trial :" << trial << endl;
+        cout << "Test tLweSubMulTo Trial :" << trial << endl;
         for (int i = 0; i < N; ++i)
         {
             decInt = modSwitchFromTorus32(dechif->coefsT[i], Msize);
@@ -234,15 +233,15 @@ int main(int argc, char** argv) {
 
         /*
         // result = result + poly.sample 
-        ringLweCopy(cipher, cipher0, params);
-        ringLweAddMulRTo(cipher, poly, cipher1, params);
+        tLweCopy(cipher, cipher0, params);
+        tLweAddMulRTo(cipher, poly, cipher1, params);
         // mu = mu0 + poly.mu1
         torusPolynomialCopy(mu, mu0);
-        addMultKaratsuba(mu, poly, mu1);
+        torusPolynomialAddMulRKaratsuba(mu, poly, mu1);
 
-        ringLweSymDecrypt(dechif, cipher, key, Msize); // DECRYPTION
+        tLweSymDecrypt(dechif, cipher, key, Msize); // DECRYPTION
         
-        cout << "Test ringLweAddMulRTo Trial:" << trial << endl;
+        cout << "Test tLweAddMulRTo Trial:" << trial << endl;
         for (int i = 0; i < N; ++i)
         {
             decInt = modSwitchFromTorus32(dechif->coefsT[i], Msize);
@@ -257,8 +256,8 @@ int main(int argc, char** argv) {
 
     
 
-    delete_RingLWESample(cipher0);
-    delete_RingLWESample(cipher1);
+    delete_TLweSample(cipher0);
+    delete_TLweSample(cipher1);
     delete_TorusPolynomial(mu0);
     delete_TorusPolynomial(mu1);
     delete_IntPolynomial(poly);
@@ -278,12 +277,12 @@ int main(int argc, char** argv) {
     cout << endl;
     cout << endl;
     cout << "-----------------------------------------------" << endl;
-    cout << "TEST Operations RingLWE with Torus32 messages :" << endl;
+    cout << "TEST Operations TLwe with Torus32 messages :" << endl;
     cout << "-----------------------------------------------" << endl;
 
     // CIPHERTEXTS
-    RingLWESample* cipherT0 = new_RingLWESample(params);
-    RingLWESample* cipherT1 = new_RingLWESample(params);
+    TLweSample* cipherT0 = new_TLweSample(params);
+    TLweSample* cipherT1 = new_TLweSample(params);
             
     
     int pT = 1;
@@ -297,22 +296,22 @@ int main(int argc, char** argv) {
         Torus32 muT = 0;    
         Torus32 dechifT = 0;
 
-        ringLweSymEncryptT(cipherT0, muT0, alpha, key); // ENCRYPTION
-        ringLweSymEncryptT(cipherT1, muT1, alpha, key); // ENCRYPTION
+        tLweSymEncryptT(cipherT0, muT0, alpha, key); // ENCRYPTION
+        tLweSymEncryptT(cipherT1, muT1, alpha, key); // ENCRYPTION
 
 
 
         
         // cipher = cipher0 + cipher1 
-        ringLweCopy(cipherT, cipherT0, params);
-        ringLweAddTo(cipherT, cipherT1, params);
+        tLweCopy(cipherT, cipherT0, params);
+        tLweAddTo(cipherT, cipherT1, params);
         muT = muT0 + muT1;
-        dechifT = ringLweSymDecryptT(cipherT, key, Msize); // DECRYPTION
+        dechifT = tLweSymDecryptT(cipherT, key, Msize); // DECRYPTION
 
         decInt = modSwitchFromTorus32(dechifT, Msize);
         muInt = modSwitchFromTorus32(muT, Msize);
         if (decInt != muInt) {
-            cout << "Test ringLweAddTo Trial : " << trial << endl;
+            cout << "Test tLweAddTo Trial : " << trial << endl;
             cout << decInt << " =? " << muInt << " Error!!!" << endl; 
             cout << cipherT->current_variance << endl;
             cout << "----------------------" << endl;
@@ -321,15 +320,15 @@ int main(int argc, char** argv) {
 
         
         // cipher = cipher0 - cipher1 
-        ringLweCopy(cipherT, cipherT0, params);
-        ringLweSubTo(cipherT, cipherT1, params);
+        tLweCopy(cipherT, cipherT0, params);
+        tLweSubTo(cipherT, cipherT1, params);
         muT = muT0 - muT1;
-        dechifT = ringLweSymDecryptT(cipherT, key, Msize); // DECRYPTION
+        dechifT = tLweSymDecryptT(cipherT, key, Msize); // DECRYPTION
         
         decInt = modSwitchFromTorus32(dechifT, Msize);
         muInt = modSwitchFromTorus32(muT, Msize);
         if (decInt != muInt) {
-            cout << "Test ringLweSubTo Trial : " << trial << endl;
+            cout << "Test tLweSubTo Trial : " << trial << endl;
             cout << decInt << " =? " << muInt << " Error!!!" << endl; 
             cout << cipherT->current_variance << endl;
             cout << "----------------------" << endl;
@@ -339,15 +338,15 @@ int main(int argc, char** argv) {
 
 
         // cipher = cipher0 + p.cipher1 
-        ringLweCopy(cipherT, cipherT0, params);
-        ringLweAddMulTo(cipherT, pT, cipherT1, params);
+        tLweCopy(cipherT, cipherT0, params);
+        tLweAddMulTo(cipherT, pT, cipherT1, params);
         muT = muT0 + pT*muT1;
-        dechifT = ringLweSymDecryptT(cipherT, key, Msize); // DECRYPTION
+        dechifT = tLweSymDecryptT(cipherT, key, Msize); // DECRYPTION
         
         decInt = modSwitchFromTorus32(dechifT, Msize);
         muInt = modSwitchFromTorus32(muT, Msize);
         if (decInt != muInt) {
-            cout << "Test ringLweAddMulTo Trial : " << trial << endl;
+            cout << "Test tLweAddMulTo Trial : " << trial << endl;
             cout << decInt << " =? " << muInt << " Error!!!" << endl; 
             cout << cipherT->current_variance << endl;
             cout << "----------------------" << endl;
@@ -357,15 +356,15 @@ int main(int argc, char** argv) {
 
 
         // result = result - p.sample 
-        ringLweCopy(cipherT, cipherT0, params);
-        ringLweSubMulTo(cipherT, pT, cipherT1, params);
+        tLweCopy(cipherT, cipherT0, params);
+        tLweSubMulTo(cipherT, pT, cipherT1, params);
         muT = muT0 - pT*muT1;
-        dechifT = ringLweSymDecryptT(cipherT, key, Msize); // DECRYPTION
+        dechifT = tLweSymDecryptT(cipherT, key, Msize); // DECRYPTION
         
         decInt = modSwitchFromTorus32(dechifT, Msize);
         muInt = modSwitchFromTorus32(muT, Msize);
         if (decInt != muInt) {
-            cout << "Test ringLweSubMulTo Trial : " << trial << endl;
+            cout << "Test tLweSubMulTo Trial : " << trial << endl;
             cout << decInt << " =? " << muInt << " Error!!!" << endl; 
             cout << cipherT->current_variance << endl;
             cout << "----------------------" << endl;
@@ -374,8 +373,8 @@ int main(int argc, char** argv) {
 
     
 
-    delete_RingLWESample(cipherT0);
-    delete_RingLWESample(cipherT1);
+    delete_TLweSample(cipherT0);
+    delete_TLweSample(cipherT1);
 
 
 
@@ -391,9 +390,9 @@ int main(int argc, char** argv) {
 
 
 
-    delete_RingLWEKey(key);
-    delete_RingLWESample(cipher);
-    delete_RingLWESample(cipherT);
+    delete_TLweKey(key);
+    delete_TLweSample(cipher);
+    delete_TLweSample(cipherT);
 
     delete_TorusPolynomial(mu);
     delete_TorusPolynomial(phi);
@@ -401,7 +400,7 @@ int main(int argc, char** argv) {
     delete_TorusPolynomial(dechif);
 
     //ATTENTION, le params est utilisé dans divers destructeurs, il faut l'effacer en dernier 
-    delete_RingLWEParams(params); 
+    delete_TLweParams(params); 
     
     return 0;
 }
