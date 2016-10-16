@@ -21,6 +21,7 @@ set(SRCS
     tlwe.cpp
     tlwefftoperations.cpp
     toruspolynomial-functions.cpp
+    boot-gates.cpp
     )
 
 set(HEADERS

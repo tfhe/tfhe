@@ -22,11 +22,11 @@ EXPORT void tGswExtractKey(SemiTGswSample* result, const TGswKey* key);
 EXPORT void tGswExtractSample(TLweSample* result, const TGswSample* x);
 
 //Lwe to Lwe Single gate bootstrapping
-//TODO: Malika
 EXPORT void lweToLweBootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LweSample* x);
 
 
 //these functions call the bootstrapping, assuming that the message space is {0,1/4} 
+// TODO syncronize names with new files
 EXPORT void lweNand(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b);
 EXPORT void lweOr(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b);
 EXPORT void lweAnd(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b);
