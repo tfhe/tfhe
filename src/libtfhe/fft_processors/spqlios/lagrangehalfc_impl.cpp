@@ -45,20 +45,72 @@ EXPORT void LagrangeHalfCPolynomialClear(
 	LagrangeHalfCPolynomial* reps) {
     LagrangeHalfCPolynomial_IMPL* reps1 = (LagrangeHalfCPolynomial_IMPL*) reps;
     const int N = reps1->proc->N;
+#ifndef __AVX2__
     for (int i=0; i<N; i++) 
 	reps1->coefsC[i] = 0;
+#else
+    {
+	double* sit = reps1->coefsC;
+	double* send = reps1->coefsC+N;
+	__asm__ __volatile__ (
+		"vpxor %%ymm0,%%ymm0,%%ymm0\n"
+		"0:\n"
+		"vmovupd %%ymm0,(%0)\n"
+		"addq $32,%0\n"
+		"cmpq %1,%0\n"
+		"jb 0b\n"
+		: "=r"(sit),"=r"(send)
+		:  "0"(sit), "1"(send)
+		: "%ymm0", "memory"
+		);
+    }
+#endif
 }
 
+#ifndef __AVX__
 EXPORT void LagrangeHalfCPolynomialSetTorusConstant(LagrangeHalfCPolynomial* result, const Torus32 mu) {
     LagrangeHalfCPolynomial_IMPL* result1 = (LagrangeHalfCPolynomial_IMPL*) result;
     const int Ns2 = result1->proc->Ns2;
     double* b = result1->coefsC;
     double* c = b+Ns2;
     const double muc = mu; //we do not rescale
+
     for (int j=0; j<Ns2; j++) b[j]=muc;
     for (int j=0; j<Ns2; j++) c[j]=0;
-}
 
+ 
+}
+#else
+EXPORT void LagrangeHalfCPolynomialSetTorusConstant(LagrangeHalfCPolynomial* result, const Torus32 mu) {
+    LagrangeHalfCPolynomial_IMPL* result1 = (LagrangeHalfCPolynomial_IMPL*) result;
+    const int Ns2 = result1->proc->Ns2;
+    double* b = result1->coefsC;
+    double* c = b+Ns2;
+    double* d = c+Ns2;
+
+    __asm__ __volatile__ (
+	    "VCVTSI2SD %%esi,%%xmm0,%%xmm0\n" 
+	    "vbroadcastsd %%xmm0,%%ymm0\n" // (mu,mu,mu,mu)
+	    "0:\n"
+	    "vmovupd %%ymm0,(%0)\n"
+	    "addq $32,%0\n"
+	    "cmpq %1,%0\n"
+	    "jb 0b\n"
+	    "vpxor %%ymm0,%%ymm0,%%ymm0\n" // (0,0,0,0)
+	    "1:\n"
+	    "vmovupd %%ymm0,(%1)\n"
+	    "addq $32,%1\n"
+	    "cmpq %2,%1\n"
+	    "jb 1b\n"
+	    : "=r"(b),"=r"(c),"=r"(d)
+	    :  "0"(b), "1"(c), "2"(d),"S"(mu)
+	    : "%ymm0", "memory"
+	    );
+ 
+}
+#endif
+
+#ifndef __AVX__
 EXPORT void LagrangeHalfCPolynomialAddTorusConstant(LagrangeHalfCPolynomial* result, const Torus32 mu) {
     LagrangeHalfCPolynomial_IMPL* result1 = (LagrangeHalfCPolynomial_IMPL*) result;
     const int Ns2 = result1->proc->Ns2;
@@ -66,6 +118,31 @@ EXPORT void LagrangeHalfCPolynomialAddTorusConstant(LagrangeHalfCPolynomial* res
     const double muc = mu; //we do not rescale
     for (int j=0; j<Ns2; j++) b[j]+=muc;
 }
+#else
+EXPORT void LagrangeHalfCPolynomialAddTorusConstant(LagrangeHalfCPolynomial* result, const Torus32 mu) {
+    LagrangeHalfCPolynomial_IMPL* result1 = (LagrangeHalfCPolynomial_IMPL*) result;
+    const int Ns2 = result1->proc->Ns2;
+    double* b = result1->coefsC;
+    double* c = b+Ns2;
+
+    __asm__ __volatile__ (
+	    "VCVTSI2SD %%esi,%%xmm0,%%xmm0\n" 
+	    "vbroadcastsd %%xmm0,%%ymm0\n" // (mu,mu,mu,mu)
+	    "0:\n"
+	    "vmovupd (%0),%%ymm1\n"
+	    "vaddpd %%ymm0,%%ymm1,%%ymm1\n"
+	    "vmovupd %%ymm1,(%0)\n"
+	    "addq $32,%0\n"
+	    "cmpq %1,%0\n"
+	    "jb 0b\n"
+	    "vzeroall\n"
+	    : "=r"(b),"=r"(c)
+	    :  "0"(b), "1"(c),"S"(mu)
+	    : "%ymm0","%ymm1","memory"
+	    );
+ 
+}
+#endif
 
 EXPORT void LagrangeHalfCPolynomialSetXaiMinusOne(LagrangeHalfCPolynomial* result, const int ai) {
     LagrangeHalfCPolynomial_IMPL* result1 = (LagrangeHalfCPolynomial_IMPL*) result;
