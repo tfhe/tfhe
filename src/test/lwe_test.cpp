@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include "../include/lwe-functions.h"
-#include "../include/numeric_functions.h"
+#include <lwe-functions.h>
+#include <numeric_functions.h>
 
 using namespace std;
 
