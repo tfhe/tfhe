@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "../include/polynomials_arithmetic.h"
+#include "../include/numeric_functions.h"
 
 using namespace std;
 
@@ -13,6 +14,7 @@ namespace {
 	    }
 
 	    const set<int> dimensions = {500,750,1024,2000};
+	    const set<int> powers_of_two_dimensions = {512,1024,2048};
     };
 
     //  TorusPolynomial = random 
@@ -171,65 +173,336 @@ namespace {
 	}
     }
 
+    //  TorusPolynomial + p*TorusPolynomial 
+    //EXPORT void torusPolynomialAddMulZ(TorusPolynomial* result, const TorusPolynomial* poly1, int p, const TorusPolynomial* poly2);
+    TEST_F(PolynomialTest, torusPolynomialAddMulZ) {
+	static const int p = uniformTorus32_distrib(generator);
+        for (int N: dimensions)	{
+	    TorusPolynomial* pols = new_TorusPolynomial_array(5,N);
+	    TorusPolynomial* pola = pols+0;
+	    TorusPolynomial* polacopy = pols+1;
+	    TorusPolynomial* polb = pols+2;
+	    TorusPolynomial* polbcopy = pols+3;
+	    TorusPolynomial* polc = pols+4;
+	    torusPolynomialUniform(pola);
+	    torusPolynomialUniform(polb);
+	    torusPolynomialCopy(polacopy, pola);
+	    torusPolynomialCopy(polbcopy, polb);
+	    torusPolynomialAddMulZ(polc,pola,p,polb);
+	    //check equality
+	    for (int j=0; j<N; j++) {
+		ASSERT_EQ(polacopy->coefsT[j],pola->coefsT[j]);
+		ASSERT_EQ(polbcopy->coefsT[j],polb->coefsT[j]);
+		ASSERT_EQ(polc->coefsT[j],pola->coefsT[j]+p*polb->coefsT[j]);
+	    }
+	    delete_TorusPolynomial_array(5,pols);
+	}
+    }
+
+    //  TorusPolynomial += p*TorusPolynomial 
+    //EXPORT void torusPolynomialAddMulZTo(TorusPolynomial* result, const int p, const TorusPolynomial* poly2);
+    TEST_F(PolynomialTest, torusPolynomialAddMulZTo) {
+	static const int p = uniformTorus32_distrib(generator);
+        for (int N: dimensions)	{
+	    TorusPolynomial* pols = new_TorusPolynomial_array(4,N);
+	    TorusPolynomial* pola = pols+0;
+	    TorusPolynomial* polacopy = pols+1;
+	    TorusPolynomial* polb = pols+2;
+	    TorusPolynomial* polbcopy = pols+3;
+	    torusPolynomialUniform(pola);
+	    torusPolynomialUniform(polb);
+	    torusPolynomialCopy(polacopy, pola);
+	    torusPolynomialCopy(polbcopy, polb);
+	    torusPolynomialAddMulZTo(pola,p,polb);
+	    //check equality
+	    for (int j=0; j<N; j++) {
+		ASSERT_EQ(polbcopy->coefsT[j],polb->coefsT[j]);
+		ASSERT_EQ(pola->coefsT[j],polacopy->coefsT[j]+p*polbcopy->coefsT[j]);
+	    }
+	    delete_TorusPolynomial_array(4,pols);
+	}
+    }
+
+    //  TorusPolynomial - p*TorusPolynomial 
+    //EXPORT void torusPolynomialSubMulZ(TorusPolynomial* result, const TorusPolynomial* poly1, int p, const TorusPolynomial* poly2);
+    TEST_F(PolynomialTest, torusPolynomialSubMulZ) {
+	static const int p = uniformTorus32_distrib(generator);
+        for (int N: dimensions)	{
+	    TorusPolynomial* pols = new_TorusPolynomial_array(5,N);
+	    TorusPolynomial* pola = pols+0;
+	    TorusPolynomial* polacopy = pols+1;
+	    TorusPolynomial* polb = pols+2;
+	    TorusPolynomial* polbcopy = pols+3;
+	    TorusPolynomial* polc = pols+4;
+	    torusPolynomialUniform(pola);
+	    torusPolynomialUniform(polb);
+	    torusPolynomialCopy(polacopy, pola);
+	    torusPolynomialCopy(polbcopy, polb);
+	    torusPolynomialSubMulZ(polc,pola,p,polb);
+	    //check equality
+	    for (int j=0; j<N; j++) {
+		ASSERT_EQ(polacopy->coefsT[j],pola->coefsT[j]);
+		ASSERT_EQ(polbcopy->coefsT[j],polb->coefsT[j]);
+		ASSERT_EQ(polc->coefsT[j],pola->coefsT[j]-p*polb->coefsT[j]);
+	    }
+	    delete_TorusPolynomial_array(5,pols);
+	}
+    }
+
+    //  TorusPolynomial -= p*TorusPolynomial 
+    //EXPORT void torusPolynomialSubMulZTo(TorusPolynomial* result, const int p, const TorusPolynomial* poly2);
+    TEST_F(PolynomialTest, torusPolynomialSubMulZTo) {
+	static const int p = uniformTorus32_distrib(generator);
+        for (int N: dimensions)	{
+	    TorusPolynomial* pols = new_TorusPolynomial_array(4,N);
+	    TorusPolynomial* pola = pols+0;
+	    TorusPolynomial* polacopy = pols+1;
+	    TorusPolynomial* polb = pols+2;
+	    TorusPolynomial* polbcopy = pols+3;
+	    torusPolynomialUniform(pola);
+	    torusPolynomialUniform(polb);
+	    torusPolynomialCopy(polacopy, pola);
+	    torusPolynomialCopy(polbcopy, polb);
+	    torusPolynomialSubMulZTo(pola,p,polb);
+	    //check equality
+	    for (int j=0; j<N; j++) {
+		ASSERT_EQ(polbcopy->coefsT[j],polb->coefsT[j]);
+		ASSERT_EQ(pola->coefsT[j],polacopy->coefsT[j]-p*polbcopy->coefsT[j]);
+	    }
+	    delete_TorusPolynomial_array(4,pols);
+	}
+    }
+
+    int anticyclic_get(int* tab, int a, int N) {
+	int agood = ((a % (2*N)) + (2*N)) % (2*N);
+	if (agood<N) 
+	    return tab[agood];
+	else
+	    return -tab[agood-N];
+    }
+
+    void random_small_ints(int* tab, int bound, int N) {
+	for (int j=0; j<N; j++) {
+	    tab[j] = (uniformTorus32_distrib(generator)%bound);
+	}
+    }
+
+    void int_tab_copy(int* dest, const int* tab, int N) {
+	for (int j=0; j<N; j++) {
+	    dest[j]=tab[j];
+	}
+    }
+
+    //  TorusPolynomial = X^a * TorusPolynomial 
+    //EXPORT void torusPolynomialMulByXai(TorusPolynomial* result, int a, const TorusPolynomial* bk)
+    TEST_F(PolynomialTest, torusPolynomialMulByXai) {
+	static const int NB_TRIALS = 50;
+	for (int N: dimensions)	{
+	    for (int trial=0; trial<NB_TRIALS; trial++) {
+		static const int a = (uniformTorus32_distrib(generator)%1000000)-500000;
+		static const int ai = ((a % (2*N)) + (2*N)) % (2*N);
+		TorusPolynomial* pols = new_TorusPolynomial_array(3,N);
+		TorusPolynomial* pola = pols+0;
+		TorusPolynomial* polacopy = pols+1;
+		TorusPolynomial* polb = pols+2;
+		torusPolynomialUniform(pola);
+		torusPolynomialUniform(polb);
+		torusPolynomialCopy(polacopy, pola);
+		torusPolynomialMulByXai(polb,ai,pola);
+		//check equality
+		for (int j=0; j<N; j++) {
+		    ASSERT_EQ(polacopy->coefsT[j],pola->coefsT[j]);
+		    ASSERT_EQ(polb->coefsT[j],anticyclic_get(polacopy->coefsT,j-ai,N));
+		}
+		delete_TorusPolynomial_array(3,pols);
+	    }
+	}
+    }
+
+    //  Norme Euclidienne d'un IntPolynomial 
+    //EXPORT double intPolynomialNormSq2(const IntPolynomial* poly);
+    TEST_F(PolynomialTest, intPolynomialNormSq2) {
+	static const int NB_TRIALS = 50;
+	for (int N: dimensions)	{
+	    IntPolynomial* pols = new_IntPolynomial_array(2,N);
+	    IntPolynomial* a = pols+0;
+	    IntPolynomial* acopy = pols+1;
+	    for (int trial=0; trial<NB_TRIALS; trial++) {
+		double norm2=0;
+		for (int j=0; j<N; j++) {
+		    int r = (uniformTorus32_distrib(generator)%1000)-500;
+		    a->coefs[j]=r;
+		    acopy->coefs[j]=r;
+		    norm2 += r*r;
+		}
+		double value = intPolynomialNormSq2(a);
+		ASSERT_EQ(norm2, value);
+		for (int j=0; j<N; j++) {
+		    ASSERT_EQ(a->coefs[j], acopy->coefs[j]);
+		}
+	    }
+	    delete_IntPolynomial_array(2,pols);
+	}
+    }
+
+    // This is the naive external multiplication of an integer polynomial
+    // with a torus polynomial. (this function should yield exactly the same
+    // result as the karatsuba or fft version, but should be slower) 
+    //EXPORT void torusPolynomialMultNaive(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+    TEST_F(PolynomialTest, torusPolynomialMultNaive) {
+	static const int NB_TRIALS = 5;
+	for (int N: dimensions)	{
+	    IntPolynomial* ipols = new_IntPolynomial_array(2,N);
+	    TorusPolynomial* tpols = new_TorusPolynomial_array(3,N);
+	    IntPolynomial* a = ipols+0;
+	    IntPolynomial* acopy = ipols+1;
+	    TorusPolynomial* b = tpols+0;
+	    TorusPolynomial* bcopy = tpols+1;
+	    TorusPolynomial* c = tpols+2;
+	    for (int trial=0; trial<NB_TRIALS; trial++) {
+		torusPolynomialUniform(b);
+		torusPolynomialUniform(c);
+		torusPolynomialCopy(bcopy,b);
+		random_small_ints(a->coefs,100000,N);
+		int_tab_copy(acopy->coefs,a->coefs,N);
+		torusPolynomialMultNaive(c,a,b);
+		for (int j=0; j<N; j++) {
+		    ASSERT_EQ(acopy->coefs[j],a->coefs[j]);
+		    ASSERT_EQ(bcopy->coefsT[j],b->coefsT[j]);
+		    Torus32 r = 0;
+		    for (int k=0; k<N; k++) {
+			r += bcopy->coefsT[k] * anticyclic_get(acopy->coefs,j-k,N);
+		    }
+		    ASSERT_EQ(r, c->coefsT[j]);
+		}
+	    }
+	    delete_IntPolynomial_array(2,ipols);
+	    delete_TorusPolynomial_array(3,tpols);
+	}
+    }
+
+    // This is the karatsuba external multiplication of an integer polynomial
+    // with a torus polynomial. 
+    // WARNING: for karatsuba, N must be a power of 2
+    //EXPORT void torusPolynomialMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+    TEST_F(PolynomialTest, torusPolynomialMultKaratsuba) {
+	static const int NB_TRIALS = 5;
+	for (int N: powers_of_two_dimensions)	{
+	    IntPolynomial* ipols = new_IntPolynomial_array(2,N);
+	    TorusPolynomial* tpols = new_TorusPolynomial_array(3,N);
+	    IntPolynomial* a = ipols+0;
+	    IntPolynomial* acopy = ipols+1;
+	    TorusPolynomial* b = tpols+0;
+	    TorusPolynomial* bcopy = tpols+1;
+	    TorusPolynomial* c = tpols+2;
+	    for (int trial=0; trial<NB_TRIALS; trial++) {
+		torusPolynomialUniform(b);
+		torusPolynomialUniform(c);
+		torusPolynomialCopy(bcopy,b);
+		random_small_ints(a->coefs,100000,N);
+		int_tab_copy(acopy->coefs,a->coefs,N);
+		torusPolynomialMultKaratsuba(c,a,b);
+		for (int j=0; j<N; j++) {
+		    ASSERT_EQ(acopy->coefs[j],a->coefs[j]);
+		    ASSERT_EQ(bcopy->coefsT[j],b->coefsT[j]);
+		    Torus32 r = 0;
+		    for (int k=0; k<N; k++) {
+			r += bcopy->coefsT[k] * anticyclic_get(acopy->coefs,j-k,N);
+		    }
+		    ASSERT_EQ(r, c->coefsT[j]);
+		}
+	    }
+	    delete_IntPolynomial_array(2,ipols);
+	    delete_TorusPolynomial_array(3,tpols);
+	}
+    }
+
+    // result += poly1 * poly2 (via karatsuba)
+    // WARNING: N must be a power of 2 to use this function. Else, the
+    // behaviour is unpredictable
+    //EXPORT void torusPolynomialAddMulRKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+    TEST_F(PolynomialTest, torusPolynomialAddMulRKaratsuba) {
+	static const int NB_TRIALS = 5;
+	for (int N: powers_of_two_dimensions)	{
+	    IntPolynomial* ipols = new_IntPolynomial_array(2,N);
+	    TorusPolynomial* tpols = new_TorusPolynomial_array(4,N);
+	    IntPolynomial* a = ipols+0;
+	    IntPolynomial* acopy = ipols+1;
+	    TorusPolynomial* b = tpols+0;
+	    TorusPolynomial* bcopy = tpols+1;
+	    TorusPolynomial* c = tpols+2;
+	    TorusPolynomial* ccopy = tpols+3;
+	    for (int trial=0; trial<NB_TRIALS; trial++) {
+		torusPolynomialUniform(b);
+		torusPolynomialUniform(c);
+		torusPolynomialCopy(bcopy,b);
+		torusPolynomialCopy(ccopy,c);
+		random_small_ints(a->coefs,100000,N);
+		int_tab_copy(acopy->coefs,a->coefs,N);
+		torusPolynomialAddMulRKaratsuba(c,a,b);
+		for (int j=0; j<N; j++) {
+		    ASSERT_EQ(acopy->coefs[j],a->coefs[j]);
+		    ASSERT_EQ(bcopy->coefsT[j],b->coefsT[j]);
+		    Torus32 r = ccopy->coefsT[j];
+		    for (int k=0; k<N; k++) {
+			r += bcopy->coefsT[k] * anticyclic_get(acopy->coefs,j-k,N);
+		    }
+		    ASSERT_EQ(r, c->coefsT[j]);
+		}
+	    }
+	    delete_IntPolynomial_array(2,ipols);
+	    delete_TorusPolynomial_array(4,tpols);
+	}
+    }
+
+    // result -= poly1 * poly2 (via karatsuba)
+    // WARNING: N must be a power of 2 to use this function. Else, the
+    // behaviour is unpredictable
+    //EXPORT void torusPolynomialAddMulRKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+    TEST_F(PolynomialTest, torusPolynomialSubMulRKaratsuba) {
+	static const int NB_TRIALS = 5;
+	for (int N: powers_of_two_dimensions)	{
+	    IntPolynomial* ipols = new_IntPolynomial_array(2,N);
+	    TorusPolynomial* tpols = new_TorusPolynomial_array(4,N);
+	    IntPolynomial* a = ipols+0;
+	    IntPolynomial* acopy = ipols+1;
+	    TorusPolynomial* b = tpols+0;
+	    TorusPolynomial* bcopy = tpols+1;
+	    TorusPolynomial* c = tpols+2;
+	    TorusPolynomial* ccopy = tpols+3;
+	    for (int trial=0; trial<NB_TRIALS; trial++) {
+		torusPolynomialUniform(b);
+		torusPolynomialUniform(c);
+		torusPolynomialCopy(bcopy,b);
+		torusPolynomialCopy(ccopy,c);
+		random_small_ints(a->coefs,100000,N);
+		int_tab_copy(acopy->coefs,a->coefs,N);
+		torusPolynomialSubMulRKaratsuba(c,a,b);
+		for (int j=0; j<N; j++) {
+		    ASSERT_EQ(acopy->coefs[j],a->coefs[j]);
+		    ASSERT_EQ(bcopy->coefsT[j],b->coefsT[j]);
+		    Torus32 r = ccopy->coefsT[j];
+		    for (int k=0; k<N; k++) {
+			r -= bcopy->coefsT[k] * anticyclic_get(acopy->coefs,j-k,N);
+		    }
+		    ASSERT_EQ(r, c->coefsT[j]);
+		}
+	    }
+	    delete_IntPolynomial_array(2,ipols);
+	    delete_TorusPolynomial_array(4,tpols);
+	}
+    }
+
 
 
 
 #if 0
 
-
-    //  TorusPolynomial + p*TorusPolynomial 
-    EXPORT void torusPolynomialAddMulZ(TorusPolynomial* result, const TorusPolynomial* poly1, int p, const TorusPolynomial* poly2);
-
-    //  TorusPolynomial += p*TorusPolynomial 
-    EXPORT void torusPolynomialAddMulZTo(TorusPolynomial* result, const int p, const TorusPolynomial* poly2);
-
-    //  TorusPolynomial - p*TorusPolynomial 
-    EXPORT void torusPolynomialSubMulZ(TorusPolynomial* result, const TorusPolynomial* poly1, const int p, const TorusPolynomial* poly2);
-
-    //  TorusPolynomial -= p*TorusPolynomial 
-    EXPORT void torusPolynomialSubMulZTo(TorusPolynomial* result, int p, const TorusPolynomial* poly2);
-
-    //  TorusPolynomial = X^a * TorusPolynomial 
-    EXPORT void torusPolynomialMulByXai(TorusPolynomial* result, int a, const TorusPolynomial* bk);
-
-    //  Norme Euclidienne d'un IntPolynomial 
-    EXPORT double intPolynomialNormSq2(const IntPolynomial* poly);
-
-    // multiplication Karatsuba 
-    EXPORT void torusPolynomialMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
-
-    // multiplication naive  
-    EXPORT void torusPolynomialMultNaive(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
-
-
-
-    //
-    // This is the naive external multiplication of an integer polynomial
-    // with a torus polynomial. (this function should yield exactly the same
-    // result as the karatsuba or fft version, but should be slower) 
-    //
-    EXPORT void torusPolynomialMultNaive(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
-
-
-
-    //
-    // This function multiplies 2 polynomials (an integer poly and a torus poly)
-    // by using Karatsuba
-    //
-    EXPORT void torusPolynomialMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
-    EXPORT void torusPolynomialAddMulRKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
-    EXPORT void torusPolynomialSubMulRKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
-
-    //#define torusPolynomialMulR torusPolynomialMultKaratsuba
-    //#define torusPolynomialAddMulR torusPolynomialAddMulRKaratsuba
-    //#define torusPolynomialSubMulR torusPolynomialSubMulRKaratsuba
-
 #define torusPolynomialMulR torusPolynomialMultFFT
 #define torusPolynomialAddMulR torusPolynomialAddMulRFFT
 #define torusPolynomialSubMulR torusPolynomialSubMulRFFT
 
-
-#endif //POLYNOMIALS_ARITHMETIC_H
+#endif 
 
 
 }
