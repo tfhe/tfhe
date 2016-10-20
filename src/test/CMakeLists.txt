@@ -24,6 +24,7 @@ set(HEADERS
 set(GOOGLETEST_SOURCES
     arithmetic_test.cpp
     lwe_test.cpp
+    polynomial_test.cpp
     )
 
 foreach (FFT_PROCESSOR IN LISTS FFT_PROCESSORS) 
