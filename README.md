@@ -8,6 +8,31 @@ The scheme is described in the paper “Faster fully homomorphic encryption: Boo
 Nicolas Gama <>, Mariya Georgieva <>, Malika Izabachène <>.
 
 
+
+
+### Description 
+
+The TFHE library implements a very fast gate-by-gate bootstrapping, based on [CGGI16]. Namely, any binary 
+gate is evaluated homomorphically in about 20 milliseconds on a single
+core which improves [DM15] by a factor, and the mux gate takes about 40 CPU-ms (or 20ms on 2 cores). 
+
+The library implements a Ring-variant of the GSW [GSW13]
+cryptosystem and makes many optimizations described in [DM15] and [CGGI16]. 
+
+It also implments a dedicated Fast Fourier
+Transformation for the anticyclic ring $\mR[X]/X^N+1$, and uses AVX assembly vectorization instructions. The default parameter set achieves a 130-bit cryptographic security, based on ideal lattice assumptions.
+
+From the user point of view, the library can evaluate a net-list of binary gates homomorphically at a rate of about 50 gates per second per core\footnote{In a near-future, TFHE will also support
+multi-threading}), without decrypting its input. It suffices to provide the sequence of gates, as well as ciphertexts of the input bits. And the
+library computes ciphertexts of the output bits.
+
+Unlike other libraries, TFHE has no restriction on the number or composition of gates. This makes the library usable with either
+manually crafted circuits, or with the output of automated circuit generation tools. For TFHE, optimal circuits have the smallest possible number of gates, 
+and to a lesser extent, the possibility to evaluate them in parallel. These rather naive circuits should be much easier to find than low multiplicative depth-circuits 
+required for other schemes such as BGV (HElib) [HElib] or FHE over integers.
+
+
+
 ### Dependencies 
 
 
@@ -24,11 +49,34 @@ This component is licensed under the MIT license, and we added the code of the r
 
 ### Installation
 
-To build the library, just run ```make optim```.  This will produce a few test/example programs. 
+To build the library, from the src directory:
+* type ```cmake .``` and ```make```
+This assumes that cmake is already installed on the system and an
+up-to-date c++ compiler.
+
+These commands compiles the library and generates test files and sample
+programs.
+
+To specify a different FFT processor, then replace ```cmake .``` by ```ccmake .``` and select your preference in the menu.
 
 
-The fast bootstrapping is shown in the program test-bootstrapping-fft2-optim, which generates a random bootstrapping key, a random message, performs a bootstrapping operation, and prints the execution time.
 
-To test the library with the FFTW3 library, just run ```make optim FFT_PROCESSOR=FFTW_FFT_PROCESSOR```. 
+
+[DM15]:   L. Ducas and D. Micciancio.  FHEW: Bootstrapping homomorphic encryption in less than a second.  In Eurocrypt, pages 617{640, 2015.
+
+[GSW13]:  C. Gentry, A. Sahai, and B. Waters. Homomorphic encryption from learning with errors:  Conceptually-simpler,  asymptotically-faster,  attribute-based. In Crypto, pages 75{92, 2013
+
+[CGGI16]: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. Faster fully homomorphic encryption: Bootstrapping in less than 0.1 seconds. Asyacrypt, To appear, 2016. Cryptology ePrint Archive, report 2016/870.
+
+[HElib]: An Implementation of homomorphic encryption https://github.com/shaih/HElib
+
+
+
+
+
+
+
+
+
 
 
