@@ -1,7 +1,7 @@
 # tfhe
 Fast Fully Homomorphic Encryption Library over the Torus
 
-**version 0.5** -- *Release date: 2016.08.18*
+**version 0.1** -- *Release date: 2016.08.18*
 
 TFHE is open-source software distributed under the terms of the Apache 2.0 license. 
 The scheme is described in the paper “Faster fully homomorphic encryption: Bootstrapping in less than 0.1 seconds” submitted at the IACR conference Asiacrypt 2016 by Ilaria Chillotti <> 
