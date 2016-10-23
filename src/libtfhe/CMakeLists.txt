@@ -23,44 +23,12 @@ set(SRCS
     toruspolynomial-functions.cpp
     )
 
-set(HEADERS
-    ../include/tlwe.h
-    ../include/lwesamples.h
-    ../include/numeric_functions.h
-    ../include/polynomials.h
-    ../include/lweparams.h
-    ../include/lagrangehalfc_arithmetic.h
-    ../include/lwe-functions.h
-    ../include/lwekeyswitch.h
-    ../include/lwebootstrappingkey.h
-    ../include/polynomials_arithmetic.h
-    ../include/tlwe_functions.h
-    ../include/tgsw_functions.h
-    ../include/tfhe.h
-    ../include/tgsw.h
-    ../include/tfhe_core.h
-    ../include/lwekey.h
-    )
 
-add_library(tfhe-core OBJECT ${SRCS} ${HEADERS})
+add_library(tfhe-core OBJECT ${SRCS} ${TFHE_HEADERS})
 
-if (ENABLE_FFTW) 
-    add_library(tfhe-fftw $<TARGET_OBJECTS:tfhe-core> $<TARGET_OBJECTS:tfhe-fft-fftw>)
-endif (ENABLE_FFTW) 
-
-if (ENABLE_NAYUKI_AVX) 
-    add_library(tfhe-nayuki-avx $<TARGET_OBJECTS:tfhe-core> $<TARGET_OBJECTS:tfhe-fft-nayuki-avx>)
-endif (ENABLE_NAYUKI_AVX)
-
-if (ENABLE_NAYUKI_PORTABLE) 
-    add_library(tfhe-nayuki-portable $<TARGET_OBJECTS:tfhe-core> $<TARGET_OBJECTS:tfhe-fft-nayuki-portable>)
-endif (ENABLE_NAYUKI_PORTABLE) 
-
-if (ENABLE_SPQLIOS_AVX) 
-    add_library(tfhe-spqlios-avx $<TARGET_OBJECTS:tfhe-core> $<TARGET_OBJECTS:tfhe-fft-spqlios-avx>)
-endif (ENABLE_SPQLIOS_AVX) 
-
-if (ENABLE_SPQLIOS_FMA) 
-    add_library(tfhe-spqlios-fma $<TARGET_OBJECTS:tfhe-core> $<TARGET_OBJECTS:tfhe-fft-spqlios-fma>)
-endif (ENABLE_SPQLIOS_FMA) 
+foreach (FFT_PROCESSOR IN LISTS FFT_PROCESSORS) 
+    add_library(tfhe-${FFT_PROCESSOR} 
+	$<TARGET_OBJECTS:tfhe-core>
+	$<TARGET_OBJECTS:tfhe-fft-${FFT_PROCESSOR}>)
+endforeach (FFT_PROCESSOR IN LISTS FFT_PROCESSORS) 
 
