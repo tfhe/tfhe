@@ -12,12 +12,12 @@ Nicolas Gama <>, Mariya Georgieva <>, Malika Izabachène <>.
 
 ### Description 
 
-The TFHE library implements a very fast gate-by-gate bootstrapping, based on [CGGI16][CGGI16]. Namely, any binary 
+The TFHE library implements a very fast gate-by-gate bootstrapping, based on [CGGI16]. Namely, any binary 
 gate is evaluated homomorphically in about 20 milliseconds on a single
-core which improves [DM15][DM15] by a factor, and the mux gate takes about 40 CPU-ms (or 20ms on 2 cores). 
+core which improves [DM15] by a factor, and the mux gate takes about 40 CPU-ms (or 20ms on 2 cores). 
 
-The library implements a Ring-variant of the GSW [GSW13][GSW13]
-cryptosystem and makes many optimizations described in [DM15][DM15] and [CGGI16][CGGI16]. 
+The library implements a Ring-variant of the GSW [GSW13]
+cryptosystem and makes many optimizations described in [DM15] and [CGGI16]. 
 
 It also implments a dedicated Fast Fourier
 Transformation for the anticyclic ring R[X]/X^N+1, and uses AVX assembly vectorization instructions. 
@@ -29,7 +29,7 @@ library computes ciphertexts of the output bits.
 Unlike other libraries, TFHE has no restriction on the number or composition of gates. This makes the library usable with either
 manually crafted circuits, or with the output of automated circuit generation tools. For TFHE, optimal circuits have the smallest possible number of gates, 
 and to a lesser extent, the possibility to evaluate them in parallel. These rather naive circuits should be much easier to find than low multiplicative depth-circuits 
-required for other schemes such as BGV [HElib][HElib] or FHE over integers.
+required for other schemes such as BGV (in [HElib]) or FHE over integers.
 
 
 
