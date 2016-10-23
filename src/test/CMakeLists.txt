@@ -8,6 +8,7 @@ set(GOOGLETEST_SOURCES
     arithmetic_test.cpp
     lwe_test.cpp
     polynomial_test.cpp
+    lwekeyswitch_test.cpp
     )
 
 foreach (FFT_PROCESSOR IN LISTS FFT_PROCESSORS) 
