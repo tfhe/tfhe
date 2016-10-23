@@ -15,7 +15,7 @@ foreach (FFT_PROCESSOR IN LISTS FFT_PROCESSORS)
 if (FFT_PROCESSOR STREQUAL "fftw")
 set(RUNTIME_LIBS
     tfhe-fftw
-    -lfftw3
+    ${FFTW_LIBRARIES}
     )
 
 else ()
