@@ -30,7 +30,7 @@ EXPORT void bootsNAND(LweSample* result, const LweSample* c1, const LweSample* c
 EXPORT void bootsOR(LweSample* result, const LweSample* c1, const LweSample* c2, const LweBootstrappingKey* BK);
 EXPORT void bootsAND(LweSample* result, const LweSample* c1, const LweSample* c2, const LweBootstrappingKey* BK);
 EXPORT void bootsXOR(LweSample* result, const LweSample* c1, const LweSample* c2, const LweBootstrappingKey* BK);
-
+//the homNOT gate doesn't need to be bootstrapped
 EXPORT void homNOT(LweSample* result, const LweSample* c1, const LweParams* params);
 
 // TODO syncronize names with new files
