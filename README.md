@@ -4,8 +4,7 @@ Fast Fully Homomorphic Encryption Library over the Torus
 **version 0.1** -- *Release date: 2016.08.18*
 
 TFHE is open-source software distributed under the terms of the Apache 2.0 license. 
-The scheme is described in the paper "Faster fully homomorphic encryption: Bootstrapping in less than 0.1 seconds" presented at the IACR conference Asiacrypt 2016 by Ilaria Chillotti <> 
-Nicolas Gama <>, Mariya Georgieva <>, Malika Izabachène <>.
+The scheme is described in the paper "Faster fully homomorphic encryption: Bootstrapping in less than 0.1 seconds" presented at the IACR conference Asiacrypt 2016 by Ilaria Chillotti <>, Nicolas Gama <>, Mariya Georgieva <>, Malika Izabachène <>.
 
 
 
@@ -14,13 +13,13 @@ Nicolas Gama <>, Mariya Georgieva <>, Malika Izabachène <>.
 
 The TFHE library implements a very fast gate-by-gate bootstrapping, based on [CGGI16]. Namely, any binary 
 gate is evaluated homomorphically in about 20 milliseconds on a single
-core which improves [DM15] by a factor, and the mux gate takes about 40 CPU-ms (or 20ms on 2 cores). 
+core which improves [DM15] by a factor 30, and the mux gate takes about 40 CPU-ms (or 20ms on 2 cores). 
 
 The library implements a Ring-variant of the GSW [GSW13]
 cryptosystem and makes many optimizations described in [DM15] and [CGGI16]. 
 
-It also implments a dedicated Fast Fourier
-Transformation for the anticyclic ring R[X]/X^N+1, and uses AVX assembly vectorization instructions. 
+It also implements a dedicated Fast Fourier
+Transformation for the anticyclic ring R[X]/(X^N+1), and uses AVX assembly vectorization instructions. 
 The default parameter set achieves a 130-bit cryptographic security, based on ideal lattice assumptions.
 
 From the user point of view, the library can evaluate a net-list of binary gates homomorphically at a rate of about 50 gates per second per core, without decrypting its input. It suffices to provide the sequence of gates, as well as ciphertexts of the input bits. And the
