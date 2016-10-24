@@ -25,10 +25,9 @@ The default parameter set achieves a 130-bit cryptographic security, based on id
 From the user point of view, the library can evaluate a net-list of binary gates homomorphically at a rate of about 50 gates per second per core, without decrypting its input. It suffices to provide the sequence of gates, as well as ciphertexts of the input bits. And the
 library computes ciphertexts of the output bits.
 
-Unlike other libraries, TFHE has no restriction on the number or composition of gates. This makes the library usable with either
+Unlike other libraries, TFHE has no restriction on the number of gates or on their composition. This makes the library usable with either
 manually crafted circuits, or with the output of automated circuit generation tools. For TFHE, optimal circuits have the smallest possible number of gates, 
-and to a lesser extent, the possibility to evaluate them in parallel. These rather naive circuits should be much easier to find than low multiplicative depth-circuits 
-required for other schemes such as BGV (in [HElib]) or FHE over integers.
+and to a lesser extent, the possibility to evaluate them in parallel. 
 
 
 
