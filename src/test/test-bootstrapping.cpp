@@ -33,7 +33,6 @@ int main(int argc, char** argv) {
 #ifndef NDEBUG
     cout << "DEBUG MODE!" << endl;
 #endif
-    //const int count = 1000; //number of tests to compare the 3 types of multiplication
 
     const int N = 1024;
     const int k = 1;
@@ -42,7 +41,7 @@ int main(int argc, char** argv) {
     const int Bgbit_bk = 10;
     //const int ks_basebit = 4;
     const double alpha_in = 5e-4;
-    const double alpha_bk = 1e-8;
+    const double alpha_bk = 9e-9;
     //const int alpha_ks = 1e-6;
 
     LweParams* params_in = new_LweParams(n, alpha_in, 1./16.);
@@ -61,11 +60,11 @@ int main(int argc, char** argv) {
     LweSample* test = new_LweSample(params_in);
     LweSample* test_out = new_LweSample(params_in);
     
-    const Torus32 mu1 = modSwitchToTorus32(1,2);
-    const Torus32 mu0 = modSwitchToTorus32(0,2);
-
-    Torus32 mu_in = modSwitchToTorus32(1,2);
+    const Torus32 mu = modSwitchToTorus32(1,4);
+    
+    Torus32 mu_in = modSwitchToTorus32(-1,4);
     lweSymEncrypt(test, mu_in, alpha_in, key);
+    cout << "in_message: " << mu_in << endl;
     
 #ifndef NDEBUG
     debug_accum_key=&key_bk->tlwe_key;
@@ -80,11 +79,14 @@ int main(int argc, char** argv) {
     int nbtrials = 50;
     clock_t begin = clock();
     for (int i=0; i<nbtrials; i++)
-	tfhe_bootstrap(test_out, bk, mu1, mu0, test);
+	tfhe_bootstrap(test_out, bk, mu, test);
     clock_t end = clock();
     cout << "finished bootstrapping in (microsecs)... " << (end-begin)/double(nbtrials) << endl;
-    Torus32 mu_out = lweSymDecrypt(test_out, key, 2);
+    Torus32 mu_out = lweSymDecrypt(test_out, key, 4);
+    Torus32 phase_out = lwePhase(test_out, key);
     cout << "end_variance: " << test_out->current_variance << endl;
+    cout << "end_phase: " << phase_out << endl;
+    cout << "end_message: " << mu_out << endl;
 
     if (mu_in != mu_out) 
 	dieDramatically("et Zut!");

@@ -44,7 +44,6 @@ EXPORT void tfhe_createLweBootstrappingKey(
     LweBootstrappingKey* bk, 
     const LweKey* key_in, 
     const TGswKey* rgsw_key);
-EXPORT void tfhe_bootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LweSample* x);
 
 
 

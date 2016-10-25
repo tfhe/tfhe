@@ -23,6 +23,7 @@ set(SRCS
     toruspolynomial-functions.cpp
     boot-gates.cpp
     lwe-keyswitch-functions.cpp
+    lwe-bootstrapping-functions.cpp
     )
 
 
