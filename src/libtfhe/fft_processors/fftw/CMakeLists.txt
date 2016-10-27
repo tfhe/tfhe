@@ -9,7 +9,7 @@ set(SRCS
     fft_processor_fftw.cpp
     lagrangehalfc_impl.cpp
     )
-    
+
 set(HEADERS
     lagrangehalfc_impl.h
     )

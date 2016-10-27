@@ -48,13 +48,6 @@ EXPORT void torusPolynomialMulByXai(TorusPolynomial* result, int a, const TorusP
 /**  Norme Euclidienne d'un IntPolynomial */
 EXPORT double intPolynomialNormSq2(const IntPolynomial* poly);
 
-/** multiplication Karatsuba */
-EXPORT void torusPolynomialMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
-
-/** multiplication naive  */
-EXPORT void torusPolynomialMultNaive(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
-
-
 
 /**
  * This is the naive external multiplication of an integer polynomial
@@ -64,13 +57,26 @@ EXPORT void torusPolynomialMultNaive(TorusPolynomial* result, const IntPolynomia
 EXPORT void torusPolynomialMultNaive(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
 
 
-
 /**
  * This function multiplies 2 polynomials (an integer poly and a torus poly)
  * by using Karatsuba
+ * WARNING: N must be a power of 2 to use this function. Else, the
+ * behaviour is unpredictable
  */
 EXPORT void torusPolynomialMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+
+/**
+ * result += poly1 * poly2 (via karatsuba)
+ * WARNING: N must be a power of 2 to use this function. Else, the
+ * behaviour is unpredictable
+ */
 EXPORT void torusPolynomialAddMulRKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
+
+/**
+ * result -= poly1 * poly2 (via karatsuba)
+ * WARNING: N must be a power of 2 to use this function. Else, the
+ * behaviour is unpredictable
+ */
 EXPORT void torusPolynomialSubMulRKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
 
 //#define torusPolynomialMulR torusPolynomialMultKaratsuba
