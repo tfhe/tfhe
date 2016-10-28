@@ -49,10 +49,10 @@ This component is licensed under the MIT license, and we added the code of the r
 ### Installation
 
 To build the library with the default options, run ```make``` from the top level directory of the TFHE project.
-This assumes that the standard tool cmake is already installed on the system as well as an
-up-to-date c++ compiler (i.e. g++ >=5.2).
+This assumes that the standard tool cmake is already installed on the system, and an
+up-to-date c++ compiler (i.e. g++ >=5.2) as well.
 It will compile the library in optimized mode in the build/libtfhe folder.
-Currently, only static libraries are generated. There is no make install yet, as developpement is still 
+Currently, only static libraries are generated. There is no make install yet, as the developpement of the library is still 
 in an early state. 
 
 If you want to choose additional compile options (i.e. debug mode, tests, fftw), you need to run cmake manually and pass the desired options:
@@ -66,7 +66,7 @@ The available options are the following:
 
 | Variable Name          | values           | 
 |------------------------|-------|
-| CMAKE_BUILD_TYPE       | <ul><li>*optim* enable compiler's optimization flags, including native architecture specific optimizations</li><li>*debug* disable any optimization and include all debugging info (-g3 -O0)</li> | 
+| CMAKE_BUILD_TYPE       | <ul><li>*optim* enables compiler's optimization flags, including native architecture specific optimizations</li><li>*debug* disables any optimization and include all debugging info (-g3 -O0)</li> | 
 | ENABLE_TESTS           | *on/off* compiles the library's unit tests and sample applications in the test/ folder. This assumes that googletest>1.8 is installed on the system. (use ```ctest``` to run all tests) | 
 | ENABLE_FFTW            | *on/off* compiles libtfhe-fftw.a, using FFTW3 (GPL licence) for fast FFT computations |
 | ENABLE_NAYUKI_PORTABLE | *on/off* compiles libtfhe-nayuki-portable.a, using the fast C version of nayuki for FFT computations |
