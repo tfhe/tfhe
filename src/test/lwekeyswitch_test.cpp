@@ -1,39 +1,38 @@
 #include <gtest/gtest.h>
+//#include <gmock/gmock.h>
 #include "lwe-functions.h"
 #include "lwekeyswitch.h"
 #include "numeric_functions.h"
 using namespace std;
 
+using namespace ::testing;
+
 namespace {
+
+    const LweParams* params250_0 = new_LweParams(250,0.,1.);
+    const LweParams* params500_0 = new_LweParams(500,0.,1.);
+    const LweParams* params500_1em5 = new_LweParams(500,1e-5,1.);
+    const LweKey* key250 = new_LweKey(params250_0);
+    const LweKey* key500 = new_LweKey(params500_0);
+
+
     class LweKeySwitchTest: public ::testing::Test {
-	protected:
-	    virtual void SetUp() {
-		params500_0 = new_LweParams(500,0.,1.);
-		params250_0 = new_LweParams(500,0.,1.);
-		params500_1em5 = new_LweParams(500,1e-5,1.);
-		key250 = new_LweKey(params250_0);
-		key500 = new_LweKey(params500_0);
-	    }
-	    virtual void TearDown() {
-		delete_LweParams(params250_0);
-		delete_LweParams(params500_0);
-		delete_LweParams(params500_1em5);
-		delete_LweKey(key250);
-		delete_LweKey(key500);
-	    }
-
 	public:
-	    LweParams* params250_0;
-	    LweParams* params500_0;
-	    LweParams* params500_1em5;
-	    LweKey* key250;
-	    LweKey* key500;
 
-	    //mock lwe encryption
-	    void lweSymEncrypt(LweSample* result,const Torus32 message,const double alpha, const LweKey* key) {
+	    //fake lwe encryption:
+	    //just create a noiseless trivial ciphertext, but set the
+	    //current_variance
+	    //static void fake_lweSymEncrypt(
+	    static void lweSymEncrypt(
+		    LweSample* result,
+		    const Torus32 message,
+		    const double alpha, 
+		    const LweKey* key) {
 		lweNoiselessTrivial(result, message, key->params);
 		result->current_variance = alpha*alpha;
 	    }
+
+	    //MOCK_METHOD4(lweSymEncrypt, void(LweSample*,const Torus32,const double, const LweKey*));
 
 #define TFHE_TEST_ENVIRONMENT 1
 #include "../libtfhe/lwe-keyswitch-functions.cpp"
@@ -52,6 +51,7 @@ namespace {
      */
     //void lweCreateKeySwitchKey_fromArray(LweSample*** result, 
     TEST_F(LweKeySwitchTest, lweCreateKeySwitchKey_fromArray) {
+	//EXPECT_CALL(*this, lweSymEncrypt(_,_,_,_)).WillRepeatedly(Invoke(fake_lweSymEncrypt));
 	LweKeySwitchKey* test = new_LweKeySwitchKey(300,14,2,params500_1em5);
 	//int n = test->out_params->n;
 	double alpha = 1e-5;
@@ -92,6 +92,7 @@ namespace {
     //	    const Torus32* ai, 
     //	    const int n, const int t, const int basebit)
     TEST_F(LweKeySwitchTest, lweKeySwitchTranslate_fromArray) {
+	//EXPECT_CALL(*this, lweSymEncrypt(_,_,_,_)).WillRepeatedly(Invoke(fake_lweSymEncrypt));
 	LweKeySwitchKey* test = new_LweKeySwitchKey(300,14,2,params500_1em5);
 	//int n = test->out_params->n;
 	double alpha = 1e-5;
@@ -143,6 +144,7 @@ namespace {
 	delete[] in_key;
 	delete[] ai;
 	delete[] aibar;
+	delete_LweSample(res);
 	delete_LweKeySwitchKey(test);
     }
 }
