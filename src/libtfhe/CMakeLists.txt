@@ -22,6 +22,7 @@ set(SRCS
     tlwefftoperations.cpp
     toruspolynomial-functions.cpp
     boot-gates.cpp
+    lwe-keyswitch-functions.cpp
     )
 
 

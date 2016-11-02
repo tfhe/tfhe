@@ -1,10 +1,10 @@
 # tfhe
 Fast Fully Homomorphic Encryption Library over the Torus
 
-**version 0.1** -- *Release date: 2016.08.18*
+**version 0.1** -- *Proof of concept release date: 2016.08.18*
 
 TFHE is open-source software distributed under the terms of the Apache 2.0 license. 
-The scheme is described in the paper "Faster fully homomorphic encryption: Bootstrapping in less than 0.1 seconds" presented at the IACR conference Asiacrypt 2016 by Ilaria Chillotti <>, Nicolas Gama <>, Mariya Georgieva <>, Malika Izabachène <>.
+The scheme is described in the paper "Faster fully homomorphic encryption: Bootstrapping in less than 0.1 seconds" presented at the IACR conference Asiacrypt 2016 by Ilaria Chillotti, Nicolas Gama, Mariya Georgieva, Malika Izabachène.
 
 
 
@@ -48,20 +48,31 @@ This component is licensed under the MIT license, and we added the code of the r
 
 ### Installation
 
-To build the library, from the src directory:
-* type ```cmake .``` then ```make```
-This assumes that the standard tool cmake is already installed on the system and an
-up-to-date c++ compiler (i.e. g++ >=5.2).
+To build the library with the default options, run ```make``` from the top level directory of the TFHE project.
+This assumes that the standard tool cmake is already installed on the system, and an
+up-to-date c++ compiler (i.e. g++ >=5.2) as well.
+It will compile the library in optimized mode in the build/libtfhe folder.
+Currently, only static libraries are generated. There is no make install yet, as the developpement of the library is still 
+in an early state. 
 
-These commands compile the library and generates test files and sample
-programs.
+If you want to choose additional compile options (i.e. debug mode, tests, fftw), you need to run cmake manually and pass the desired options:
+```
+mkdir build
+cd build
+cmake ../src -DENABLE_TESTS=on -DENABLE_FFTW=on -DCMAKE_BUILD_TYPE=debug
+make
+```
+The available options are the following:
 
-Currently, static libraries are generated in libtfhe/ and test programs are in test/.
-There is no make install yet, as developpement is still in an early state. 
-
-To specify a different FFT processor, then replace ```cmake .``` with ```ccmake .``` 
-and select your preferences in the interactive menu.
-
+| Variable Name          | values           | 
+|------------------------|-------|
+| CMAKE_BUILD_TYPE       | <ul><li>*optim* enables compiler's optimization flags, including native architecture specific optimizations</li><li>*debug* disables any optimization and include all debugging info (-g3 -O0)</li> | 
+| ENABLE_TESTS           | *on/off* compiles the library's unit tests and sample applications in the test/ folder. This assumes that googletest>1.8 is installed on the system. (use ```ctest``` to run all tests) | 
+| ENABLE_FFTW            | *on/off* compiles libtfhe-fftw.a, using FFTW3 (GPL licence) for fast FFT computations |
+| ENABLE_NAYUKI_PORTABLE | *on/off* compiles libtfhe-nayuki-portable.a, using the fast C version of nayuki for FFT computations |
+| ENABLE_NAYUKI_AVX      | *on/off* compiles libtfhe-nayuki-avx.a, using the avx assembly version of nayuki for FFT computations |
+| ENABLE_SPQLIOS_AVX     | *on/off* compiles libtfhe-spqlios-avx.a, using tfhe's dedicated avx assembly version for FFT computations |
+| ENABLE_SPQLIOS_AVX     | *on/off* compiles libtfhe-spqlios-fma.a, using tfhe's dedicated fma assembly version for FFT computations |
 
 ### References
 

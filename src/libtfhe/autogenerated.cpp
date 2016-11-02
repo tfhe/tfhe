@@ -264,12 +264,12 @@ EXPORT void free_LweKeySwitchKey_array(int nbelts, LweKeySwitchKey* ptr) {
 
 //initialize the key structure
 //(equivalent of the C++ constructor)
-EXPORT void init_LweKeySwitchKey(LweKeySwitchKey* obj, int basebit, int kslength, const LweParams* in_params, const LweParams* out_params) {
-    new(obj) LweKeySwitchKey(basebit,kslength,in_params,out_params);
+EXPORT void init_LweKeySwitchKey(LweKeySwitchKey* obj, int n, int t, int basebit, const LweParams* out_params) {
+    new(obj) LweKeySwitchKey(n,t,basebit,out_params);
 }
-EXPORT void init_LweKeySwitchKey_array(int nbelts, LweKeySwitchKey* obj, int basebit, int kslength, const LweParams* in_params, const LweParams* out_params) {
+EXPORT void init_LweKeySwitchKey_array(int nbelts, LweKeySwitchKey* obj, int n, int t, int basebit, const LweParams* out_params) {
     for (int i=0; i<nbelts; i++) {
-	new(obj+i) LweKeySwitchKey(basebit,kslength,in_params,out_params);
+	new(obj+i) LweKeySwitchKey(n,t,basebit,out_params);
     }
 }
 
@@ -286,12 +286,12 @@ EXPORT void destroy_LweKeySwitchKey_array(int nbelts, LweKeySwitchKey* obj) {
  
 //allocates and initialize the LweKeySwitchKey structure
 //(equivalent of the C++ new)
-EXPORT LweKeySwitchKey* new_LweKeySwitchKey(int basebit, int kslength, const LweParams* in_params, const LweParams* out_params) {
-    return new LweKeySwitchKey(basebit,kslength,in_params,out_params);
+EXPORT LweKeySwitchKey* new_LweKeySwitchKey(int n, int t, int basebit, const LweParams* out_params) {
+    return new LweKeySwitchKey(n,t,basebit,out_params);
 }
-EXPORT LweKeySwitchKey* new_LweKeySwitchKey_array(int nbelts, int basebit, int kslength, const LweParams* in_params, const LweParams* out_params) {
+EXPORT LweKeySwitchKey* new_LweKeySwitchKey_array(int nbelts, int n, int t, int basebit, const LweParams* out_params) {
     LweKeySwitchKey* obj = alloc_LweKeySwitchKey_array(nbelts);
-    init_LweKeySwitchKey_array(nbelts,obj,basebit,kslength,in_params,out_params);
+    init_LweKeySwitchKey_array(nbelts, obj, n,t,basebit,out_params);
     return obj;
 }
 
