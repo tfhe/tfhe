@@ -5,33 +5,27 @@
 using namespace std;
 
 namespace {
+	// N=512,1024,2048 et k=1,2
+	// creer un set des parametres avec tous les params à l'interieur
+	// utiliser le set dans les tests
+	/*
+	const TLweParams* params512_1 = new_TLweParams(500,1,0.,1.);
+	const TLweParams* params512_2 = new_TLweParams(500,1,0.,1.);
+	params750 = new_TLweParams(750,1,0.,1.);
+	params1024 = new_TLweParams(1024,1,0.,1.);
+	key500 = new_TLweKey(params500);
+	key750 = new_TLweKey(params750);
+	key1024 = new_TLweKey(params1024);
+
+	
+    TLweParams* params750;
+    TLweParams* params1024;
+    TLweKey* key500;
+    TLweKey* key750;
+    TLweKey* key1024;
+    */
 
     class TLweTest: public ::testing::Test {
-	protected:
-	    virtual void SetUp() {
-		params500 = new_TLweParams(500,1,0.,1.);
-		params750 = new_TLweParams(750,1,0.,1.);
-		params1024 = new_TLweParams(1024,1,0.,1.);
-		key500 = new_TLweKey(params500);
-		key750 = new_TLweKey(params750);
-		key1024 = new_TLweKey(params1024);
-	    }
-	    virtual void TearDown() {
-		delete_TLweParams(params500);
-		delete_TLweParams(params750);
-		delete_TLweParams(params1024);
-		delete_TLweKey(key500);
-		delete_TLweKey(key750);
-		delete_TLweKey(key1024);
-	    }
-
-	public:
-	    TLweParams* params500;
-	    TLweParams* params750;
-	    TLweParams* params1024;
-	    TLweKey* key500;
-	    TLweKey* key750;
-	    TLweKey* key1024;
     };
 
     // | frac(x) |
@@ -81,10 +75,8 @@ namespace {
 		    	}
 			}
 			
-			// ILA???
-		    ASSERT_LE(count,n-20);
-		    ASSERT_GE(count,20);
-		    // ILA???
+			ASSERT_LE(count,k*N-20); // <=
+		    ASSERT_GE(count,20); // >=
 
 		    delete_TLweKey(key);
 		}
@@ -93,7 +85,7 @@ namespace {
 
 
 	/* ILA
-    not tested
+    not tested --> à faire
 	EXPORT void tLweSymEncryptT(TLweSample* result, Torus32 message, double alpha, const TLweKey* key);
 	EXPORT void tLweApproxPhase(TorusPolynomial* message, const TorusPolynomial* phase, int Msize, int N);
 	EXPORT Torus32 tLweSymDecryptT(const TLweSample* sample, const TLweKey* key, int Msize);
@@ -343,30 +335,6 @@ EXPORT void tLweExtractLweSample(LweSample* result, const TLweSample* x, const L
 //extractions TLwe -> Lwe
 EXPORT void tLweExtractKey(LweKey* result, const TLweKey*); //sans doute un param supplémentaire
 */
-
-
-
-
-
-
-
-
-#if 0
-
-    //TODO: à tester!!
-    
-    // 
-    // creates a Key Switching Key between the two keys
-    ///
-    EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key);
-
-
-    //
-    // applies keySwitching
-    ///
-    EXPORT void lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, const LweSample* sample);
-
-#endif //Lwe_FUNCTIONS_H
 
 
 
