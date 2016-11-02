@@ -8,6 +8,7 @@ set(GOOGLETEST_SOURCES
     arithmetic_test.cpp
     lwe_test.cpp
     polynomial_test.cpp
+    tlwe_test.cpp
     )
 
 foreach (FFT_PROCESSOR IN LISTS FFT_PROCESSORS) 
@@ -34,7 +35,8 @@ add_executable(test-lwe-${FFT_PROCESSOR} test-lwe.cpp ${TFHE_HEADERS})
 add_executable(test-multiplication-${FFT_PROCESSOR} test-multiplication.cpp ${TFHE_HEADERS})
 add_executable(test-tlwe-${FFT_PROCESSOR} test-tlwe.cpp ${TFHE_HEADERS})
 
-target_link_libraries(unittests-${FFT_PROCESSOR} ${RUNTIME_LIBS} ${GTEST_BOTH_LIBRARIES})
+target_link_libraries(unittests-${FFT_PROCESSOR} ${RUNTIME_LIBS} ${GTEST_BOTH_LIBRARIES} 
+-lpthread)
 target_link_libraries(test-bootstrapping-${FFT_PROCESSOR} ${RUNTIME_LIBS})
 target_link_libraries(test-bootstrapping-fft2-${FFT_PROCESSOR} ${RUNTIME_LIBS})
 target_link_libraries(test-deb-boot-${FFT_PROCESSOR} ${RUNTIME_LIBS})
