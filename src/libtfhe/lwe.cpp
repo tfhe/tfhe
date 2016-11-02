@@ -375,58 +375,6 @@ EXPORT void tGswExternMulToTLwe(TLweSample* accum, const TGswSample* sample,cons
     delete_IntPolynomial_array(kpl, dec);
 }
 
-//crée la clé de KeySwitching
-EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key){
-    const int n=result->n;
-    const int basebit=result->basebit;
-    const int l=result->l;
-    const int base=result->base;
-
-    cerr << "create_keyswitch: " << n << " " << l << " " << base << " ("<< n*l*base*out_key->params->n*4 << "bytes)" << endl;
-    cerr << "  with noise stdev: " << out_key->params->alpha_min << endl;
-    for(int i=0;i<n;i++){
-    	for(int j=0;j<l;j++){
-    	    for(int k=0;k<base;k++){
-		Torus32 x=(in_key->key[i]*k)*(1<<(32-(j+1)*basebit));
-		lweSymEncrypt(&result->ks[i][j][k],x,out_key->params->alpha_min,out_key);
-		//printf("i,j,k,ki,x,phase=%d,%d,%d,%d,%d,%d\n",i,j,k,in_key->key[i],x,lwePhase(&result->ks[i][j][k],out_key));
-    	    }
-    	}
-    }
-}
-
-//sample=(a',b')
-EXPORT void lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, const LweSample* sample){
-    const LweParams* par=ks->out_params;
-    const int n=ks->in_params->n;
-    const int basebit=ks->basebit;
-    const int l=ks->l;
-    const uint32_t mask=ks->mask;
-
-    lweNoiselessTrivial(result,sample->b,par);
-/*
-#ifndef NDEBUG
-    Torus32 expected = sample->b;
-    Torus32 actual = lwePhase(result, debug_in_key);
-    printf("initialization: actual=%d, expected=%d\n",actual, expected);
-#endif
-*/
-    for (int i=0;i<n;i++){
-    	uint32_t ai=sample->a[i];
-    	for (int j=0;j<l;j++){
-    	    uint32_t aij=(ai>>(32-(j+1)*basebit))& mask;
-    	    lweSubTo(result,&ks->ks[i][j][aij],par);	
-    	}
-/*
-#ifndef NDEBUG
-    expected -= ai*debug_extract_key->key[i];
-    actual = lwePhase(result, debug_in_key);
-    printf("iter %d: ai=%d, ki=%d, actual=%d, expected=%d\n", i, ai, debug_extract_key->key[i], actual, expected);
-#endif
-*/
-    }
-}
-
 
 /**
  * encrypts a poly message
