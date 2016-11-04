@@ -1,8 +1,16 @@
+#ifndef TFHE_TEST_ENVIRONMENT
 #include <iostream>
 #include <cassert>
 #include "tfhe.h"
 using namespace std;
+#define INCLUDE_ALL
+#else
+#undef EXPORT
+#define EXPORT
+#endif
 
+
+#if defined INCLUDE_ALL || defined INCLUDE_TFHE_BOOTSTRAPROTATE
 /**
  * multiply the accumulator by X^sum(bara_i.s_i)
  * @param accum the TLWE sample to multiply
@@ -25,7 +33,9 @@ EXPORT void tfhe_bootstrapRotate(TLweSample* accum,
     }
     delete_TGswSample(temp);
 }
-   
+#endif 
+
+#if defined INCLUDE_ALL || defined INCLUDE_TFHE_BOOTSTRAPROTATEEXTRACT
 /**
  * result = LWE(v_p) where p=barb-sum(bara_i.s_i) mod 2N
  * @param result the output LWE sample
@@ -59,13 +69,15 @@ EXPORT void tfhe_bootstrapRotateExtract(LweSample* result,
     delete_TLweSample(acc);
     delete_TorusPolynomial(testvectbis);
 }
+#endif 
    
+
+#if defined INCLUDE_ALL || defined INCLUDE_TFHE_BOOTSTRAP
 //EXPORT void tfhe_bootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LweSample* x){
 //    const Torus32 ab=(mu0+mu1)/2;
 //    const Torus32 aa=mu0-ab; //it is important to define it like this and not (mu0-mu1)/2!
 //    u->b += ab;
 //}
-
 /**
  * result = LWE(mu) iff phase(x)>0, LWE(-mu) iff phase(x)<0
  * @param result The resulting LweSample
@@ -104,7 +116,9 @@ EXPORT void tfhe_bootstrap(LweSample* result,
     delete[] bara;
     delete_TorusPolynomial(testvect);
 }
+#endif
 
+#if defined INCLUDE_ALL || defined INCLUDE_TFHE_CREATEBOOTSTRAPPINGKEY
 EXPORT void tfhe_createLweBootstrappingKey(
 	LweBootstrappingKey* bk, 
 	const LweKey* key_in, 
@@ -137,4 +151,4 @@ EXPORT void tfhe_createLweBootstrappingKey(
 	tGswSymEncryptInt(&bk->bk[i], kin[i], alpha, rgsw_key);
     }
 }
-
+#endif

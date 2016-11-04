@@ -48,6 +48,17 @@ EXPORT void torusPolynomialMulByXai(TorusPolynomial* result, int a, const TorusP
 /**  Norme Euclidienne d'un IntPolynomial */
 EXPORT double intPolynomialNormSq2(const IntPolynomial* poly);
 
+/**  IntPolynomial = 0 */
+EXPORT void intPolynomialClear(IntPolynomial* result);
+
+/**  result = source */
+EXPORT void intPolynomialCopy(IntPolynomial* result, const IntPolynomial* source);
+
+/**  result += poly1 */
+EXPORT void intPolynomialAddTo(IntPolynomial* result, const IntPolynomial* poly1);
+
+/**  result = (X^ai-1) * source */
+EXPORT void intPolynomialMulByXaiMinusOne(IntPolynomial* result, int ai, const IntPolynomial* source);
 
 /**
  * This is the naive external multiplication of an integer polynomial
