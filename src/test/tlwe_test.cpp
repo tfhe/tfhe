@@ -6,24 +6,27 @@ tlwe_test.cpp
 
 
 #include <gtest/gtest.h>
+#include <tlwe.h>
 #include <tlwe_functions.h>
 #include <numeric_functions.h>
 #include <polynomials_arithmetic.h> 
 
 using namespace std;
 
-/*
- * Parameters and keys (N=512,1024,2048 and k=1,2)
- * ILA: Creer un set des parametres avec tous les params à l'interieur et utiliser le set dans les tests (?)
-*/
+
 namespace {
+
+	/*
+	 * Parameters and keys (for N=512,1024,2048 and k=1,2)
+	 * ILA: Creer un set des parametres avec tous les params à l'interieur et utiliser le set dans les tests (?)
+	*/
 	const TLweParams* params512_1 = new_TLweParams(512,1,0.,1.);
 	const TLweParams* params512_2 = new_TLweParams(512,2,0.,1.);
 	const TLweParams* params1024_1 = new_TLweParams(1024,1,0.,1.);
 	const TLweParams* params1024_2 = new_TLweParams(1024,2,0.,1.);
 	const TLweParams* params2048_1 = new_TLweParams(2048,1,0.,1.);
 	const TLweParams* params2048_2 = new_TLweParams(2048,2,0.,1.);
-	// all_params = {params512_1, params512_2, params1024_1, params1024_2, params2048_1, params2048_2}
+	// all_params = {params512_1, params512_2, params1024_1, params1024_2, params2048_1, params2048_2}	
 	
 	const TLweKey* key512_1 = new_TLweKey(params512_1);
 	const TLweKey* key512_2 = new_TLweKey(params512_2);
@@ -50,9 +53,11 @@ namespace {
 */
 	void fillRandom(TLweSample* result, const TLweParams* params) {
 		const int k = params->k;
+		const int N = params->N;
 		
 		for (int i = 0; i <= k; ++i)
-			torusPolynomialUniform(result->a[i]); // generates a random Torus32 polynomial
+			for (int j = 0; j < N; ++j)
+				result->a[i].coefsT[j] = uniformTorus32_distrib(generator);
 		result->current_variance=0.2;
     }
 
@@ -63,9 +68,11 @@ namespace {
 */
     void copySample(TLweSample* result, const TLweSample* sample, const TLweParams* params) {
 		const int k = params->k;
+		const int N = params->N;
 		
 		for (int i = 0; i <= k; ++i) 
-			torusPolynomialCopy(result->a[i], sample->a[i]); // copies the Torus32 polynomials
+			for (int j = 0; j < N; ++j)
+				result->a[i].coefsT[j] = sample->a[i].coefsT[j];
 		result->current_variance=sample->current_variance;
     }
 
@@ -93,9 +100,10 @@ Testing the function tLweKeyGen
 		    TLweKey* key = new_TLweKey(params);
 		    tLweKeyGen(key);
 		    ASSERT_EQ(params,key->params);
-			int N = key->params->N;
-			int k = key->params->k;
-			int* s = key->key;
+			const int N = key->params->N;
+			const int k = key->params->k;
+			IntPolynomial* s = new_IntPolynomial(N);
+			s = key->key;
 		    
 		    //verify that the key is binary and kind-of random
 		    int count = 0;
@@ -108,6 +116,7 @@ Testing the function tLweKeyGen
 			ASSERT_LE(count,k*N-20); // <=
 		    ASSERT_GE(count,20); // >=
 
+		    delete_IntPolynomial(s);
 		    delete_TLweKey(key);
 		}
     }
@@ -133,15 +142,17 @@ Testing the functions tLweSymEncryptT, tLwePhase, tLweSymDecryptT
 		
 		for (TLweKey* key: all_keys) {			
 		    const TLweParams* params = key->params;
+		    const int N = params->N;
+		    const int k = params->k;
 		    TLweSample* samples = new_TLweSample_array(NB_SAMPLES,params);
-		    
+		    TorusPolynomial* phase = new_TorusPolynomial(N);
+			Torus32 decrypt;
+					    
 		    //verify correctness of the decryption
 		    for (int trial=0; trial<NB_SAMPLES; trial++) {
 		    	// The message is a Torus32   	
 		    	Torus32 message = modSwitchToTorus32(trial,M);
-			    TorusPolynomial* phase = new_TorusPolynomial(N);
-			    Torus32 decrypt;
-				
+			    
 				// Encrypt and decrypt
 				tLweSymEncryptT(&samples[trial],message,alpha,key);
 				decrypt = tLweSymDecryptT(&samples[trial],key,M);
@@ -159,9 +170,6 @@ Testing the functions tLweSymEncryptT, tLwePhase, tLweSymDecryptT
 		    }
 
 		    // Verify that samples are random enough (all coordinates different)
-		    const int N = params->N;
-		    const int k = params->k;
-
 		    for (int i = 0; i < k; ++i) {
 		    	for (int j = 0; j < N; ++j) {
 		    		set<Torus32> testset;
@@ -190,7 +198,7 @@ Testing the functions tLweSymEncrypt, tLwePhase, tLweApproxPhase, tLweSymDecrypt
  * EXPORT void tLweSymDecrypt(TorusPolynomial* result, const TLweSample* sample, const TLweKey* key, int Msize);
  *
  * This functions encrypt and decrypt a random TorusPolynomial message by using the given key
-*/
+*/ 
     TEST_F (TLweTest,tLweSymEncryptPhaseDecrypt) {
 		static const int NB_SAMPLES=10;
 		static const int M = 8;
@@ -200,6 +208,7 @@ Testing the functions tLweSymEncrypt, tLwePhase, tLweApproxPhase, tLweSymDecrypt
 		for (TLweKey* key: all_keys) {			
 		    const TLweParams* params = key->params;
 		    const int N = params->N;
+		    const int k = params->k;
 		    TLweSample* samples = new_TLweSample_array(NB_SAMPLES,params);
 		    TorusPolynomial* message = new_TorusPolynomial(N);
 		    TorusPolynomial* phase = new_TorusPolynomial(N);
@@ -209,13 +218,13 @@ Testing the functions tLweSymEncrypt, tLwePhase, tLweApproxPhase, tLweSymDecrypt
 		    //verify correctness of the decryption
 		    for (int trial=0; trial<NB_SAMPLES; trial++) {
 		    	for (int j = 0; j < N; ++j)
-		    		message.coefsT[j] = modSwitchToTorus32(trial,M);
+		    		message->coefsT[j] = modSwitchToTorus32(trial,M);
 				
 				// Encrypt and Decrypt 
 				tLweSymEncrypt(&samples[trial],message,alpha,key);
 				tLweSymDecrypt(decrypt,&samples[trial],key,M);
 				// Testing correct decryption
-				for (int j = 0; j < N; ++j) ASSERT_EQ(message.coefsT[j],decrypt.coefsT[j]);
+				for (int j = 0; j < N; ++j) ASSERT_EQ(message->coefsT[j],decrypt->coefsT[j]);
 				
 				// ILA: It is really necessary? phase and ApproxPhase used in decrypt!!!
 				// Phase and ApproxPhase
@@ -223,9 +232,9 @@ Testing the functions tLweSymEncrypt, tLwePhase, tLweApproxPhase, tLweSymDecrypt
 				tLweApproxPhase(approxphase, phase, M, N);
 				// Testing Phase and ApproxPhase
 				for (int j = 0; j < N; ++j) {
-					double dmessage = t32tod(message.coefsT[j]);
-		    		double dphase = t32tod(phase.coefsT[j]);
-		    		double dapproxphase = t32tod(approxphase.coefsT[j]);
+					double dmessage = t32tod(message->coefsT[j]);
+		    		double dphase = t32tod(phase->coefsT[j]);
+		    		double dapproxphase = t32tod(approxphase->coefsT[j]);
 		    		ASSERT_LE(absfrac(dmessage-dphase),10.*alpha);
 		    		ASSERT_LE(absfrac(dmessage-dapproxphase),alpha); // ILA verify
 		    	}
@@ -234,9 +243,6 @@ Testing the functions tLweSymEncrypt, tLwePhase, tLweApproxPhase, tLweSymDecrypt
 		    }
 
 		    // Verify that samples are random enough (all coordinates different)
-		    const int N = params->N;
-		    const int k = params->k;
-
 		    for (int i = 0; i < k; ++i) {
 		    	for (int j = 0; j < N; ++j) {
 		    		set<Torus32> testset;
@@ -254,7 +260,7 @@ Testing the functions tLweSymEncrypt, tLwePhase, tLweApproxPhase, tLweSymDecrypt
 		    delete_TLweSample_array(NB_SAMPLES,samples);
 		}
 	}
-   
+  
 
 
 		   
@@ -305,7 +311,6 @@ Testing the function tLweClear
 
 
 
-
 /*
 Testing the function tLweCopy
  * EXPORT void tLweCopy(TLweSample* result, const TLweSample* sample, const TLweParams* params)
@@ -348,12 +353,13 @@ Testing the function tLweNoiselessTrivial
     TEST_F(TLweTest, tLweNoiselessTrivial) {
 		vector<TLweKey*> all_keys = {key512_1, key512_2, key1024_1, key1024_2, key2048_1, key2048_2};
 		for (TLweKey* key: all_keys) {
-		    const TorusPolynomial* message = new_TorusPolynomial(N);
-			for (int j = 0; j < N; ++j)
-				message.coefsT[j] = uniformTorus32_distrib(generator);
-		    const LweParams* params = key->params;
+		    const TLweParams* params = key->params;
 		    const int N = params->N;
 			const int k = params->k;
+
+			TorusPolynomial* message = new_TorusPolynomial(N);
+			for (int j = 0; j < N; ++j)
+				message->coefsT[j] = uniformTorus32_distrib(generator);
 		    TLweSample* sample = new_TLweSample(params);
 
 		    // Generate a random TLweSample and set it to (0,mu)
@@ -365,7 +371,7 @@ Testing the function tLweNoiselessTrivial
 		    	for (int j = 0; j < N; ++j)
 		    		ASSERT_EQ(0,sample->a[i].coefsT[j]);
 		    for (int j = 0; j < N; ++j)
-		    	ASSERT_EQ(message.coefsT[j],sample->b.coefsT[j]);
+		    	ASSERT_EQ(message->coefsT[j],sample->b->coefsT[j]);
 		    ASSERT_EQ(0.,sample->current_variance);
 
 		    delete_TorusPolynomial(message);
@@ -406,9 +412,9 @@ Testing the function tLweAddTo
 		    		ASSERT_EQ(sample1copy->a[i].coefsT[j] + sample2->a[i].coefsT[j], sample1->a[i].coefsT[j]);
 		    ASSERT_EQ(sample1copy->current_variance + sample2->current_variance, sample1->current_variance);
 
-		    delete_LweSample(sample1);
-		    delete_LweSample(sample2);
-		    delete_LweSample(sample1copy);
+		    delete_TLweSample(sample1);
+		    delete_TLweSample(sample2);
+		    delete_TLweSample(sample1copy);
 		}
     }
 
@@ -422,7 +428,7 @@ Testing the function tLweSubTo
  * tLweSubTo computes result = result - sample
 */
     TEST_F(TLweTest, tLweSubTo) {
-		vector<LweKey*> all_keys = {key500, key750, key1024};
+		vector<TLweKey*> all_keys = {key512_1, key512_2, key1024_1, key1024_2, key2048_1, key2048_2};
 		for (TLweKey* key: all_keys) {
 		    const TLweParams* params = key->params;
 		    const int N = params->N;
@@ -443,9 +449,9 @@ Testing the function tLweSubTo
 		    		ASSERT_EQ(sample1copy->a[i].coefsT[j] - sample2->a[i].coefsT[j], sample1->a[i].coefsT[j]);
 		    ASSERT_EQ(sample1copy->current_variance + sample2->current_variance, sample1->current_variance);
 
-		    delete_LweSample(sample1);
-		    delete_LweSample(sample2);
-		    delete_LweSample(sample1copy);
+		    delete_TLweSample(sample1);
+		    delete_TLweSample(sample2);
+		    delete_TLweSample(sample1copy);
 		}
     }
 
@@ -460,7 +466,7 @@ Testing the function tLweAddMulTo
 */
     TEST_F(TLweTest, tLweAddMulTo) {
 		const int p = 3;
-		vector<TLweKey*> all_keys = {key500, key750, key1024};
+		vector<TLweKey*> all_keys = {key512_1, key512_2, key1024_1, key1024_2, key2048_1, key2048_2};
 		for (TLweKey* key: all_keys) {
 		    const TLweParams* params = key->params;
 		    const int N = params->N;
@@ -481,9 +487,9 @@ Testing the function tLweAddMulTo
 		    		ASSERT_EQ(sample1copy->a[i].coefsT[j] + p*sample2->a[i].coefsT[j], sample1->a[i].coefsT[j]);
 		    ASSERT_EQ(sample1copy->current_variance + p*p*sample2->current_variance, sample1->current_variance);
 
-		    delete_LweSample(sample1);
-		    delete_LweSample(sample2);
-		    delete_LweSample(sample1copy);
+		    delete_TLweSample(sample1);
+		    delete_TLweSample(sample2);
+		    delete_TLweSample(sample1copy);
 		}
     }
 
@@ -498,7 +504,7 @@ Testing the function tLweSubMulTo
 */
     TEST_F(TLweTest, tLweSubMulTo) {
 		const int p = 3;
-		vector<TLweKey*> all_keys = {key500, key750, key1024};
+		vector<TLweKey*> all_keys = {key512_1, key512_2, key1024_1, key1024_2, key2048_1, key2048_2};
 		for (TLweKey* key: all_keys) {
 		    const TLweParams* params = key->params;
 		    const int N = params->N;
@@ -519,9 +525,9 @@ Testing the function tLweSubMulTo
 		    		ASSERT_EQ(sample1copy->a[i].coefsT[j] - p*sample2->a[i].coefsT[j], sample1->a[i].coefsT[j]);
 		    ASSERT_EQ(sample1copy->current_variance + p*p*sample2->current_variance, sample1->current_variance);
 
-		    delete_LweSample(sample1);
-		    delete_LweSample(sample2);
-		    delete_LweSample(sample1copy);
+		    delete_TLweSample(sample1);
+		    delete_TLweSample(sample2);
+		    delete_TLweSample(sample1copy);
 		}
     }
 
@@ -535,10 +541,6 @@ Testing the function tLweSubMulTo
 			
 
 		    
-
-
-
-
 
 
 
