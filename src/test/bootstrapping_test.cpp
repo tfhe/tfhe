@@ -2,6 +2,7 @@
 //#include <gmock/gmock.h>
 #include "tfhe.h"
 #include "fakes/tgsw.h"
+#include "fakes/lwe-bootstrapping.h"
 #define TFHE_TEST_ENVIRONMENT 1
 using namespace std;
 
@@ -9,154 +10,158 @@ using namespace ::testing;
 
 namespace {
 
+    const int N = 1024;
+    const int k = 1;
+    const int n = 500;
+    const int l_bk = 3; //ell
+    const int Bgbit_bk = 10;
+    //const int ks_basebit = 4;
+    const double alpha_in = 5e-4;
+    const double alpha_bk = 9e-9;
+    //const int alpha_ks = 1e-6;
 
-    const LweParams* params250_0 = new_LweParams(250,0.,1.);
-    const LweParams* params500_0 = new_LweParams(500,0.,1.);
-    const LweParams* params500_1em5 = new_LweParams(500,1e-5,1.);
-    const LweKey* key250 = new_LweKey(params250_0);
-    const LweKey* key500 = new_LweKey(params500_0);
+    const LweParams* in_params = new_LweParams(n, alpha_in, 1./16.);
+    const TLweParams* accum_params = new_TLweParams(N, k, alpha_bk, 1./16.);
+    const TGswParams* bk_params = new_TGswParams(l_bk, Bgbit_bk, accum_params);
+
+/*
+    LweKey* key = new_LweKey(params_in);
+    lweKeyGen(key);
+
+    TGswKey* key_bk = new_TGswKey(params_bk);
+    tGswKeyGen(key_bk);
+*/
 
 
-    class LweBootstrappingTest: public ::testing::Test {
+    class LweBootstrapRotateTest: public ::testing::Test {
 	public:
 
-	    //MOCK_METHOD4(lweSymEncrypt, void(LweSample*,const Torus32,const double, const LweKey*));
+	    USE_FAKE_new_TGswSample;
+	    USE_FAKE_delete_TGswSample;
+	    USE_FAKE_tGswMulByXaiMinusOne;
+            USE_FAKE_tGswAddH;
+	    USE_FAKE_tGswExternMulToTLwe;
 
 #define INCLUDE_TFHE_BOOTSTRAPROTATE
 #include "../libtfhe/lwe-bootstrapping-functions.cpp"
 #undef INCLUDE_TFHE_BOOTSTRAPROTATE
-	    /**
- * multiply the accumulator by X^sum(bara_i.s_i)
- * @param accum the TLWE sample to multiply
- * @param bk An array of n TGSW samples where bk_i encodes s_i
- * @param bara An array of n coefficients between 0 and 2N-1
- * @param bk_params The parameters of bk
- */
-EXPORT void tfhe_bootstrapRotate(TLweSample* accum, 
-	const TGswSample* bk, 
-	const int* bara,
-	const int n,
-	const TGswParams* bk_params) {
-    TGswSample* temp = new_TGswSample(bk_params);
-    for (int i=0; i<n; i++) {
-	const int barai=bara[i];
-	if (barai==0) continue; //indeed, this is an easy case!
-	tGswMulByXaiMinusOne(temp, barai, bk+i, bk_params);
-	tGswAddH(temp, bk_params);
-	tGswExternMulToTLwe(accum, temp, bk_params);
+
+    };
+
+
+    /**
+     * multiply the accumulator by X^sum(bara_i.s_i)
+     * @param accum the TLWE sample to multiply
+     * @param bk An array of n TGSW samples where bk_i encodes s_i
+     * @param bara An array of n coefficients between 0 and 2N-1
+     * @param bk_params The parameters of bk
+     */
+    //EXPORT void tfhe_bootstrapRotate(TLweSample* accum, 
+    //	    const TGswSample* bk, 
+    //	    const int* bara,
+    //	    const int n,
+    //	    const TGswParams* bk_params) {
+    TEST_F(LweBootstrapRotateTest,tfheBootstrapRotateTest) {
+	LweKey* key = new_LweKey(in_params);
+	lweKeyGen(key);
+	TGswKey* key_bk = new_TGswKey(bk_params);
+	tGswKeyGen(key_bk);
+	TGswSample* bk = fake_new_TGswSample_array(n, bk_params);
+	//create bara
+	int* bara = new int[n];
+	for (int i=0; i<n; i++) bara[i]=rand()%(2*N);
+	//create bk
+	for (int i=0; i<n; i++) fake_tGswSymEncryptInt(bk+i,key->key[i],alpha_bk,key_bk);
+	//create accum
+	TorusPolynomial* initAccumMessage = new_TorusPolynomial(N);
+	torusPolynomialUniform(initAccumMessage);
+	const double initAlphaAccum=0.2;
+	int expectedOffset=0;
+	TorusPolynomial* expectedAccumMessage = new_TorusPolynomial(N);
+	torusPolynomialCopy(expectedAccumMessage,initAccumMessage);
+	//double expectedAccumVariance=initAlphaAccum*initAlphaAccum;
+	TLweSample* accum = new_TLweSample(accum_params);
+	tLweNoiselessTrivial(accum, initAccumMessage, accum_params);
+	accum->current_variance=initAlphaAccum*initAlphaAccum;
+	//call bootstraprotate: one iteration at a time
+	for (int i=0; i<n; i++) {
+	    tfhe_bootstrapRotate(accum,bk+i,bara+i,1,bk_params);
+	    if (key->key[i]==1 && bara[i]!=0) {
+		expectedOffset=(expectedOffset+bara[i])%(2*N);
+		torusPolynomialMulByXai(expectedAccumMessage,expectedOffset,initAccumMessage);
+	    }
+	    //printf("i=%d,si=%d,barai=%d,offset=%d\n",i,key->key[i],bara[i],expectedOffset);
+	    for (int j=0; j<N; j++) ASSERT_EQ(expectedAccumMessage->coefsT[j],accum->b->coefsT[j]);
+	}
+	//Now, bootstraprotate: all iterations at once (same offset)
+	tLweNoiselessTrivial(accum, initAccumMessage, accum_params);
+	accum->current_variance=initAlphaAccum*initAlphaAccum;
+	tfhe_bootstrapRotate(accum,bk,bara,n,bk_params);
+	for (int j=0; j<N; j++) ASSERT_EQ(expectedAccumMessage->coefsT[j],accum->b->coefsT[j]);
+	//cleanup everything
+	delete_TLweSample(accum);
+	delete_TorusPolynomial(expectedAccumMessage);
+	delete_TorusPolynomial(initAccumMessage);
+	delete[] bara;
+	fake_delete_TGswSample_array(n,bk);
+	delete_TGswKey(key_bk);
+	delete_LweKey(key);
     }
-    delete_TGswSample(temp);
-}
+
+    class LweBootstrapRotateExtractTest: public ::testing::Test {
+	public:
+
+	    USE_FAKE_tfhe_bootstrapRotate;
+
+#define INCLUDE_TFHE_BOOTSTRAPROTATEEXTRACT
+#include "../libtfhe/lwe-bootstrapping-functions.cpp"
+#undef INCLUDE_TFHE_BOOTSTRAPROTATEEXTRACT
 
     };
 
     /**
-     * fills the KeySwitching key array
-     * @param result The (n x t x base) array of samples. 
-     *        result[i][j][k] encodes k.s[i]/base^(j+1)
-     * @param out_key The LWE key to encode all the output samples 
-     * @param out_alpha The standard deviation of all output samples
-     * @param in_key The (binary) input key
-     * @param n The size of the input key
-     * @param t The precision of the keyswitch (technically, 1/2.base^t)
-     * @param basebit Log_2 of base
+     * result = LWE(v_p) where p=barb-sum(bara_i.s_i) mod 2N
+     * @param result the output LWE sample
+     * @param v a 2N-elt anticyclic function (represented by a TorusPolynomial)
+     * @param bk An array of n TGSW samples where bk_i encodes s_i
+     * @param barb A coefficients between 0 and 2N-1
+     * @param bara An array of n coefficients between 0 and 2N-1
+     * @param bk_params The parameters of bk
      */
-    //void lweCreateKeySwitchKey_fromArray(LweSample*** result, 
-    TEST_F(LweKeySwitchTest, lweCreateKeySwitchKey_fromArray) {
-	//EXPECT_CALL(*this, lweSymEncrypt(_,_,_,_)).WillRepeatedly(Invoke(fake_lweSymEncrypt));
-	LweKeySwitchKey* test = new_LweKeySwitchKey(300,14,2,params500_1em5);
-	//int n = test->out_params->n;
-	double alpha = 1e-5;
-	int N = test->n;
-	int t = test->t;
-	int basebit = test->basebit;
-	int base = test->base;
-	int* in_key = new int[N];
-	for (int i=0; i<N; i++) in_key[i]=(uniformTorus32_distrib(generator)%2==0?1:0);
-	lweCreateKeySwitchKey_fromArray(test->ks,key500,alpha,in_key,N,t,basebit);
-	for (int i=0; i<N; i++) {
-	    for (int j=0; j<t; j++) {
-		for (int k=0; k<base; k++) {
-		    LweSample* ks_ijk = &test->ks[i][j][k];
-		    ASSERT_EQ(alpha*alpha,ks_ijk->current_variance);
-		    ASSERT_EQ(k*in_key[i]*1<<(32-(j+1)*basebit),ks_ijk->b);
-		}
-	    }
-	}
-	delete[] in_key;
-	delete_LweKeySwitchKey(test);
-    }
+    TEST_F(LweBootstrapRotateExtractTest,tfheBootstrapRotateExtractTest) {
+	LweKey* key = new_LweKey(in_params);
+	lweKeyGen(key);
+	TGswKey* key_bk = new_TGswKey(bk_params);
+	tGswKeyGen(key_bk);
+	TGswSample* bk = fake_new_TGswSample_array(n, bk_params);
+	//create bara and b
+	int* bara = new int[n];
+	for (int i=0; i<n; i++) bara[i]=rand()%(2*N);
+	int barb = rand()%(2*N);
+	//create bk
+	for (int i=0; i<n; i++) fake_tGswSymEncryptInt(bk+i,key->key[i],alpha_bk,key_bk);
+	//create v
+	TorusPolynomial* v = new_TorusPolynomial(N);
+	torusPolynomialUniform(v);
+	//const double initAlphaAccum=0.2;
+	//create result
+	LweSample* result = new_LweSample(&accum_params->extracted_lweparams);
 
-    /**
-     * translates the message of the result sample by -sum(a[i].s[i]) where s is the secret
-     * embedded in ks.
-     * @param result the LWE sample to translate by -sum(ai.si). 
-     * @param ks The (n x t x base) key switching key 
-     *        ks[i][j][k] encodes k.s[i]/base^(j+1)
-     * @param params The common LWE parameters of ks and result
-     * @param ai The input torus array
-     * @param n The size of the input key
-     * @param t The precision of the keyswitch (technically, 1/2.base^t)
-     * @param basebit Log_2 of base
-     */
-    //void lweKeySwitchTranslate_fromArray(LweSample* result, 
-    //	    const LweSample*** ks, const LweParams* params, 
-    //	    const Torus32* ai, 
-    //	    const int n, const int t, const int basebit)
-    TEST_F(LweKeySwitchTest, lweKeySwitchTranslate_fromArray) {
-	//EXPECT_CALL(*this, lweSymEncrypt(_,_,_,_)).WillRepeatedly(Invoke(fake_lweSymEncrypt));
-	LweKeySwitchKey* test = new_LweKeySwitchKey(300,14,2,params500_1em5);
-	//int n = test->out_params->n;
-	double alpha = 1e-5;
-	int N = test->n;
-	int t = test->t;
-	int basebit = test->basebit;
-	int base = test->base;
-	const int32_t prec_offset=1<<(32-(1+basebit*t)); //precision
-	const uint32_t prec_mask=-(1<<(32-(basebit*t))); //precision
-	//printf("prec_offset: %08x\n",prec_offset);
-	//printf("prec_mask: %08x\n",prec_mask);
-	int* in_key = new int[N];
-	Torus32 b = uniformTorus32_distrib(generator);
-	Torus32* ai = new int[N];
-	uint32_t* aibar = new uint32_t[N];
-	for (int i=0; i<N; i++) {
-	    in_key[i]=(uniformTorus32_distrib(generator)%2==0?1:0);
-	    ai[i]=uniformTorus32_distrib(generator);
-	    aibar[i]=(ai[i]+prec_offset) & prec_mask;
-	}
-	LweSample* res = new_LweSample(params500_1em5);
-	lweCreateKeySwitchKey_fromArray(test->ks,key500,alpha,in_key,N,t,basebit);
-	//we first try one by one
-	lweNoiselessTrivial(res,b,params500_1em5);
-	Torus32 barphi = b;
-	ASSERT_EQ(barphi,res->b);
-	for (int i=0; i<N; i++) {
-	    lweKeySwitchTranslate_fromArray(res, (const LweSample***) test->ks+i,params500_1em5,ai+i,1,t,basebit);
-	    barphi -= aibar[i]*in_key[i];
-	    //verify the decomposition function
-	    //printf( "ai:  %08x\n"
-	    //	    "aib: %08x si: %d\n",ai[i],aibar[i],in_key[i]);
-	    uint32_t dec = 0;
-	    for (int j=0;j<t;j++){
-		const uint32_t aij=(aibar[i]>>(32-(j+1)*basebit)) & (base-1);
-		const uint32_t rec=aij<<(32-(j+1)*basebit);
-		//printf("rec: %08x at j=%d\n",rec,j);
-		dec += rec;
-	    }
-	    ASSERT_EQ(dec,aibar[i]);
-	    ASSERT_NEAR(alpha*alpha*(i+1)*t,res->current_variance,1e-10);
-	    ASSERT_EQ(barphi,res->b);
-	}
-	//now, test it all at once
-	lweNoiselessTrivial(res,b,params500_1em5);
-	lweKeySwitchTranslate_fromArray(res, (const LweSample***) test->ks,params500_1em5,ai,N,t,basebit);
-	ASSERT_NEAR(alpha*alpha*N*t,res->current_variance,1e-10);
-	ASSERT_EQ(barphi,res->b);
-	delete[] in_key;
-	delete[] ai;
-	delete[] aibar;
-	delete_LweSample(res);
-	delete_LweKeySwitchKey(test);
+	//run the function
+	tfhe_bootstrapRotateExtract(result,v,bk,barb,bara,n,bk_params);
+
+	//verify
+	int offset = barb;
+	for (int i=0; i<n; i++) offset = (offset + 2*N - key->key[i]*bara[i])%(2*N);
+	ASSERT_EQ(result->b,(offset<N)?(v->coefsT[offset]):(-v->coefsT[offset-N]));
+	//TODO variance
+
+	//clean up
+	delete_LweSample(result);
+	delete_TorusPolynomial(v);
+	delete[] bara;
+	fake_delete_TGswSample_array(n,bk);
+	delete_TGswKey(key_bk);
+	delete_LweKey(key);
     }
 }

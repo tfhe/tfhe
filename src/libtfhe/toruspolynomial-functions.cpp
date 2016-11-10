@@ -136,3 +136,34 @@ EXPORT double intPolynomialNormSq2(const IntPolynomial* poly){
     }
     return temp1;
 }
+
+// Sets to zero
+EXPORT void intPolynomialClear(IntPolynomial* poly){
+    const int N = poly->N;
+    for (int i = 0; i < N; ++i)
+        poly->coefs[i]=0;
+}
+
+
+/**  result = (X^ai-1) * source */
+EXPORT void intPolynomialMulByXaiMinusOne(IntPolynomial* result, int ai, const IntPolynomial* source) {
+    const int N=source->N;
+    int* out=result->coefs;
+    int* in =source->coefs; 
+
+    assert(ai>=0 && ai<2*N);
+
+    if (ai<N) {
+	for (int i=0;i<ai;i++)//sur que i-a<0
+	    out[i]= -in[i-ai+N]-in[i];
+	for (int i=ai;i<N;i++)//sur que N>i-a>=0
+	    out[i]= in[i-ai]-in[i];
+    } else {
+	const int aa=ai-N;
+	for (int i=0;i<aa;i++)//sur que i-a<0
+	    out[i]= in[i-aa+N]-in[i];
+	for (int i=aa;i<N;i++)//sur que N>i-a>=0
+	    out[i]= -in[i-aa]-in[i];
+    }
+}
+

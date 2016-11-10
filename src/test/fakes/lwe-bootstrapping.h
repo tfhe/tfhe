@@ -1,41 +1,40 @@
-#ifndef TFHE_TEST_ENVIRONMENT
-#include <iostream>
-#include <cassert>
 #include "tfhe.h"
-using namespace std;
-#define INCLUDE_ALL
-#else
-#undef EXPORT
-#define EXPORT
-#endif
 
-
-#if defined INCLUDE_ALL || defined INCLUDE_TFHE_BOOTSTRAPROTATE
 /**
  * multiply the accumulator by X^sum(bara_i.s_i)
- * @param accum the TLWE sample to multiply
- * @param bk An array of n TGSW samples where bk_i encodes s_i
+ * @param accum the (fake) TLWE sample to multiply
+ * @param bk An array of n (fakes) TGSW samples where bk_i encodes s_i
  * @param bara An array of n coefficients between 0 and 2N-1
  * @param bk_params The parameters of bk
  */
-EXPORT void tfhe_bootstrapRotate(TLweSample* accum, 
+inline void fake_tfhe_bootstrapRotate(TLweSample* accum, 
 	const TGswSample* bk, 
 	const int* bara,
 	const int n,
 	const TGswParams* bk_params) {
-    TGswSample* temp = new_TGswSample(bk_params);
+    int offset = 0;
     for (int i=0; i<n; i++) {
+	const int si = fake(bk+i)->message->coefs[0];
 	const int barai=bara[i];
-	if (barai==0) continue; //indeed, this is an easy case!
-	tGswMulByXaiMinusOne(temp, barai, bk+i, bk_params);
-	tGswAddH(temp, bk_params);
-	tGswExternMulToTLwe(accum, temp, bk_params);
+	if (barai==0 || si==0) continue; //indeed, this is an easy case!
+	offset = (offset + barai*si) % (2*bk_params->tlwe_params->N);
     }
-    delete_TGswSample(temp);
+    //TODO: make a fake function for that
+    torusPolynomialCopy(accum->a,accum->b);
+    torusPolynomialMulByXai(accum->b,offset,accum->a);
+    torusPolynomialClear(accum->a);
+    //TODO update the variance
 }
-#endif 
 
-#if defined INCLUDE_ALL || defined INCLUDE_TFHE_BOOTSTRAPROTATEEXTRACT
+#define USE_FAKE_tfhe_bootstrapRotate \
+    inline void tfhe_bootstrapRotate(TLweSample* accum, \
+	    const TGswSample* bk, \
+	    const int* bara, \
+	    const int n, \
+	    const TGswParams* bk_params) { \
+	fake_tfhe_bootstrapRotate(accum,bk,bara,n,bk_params); \
+    }
+
 /**
  * result = LWE(v_p) where p=barb-sum(bara_i.s_i) mod 2N
  * @param result the output LWE sample
@@ -45,7 +44,7 @@ EXPORT void tfhe_bootstrapRotate(TLweSample* accum,
  * @param bara An array of n coefficients between 0 and 2N-1
  * @param bk_params The parameters of bk
  */
-EXPORT void tfhe_bootstrapRotateExtract(LweSample* result, 
+inline void fake_tfhe_bootstrapRotateExtract(LweSample* result, 
 	const TorusPolynomial* v,
 	const TGswSample* bk, 
 	const int barb,
@@ -57,20 +56,26 @@ EXPORT void tfhe_bootstrapRotateExtract(LweSample* result,
     const int N = accum_params->N;
     const int _2N = 2*N;
 
-    TorusPolynomial* testvectbis=new_TorusPolynomial(N);
-    TLweSample* acc = new_TLweSample(accum_params);
-
-    if (barb!=0)
-	torusPolynomialMulByXai(testvectbis, _2N-barb, v);
-    tLweNoiselessTrivial(acc, testvectbis, accum_params);
-    tfhe_bootstrapRotate(acc, bk, bara, n, bk_params);
-    tLweExtractLweSample(result, acc, extract_params, accum_params);
-
-    delete_TLweSample(acc);
-    delete_TorusPolynomial(testvectbis);
+    int offset = barb;
+    for (int i=0; i<n; i++) {
+	int si = fake(bk+i)->message->coefs[0];
+	offset = (offset + _2N - si*bara[i])%(_2N);
+    }
+    lweNoiselessTrivial(result,v->coefsT[offset],extract_params);
+    result->current_variance=0; //TODO variance
 }
-#endif 
-   
+
+#define USE_FAKE_tfhe_bootstrapRotateExtract \
+    inline void tfhe_bootstrapRotateExtract(LweSample* result, \
+	    const TorusPolynomial* v, \
+	    const TGswSample* bk, \
+	    const int barb, \
+	    const int* bara, \
+	    const int n, \
+	    const TGswParams* bk_params) { \
+	fake_tfhe_bootstrapRotateExtract(result,v,bk,barb,bara,n,bk_params); \
+    }
+
 
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_BOOTSTRAP
 /**
@@ -99,7 +104,7 @@ EXPORT void tfhe_bootstrap(LweSample* result,
     for (int i=0; i<n; i++) {
 	bara[i]=modSwitchFromTorus32(x->a[i],Nx2);
     }
- 
+
     //the initial testvec = [mu,mu,mu,...,mu]
     for (int i=0;i<N;i++) testvect->coefsT[i]=mu;
 
