@@ -23,6 +23,7 @@ namespace {
     const LweParams* in_params = new_LweParams(n, alpha_in, 1./16.);
     const TLweParams* accum_params = new_TLweParams(N, k, alpha_bk, 1./16.);
     const TGswParams* bk_params = new_TGswParams(l_bk, Bgbit_bk, accum_params);
+    const LweParams* extract_params = &accum_params->extracted_lweparams;
 
 /*
     LweKey* key = new_LweKey(params_in);
@@ -129,6 +130,8 @@ namespace {
      * @param bk_params The parameters of bk
      */
     TEST_F(LweBootstrapRotateExtractTest,tfheBootstrapRotateExtractTest) {
+	const int NB_TRIALS=30;
+
 	LweKey* key = new_LweKey(in_params);
 	lweKeyGen(key);
 	TGswKey* key_bk = new_TGswKey(bk_params);
@@ -136,26 +139,28 @@ namespace {
 	TGswSample* bk = fake_new_TGswSample_array(n, bk_params);
 	//create bara and b
 	int* bara = new int[n];
-	for (int i=0; i<n; i++) bara[i]=rand()%(2*N);
-	int barb = rand()%(2*N);
 	//create bk
 	for (int i=0; i<n; i++) fake_tGswSymEncryptInt(bk+i,key->key[i],alpha_bk,key_bk);
 	//create v
 	TorusPolynomial* v = new_TorusPolynomial(N);
-	torusPolynomialUniform(v);
-	//const double initAlphaAccum=0.2;
 	//create result
 	LweSample* result = new_LweSample(&accum_params->extracted_lweparams);
 
-	//run the function
-	tfhe_bootstrapRotateExtract(result,v,bk,barb,bara,n,bk_params);
+	for (int trial=0; trial<NB_TRIALS; trial++) {
+	    for (int i=0; i<n; i++) bara[i]=rand()%(2*N);
+	    int barb = rand()%(2*N);
+	    torusPolynomialUniform(v);
+	    //const double initAlphaAccum=0.2;
 
-	//verify
-	int offset = barb;
-	for (int i=0; i<n; i++) offset = (offset + 2*N - key->key[i]*bara[i])%(2*N);
-	ASSERT_EQ(result->b,(offset<N)?(v->coefsT[offset]):(-v->coefsT[offset-N]));
-	//TODO variance
+	    //run the function
+	    tfhe_bootstrapRotateExtract(result,v,bk,barb,bara,n,bk_params);
 
+	    //verify
+	    int offset = barb;
+	    for (int i=0; i<n; i++) offset = (offset + 2*N - key->key[i]*bara[i])%(2*N);
+	    ASSERT_EQ(result->b,(offset<N)?(v->coefsT[offset]):(-v->coefsT[offset-N]));
+	    //TODO variance
+	}
 	//clean up
 	delete_LweSample(result);
 	delete_TorusPolynomial(v);
@@ -164,4 +169,136 @@ namespace {
 	delete_TGswKey(key_bk);
 	delete_LweKey(key);
     }
+
+
+    class LweBootstrapTest: public ::testing::Test {
+	public:
+
+	    USE_FAKE_tfhe_bootstrapRotateExtract;
+
+#define INCLUDE_TFHE_BOOTSTRAP
+#include "../libtfhe/lwe-bootstrapping-functions.cpp"
+#undef INCLUDE_TFHE_BOOTSTRAP
+
+    };
+    /**
+     * result = LWE(mu) iff phase(x)>0, LWE(-mu) iff phase(x)<0
+     * @param result The resulting LweSample
+     * @param bk The bootstrapping + keyswitch key
+     * @param mu The output message (if phase(x)>0)
+     * @param x The input sample
+     */
+    //EXPORT void tfhe_bootstrap(LweSample* result, 
+    //	const LweBootstrappingKey* bk, 
+    //	Torus32 mu, const LweSample* x)
+    TEST_F(LweBootstrapTest,tfheBootstrapTest) {
+	const Torus32 TEST_MU=123456789;
+	const int NB_TRIALS=30;
+	const int Nx2= 2*N;
+	const int n = in_params->n;
+	//create a fake bootstrapping key
+	LweKey* key = new_LweKey(in_params);
+	lweKeyGen(key);
+	TGswKey* key_bk = new_TGswKey(bk_params);
+	tGswKeyGen(key_bk);
+	LweBootstrappingKey* bk = fake_new_LweBootstrappingKey(in_params, bk_params);
+	fake_tfhe_createLweBootstrappingKey(bk, key, key_bk);
+
+	//alloc the output lwe sample
+	LweSample* result = new_LweSample(in_params);
+
+	//create a random input sample
+	LweSample* insample = new_LweSample(extract_params);
+	for (int trial=0; trial<NB_TRIALS; trial++) {
+	    lweSymEncrypt(insample,uniformTorus32_distrib(generator),0.001,key);
+
+	    //compute the approx. phase mod 2N
+	    int barb=modSwitchFromTorus32(insample->b,Nx2);
+	    int phase=barb;
+	    for (int i=0; i<n; i++) {
+		int barai=modSwitchFromTorus32(insample->a[i],Nx2);
+		phase-=key->key[i]*barai;
+	    }
+	    phase = (Nx2+(phase%Nx2))%Nx2; //positive modulo
+
+	    //call the function
+	    tfhe_bootstrap(result,bk,TEST_MU,insample);
+
+	    //printf("trial=%d,hash=%d,phase=%d,result=%d\n",trial,hash,phase,result->b);
+	    //verify the result
+	    ASSERT_EQ(result->b,phase<N?TEST_MU:-TEST_MU);
+	}
+
+	//cleanup
+	delete_LweSample(insample);
+	delete_LweSample(result);
+	fake_delete_LweBootstrappingKey(bk);
+	delete_TGswKey(key_bk);
+	delete_LweKey(key);
+
+    }
+
+    class LweCreateBootstrapKeyTest: public ::testing::Test {
+	public:
+
+
+	    LweKeySwitchKey* captured_result;
+	    vector<int> captured_in_key_copy;
+	    const LweKey* captured_out_key;
+	    void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key) {
+		const int N = in_key->params->n;
+		captured_result=result;
+		copy(in_key->key,in_key->key+N,back_inserter(captured_in_key_copy));
+		captured_out_key=out_key;
+		fake_lweCreateKeySwitchKey(result,in_key,out_key);
+	    }
+
+	    USE_FAKE_tGswSymEncryptInt;
+
+#define INCLUDE_TFHE_CREATEBOOTSTRAPPINGKEY
+#include "../libtfhe/lwe-bootstrapping-functions.cpp"
+#undef INCLUDE_TFHE_CREATEBOOTSTRAPPINGKEY
+
+    };
+
+    //EXPORT void tfhe_createLweBootstrappingKey(
+    //	LweBootstrappingKey* bk, 
+    //	const LweKey* key_in, 
+    //	const TGswKey* rgsw_key) 
+    TEST_F(LweCreateBootstrapKeyTest,createBootstrappingKeyTest) {
+	LweKey* key = new_LweKey(in_params);
+	lweKeyGen(key);
+	TGswKey* key_bk = new_TGswKey(bk_params);
+	tGswKeyGen(key_bk);
+	LweBootstrappingKey* bk = fake_new_LweBootstrappingKey(in_params, bk_params);
+
+	//call the function
+	tfhe_createLweBootstrappingKey(bk, key, key_bk);
+
+	//make the checks
+	//LweKeySwitchKey* ks; ///< the keyswitch key (s'->s)
+	const TLweKey* accum_key = &key_bk->tlwe_key;
+	LweKey* extracted_key = new_LweKey(extract_params);
+	tLweExtractKey(extracted_key, accum_key);
+	ASSERT_TRUE(captured_result==bk->ks);
+	ASSERT_TRUE(captured_out_key==key);
+	for (int i=0; i<N; i++) {
+	    ASSERT_EQ(captured_in_key_copy[i],extracted_key->key[i]);
+	}
+	delete_LweKey(extracted_key);
+
+	//TGswSample* bk; ///< the bootstrapping key (s->s")
+	const int* kin = key->key;
+	const int n = in_params->n;
+	for (int i=0; i<n; i++) {
+	    ASSERT_EQ(fake(&bk->bk[i])->message->coefs[0],kin[i]);
+	    //TODO: check noise variance
+	}
+
+	//cleanup
+	fake_delete_LweBootstrappingKey(bk);
+	delete_TGswKey(key_bk);
+	delete_LweKey(key);
+    }
+
 }

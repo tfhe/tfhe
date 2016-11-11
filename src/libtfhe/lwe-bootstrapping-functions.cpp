@@ -137,11 +137,11 @@ EXPORT void tfhe_createLweBootstrappingKey(
     int* kin = key_in->key;
     const double alpha = accum_params->alpha_min;
     const int n = in_out_params->n;
-    const int kpl = bk_params->kpl;
-    const int k = accum_params->k;
-    const int N = accum_params->N;
-    cout << "create the bootstrapping key bk ("  << "  " << n*kpl*(k+1)*N*4 << " bytes)" << endl;
-    cout << "  with noise_stdev: " << alpha << endl;
+    //const int kpl = bk_params->kpl;
+    //const int k = accum_params->k;
+    //const int N = accum_params->N;
+    //cout << "create the bootstrapping key bk ("  << "  " << n*kpl*(k+1)*N*4 << " bytes)" << endl;
+    //cout << "  with noise_stdev: " << alpha << endl;
     for (int i=0; i<n; i++) {
 	tGswSymEncryptInt(&bk->bk[i], kin[i], alpha, rgsw_key);
     }

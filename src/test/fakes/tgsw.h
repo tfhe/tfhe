@@ -90,7 +90,7 @@ namespace {
 
 #define USE_FAKE_tGswSymEncryptInt \
     inline void tGswSymEncryptInt(TGswSample* result, const int message, double alpha, const TGswKey* key) { \
-	tGswSymEncryptInt(result, message, alpha, TGswKey* key); \
+	fake_tGswSymEncryptInt(result, message, alpha, key); \
     }
 
     inline void fake_tGswSymDecrypt(IntPolynomial* result, const TGswSample* sample, const TGswKey* key, const int Msize) {
