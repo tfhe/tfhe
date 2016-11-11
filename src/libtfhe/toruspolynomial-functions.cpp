@@ -151,6 +151,12 @@ EXPORT void intPolynomialCopy(IntPolynomial* result, const IntPolynomial* source
         result->coefs[i]=source->coefs[i];
 }
 
+/** accum += source */
+EXPORT void intPolynomialAddTo(IntPolynomial* accum, const IntPolynomial* source) {
+    const int N = source->N;
+    for (int i = 0; i < N; ++i)
+        accum->coefs[i]+=source->coefs[i];
+}
 
 /**  result = (X^ai-1) * source */
 EXPORT void intPolynomialMulByXaiMinusOne(IntPolynomial* result, int ai, const IntPolynomial* source) {
