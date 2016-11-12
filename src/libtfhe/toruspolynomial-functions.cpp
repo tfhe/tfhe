@@ -139,9 +139,6 @@ EXPORT double intPolynomialNormSq2(const IntPolynomial* poly){
 
 
 
-/* *****************
-**** À verifier ****
-***************** */
 // ILA: Norme infini de la distance entre deux TorusPolynomial
 EXPORT double torusPolynomialNormInftyDist(const TorusPolynomial* poly1, const TorusPolynomial* poly2) {
     const int N = poly1->N;

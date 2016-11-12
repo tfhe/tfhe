@@ -26,7 +26,7 @@ namespace {
 	const TLweParams* params1024_2 = new_TLweParams(1024,2,0.,1.);
 	const TLweParams* params2048_1 = new_TLweParams(2048,1,0.,1.);
 	const TLweParams* params2048_2 = new_TLweParams(2048,2,0.,1.);
-	// all_params = {params512_1, params512_2, params1024_1, params1024_2, params2048_1, params2048_2}	
+	// all_params = {params512_1, params512_2, params1024_1, params1024_2, params2048_1, params2048_2}
 	
 	const TLweKey* key512_1 = new_TLweKey(params512_1);
 	const TLweKey* key512_2 = new_TLweKey(params512_2);
@@ -36,8 +36,8 @@ namespace {
 	const TLweKey* key2048_2 = new_TLweKey(params2048_2);
 	// all_keys = {key512_1, key512_2, key1024_1, key1024_2, key2048_1, key2048_2}
 
-	/* ILA tolerance factor for the equality between two TorusPolynomial */
-	const double toler = 0.001; //ILA 
+	/* Tolerance factor for the equality between two TorusPolynomial */
+	const double toler = 1e-8; 
 	
     class TLweTest: public ::testing::Test {
     };
@@ -106,8 +106,7 @@ Testing the function tLweKeyGen
 		    
 			const int N = key->params->N;
 			const int k = key->params->k;
-			IntPolynomial* s = new_IntPolynomial(N);
-			s = key->key;
+			const IntPolynomial* s = key->key;
 		    
 		    //verify that the key is binary and kind-of random
 		    int count = 0;
@@ -120,7 +119,6 @@ Testing the function tLweKeyGen
 			ASSERT_LE(count,k*N-20); // <=
 		    ASSERT_GE(count,20); // >=
 			
-		    delete_IntPolynomial(s);
 		    delete_TLweKey(key);
 		}
     }
