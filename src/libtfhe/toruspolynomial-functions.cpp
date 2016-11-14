@@ -139,17 +139,15 @@ EXPORT double intPolynomialNormSq2(const IntPolynomial* poly){
 
 
 
-// ILA: Norme infini de la distance entre deux TorusPolynomial
+// Norme infini de la distance entre deux TorusPolynomial
 EXPORT double torusPolynomialNormInftyDist(const TorusPolynomial* poly1, const TorusPolynomial* poly2) {
     const int N = poly1->N;
-
-    double r = abs(t32tod(poly1->coefsT[0] - poly2->coefsT[0]));
-    double norm = r;
+    double norm = 0;
 
     // Max between the coefficients of abs(poly1-poly2)
-    for (int i = 1; i < N; ++i){
-        r = abs(t32tod(poly1->coefsT[i] - poly2->coefsT[i]));
-        if (r<norm) {norm = r;}
+    for (int i = 0; i < N; ++i){
+        double r = abs(t32tod(poly1->coefsT[i] - poly2->coefsT[i]));
+        if (r>norm) {norm = r;}
     }
     return norm;
 }

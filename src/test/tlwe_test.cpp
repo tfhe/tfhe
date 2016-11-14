@@ -16,6 +16,18 @@ using namespace std;
 
 namespace {
 
+	// we use the function rand because in the "const static" context the uniformly random generator doesn't work!
+	const TLweKey* new_random_key(const TLweParams* params) {
+	    TLweKey* key = new_TLweKey(params);
+	    const int N = params->N;
+    	const int k = params->k;
+
+	    for (int i = 0; i < k; ++i)
+	        for (int j = 0; j < N; ++j)
+	            key->key[i].coefs[j] = rand()%2;	
+	    return key;
+	}	
+
 	/*
 	 * Parameters and keys (for N=512,1024,2048 and k=1,2)
 	 * ILA: Creer un set des parametres avec tous les params à l'interieur et utiliser le set dans les tests (?)
@@ -28,12 +40,12 @@ namespace {
 	const TLweParams* params2048_2 = new_TLweParams(2048,2,0.,1.);
 	// all_params = {params512_1, params512_2, params1024_1, params1024_2, params2048_1, params2048_2}
 	
-	const TLweKey* key512_1 = new_TLweKey(params512_1);
-	const TLweKey* key512_2 = new_TLweKey(params512_2);
-	const TLweKey* key1024_1 = new_TLweKey(params1024_1);
-	const TLweKey* key1024_2 = new_TLweKey(params1024_2);
-	const TLweKey* key2048_1 = new_TLweKey(params2048_1);
-	const TLweKey* key2048_2 = new_TLweKey(params2048_2);
+	const TLweKey* key512_1 = new_random_key(params512_1);
+	const TLweKey* key512_2 = new_random_key(params512_2);
+	const TLweKey* key1024_1 = new_random_key(params1024_1);
+	const TLweKey* key1024_2 = new_random_key(params1024_2);
+	const TLweKey* key2048_1 = new_random_key(params2048_1);
+	const TLweKey* key2048_2 = new_random_key(params2048_2);
 	// all_keys = {key512_1, key512_2, key1024_1, key1024_2, key2048_1, key2048_2}
 
 	/* Tolerance factor for the equality between two TorusPolynomial */
@@ -153,7 +165,7 @@ Testing the functions tLweSymEncryptT, tLwePhase, tLweSymDecryptT
 		    //verify correctness of the decryption
 		    for (int trial=0; trial<NB_SAMPLES; trial++) {
 		    	// The message is a Torus32   	
-		    	Torus32 message = modSwitchToTorus32(trial,M);
+		    	Torus32 message = modSwitchToTorus32(rand()%M,M);
 			    
 				// Encrypt and decrypt
 				tLweSymEncryptT(&samples[trial],message,alpha,key);
@@ -221,7 +233,7 @@ Testing the functions tLweSymEncrypt, tLwePhase, tLweApproxPhase, tLweSymDecrypt
 		    //verify correctness of the decryption
 		    for (int trial=0; trial<NB_SAMPLES; trial++) {
 		    	for (int j = 0; j < N; ++j)
-		    		message->coefsT[j] = modSwitchToTorus32(trial,M);
+		    		message->coefsT[j] = modSwitchToTorus32(rand()%M,M);
 				
 				// Encrypt and Decrypt 
 				tLweSymEncrypt(&samples[trial],message,alpha,key);
