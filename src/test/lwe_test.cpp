@@ -5,34 +5,36 @@
 using namespace std;
 
 namespace {
+    //this function creates a new lwekey and initializes it with random
+    //values. We do not use the c++11 random generator, since it gets in
+    //a deadlock mode on static const initializers
+    const LweKey* new_random_LweKey(const LweParams* params) {
+	LweKey* key = new_LweKey(params);
+	const int n = params->n;
+	for (int i=0; i<n; i++)
+	    key->key[i]=rand()%2;
+	return key;
+    }
 
     class LweTest: public ::testing::Test {
-	protected:
-	    virtual void SetUp() {
-		params500 = new_LweParams(500,0.,1.);
-		params750 = new_LweParams(750,0.,1.);
-		params1024 = new_LweParams(1024,0.,1.);
-		key500 = new_LweKey(params500);
-		key750 = new_LweKey(params750);
-		key1024 = new_LweKey(params1024);
-	    }
-	    virtual void TearDown() {
-		delete_LweParams(params500);
-		delete_LweParams(params750);
-		delete_LweParams(params1024);
-		delete_LweKey(key500);
-		delete_LweKey(key750);
-		delete_LweKey(key1024);
-	    }
-
 	public:
-	    LweParams* params500;
-	    LweParams* params750;
-	    LweParams* params1024;
-	    LweKey* key500;
-	    LweKey* key750;
-	    LweKey* key1024;
+	    static const LweParams* params500;
+	    static const LweParams* params750;
+	    static const LweParams* params1024;
+	    static const LweKey* key500;
+	    static const LweKey* key750;
+	    static const LweKey* key1024;
+	    static const vector<const LweParams*> all_params;
+	    static const vector<const LweKey*> all_keys;
     };
+    const LweParams* LweTest::params500 = new_LweParams(500,0.,1.);
+    const LweParams* LweTest::params750 = new_LweParams(750,0.,1.);
+    const LweParams* LweTest::params1024 = new_LweParams(1024,0.,1.);
+    const LweKey* LweTest::key500 = new_random_LweKey(params500);
+    const LweKey* LweTest::key750 = new_random_LweKey(params750);
+    const LweKey* LweTest::key1024 = new_random_LweKey(params1024);
+    const vector<const LweParams*> LweTest::all_params = {params500, params750, params1024};
+    const vector<const LweKey*> LweTest::all_keys = {key500, key750, key1024};
 
     // | frac(x) |
     double absfrac(double d) {return abs(d-rint(d));}
@@ -58,8 +60,7 @@ namespace {
     // The Lwe key for the result must be allocated and initialized
     // (this means that the parameters are already in the result)
     TEST_F(LweTest, lweKeyGen) {
-	vector<LweParams*> all_params = {params500, params750, params1024};
-	for (LweParams* params: all_params) {
+	for (const LweParams* params: all_params) {
 	    LweKey* key = new_LweKey(params);
 	    lweKeyGen(key);
 	    ASSERT_EQ(params,key->params);
@@ -84,8 +85,7 @@ namespace {
 	static const int NB_SAMPLES=10;
 	static const int M = 8;
 	static const double alpha = 1./(10.*M);
-	vector<LweKey*> all_keys = {key500, key750, key1024};
-	for (LweKey* key: all_keys) {
+	for (const LweKey* key: all_keys) {
 	    const LweParams* params = key->params;
 	    LweSample* samples = new_LweSample_array(NB_SAMPLES,params);
 	    //verify correctness of the decryption
@@ -116,8 +116,7 @@ namespace {
     //Arithmetic operations on Lwe samples
     // result = (0,0)
     TEST_F(LweTest, lweClear) {
-	vector<LweKey*> all_keys = {key500, key750, key1024};
-	for (LweKey* key: all_keys) {
+	for (const LweKey* key: all_keys) {
 	    const LweParams* params = key->params;
 	    const int n = params->n;
 	    LweSample* sample = new_LweSample(params);
@@ -134,8 +133,7 @@ namespace {
 
     // result = (0,mu)
     TEST_F(LweTest, lweNoiselessTrivial) {
-	vector<LweKey*> all_keys = {key500, key750, key1024};
-	for (LweKey* key: all_keys) {
+	for (const LweKey* key: all_keys) {
 	    const Torus32 message = uniformTorus32_distrib(generator);
 	    const LweParams* params = key->params;
 	    const int n = params->n;
@@ -155,8 +153,7 @@ namespace {
     // result = result + sample */
     //EXPORT void lweAddTo(LweSample* result, const LweSample* sample, const LweParams* params);
     TEST_F(LweTest, lweAddTo) {
-	vector<LweKey*> all_keys = {key500, key750, key1024};
-	for (LweKey* key: all_keys) {
+	for (const LweKey* key: all_keys) {
 	    const LweParams* params = key->params;
 	    const int n = params->n;
 	    LweSample* a = new_LweSample(params);
@@ -180,8 +177,7 @@ namespace {
     // result = result - sample
     //EXPORT void lweSubTo(LweSample* result, const LweSample* sample, const LweParams* params);
     TEST_F(LweTest, lweSubTo) {
-	vector<LweKey*> all_keys = {key500, key750, key1024};
-	for (LweKey* key: all_keys) {
+	for (const LweKey* key: all_keys) {
 	    const LweParams* params = key->params;
 	    const int n = params->n;
 	    LweSample* a = new_LweSample(params);
@@ -207,8 +203,7 @@ namespace {
     //EXPORT void lweAddMulTo(LweSample* result, int p, const LweSample* sample, const LweParams* params);
     TEST_F(LweTest, lweAddMulTo) {
 	const int p = 3;
-	vector<LweKey*> all_keys = {key500, key750, key1024};
-	for (LweKey* key: all_keys) {
+	for (const LweKey* key: all_keys) {
 	    const LweParams* params = key->params;
 	    const int n = params->n;
 	    LweSample* a = new_LweSample(params);
@@ -233,8 +228,7 @@ namespace {
     //EXPORT void lweSubMulTo(LweSample* result, int p, const LweSample* sample, const LweParams* params);
     TEST_F(LweTest, lweSubMulTo) {
 	const int p = 3;
-	vector<LweKey*> all_keys = {key500, key750, key1024};
-	for (LweKey* key: all_keys) {
+	for (const LweKey* key: all_keys) {
 	    const LweParams* params = key->params;
 	    const int n = params->n;
 	    LweSample* a = new_LweSample(params);
@@ -258,7 +252,7 @@ namespace {
 #if 0
 
     //TODO: à tester!!
-    
+
     // 
     // creates a Key Switching Key between the two keys
     ///
