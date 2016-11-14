@@ -60,6 +60,12 @@ EXPORT void intPolynomialAddTo(IntPolynomial* result, const IntPolynomial* poly1
 /**  result = (X^ai-1) * source */
 EXPORT void intPolynomialMulByXaiMinusOne(IntPolynomial* result, int ai, const IntPolynomial* source);
 
+/**  ILA: Norme infini de la distance entre deux TorusPolynomial */
+EXPORT double torusPolynomialNormInftyDist(const TorusPolynomial* poly1, const TorusPolynomial* poly2);
+
+
+
+
 /**
  * This is the naive external multiplication of an integer polynomial
  * with a torus polynomial. (this function should yield exactly the same
