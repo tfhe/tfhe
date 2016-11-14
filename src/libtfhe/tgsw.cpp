@@ -5,7 +5,7 @@
 
 
 
-TGswParams::TGswParams(int l, int Bgbit, TLweParams* tlwe_params):
+TGswParams::TGswParams(int l, int Bgbit, const TLweParams* tlwe_params):
     l(l),
     Bgbit(Bgbit),
     Bg(1<<Bgbit),

@@ -17,6 +17,10 @@
 
 #include "tgsw_functions.h"
 
+#include "lwekeyswitch.h"
+
+#include "lwebootstrappingkey.h"
+
 //extraction TGsw -> SemiTGsw
 EXPORT void tGswExtractKey(SemiTGswSample* result, const TGswKey* key);
 EXPORT void tGswExtractSample(TLweSample* result, const TGswSample* x);

@@ -20,7 +20,7 @@ struct TGswParams {
     uint32_t offset; ///< offset = Bg/2 * (2^(32-Bgbit) + 2^(32-2*Bgbit) + ... + 2^(32-l*Bgbit))
 
 #ifdef __cplusplus
-    TGswParams(int l, int Bgbit, TLweParams* tlwe_params);
+    TGswParams(int l, int Bgbit, const TLweParams* tlwe_params);
     ~TGswParams();
     TGswParams(const TGswParams&) = delete;
     void operator=(const TGswParams&) = delete;
@@ -110,8 +110,8 @@ EXPORT void free_TGswParams_array(int nbelts, TGswParams* ptr);
 
 //initialize the TGswParams structure
 //(equivalent of the C++ constructor)
-EXPORT void init_TGswParams(TGswParams* obj, int l, int Bgbit, TLweParams* tlwe_params);
-EXPORT void init_TGswParams_array(int nbelts, TGswParams* obj, int l, int Bgbit, TLweParams* tlwe_params);
+EXPORT void init_TGswParams(TGswParams* obj, int l, int Bgbit, const TLweParams* tlwe_params);
+EXPORT void init_TGswParams_array(int nbelts, TGswParams* obj, int l, int Bgbit, const TLweParams* tlwe_params);
 
 //destroys the TGswParams structure
 //(equivalent of the C++ destructor)
@@ -120,8 +120,8 @@ EXPORT void destroy_TGswParams_array(int nbelts, TGswParams* obj);
  
 //allocates and initialize the TGswParams structure
 //(equivalent of the C++ new)
-EXPORT TGswParams* new_TGswParams(int l, int Bgbit, TLweParams* tlwe_params);
-EXPORT TGswParams* new_TGswParams_array(int nbelts, int l, int Bgbit, TLweParams* tlwe_params);
+EXPORT TGswParams* new_TGswParams(int l, int Bgbit, const TLweParams* tlwe_params);
+EXPORT TGswParams* new_TGswParams_array(int nbelts, int l, int Bgbit, const TLweParams* tlwe_params);
 
 //destroys and frees the TGswParams structure
 //(equivalent of the C++ delete)

@@ -505,10 +505,10 @@ EXPORT void free_TGswParams_array(int nbelts, TGswParams* ptr) {
 
 //initialize the key structure
 //(equivalent of the C++ constructor)
-EXPORT void init_TGswParams(TGswParams* obj, int l, int Bgbit, TLweParams* tlwe_params) {
+EXPORT void init_TGswParams(TGswParams* obj, int l, int Bgbit, const TLweParams* tlwe_params) {
     new(obj) TGswParams(l,Bgbit,tlwe_params);
 }
-EXPORT void init_TGswParams_array(int nbelts, TGswParams* obj, int l, int Bgbit, TLweParams* tlwe_params) {
+EXPORT void init_TGswParams_array(int nbelts, TGswParams* obj, int l, int Bgbit, const TLweParams* tlwe_params) {
     for (int i=0; i<nbelts; i++) {
 	new(obj+i) TGswParams(l,Bgbit,tlwe_params);
     }
@@ -527,10 +527,10 @@ EXPORT void destroy_TGswParams_array(int nbelts, TGswParams* obj) {
  
 //allocates and initialize the TGswParams structure
 //(equivalent of the C++ new)
-EXPORT TGswParams* new_TGswParams(int l, int Bgbit, TLweParams* tlwe_params) {
+EXPORT TGswParams* new_TGswParams(int l, int Bgbit, const TLweParams* tlwe_params) {
     return new TGswParams(l,Bgbit,tlwe_params);
 }
-EXPORT TGswParams* new_TGswParams_array(int nbelts, int l, int Bgbit, TLweParams* tlwe_params) {
+EXPORT TGswParams* new_TGswParams_array(int nbelts, int l, int Bgbit, const TLweParams* tlwe_params) {
     TGswParams* obj = alloc_TGswParams_array(nbelts);
     init_TGswParams_array(nbelts,obj,l,Bgbit,tlwe_params);
     return obj;
