@@ -29,6 +29,7 @@ set(RUNTIME_LIBS
 endif (FFT_PROCESSOR STREQUAL "fftw") 
 
 add_executable(unittests-${FFT_PROCESSOR} ${GOOGLETEST_SOURCES} ${TFHE_HEADERS})
+add_executable(test-c-binding-${FFT_PROCESSOR} test-c-binding.c ${TFHE_HEADERS})
 add_executable(test-bootstrapping-${FFT_PROCESSOR} test-bootstrapping.cpp ${TFHE_HEADERS})
 add_executable(test-bootstrapping-fft2-${FFT_PROCESSOR} test-bootstrapping-fft2.cpp ${TFHE_HEADERS})
 add_executable(test-deb-boot-${FFT_PROCESSOR} test-deb-boot.cpp ${TFHE_HEADERS})
@@ -38,6 +39,7 @@ add_executable(test-multiplication-${FFT_PROCESSOR} test-multiplication.cpp ${TF
 add_executable(test-tlwe-${FFT_PROCESSOR} test-tlwe.cpp ${TFHE_HEADERS})
 
 target_link_libraries(unittests-${FFT_PROCESSOR} ${RUNTIME_LIBS} ${GTEST_BOTH_LIBRARIES} -lgmock -lpthread)
+target_link_libraries(test-c-binding-${FFT_PROCESSOR} ${RUNTIME_LIBS})
 target_link_libraries(test-bootstrapping-${FFT_PROCESSOR} ${RUNTIME_LIBS})
 target_link_libraries(test-bootstrapping-fft2-${FFT_PROCESSOR} ${RUNTIME_LIBS})
 target_link_libraries(test-deb-boot-${FFT_PROCESSOR} ${RUNTIME_LIBS})
