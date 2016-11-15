@@ -38,7 +38,7 @@ namespace {
     const TLweParams* params1024_2 = new_TLweParams(1024,2,0.,1.);
     const TLweParams* params2048_1 = new_TLweParams(2048,1,0.,1.);
     const TLweParams* params2048_2 = new_TLweParams(2048,2,0.,1.);
-    // all_params = {params512_1, params512_2, params1024_1, params1024_2, params2048_1, params2048_2}
+    vector<const TLweParams*> all_params = {params512_1, params512_2, params1024_1, params1024_2, params2048_1, params2048_2};
 
     const TLweKey* key512_1 = new_random_key(params512_1);
     const TLweKey* key512_2 = new_random_key(params512_2);
@@ -46,7 +46,7 @@ namespace {
     const TLweKey* key1024_2 = new_random_key(params1024_2);
     const TLweKey* key2048_1 = new_random_key(params2048_1);
     const TLweKey* key2048_2 = new_random_key(params2048_2);
-    // all_keys = {key512_1, key512_2, key1024_1, key1024_2, key2048_1, key2048_2}
+    vector<const TLweKey*> all_keys = {key512_1, key512_2, key1024_1, key1024_2, key2048_1, key2048_2};
 
     /* Tolerance factor for the equality between two TorusPolynomial */
     const double toler = 1e-8; 
@@ -108,7 +108,6 @@ namespace {
      * (this means that the parameters are already in the result)
      */
     TEST_F(TLweTest, tLweKeyGen) {
-	vector<const TLweParams*> all_params = {params1024_1};//{params512_1, params512_2, params1024_1, params1024_2, params2048_1, params2048_2};
 	for (const TLweParams* params: all_params) {
 
 	    // Generating the key
@@ -152,9 +151,9 @@ namespace {
 	static const int NB_SAMPLES=10;
 	static const int M = 8;
 	static const double alpha = 1./(10.*M);
-	vector<const TLweKey*> all_keys = {key1024_1, key1024_2}; //{key512_1, key512_2, key1024_1, key1024_2, key2048_1, key2048_2};
+	vector<const TLweKey*> all_keys1024 = {key1024_1, key1024_2}; 
 
-	for (const TLweKey* key: all_keys) {			
+	for (const TLweKey* key: all_keys1024) {			
 	    const TLweParams* params = key->params;
 	    const int N = params->N;
 	    const int k = params->k;
@@ -218,9 +217,9 @@ namespace {
 	static const int NB_SAMPLES=10;
 	static const int M = 8;
 	static const double alpha = 1./(10.*M);
-	vector<const TLweKey*> all_keys = {key1024_1, key1024_2};//{key512_1, key512_2, key1024_1, key1024_2, key2048_1, key2048_2};
+	vector<const TLweKey*> all_keys1024 = {key1024_1, key1024_2};
 
-	for (const TLweKey* key: all_keys) {			
+	for (const TLweKey* key: all_keys1024) {			
 	    const TLweParams* params = key->params;
 	    const int N = params->N;
 	    const int k = params->k;
@@ -305,7 +304,6 @@ namespace {
      * tLweClear sets the TLweSample to (0,0)
      */
     TEST_F(TLweTest, tLweClear) {
-	vector<const TLweKey*> all_keys = {key512_1, key512_2, key1024_1, key1024_2, key2048_1, key2048_2};
 	for (const TLweKey* key: all_keys) {
 	    const TLweParams* params = key->params;
 	    const int N = params->N;
@@ -335,7 +333,6 @@ namespace {
      * tLweCopy sets the (TLweSample) result equl to a given (TLweSample) sample
      */
     TEST_F(TLweTest, tLweCopy) {
-	vector<const TLweKey*> all_keys = {key512_1, key512_2, key1024_1, key1024_2, key2048_1, key2048_2};
 	for (const TLweKey* key: all_keys) {
 	    const TLweParams* params = key->params;
 	    const int N = params->N;
@@ -368,7 +365,6 @@ namespace {
      * tLweNoiselessTrivial sets the TLweSample to (0,mu)
      */
     TEST_F(TLweTest, tLweNoiselessTrivial) {
-	vector<const TLweKey*> all_keys = {key512_1, key512_2, key1024_1, key1024_2, key2048_1, key2048_2};
 	for (const TLweKey* key: all_keys) {
 	    const TLweParams* params = key->params;
 	    const int N = params->N;
@@ -406,7 +402,6 @@ namespace {
      * tLweAddTo computes result = result + sample
      */
     TEST_F(TLweTest, tLweAddTo) {
-	vector<const TLweKey*> all_keys = {key512_1, key512_2, key1024_1, key1024_2, key2048_1, key2048_2};
 	for (const TLweKey* key: all_keys) {
 	    const TLweParams* params = key->params;
 	    const int N = params->N;
@@ -445,7 +440,6 @@ namespace {
      * tLweSubTo computes result = result - sample
      */
     TEST_F(TLweTest, tLweSubTo) {
-	vector<const TLweKey*> all_keys = {key512_1, key512_2, key1024_1, key1024_2, key2048_1, key2048_2};
 	for (const TLweKey* key: all_keys) {
 	    const TLweParams* params = key->params;
 	    const int N = params->N;
@@ -483,7 +477,6 @@ namespace {
      */
     TEST_F(TLweTest, tLweAddMulTo) {
 	const int p = 3;
-	vector<const TLweKey*> all_keys = {key512_1, key512_2, key1024_1, key1024_2, key2048_1, key2048_2};
 	for (const TLweKey* key: all_keys) {
 	    const TLweParams* params = key->params;
 	    const int N = params->N;
@@ -521,7 +514,6 @@ namespace {
      */
     TEST_F(TLweTest, tLweSubMulTo) {
 	const int p = 3;
-	vector<const TLweKey*> all_keys = {key512_1, key512_2, key1024_1, key1024_2, key2048_1, key2048_2};
 	for (const TLweKey* key: all_keys) {
 	    const TLweParams* params = key->params;
 	    const int N = params->N;
