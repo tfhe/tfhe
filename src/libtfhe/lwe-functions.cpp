@@ -104,6 +104,7 @@ EXPORT void lweAddTo(LweSample* result, const LweSample* sample, const LweParams
     result->current_variance += sample->current_variance; 
 }
 
+#ifdef __AVX2__
 /** r -= a  using avx instructions (of size n, not necessarily multiple of 8) */
 EXPORT void __attribute__ ((noinline)) intVecSubTo_avx(int* r, const int* a, long n) {
     __asm__ __volatile__ (
@@ -175,6 +176,7 @@ int intVecSubTo_avx_test() {
     return tst[0];
 }
 //int ooo = intVecSubTo_avx_test();
+#endif
 
 /** result = result - sample */
 EXPORT void lweSubTo(LweSample* result, const LweSample* sample, const LweParams* params){
