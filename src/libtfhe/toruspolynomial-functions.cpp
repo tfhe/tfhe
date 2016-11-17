@@ -114,6 +114,52 @@ EXPORT void torusPolynomialSubMulZ(TorusPolynomial* result, const TorusPolynomia
     for (int i = 0; i < N; ++i) r[i] = a[i] - p*b[i];
 }
 
+//result= (X^{a}-1)*source
+EXPORT void TorusPolynomialMulByXaiMinusOne(TorusPolynomial* result, int a, const TorusPolynomial* source){
+    const int N=source->N;
+    Torus32* out=result->coefsT;
+    Torus32* in =source->coefsT; 
+
+    assert(a>=0 && a<2*N);
+
+    if (a<N) {
+	for (int i=0;i<a;i++)//sur que i-a<0
+	    out[i]= -in[i-a+N]-in[i];
+	for (int i=a;i<N;i++)//sur que N>i-a>=0
+	    out[i]= in[i-a]-in[i];
+    } else {
+	const int aa=a-N;
+	for (int i=0;i<aa;i++)//sur que i-a<0
+	    out[i]= in[i-aa+N]-in[i];
+	for (int i=aa;i<N;i++)//sur que N>i-a>=0
+	    out[i]= -in[i-aa]-in[i];
+    }
+}
+
+
+//result= X^{a}*source
+EXPORT void torusPolynomialMulByXai(TorusPolynomial* result, int a, const TorusPolynomial* source){
+    const int N=source->N;
+    Torus32* out=result->coefsT;
+    Torus32* in =source->coefsT; 
+
+    assert(a>=0 && a<2*N);
+
+    if (a<N) {
+	for (int i=0;i<a;i++)//sur que i-a<0
+	    out[i]= -in[i-a+N];
+	for (int i=a;i<N;i++)//sur que N>i-a>=0
+	    out[i]= in[i-a];
+    } else {
+	const int aa=a-N;
+	for (int i=0;i<aa;i++)//sur que i-a<0
+	    out[i]= in[i-aa+N];
+	for (int i=aa;i<N;i++)//sur que N>i-a>=0
+	    out[i]= -in[i-aa];
+    }
+}
+
+
 // TorusPolynomial -= p*TorusPolynomial
 EXPORT void torusPolynomialSubMulZTo(TorusPolynomial* result, int p, const TorusPolynomial* poly2) {
     const int N = poly2->N;

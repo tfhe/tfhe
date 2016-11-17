@@ -42,8 +42,11 @@ EXPORT void torusPolynomialSubMulZ(TorusPolynomial* result, const TorusPolynomia
 /**  TorusPolynomial -= p*TorusPolynomial */
 EXPORT void torusPolynomialSubMulZTo(TorusPolynomial* result, int p, const TorusPolynomial* poly2);
 
-/**  TorusPolynomial = X^a * TorusPolynomial */
-EXPORT void torusPolynomialMulByXai(TorusPolynomial* result, int a, const TorusPolynomial* bk);
+/**  TorusPolynomial = (X^a-1)* TorusPolynomial */
+EXPORT void TorusPolynomialMulByXaiMinusOne(TorusPolynomial* result, int a, const TorusPolynomial* source);
+
+/** result= X^{a}*source */
+EXPORT void torusPolynomialMulByXai(TorusPolynomial* result, int a, const TorusPolynomial* source);
 
 /**  Norme Euclidienne d'un IntPolynomial */
 EXPORT double intPolynomialNormSq2(const IntPolynomial* poly);
