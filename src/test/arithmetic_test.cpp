@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <numeric_functions.h>
 
+using namespace std;  
+
 namespace {
 
     // The fixture for testing class Arithmetic.
