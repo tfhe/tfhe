@@ -115,7 +115,7 @@ EXPORT void torusPolynomialSubMulZ(TorusPolynomial* result, const TorusPolynomia
 }
 
 //result= (X^{a}-1)*source
-EXPORT void TorusPolynomialMulByXaiMinusOne(TorusPolynomial* result, int a, const TorusPolynomial* source){
+EXPORT void torusPolynomialMulByXaiMinusOne(TorusPolynomial* result, int a, const TorusPolynomial* source){
     const int N=source->N;
     Torus32* out=result->coefsT;
     Torus32* in =source->coefsT; 

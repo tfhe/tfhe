@@ -201,7 +201,7 @@ EXPORT void tLweAddMulRTo(TLweSample* result, const IntPolynomial* p, const TLwe
 EXPORT void tLweMulByXaiMinusOne(TLweSample* result, int ai, const TLweSample* bk, const TLweParams* params){
     const int k=params->k;
     for(int i=0;i<=k;i++)
-        TorusPolynomialMulByXaiMinusOne(&result->a[i],ai,&bk->a[i]);
+        torusPolynomialMulByXaiMinusOne(&result->a[i],ai,&bk->a[i]);
 }
 
 
