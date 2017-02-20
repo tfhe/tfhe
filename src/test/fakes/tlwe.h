@@ -23,11 +23,13 @@ inline void fake_tLweSymEncrypt(TLweSample* result, TorusPolynomial* mu, double 
 }
 
 
-
+// The message is just the b part, as the samples are noiseless trivial 
 inline Torus32 fake_tLweMessage(const TLweSample* sample) {
     return sample->b;
 }
 
+
+// Variance 
 inline Torus32 fake_tLweVariance(const TLweSample* sample) {
     return sample->current_variance;
 }
