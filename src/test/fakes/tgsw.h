@@ -1,13 +1,19 @@
 namespace {
+
+    // Fake TGSW structure 
     struct FakeTGsw {
-	static const long FAKE_TGSW_UID=123444802642375465l;
+	static const long FAKE_TGSW_UID=123444802642375465l; // precaution: do not confuse fakes with trues
 	const long fake_uid;
 	IntPolynomial* message;
 	double current_variance;
+
+    // construct
 	FakeTGsw(int N):fake_uid(FAKE_TGSW_UID) {
 	    message = new_IntPolynomial(N);
 	    current_variance = 0.;
 	}
+
+    // delete
 	~FakeTGsw() {
 	    if (fake_uid!=FAKE_TGSW_UID) abort();
 	    delete_IntPolynomial(message);
@@ -15,6 +21,9 @@ namespace {
 	FakeTGsw(const FakeTGsw&)=delete;
 	void operator=(const FakeTGsw&)=delete;
     };
+
+
+
 
     inline FakeTGsw* fake(TGswSample* sample) {
 	FakeTGsw* reps = (FakeTGsw*) sample;
