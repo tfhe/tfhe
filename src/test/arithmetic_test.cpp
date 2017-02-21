@@ -56,8 +56,9 @@ namespace {
 	    Torus32 w = approxPhase(v,i);
 	    double dv = t32tod(v);
 	    double dw = t32tod(w);
+	    //printf("%d, %lf, %lf, %lf\n", i, dv,dw,i*dw);
 	    ASSERT_LE(absfrac(dv-dw),1./(2.*i)+1e-40);
-	    ASSERT_LE(absfrac(i*dw),1e-40);
+	    ASSERT_LE(absfrac(i*dw),i*1e-9);
 	}
     }
 
@@ -77,8 +78,9 @@ namespace {
     TEST_F (ArithmeticTest,modSwitchToTorus32) {
 	for (int i=2; i<200; i++) {
 	    int j = uniformTorus32_distrib(generator)%i;
-	    Torus32 v = modSwitchFromTorus32(j,i);
+	    Torus32 v = modSwitchToTorus32(j,i);
 	    double dv = t32tod(v);
+	    //printf("%d, %d, %lf, %lf\n", j, i, dv, double(j)/i);
 	    ASSERT_LE(absfrac(dv-double(j)/double(i)),1./(2.*i)+1e-40);
 	}
     }

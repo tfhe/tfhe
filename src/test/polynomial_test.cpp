@@ -319,6 +319,62 @@ namespace {
 	}
     }
 
+    //  intPolynomial = (X^ai-1) * intPolynomial 
+    //EXPORT void intPolynomialMulByXaiMinusOne(IntPolynomial* result, int a, const IntPolynomial* bk)
+    TEST_F(PolynomialTest, intPolynomialMulByXaiMinusOne) {
+	static const int NB_TRIALS = 50;
+	for (int N: dimensions)	{
+	    for (int trial=0; trial<NB_TRIALS; trial++) {
+		static const int a = (uniformTorus32_distrib(generator)%1000000)-500000;
+		static const int ai = ((a % (2*N)) + (2*N)) % (2*N);
+		IntPolynomial* pols = new_IntPolynomial_array(3,N);
+		IntPolynomial* pola = pols+0;
+		IntPolynomial* polacopy = pols+1;
+		IntPolynomial* polb = pols+2;
+		//fill the polynomial with random coefs
+		for (int j=0; j<N; j++) {
+		    pola->coefs[j]=uniformTorus32_distrib(generator);
+		    polb->coefs[j]=uniformTorus32_distrib(generator);
+		}
+		intPolynomialCopy(polacopy, pola);
+		intPolynomialMulByXaiMinusOne(polb,ai,pola);
+		//check equality
+		for (int j=0; j<N; j++) {
+		    ASSERT_EQ(polacopy->coefs[j],pola->coefs[j]);
+		    ASSERT_EQ(polb->coefs[j],anticyclic_get(polacopy->coefs,j-ai,N)-anticyclic_get(polacopy->coefs,j,N));
+		}
+		delete_IntPolynomial_array(3,pols);
+	    }
+	}
+    }
+
+    //  TorusPolynomial = (X^ai-1) * TorusPolynomial 
+    //EXPORT void torusPolynomialMulByXaiMinusOne(TorusPolynomial* result, int a, const TorusPolynomial* bk)
+    TEST_F(PolynomialTest, torusPolynomialMulByXaiMinusOne) {
+	static const int NB_TRIALS = 50;
+	for (int N: dimensions)	{
+	    for (int trial=0; trial<NB_TRIALS; trial++) {
+		static const int a = (uniformTorus32_distrib(generator)%1000000)-500000;
+		static const int ai = ((a % (2*N)) + (2*N)) % (2*N);
+		TorusPolynomial* pols = new_TorusPolynomial_array(3,N);
+		TorusPolynomial* pola = pols+0;
+		TorusPolynomial* polacopy = pols+1;
+		TorusPolynomial* polb = pols+2;
+		//fill the polynomial with random coefs
+		torusPolynomialUniform(pola);
+		torusPolynomialUniform(polb);
+		torusPolynomialCopy(polacopy, pola);
+		torusPolynomialMulByXaiMinusOne(polb,ai,pola);
+		//check equality
+		for (int j=0; j<N; j++) {
+		    ASSERT_EQ(polacopy->coefsT[j],pola->coefsT[j]);
+		    ASSERT_EQ(polb->coefsT[j],anticyclic_get(polacopy->coefsT,j-ai,N)-anticyclic_get(polacopy->coefsT,j,N));
+		}
+		delete_TorusPolynomial_array(3,pols);
+	    }
+	}
+    }
+
     //  Norme Euclidienne d'un IntPolynomial 
     //EXPORT double intPolynomialNormSq2(const IntPolynomial* poly);
     TEST_F(PolynomialTest, intPolynomialNormSq2) {
