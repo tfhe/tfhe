@@ -1,28 +1,6 @@
 /* **************************
 Fakes for TLWE 
 ************************** */
-/*
-// Fake symetric encryption of a Torus message
-inline void fake_tLweSymEncryptT(TLweSample* result, Torus32 message, double alpha, const TLweKey* key) {
-    tLweNoiselessTrivialT(result,message,key->params);
-    result->current_variance=alpha*alpha;
-}
-
-// The message is just the b part, as the samples are noiseless trivial 
-inline Torus32 fake_tLweMessage(const TLweSample* sample) {
-    return sample->b;
-}
-
-// Variance 
-inline Torus32 fake_tLweVariance(const TLweSample* sample) {
-    return sample->current_variance;
-}
-*/
-
-
-
-
-
 
 namespace {
 
@@ -190,8 +168,9 @@ namespace {
 
     /** result = (0,0) */
     inline void fake_tLweClear(TLweSample* result, const TLweParams* params) {
-        torusPolynomialClear(result->message);
-        result->current_variance = 0.;
+        FakeTLwe* fres = fake(result);
+        torusPolynomialClear(fres->message);
+        fres->current_variance = 0.;
     }
     #define USE_FAKE_tLweClear \
     inline void tLweClear(TLweSample* result, const TLweParams* params) { \
@@ -202,8 +181,9 @@ namespace {
 
     /** result = sample */
     inline void fake_tLweCopy(TLweSample* result, const TLweSample* sample, const TLweParams* params) { 
-        torusPolynomialCopy(result->message, sample->message);
-        result->current_variance = sample->current_variance;
+        FakeTLwe* fres = fake(result);
+        torusPolynomialCopy(fres->message, sample->message);
+        fres->current_variance = sample->current_variance;
     }
     #define USE_FAKE_tLweCopy \
     inline void tLweCopy(TLweSample* result, const TLweSample* sample, const TLweParams* params) { \
@@ -225,13 +205,101 @@ namespace {
 
 
 
+    /** result = result + sample */
+    inline void fake_tLweAddTo(TLweSample* result, const TLweSample* sample, const TLweParams* params) { 
+        FakeTLwe* fres = fake(result);
+        torusPolynomialAddTo(fres->message, sample->message);
+        fres->current_variance += sample->current_variance;
+    }
+    #define USE_FAKE_tLweAddTo \
+    inline void tLweAddTo(TLweSample* result, const TLweSample* sample, const TLweParams* params) { \
+        fake_tLweAddTo(result,sample,params); \
+    }
+
+
+
+    /** result = result - sample */
+    inline void fake_tLweSubTo(TLweSample* result, const TLweSample* sample, const TLweParams* params) { 
+        FakeTLwe* fres = fake(result);
+        torusPolynomialSubTo(fres->message, sample->message);
+        fres->current_variance += sample->current_variance;
+    }
+    #define USE_FAKE_tLweSubTo \
+    inline void tLweSubTo(TLweSample* result, const TLweSample* sample, const TLweParams* params) { \
+        fake_tLweSubTo(result,sample,params); \
+    }
+
+
+
+    /** result = result + p.sample */
+    inline void fake_tLweAddMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params) { 
+        FakeTLwe* fres = fake(result);
+        torusPolynomialAddMulZTo(fres->message, p, sample->message);
+        fres->current_variance += p*sample->current_variance;
+    }
+    #define USE_FAKE_tLweAddMulTo \
+    inline void tLweAddMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params) { \
+        fake_tLweAddMulTo(result,p,sample,params); \
+    }
+
+
+
+    /** result = result - p.sample */
+    inline void fake_tLweSubMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params) { 
+        FakeTLwe* fres = fake(result);
+        torusPolynomialSubMulZTo(fres->message, p, sample->message);
+        fres->current_variance += p*sample->current_variance;
+    }
+    #define USE_FAKE_tLweSubMulTo \
+    inline void tLweSubMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params) { \
+        fake_tLweSubMulTo(result,p,sample,params); \
+    }
+
+
+
+    /** create an homogeneous tlwe sample*/
+    inline void fake_tLweSymEncryptZero(TLweSample* result, double alpha, const TLweKey* key) { 
+        FakeTLwe* fres = fake(result);
+
+        torusPolynomialClear(fres->message);
+        fres->current_variance = alpha*alpha;
+    }
+    #define USE_FAKE_tLweSymEncryptZero \
+    inline void tLweSymEncryptZero(TLweSample* result, double alpha, const TLweKey* key) { \
+        fake_tLweSymEncryptZero(result,alpha,key); \
+    }
 
 
 
 
+    /** result = result + p.sample */
+    inline void fake_tLweAddMulRTo(TLweSample* result, const IntPolynomial* p, const TLweSample* sample, const TLweParams* params) { 
+        //FakeTLwe* fres = fake(result);
 
 
 
+
+        //TODO: à faire ilaria
+    }
+    #define USE_FAKE_tLweAddMulRTo \
+    inline void tLweAddMulRTo(TLweSample* result, const IntPolynomial* p, const TLweSample* sample, const TLweParams* params) { \
+        fake_tLweAddMulRTo(result,p,sample,params); \
+    }
+
+
+
+
+    /** result = (X^{a}-1)*source */
+    inline void fake_tLweMulByXaiMinusOne(TLweSample* result, int ai, const TLweSample* bk, const TLweParams* params) { 
+        FakeTLwe* fres = fake(result);
+
+        torusPolynomialMulByXaiMinusOne(fres->message, ai, bk->message);
+        fres->current_variance = bk->current_variance; //ATTENTION
+    }
+    #define USE_FAKE_tLweMulByXaiMinusOne \
+    inline void tLweMulByXaiMinusOne(TLweSample* result, int ai, const TLweSample* bk, const TLweParams* params) { \
+        fake_tLweMulByXaiMinusOne(result,ai,bk,params); \
+    }
 
 
 
@@ -250,87 +318,8 @@ namespace {
 // Est-ce qu'on doit aussi faker les clés?
 // EXPORT void tLweKeyGen(TLweKey* result);
 
-    
 
 
-
-
-
-
-
-
-
-/** result = result + sample */
-inline void fake_tLweAddTo(TLweSample* result, const TLweSample* sample, const TLweParams* params) { 
-    //TODO: à faire ilaria
-}
-
-#define USE_FAKE_tLweAddTo \
-    inline void tLweAddTo(TLweSample* result, const TLweSample* sample, const TLweParams* params) { \
-	fake_tLweAddTo(result,sample,params); \
-    }
-
-/** result = result - sample */
-inline void fake_tLweSubTo(TLweSample* result, const TLweSample* sample, const TLweParams* params) { 
-    //TODO: à faire ilaria
-}
-
-#define USE_FAKE_tLweSubTo \
-    inline void tLweSubTo(TLweSample* result, const TLweSample* sample, const TLweParams* params) { \
-	fake_tLweSubTo(result,sample,params); \
-    }
-
-/** result = result + p.sample */
-inline void fake_tLweAddMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params) { 
-    //TODO: à faire ilaria
-}
-
-#define USE_FAKE_tLweAddMulTo \
-    inline void tLweAddMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params) { \
-	fake_tLweAddMulTo(result,p,sample,params); \
-    }
-
-/** result = result - p.sample */
-inline void fake_tLweSubMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params) { 
-    //TODO: à faire ilaria
-}
-
-#define USE_FAKE_tLweSubMulTo \
-    inline void tLweSubMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params) { \
-	fake_tLweSubMulTo(result,p,sample,params); \
-    }
-
-/** create an homogeneous tlwe sample*/
-inline void fake_tLweSymEncryptZero(TLweSample* result, double alpha, const TLweKey* key) { 
-    //TODO: à faire ilaria
-}
-
-#define USE_FAKE_tLweSymEncryptZero \
-    inline void tLweSymEncryptZero(TLweSample* result, double alpha, const TLweKey* key) { \
-	fake_tLweSymEncryptZero(result,alpha,key); \
-    }
-
-
-/** result = result + p.sample */
-inline void fake_tLweAddMulRTo(TLweSample* result, const IntPolynomial* p, const TLweSample* sample, const TLweParams* params) { 
-    //TODO: à faire ilaria
-}
-
-#define USE_FAKE_tLweAddMulRTo \
-    inline void tLweAddMulRTo(TLweSample* result, const IntPolynomial* p, const TLweSample* sample, const TLweParams* params) { \
-	fake_tLweAddMulRTo(result,p,sample,params); \
-    }
-
-
-
-inline void fake_tLweMulByXaiMinusOne(TLweSample* result, int ai, const TLweSample* bk, const TLweParams* params) { 
-    //TODO: à faire ilaria
-}
-
-#define USE_FAKE_tLweMulByXaiMinusOne \
-    inline void tLweMulByXaiMinusOne(TLweSample* result, int ai, const TLweSample* bk, const TLweParams* params) { \
-	fake_tLweMulByXaiMinusOne(result,ai,bk,params); \
-    }
 
 
 ////////////////////////////////////////////
