@@ -240,3 +240,21 @@ EXPORT double torusPolynomialNormInftyDist(const TorusPolynomial* poly1, const T
     }
     return norm;
 }
+
+
+
+
+
+
+// Norme 2 d'un IntPolynomial
+EXPORT double intPolynomialNorm2sq(const IntPolynomial* poly) {
+    const int N = poly->N;
+    double norm = 0;
+
+    for (int i = 0; i < N; ++i){
+        double r = poly->coefsT[i];
+        norm += r*r;
+    }
+    return norm;
+}
+

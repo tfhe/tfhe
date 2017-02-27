@@ -66,6 +66,8 @@ EXPORT void intPolynomialMulByXaiMinusOne(IntPolynomial* result, int ai, const I
 /**  ILA: Norme infini de la distance entre deux TorusPolynomial */
 EXPORT double torusPolynomialNormInftyDist(const TorusPolynomial* poly1, const TorusPolynomial* poly2);
 
+// Norme 2 d'un IntPolynomial
+EXPORT double intPolynomialNorm2sq(const IntPolynomial* poly);
 
 
 
