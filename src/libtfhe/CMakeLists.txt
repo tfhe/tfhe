@@ -20,6 +20,7 @@ set(SRCS
     tgsw.cpp
     tlwe.cpp
     tlwe-functions.cpp
+    tgsw-functions.cpp
     tlwefftoperations.cpp
     toruspolynomial-functions.cpp
     boot-gates.cpp
