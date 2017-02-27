@@ -1,3 +1,4 @@
+#ifndef TFHE_TEST_ENVIRONMENT
 #include <cstdlib>
 #include <iostream>
 #include <random>
@@ -8,15 +9,23 @@
 #include "tgsw_functions.h"
 #include "polynomials_arithmetic.h"
 #include "lagrangehalfc_arithmetic.h"
+#define INCLUDE_ALL
+#else
+#undef EXPORT
+#define EXPORT
+#endif
 
+
+#if defined INCLUDE_ALL || defined INCLUDE_TGSW_KEYGEN
 // TGsw
 /** generate a tgsw key (in fact, a tlwe key) */
 EXPORT void tGswKeyGen(TGswKey* result){
     tLweKeyGen(&result->tlwe_key);
 }
+#endif
 
 
-
+#if defined INCLUDE_ALL || defined INCLUDE_TGSW_CLEAR
 // support Functions for TGsw
 // Result = 0
 EXPORT void tGswClear(TGswSample* result, const TGswParams* params){
@@ -25,6 +34,7 @@ EXPORT void tGswClear(TGswSample* result, const TGswParams* params){
     for (int p = 0; p < kpl; ++p)
         tLweClear(&result->all_sample[p], params->tlwe_params);
 }
+#endif
 
 // Result += H
 EXPORT void tGswAddH(TGswSample* result, const TGswParams* params){
