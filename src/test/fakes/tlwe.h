@@ -71,6 +71,39 @@ namespace {
         free(arr);
     }
 
+    // 
+    #define USE_FAKE_delete_TLweSample_array \
+    inline void delete_TLweSample_array(int nbelts, TLweSample* samples) { \
+        fake_delete_TLweSample_array(nbelts,samples); \
+    }
+
+
+
+    inline TLweSample* fake_new_TLweSample(const TLweParams* params) {
+        int N = params->N;
+        FakeTLwe* reps = (FakeTLwe*) malloc(sizeof(FakeTLwe));
+        new(reps) FakeTLwe(N);
+        return (TLweSample*) reps;
+    }
+
+    // 
+    #define USE_FAKE_new_TLweSample \
+    inline TLweSample* new_TLweSample(const TLweParams* params) { \
+        return fake_new_TLweSample(params); \
+    }
+
+    inline void fake_delete_TLweSample(TLweSample* sample) {
+        FakeTLwe* ptr = fake(sample);
+        (ptr)->~FakeTLwe();
+        free(ptr);
+    }
+
+    // 
+    #define USE_FAKE_delete_TLweSample \
+    inline void delete_TLweSample(TLweSample* sample) { \
+        fake_delete_TLweSample(sample); \
+    }
+
 
 
     // Fake symmetric encryption of a Torus polynomial message (encryption is a noiseless trivial sample)
@@ -105,7 +138,7 @@ namespace {
 
     // Fake Torus polynomial phase (samples are noiseless trivial) 
     inline void fake_tLwePhase(TorusPolynomial* phase, const TLweSample* sample, const TLweKey* key) { 
-        const FakeTlwe* fsamp = fake(sample);
+        const FakeTLwe* fsamp = fake(sample);
 
         torusPolynomialCopy(phase, fsamp->message);
     }
@@ -185,7 +218,7 @@ namespace {
 
     /** result = sample */
     inline void fake_tLweCopy(TLweSample* result, const TLweSample* sample, const TLweParams* params) { 
-        const FakeTlwe* fsamp = fake(sample);
+        const FakeTLwe* fsamp = fake(sample);
         FakeTLwe* fres = fake(result);
 
         torusPolynomialCopy(fres->message, fsamp->message);
@@ -214,7 +247,7 @@ namespace {
 
     /** result = result + sample */
     inline void fake_tLweAddTo(TLweSample* result, const TLweSample* sample, const TLweParams* params) { 
-        const FakeTlwe* fsamp = fake(sample);
+        const FakeTLwe* fsamp = fake(sample);
         FakeTLwe* fres = fake(result);
 
         torusPolynomialAddTo(fres->message, fsamp->message);
@@ -229,7 +262,7 @@ namespace {
 
     /** result = result - sample */
     inline void fake_tLweSubTo(TLweSample* result, const TLweSample* sample, const TLweParams* params) { 
-        const FakeTlwe* fsamp = fake(sample);
+        const FakeTLwe* fsamp = fake(sample);
         FakeTLwe* fres = fake(result);
 
         torusPolynomialSubTo(fres->message, fsamp->message);
@@ -244,7 +277,7 @@ namespace {
 
     /** result = result + p.sample */
     inline void fake_tLweAddMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params) { 
-        const FakeTlwe* fsamp = fake(sample);
+        const FakeTLwe* fsamp = fake(sample);
         FakeTLwe* fres = fake(result);
 
         torusPolynomialAddMulZTo(fres->message, p, fsamp->message);
@@ -259,7 +292,7 @@ namespace {
 
     /** result = result - p.sample */
     inline void fake_tLweSubMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params) { 
-        const FakeTlwe* fsamp = fake(sample);
+        const FakeTLwe* fsamp = fake(sample);
         FakeTLwe* fres = fake(result);
 
         torusPolynomialSubMulZTo(fres->message, p, fsamp->message);
@@ -289,7 +322,7 @@ namespace {
 
     /** result = result + p.sample */
     inline void fake_tLweAddMulRTo(TLweSample* result, const IntPolynomial* p, const TLweSample* sample, const TLweParams* params) { 
-        const FakeTlwe* fsamp = fake(sample);
+        const FakeTLwe* fsamp = fake(sample);
         FakeTLwe* fres = fake(result);
         
         torusPolynomialMultNaive(fres->message, p, fsamp->message);
@@ -305,7 +338,7 @@ namespace {
 
     /** result = (X^{a}-1)*source */
     inline void fake_tLweMulByXaiMinusOne(TLweSample* result, int ai, const TLweSample* bk, const TLweParams* params) { 
-        const FakeTlwe* fbk = fake(bk);
+        const FakeTLwe* fbk = fake(bk);
         FakeTLwe* fres = fake(result);
 
         torusPolynomialMulByXaiMinusOne(fres->message, ai, fbk->message);

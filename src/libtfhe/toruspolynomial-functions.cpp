@@ -252,7 +252,7 @@ EXPORT double intPolynomialNorm2sq(const IntPolynomial* poly) {
     double norm = 0;
 
     for (int i = 0; i < N; ++i){
-        double r = poly->coefsT[i];
+        double r = poly->coefs[i];
         norm += r*r;
     }
     return norm;

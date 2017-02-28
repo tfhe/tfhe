@@ -36,6 +36,7 @@ EXPORT void tGswClear(TGswSample* result, const TGswParams* params){
 }
 #endif
 
+#if defined INCLUDE_ALL || defined INCLUDE_TGSW_ADD_H
 // Result += H
 EXPORT void tGswAddH(TGswSample* result, const TGswParams* params){
     const int k = params->tlwe_params->k;
@@ -47,7 +48,9 @@ EXPORT void tGswAddH(TGswSample* result, const TGswParams* params){
     	for (int i=0; i<l; i++) 
     	    result->bloc_sample[bloc][i].a[bloc].coefsT[0]+=h[i];
 }
+#endif
 
+#if defined INCLUDE_ALL || defined INCLUDE_TGSW_ADD_MU_H
 // Result += mu*H
 EXPORT void tGswAddMuH(TGswSample* result, const IntPolynomial* message, const TGswParams* params) {
     const int k = params->tlwe_params->k;
@@ -67,7 +70,9 @@ EXPORT void tGswAddMuH(TGswSample* result, const IntPolynomial* message, const T
 	    }
 	}
 }
+#endif
 
+#if defined INCLUDE_ALL || defined INCLUDE_TGSW_ADD_MU_INT_H
 // Result += mu*H, mu integer
 EXPORT void tGswAddMuIntH(TGswSample* result, const int message, const TGswParams* params)
 {
@@ -80,7 +85,9 @@ EXPORT void tGswAddMuIntH(TGswSample* result, const int message, const TGswParam
 	for (int i=0; i<l; i++) 
 	    result->bloc_sample[bloc][i].a[bloc].coefsT[0]+=message*h[i];
 }
+#endif
 
+#if defined INCLUDE_ALL || defined INCLUDE_TGSW_ENCRYPT_ZERO
 // Result = tGsw(0)
 EXPORT void tGswEncryptZero(TGswSample* result, double alpha, const TGswKey* key){
     const TLweKey* rlkey = &key->tlwe_key;
@@ -91,12 +98,14 @@ EXPORT void tGswEncryptZero(TGswSample* result, double alpha, const TGswKey* key
 	tLweSymEncryptZero(&result->all_sample[p], alpha, rlkey);
     }
 }
+#endif
 
 
 
 
 
 
+#if defined INCLUDE_ALL || defined INCLUDE_TGSW_MUL_BY_XAI_MINUS_ONE
 //mult externe de X^{a_i} par bki
 EXPORT void tGswMulByXaiMinusOne(TGswSample* result, int ai, const TGswSample* bk, const TGswParams* params){
     const TLweParams* par=params->tlwe_params;
@@ -104,7 +113,9 @@ EXPORT void tGswMulByXaiMinusOne(TGswSample* result, int ai, const TGswSample* b
     for (int i=0;i<kpl;i++)
         tLweMulByXaiMinusOne(&result->all_sample[i],ai,&bk->all_sample[i],par);
 }
+#endif
 
+#if defined INCLUDE_ALL || defined INCLUDE_TGSW_EXTERN_MUL_TO_TLWE
 //Update l'accumulateur ligne 5 de l'algo toujours
 //void tGswTLweDecompH(IntPolynomial* result, const TLweSample* sample,const TGswParams* params);
 //accum *= sample
@@ -121,8 +132,10 @@ EXPORT void tGswExternMulToTLwe(TLweSample* accum, const TGswSample* sample,cons
 
     delete_IntPolynomial_array(kpl, dec);
 }
+#endif
 
 
+#if defined INCLUDE_ALL || defined INCLUDE_TGSW_SYM_ENCRYPT
 /**
  * encrypts a poly message
  */
@@ -130,8 +143,10 @@ EXPORT void tGswSymEncrypt(TGswSample* result, const IntPolynomial* message, dou
     tGswEncryptZero(result, alpha, key);
     tGswAddMuH(result, message, key->params);
 }
+#endif
 
 
+#if defined INCLUDE_ALL || defined INCLUDE_TGSW_SYM_ENCRYPT_INT
 /**
  * encrypts a constant message
  */
@@ -139,8 +154,10 @@ EXPORT void tGswSymEncryptInt(TGswSample* result, const int message, double alph
     tGswEncryptZero(result, alpha, key);
     tGswAddMuIntH(result, message, key->params);
 }
+#endif
 
 
+#if defined INCLUDE_ALL || defined INCLUDE_TGSW_ENCRYPT_B
 /**
  * encrypts a message = 0 ou 1
  */
@@ -149,10 +166,12 @@ EXPORT void tGswEncryptB(TGswSample* result, const int message, double alpha, co
     if (message == 1)
         tGswAddH(result, key->params);    
 }
+#endif
 
 
 
 
+#if defined INCLUDE_ALL || defined INCLUDE_TGSW_DECRYPT
 // à revoir
 EXPORT void tGswSymDecrypt(IntPolynomial* result, const TGswSample* sample, const TGswKey* key, const int Msize){
     const TGswParams* params = key->params;
@@ -182,6 +201,7 @@ EXPORT void tGswSymDecrypt(IntPolynomial* result, const TGswSample* sample, cons
     delete_TorusPolynomial(tmp);
     delete_IntPolynomial_array(l,decomp);
 }
+#endif
 
 /*
 // à revoir
@@ -200,6 +220,7 @@ EXPORT int tGswSymDecryptInt(const TGswSample* sample, const TGswKey* key){
 // EXPORT void tLweExternMulRLweTo(RLwe* accum, Gsw* a); //  accum = a \odot accum
 
 
+#if defined INCLUDE_ALL || defined INCLUDE_TGSW_TLWE_DECOMP_H
 //fonction de decomposition
 EXPORT void tGswTLweDecompH(IntPolynomial* result, const TLweSample* sample, const TGswParams* params){
     const int k = params->tlwe_params->k;
@@ -208,8 +229,10 @@ EXPORT void tGswTLweDecompH(IntPolynomial* result, const TLweSample* sample, con
     for (int i = 0; i <= k; ++i) // b=a[k]
         tGswTorus32PolynomialDecompH(result+(i*l), &sample->a[i], params);
 }
+#endif
 
 
+#if defined INCLUDE_ALL || defined INCLUDE_TGSW_TORUS32POLYNOMIAL_DECOMP_H_OLD
 EXPORT void Torus32PolynomialDecompH_old(IntPolynomial* result, const TorusPolynomial* sample, const TGswParams* params){
     const int N = params->tlwe_params->N;
     const int l = params->l;
@@ -228,6 +251,9 @@ EXPORT void Torus32PolynomialDecompH_old(IntPolynomial* result, const TorusPolyn
         }   
     }
 }
+#endif
+
+#if defined INCLUDE_ALL || defined INCLUDE_TGSW_TORUS32POLYNOMIAL_DECOMP_H
 EXPORT void tGswTorus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const TGswParams* params){
     const int N = params->tlwe_params->N;
     const int l = params->l;
@@ -342,8 +368,10 @@ EXPORT void tGswTorus32PolynomialDecompH(IntPolynomial* result, const TorusPolyn
     }
 #endif	
 }
+#endif
 
 
+#if defined INCLUDE_ALL || defined INCLUDE_TGSW_EXTERN_PRODUCT
 //result = a*b
 EXPORT void tGswExternProduct(TLweSample* result, const TGswSample* a, const TLweSample* b, const TGswParams* params){
     const TLweParams* parlwe = params->tlwe_params;
@@ -361,6 +389,7 @@ EXPORT void tGswExternProduct(TLweSample* result, const TGswSample* a, const TLw
 
     delete_IntPolynomial_array(kpl, dec);
 }
+#endif
 
 
 
