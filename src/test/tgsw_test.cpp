@@ -78,6 +78,8 @@ namespace {
 	    USE_FAKE_new_TLweSample;
 	    USE_FAKE_delete_TLweSample;
 
+#define INCLUDE_TGSW_INIT
+#define INCLUDE_TGSW_DESTROY
 #define INCLUDE_TGSW_KEYGEN
 #define INCLUDE_TGSW_CLEAR
 #define INCLUDE_TGSW_ADD_H
@@ -185,19 +187,21 @@ namespace {
     //// Result = 0
     //EXPORT void tGswClear(TGswSample* result, const TGswParams* params);
     TEST_F(TGswTest, tGswClear) {
-	TGswSample* s = new_TGswSample(params512_1);
-	int kpl = params512_1->kpl;
-	TorusPolynomial* zeroPol = new_TorusPolynomial(params512_1->tlwe_params->N);
-	torusPolynomialClear(zeroPol);
-	tGswClear(s,params512_1);
-	for (int i=0; i<kpl; i++) {
-	    FakeTLwe* si = fake(&s->all_sample[i]);
-	    ASSERT_TRUE(torusPolynomialNormInftyDist(si->message,zeroPol)==0);
+	for (const TGswParams* param: all_params) {
+	    TGswSample* s = new_TGswSample(param);
+	    int kpl = param->kpl;
+	    TorusPolynomial* zeroPol = new_TorusPolynomial(param->tlwe_params->N);
+	    torusPolynomialClear(zeroPol);
+	    tGswClear(s,param);
+	    for (int i=0; i<kpl; i++) {
+		FakeTLwe* si = fake(&s->all_sample[i]);
+		ASSERT_TRUE(torusPolynomialNormInftyDist(si->message,zeroPol)==0);
+	    }
+	    delete_TorusPolynomial(zeroPol);
+	    delete_TGswSample(s);
 	}
-	delete_TorusPolynomial(zeroPol);
-	delete_TGswSample(s);
     }
-    
+
     //// Result += H
     //EXPORT void tGswAddH(TGswSample* result, const TGswParams* params);
     //// Result += mu*H

@@ -51,8 +51,11 @@ struct TGswSample {
     const int l;
 
 #ifdef __cplusplus
-    TGswSample(const TGswParams* params);
-    ~TGswSample();
+    inline TGswSample(TLweSample* all_sample, TLweSample** bloc_sample, const int k, const int l):
+	all_sample(all_sample),
+	bloc_sample(bloc_sample),
+	k(k),l(l) {}
+    inline ~TGswSample() {}
     TGswSample(const TGswSample&) = delete;
     void operator=(const TGswSample&) = delete;
 #endif
