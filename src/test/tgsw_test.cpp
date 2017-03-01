@@ -215,6 +215,10 @@ namespace {
     //EXPORT void tGswTLweDecompH(IntPolynomial* result, const TLweSample* sample, const TGswParams* params);
 
     //EXPORT void tGswTorus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const TGswParams* params);
+    TEST_F(TGswDirectTest, tGswTorus32PolynomialDecompH) {
+	ASSERT_FALSE(42);//TODO Ilaria
+    }
+
     //EXPORT void tGswTLweDecompH(IntPolynomial* result, const TLweSample* sample,const TGswParams* params);	
 
     ////TODO: Ilaria.Theoreme3.5
