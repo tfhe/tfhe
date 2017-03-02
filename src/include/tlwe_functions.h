@@ -38,6 +38,11 @@ EXPORT void tLweSymEncryptZero(TLweSample* result, double alpha, const TLweKey* 
 /** result = result + p.sample */
 EXPORT void tLweAddMulRTo(TLweSample* result, const IntPolynomial* p, const TLweSample* sample, const TLweParams* params);
 
+/** result += (0...,0,x,0,...,0) */
+EXPORT void tLweAddTTo(TLweSample* result, const int pos, const Torus32 x, const TLweParams* params);
+
+/** result += p*(0...,0,x,0,...,0) */
+EXPORT void tLweAddRTTo(TLweSample* result, const int pos, const IntPolynomial* p, const Torus32 x, const TLweParams* params);
 
 // EXPORT void tLwePolyCombination(TLweSample* result, const int* combi, const TLweSample* samples, const TLweParams* params);
 

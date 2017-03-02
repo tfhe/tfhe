@@ -258,3 +258,18 @@ EXPORT double intPolynomialNorm2sq(const IntPolynomial* poly) {
     return norm;
 }
 
+// Norme infini de la distance entre deux IntPolynomial
+EXPORT double intPolynomialNormInftyDist(const IntPolynomial* poly1, const IntPolynomial* poly2) {
+    const int N = poly1->N;
+    double norm = 0;
+
+
+    // Max between the coefficients of abs(poly1-poly2)
+    for (int i = 0; i < N; ++i){
+        double r = abs(poly1->coefs[i] - poly2->coefs[i]);
+        if (r>norm) {norm = r;}
+    }
+    return norm;
+}
+
+

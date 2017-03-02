@@ -49,21 +49,6 @@ TGswKey::~TGswKey() {
 
 
 
-TGswSample::TGswSample(const TGswParams* params): k(params->tlwe_params->k), l(params->l) {
-    all_sample = new_TLweSample_array((k+1)*l,params->tlwe_params); // tous les samples comme un vecteur ligne
-    bloc_sample = new TLweSample*[k+1]; // blocs horizontaux (l lignes) de la matrice TGsw
-
-    for (int p = 0; p < k+1; ++p)
-	    bloc_sample[p] = all_sample + p*l;
-
-	// current_variance = 0;
-}
-
-TGswSample::~TGswSample() {
-    delete_TLweSample_array((k+1)*l,all_sample);
-    delete[] bloc_sample;
-}
-
 TGswSampleFFT::TGswSampleFFT(const TGswParams* params): k(params->tlwe_params->k), l(params->l) {
     all_samples = new_TLweSampleFFT_array((k+1)*l,params->tlwe_params);
     sample = new TLweSampleFFT*[(k+1)*l];

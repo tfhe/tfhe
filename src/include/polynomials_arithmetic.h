@@ -69,6 +69,10 @@ EXPORT double torusPolynomialNormInftyDist(const TorusPolynomial* poly1, const T
 // Norme 2 d'un IntPolynomial
 EXPORT double intPolynomialNorm2sq(const IntPolynomial* poly);
 
+// Norme infini de la distance entre deux IntPolynomial
+EXPORT double intPolynomialNormInftyDist(const IntPolynomial* poly1, const IntPolynomial* poly2);
+
+
 
 
 /**
