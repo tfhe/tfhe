@@ -184,6 +184,7 @@ namespace {
     //// support Functions for TGsw
     //// Result = 0
     //EXPORT void tGswClear(TGswSample* result, const TGswParams* params);
+    //ILA: ce devrait etre des intpoly?
     TEST_F(TGswTest, tGswClear) {
 	TGswSample* s = new_TGswSample(params512_1);
 	int kpl = params512_1->kpl;
@@ -198,8 +199,45 @@ namespace {
 	delete_TGswSample(s);
     }
     
+
     //// Result += H
     //EXPORT void tGswAddH(TGswSample* result, const TGswParams* params);
+    //ILA: ce devrait etre des intpoly?
+    TEST_F(TGswTest, tGswAddH) {
+    TGswSample* s = new_TGswSample(params512_1);
+    TGswSample* stemp = new_TGswSample(params512_1);
+    int kpl = params512_1->kpl;
+    Torus32* h = params->h;
+
+    TorusPolynomial* poly = new_TorusPolynomial(params512_1->tlwe_params->N);
+    for (int i = 0; i < kpl; ++i)
+    {
+        FakeTGsw* si = fake(&s->all_sample[i]);
+
+        ASSERT_TRUE(torusPolynomialNormInftyDist(si->message,zeroPol)==0);
+    }
+
+
+    torusPolynomialClear(zeroPol);
+    
+
+
+    tGswAddH(s, params512_1);
+
+
+    for (int i=0; i<kpl; i++) {
+        FakeTLwe* si = fake(&s->all_sample[i]);
+        ASSERT_TRUE(torusPolynomialNormInftyDist(si->message,zeroPol)==0);
+    }
+
+
+
+    delete_TorusPolynomial(poly);
+    delete_TGswSample(stemp);
+    delete_TGswSample(s);
+    }
+
+
     //// Result += mu*H
     //EXPORT void tGswAddMuH(TGswSample* result, const IntPolynomial* message, const TGswParams* params);
     //// Result += mu*H, mu integer
