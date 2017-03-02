@@ -542,6 +542,65 @@ namespace {
 
 
 
+    /** result += (0,x) */
+    //EXPORT void tLweAddTTo(TLweSample* result, const Torus32 x, const TLweParams* params);
+    TEST_F(TLweTest, tLweAddTTo) {
+	const int x = uniformTorus32_distrib(generator);
+	for (const TLweKey* key: all_keys) {
+	    const TLweParams* params = key->params;
+	    const int N = params->N;
+	    const int k = params->k;
+	    const int pos = rand()%params->k;
+	    TLweSample* sample1 = new_TLweSample(params);
+	    TLweSample* sample1copy = new_TLweSample(params);
+	    fillRandom(sample1,params);
+	    copySample(sample1copy,sample1,params);
+	    tLweAddTTo(sample1,pos,x,params);
+	    // Verify if the operation was correctly executed 
+	    for (int i = 0; i <= k; ++i)
+		for (int j = 0; j < N; ++j)
+		    if (i==pos&&j==0)
+			ASSERT_EQ(sample1copy->a[i].coefsT[j]+x, sample1->a[i].coefsT[j]);
+		    else
+			ASSERT_EQ(sample1copy->a[i].coefsT[j], sample1->a[i].coefsT[j]);
+	    ASSERT_EQ(sample1copy->current_variance, sample1->current_variance);
+
+	    delete_TLweSample(sample1);
+	    delete_TLweSample(sample1copy);
+	}
+    }
+
+    /** result += p*(0,x) */
+    //EXPORT void tLweAddRTTo(TLweSample* result, const IntPolynomial* p, const Torus32 x, const TLweParams* params);
+    TEST_F(TLweTest, tLweAddRTTo) {
+	const int x = uniformTorus32_distrib(generator);
+	for (const TLweKey* key: all_keys) {
+	    const TLweParams* params = key->params;
+	    const int N = params->N;
+	    const int k = params->k;
+	    const int pos = rand()%params->k;
+	    TLweSample* sample1 = new_TLweSample(params);
+	    TLweSample* sample1copy = new_TLweSample(params);
+	    IntPolynomial* p = new IntPolynomial(N);
+	    fillRandom(sample1,params);
+	    for (int i=0; i<N; i++) p->coefs[i]=uniformTorus32_distrib(generator)%1000;
+	    copySample(sample1copy,sample1,params);
+	    tLweAddRTTo(sample1,pos,p,x,params);
+	    // Verify if the operation was correctly executed 
+	    for (int i = 0; i <= k; ++i)
+		for (int j = 0; j < N; ++j)
+		    if (i!=pos)
+			ASSERT_EQ(sample1copy->a[i].coefsT[j], sample1->a[i].coefsT[j]);
+		    else
+			ASSERT_EQ(sample1copy->a[i].coefsT[j]+p->coefs[j]*x, sample1->a[i].coefsT[j]);
+	    ASSERT_EQ(sample1copy->current_variance, sample1->current_variance);
+
+	    delete_TLweSample(sample1);
+	    delete_IntPolynomial(p);
+	    delete_TLweSample(sample1copy);
+	}
+    }
+
 
 
 
