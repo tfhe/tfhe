@@ -32,9 +32,23 @@ namespace {
 	return key;
     }	
 
+
+
+    // we use the function rand because in the "const static" context the uniformly random generator doesn't work!
+    IntPolynomial* new_random_IntPolynomial(const int N) {
+        IntPolynomial* poly = new_IntPolynomial(N);
+        
+        for (int i = 0; i < N; ++i)
+            poly->coefs[i] = rand()%2; // ILA: ça suffit?   
+        return poly;
+    }
+
+
+
+
+
     /*
      * Parameters and keys (for N=512,1024,2048 and k=1,2)
-     * ILA: Creer un set des parametres avec tous les params à l'interieur et utiliser le set dans les tests (?)
      */
     const TGswParams* params512_1 = new_TGswParams(4,8,new_TLweParams(512,1,0.,1.));
     const TGswParams* params512_2 = new_TGswParams(3,10,new_TLweParams(512,2,0.,1.));
@@ -198,21 +212,27 @@ namespace {
     //EXPORT void tGswSymEncrypt(TGswSample* result, const IntPolynomial* message, double alpha, const TGswKey* key);
     TEST_F(TGswTest, tGswSymEncrypt) {
         for (const TGswKey* key: all_keys) {
-            int kpl = key->param->kpl;
-            TGswSample* res = new_TGswSample(key->param);
-            IntPolynomial* mess = new_IntPolynomial(key->param->tlwe_params->N);
-            double alpha;
-            // ILA: est ce qu'il faut les generer random (alpha et poly)?
+            int l = key->params->l;
+            int k = key->params->tlwe_params->k;
+            Torus32* h = key->params->h;
+            TGswSample* s = new_TGswSample(key->params);
+            IntPolynomial* mess = new_random_IntPolynomial(key->params->tlwe_params->N);
+            double alpha = 4.2; // valeur pseudo aleatoire fixé
             
-            tGswSymEncrypt(res, mess, alpha, key);
-            for (int i=0; i<kpl; i++) {
-                FakeTLwe* si = fake(&s->all_sample[i]);
-                ASSERT_TRUE(intPolynomialNormInftyDist(si->message,mess)==0);
-                ASSERT_TRUE(si->current_variance==alpha);
+            tGswSymEncrypt(s, mess, alpha, key);
+            for (int bloc=0; bloc<=k; bloc++) {
+                for (int i=0; i<l; ++i)
+                {
+                    int t = bloc*l+i;
+                    FakeTLwe* st = fake(&s->all_sample[t]);
+
+                    ASSERT_TRUE(torusPolynomialNormInftyDist(st->message,mess*h[i])==0);
+                    ASSERT_TRUE(st->current_variance==alpha);
+                }
             }
 
             delete_IntPolynomial(mess);
-            delete_TGswSample(res);
+            delete_TGswSample(s);
         }
     }
 
@@ -221,33 +241,31 @@ namespace {
     //EXPORT void tGswSymEncryptInt(TGswSample* result, const int message, double alpha, const TGswKey* key);
     TEST_F(TGswTest, tGswSymEncryptInt) {
         for (const TGswKey* key: all_keys) {
-            int kpl = key->param->kpl;
-            TGswSample* res = new_TGswSample(key->param);
-            int mess;
-            double alpha;
-            // ILA: est ce qu'il faut les generer random (alpha et message)?
+            int kpl = key->params->kpl;
+            TGswSample* s = new_TGswSample(key->params);
+            int mess = rand()%2; // ILA: ça suffit?
+            double alpha = 4.2; // valeur pseudo aleatoire fixé
             
-            tGswSymEncryptInt(res, mess, alpha, key);
+            tGswSymEncryptInt(s, mess, alpha, key);
             for (int i=0; i<kpl; i++) {
                 FakeTLwe* si = fake(&s->all_sample[i]);
-                ASSERT_TRUE(si->message->coefs[0]==mess);
+                ASSERT_TRUE(si->message->coefsT[0]==mess); //mess*h[i]
                 ASSERT_TRUE(si->current_variance==alpha);
             }
 
-            delete_TGswSample(res);
+            delete_TGswSample(s);
         }
     }
 
 
 
-
+    // ILA: we do not decrypt TGSW, no test for now
     //EXPORT void tGswSymDecrypt(IntPolynomial* result, const TGswSample* sample, const TGswKey* key, const int Msize);
     //EXPORT int tGswSymDecryptInt(const TGswSample* sample, const TGswKey* key); 
     
     //// support Functions for TGsw
     //// Result = 0
     //EXPORT void tGswClear(TGswSample* result, const TGswParams* params);
-    //ILA: ce devrait etre des intpoly?
     //ILA: on devrait verifier aussi la variance?
     TEST_F(TGswTest, tGswClear) {
     	for (const TGswParams* param: all_params) {
@@ -267,37 +285,48 @@ namespace {
     	}
     }
 
+
+
+
+    
+
+
+
+
+    // ***************************************************************************************************************
+    // TGswDirectTest will be used to do direct tests while the function to be tested is not compatible with the fakes
+    // ***************************************************************************************************************
+
     //// Result += H
     //EXPORT void tGswAddH(TGswSample* result, const TGswParams* params);
-    //ILA: ce devrait etre des intpoly?
     //ILA: on devrait verifier aussi la variance?
-    TEST_F(TGswTest, tGswAddH) {
-        for (const TGswParams* param: all_params) {
-            TGswSample* s = new_TGswSample(param);
-            TGswSample* stemp = new_TGswSample(param);
-            int kpl = param->kpl;
-            TorusPolynomial* poly = new_TorusPolynomial(param->tlwe_params->N);
-            IntPolynomial* mess = new_IntPolynomial(param->tlwe_params->N);
+    TEST_F(TGswDirectTest, tGswAddH) {
+        for (const TGswKey* key: all_keys) {
+            TGswSample* s = new_TGswSample(key->params);
+            TGswSample* stemp = new_TGswSample(key->params);
+            int kpl = key->params->kpl;
+            int l = key->params->l;
+            int k = key->params->tlwe_params->k;
+            Torus32* h = key->params->h;
+            IntPolynomial* mess = new_IntPolynomial(key->params->tlwe_params->N);
+            double alpha = 4.2; // valeur pseudo aleatoire fixé
+            tGswSymEncrypt(s, mess, alpha, key);
 
-            intPolynomialClear(mess);
-            mess->coefs[0]+=1;
-
-            //ILA: a copy function for gsw is missing
             // stemp is equal to s
             for (int i = 0; i < kpl; ++i){
-                tLweCopy(&stemp->all_sample[i], &s->all_sample[i], param);
+                tLweCopy(&stemp->all_sample[i], &s->all_sample[i], key->params->tlwe_params);
             }
 
-            tGswAddH(s,param);
-            for (int i=0; i<=kpl; i++) {
-                FakeTLwe* si = fake(&s->all_sample[i]);
-                FakeTLwe* sitemp = fake(&stemp->all_sample[i]);
-                intPolynomialAddTo(sitemp->message,mess);
-                ASSERT_TRUE(torusPolynomialNormInftyDist(si->message,sitemp->message)==0);              
+            tGswAddH(s,key->params);
+            for (int bloc=0; bloc<=k; bloc++) {
+                for (int i=0; i<l; ++i)
+                {
+                    stemp->bloc_sample[bloc][i].a[bloc].coefsT[0]+=h[i];
+                    ASSERT_TRUE(torusPolynomialNormInftyDist(s->bloc_sample[bloc][i].a[bloc],stemp->bloc_sample[bloc][i].a[bloc])==0);
+                }                              
             }
 
             delete_IntPolynomial(mess);
-            delete_TorusPolynomial(poly);
             delete_TGswSample(stemp);
             delete_TGswSample(s);
         }
@@ -307,6 +336,7 @@ namespace {
     //// Result += mu*H
     //EXPORT void tGswAddMuH(TGswSample* result, const IntPolynomial* message, const TGswParams* params);
     //ILA: on devrait verifier aussi la variance?
+    /*
     TEST_F(TGswTest, tGswAddMuH) {
         for (const TGswParams* param: all_params) {
             TGswSample* s = new_TGswSample(param);
@@ -335,7 +365,7 @@ namespace {
             delete_TGswSample(s);
         }
     }
-
+*/
 
 
 
