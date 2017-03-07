@@ -1,3 +1,8 @@
+#ifndef FAKES_TGSW_H
+#define FAKES_TGSW_H
+
+#include "./tlwe.h"
+
 namespace {
 
     // Fake TGSW structure 
@@ -176,18 +181,15 @@ namespace {
 	return fake_tGswMulByXaiMinusOne(result,ai,bk,params); \
     }
 
-    inline void fake_tLweMulRTo(TLweSample* result, const IntPolynomial* u, const TLweParams* params) {
-	torusPolynomialCopy(result->a,result->b);
-	torusPolynomialMultNaive(result->b,u,result->a);
-	torusPolynomialClear(result->a);
-	result->current_variance *= intPolynomialNormSq2(u);
-    }
-
     //ligne 5 algo,mult externe
     inline void fake_tGswExternMulToTLwe(TLweSample* accum, const TGswSample* sample,const TGswParams* params) {
-	const FakeTGsw* fsample = fake(sample);
-	fake_tLweMulRTo(accum,fsample->message, params->tlwe_params);
-	//TODO: variance 
+	const int N = params->tlwe_params->N;
+	const FakeTGsw* fgsw = fake(sample);
+	const FakeTLwe* faccum = fake(accum);
+	TorusPolynomial* tmp = new_TorusPolynomial(N);
+	torusPolynomialMultKaratsuba(tmp,fgsw->message,faccum->message);
+	torusPolynomialCopy(faccum->message, tmp);
+	delete_TorusPolynomial(tmp);
     }
 
 #define USE_FAKE_tGswExternMulToTLwe \
@@ -215,3 +217,5 @@ namespace {
     EXPORT void tfhe_bootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu, const LweSample* x);
 
 }
+
+#endif// FAKES_TGSW_H

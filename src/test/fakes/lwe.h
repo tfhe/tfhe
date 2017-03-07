@@ -3,8 +3,8 @@ Fakes for LWE
 ************************** */
 
 
-#ifndef FAKE_LWE_H
-#define FAKE_LWE_H
+#ifndef FAKES_LWE_H
+#define FAKES_LWE_H
 
 #include "tfhe.h"
 
@@ -24,4 +24,4 @@ inline Torus32 fake_lweVariance(const LweSample* sample) {
     return sample->current_variance;
 }
 
-#endif //FAKE_LWE_H
+#endif //FAKES_LWE_H

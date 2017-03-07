@@ -1,3 +1,8 @@
+#ifndef FAKES_TLWE_FFT_H
+#define FAKES_TLWE_FFT_H
+
+#include "./lagrangehalfc.h"
+
 namespace {
 
     // Fake TLWE structure 
@@ -11,18 +16,18 @@ namespace {
 	char unused_padding[sizeof(TLweSampleFFT)-sizeof(long)-sizeof(TorusPolynomial*)-sizeof(double)];
 
 	// construct
-	FakeTLwe(int N):fake_uid(FAKE_TYPE_UID) {
+	FakeTLweFFT(int N):fake_uid(FAKE_TYPE_UID) {
 	    message = new_TorusPolynomial(N);
 	    current_variance = 0.;
 	}
 
 	// delete
-	~FakeTLwe() {
+	~FakeTLweFFT() {
 	    if (fake_uid!=FAKE_TYPE_UID) abort();
 	    delete_TorusPolynomial(message);
 	}
-	FakeTLwe(const FakeTLwe&)=delete;
-	void operator=(const FakeTLwe&)=delete;
+	FakeTLweFFT(const FakeTLweFFT&)=delete;
+	void operator=(const FakeTLweFFT&)=delete;
     };
 
 
@@ -47,20 +52,20 @@ namespace {
     //  constructor/destructor
     //-----------------------------------------
 
-    #define USE_FAKE_new_TLweSample_array \
-    inline TLweSampleFFT* new_TLweSample_array(int nbelts, const TLweParams* params) { \
-        return fake_new_TLweSample_array(nbelts,params); \
+    #define USE_FAKE_new_TLweSampleFFT_array \
+    inline TLweSampleFFT* new_TLweSampleFFT_array(int nbelts, const TLweParams* params) { \
+        return fake_new_TLweSampleFFT_array(nbelts,params); \
     }
 
-    inline void fake_delete_TLweSample_array(int nbelts, TLweSampleFFT* sample) {
+    inline void fake_delete_TLweSampleFFT_array(int nbelts, TLweSampleFFT* sample) {
         FakeTLweFFT* arr = fake(sample);
         for (int i=0; i<nbelts; i++) (arr+i)->~FakeTLweFFT();
         free(arr);
     }
 
     // 
-    #define USE_FAKE_delete_TLweSample_array \
-    inline void delete_TLweSample_array(int nbelts, TLweSampleFFT* samples) { \
+    #define USE_FAKE_delete_TLweSampleFFT_array \
+    inline void delete_TLweSampleFFT_array(int nbelts, TLweSampleFFT* samples) { \
         fake_delete_TLweSample_array(nbelts,samples); \
     }
 
@@ -102,7 +107,7 @@ namespace {
 	const FakeTLwe* fs = fake(source);
 	FakeTLweFFT* fres = fake(result);
 
-	TorusPolynomial_copy(fres->message, fs->message);
+	torusPolynomialCopy(fres->message, fs->message);
 	fres->current_variance=fs->current_variance;
     }
 
@@ -114,10 +119,10 @@ namespace {
 
     // Computes the FFT of the coefficients of the TLWEfft sample
     inline void fake_tLweFromFFTConvert(TLweSample* result, const TLweSampleFFT* source, const TLweParams* params){
-	FakeTLweFFT* fs = fake(source);
+	const FakeTLweFFT* fs = fake(source);
 	FakeTLwe* fres = fake(result);
 
-	TorusPolynomial_copy(fres->message, fs->message);
+	torusPolynomialCopy(fres->message, fs->message);
 	fres->current_variance=fs->current_variance;
     }
 
@@ -132,7 +137,7 @@ namespace {
     inline void fake_tLweFFTClear(TLweSampleFFT* result, const TLweParams* params){
 	FakeTLweFFT* fres = fake(result);
 
-	TorusPolynomial_clear(fres->message);
+	torusPolynomialClear(fres->message);
 	fres->current_variance=0;
     }
 
@@ -142,68 +147,18 @@ namespace {
     }
 
 
-    /** result = (0,mu) where mu is a torus polynomial */
-    inline void fake_tLweFFTNoiselessTrivial(TLweSampleFFT* result, const TorusPolynomial* mu, const TLweParams* params){
-	FakeTLweFFT* fres = fake(result);
-	
-	TorusPolynomial_copy(fres->message, mu);
-	fres->current_variance = 0.;
-    }
-
-#define USE_FAKE_tLweFFTNoiselessTrivial \
-    inline void tLweFFTNoiselessTrivial(TLweSampleFFT* result, const TorusPolynomial* mu, const TLweParams* params) { \
-	fake_tLweFFTNoiselessTrivial(result, mu, params); \
-    }
-
-    /** result = (0,mu) where mu is constant*/
-    EXPORT void tLweFFTNoiselessTrivialT(TLweSampleFFT* result, const Torus32 mu, const TLweParams* params){
-	FakeTLweFFT* fres = fake(result);
-	
-	TorusPolynomial_clear(fres->message);
-	fres->message.coefsT[0]=mu;
-	fres->current_variance = 0.;
-    }
-
-    /** result = result + sample */
-    //EXPORT void tLweFFTAddTo(TLweSampleFFT* result, const TLweSampleFFT* sample, const TLweParams* params);
-    //Let's postpone this to make sure we actually need it
-
-    /** result = result - sample */
-    //EXPORT void tLweFFTSubTo(TLweSampleFFT* result, const TLweSampleFFT* sample, const TLweParams* params);
-    //Let's postpone this to make sure we actually need it
-
-    /** result = result + p.sample */
-    //EXPORT void tLweFFTAddMulZTo(TLweSampleFFT* result, int p, const TLweSampleFFT* sample, const TLweParams* params);
-    //Let's postpone this to make sure we actually need it
-
-    /** result = result - p.sample */
-    //EXPORT void tLweFFTSubMulZTo(TLweSampleFFT* result, int p, const TLweSampleFFT* sample, const TLweParams* params);
-    //Let's postpone this to make sure we actually need it
-
-
     // result = result + p*sample
-    EXPORT void tLweFFTAddMulRTo(TLweSampleFFT* result, const LagrangeHalfCPolynomial* p, const TLweSampleFFT* sample, const TLweParams* params) {
-	const int k = params->k;
+    inline void fake_tLweFFTAddMulRTo(TLweSampleFFT* result, const LagrangeHalfCPolynomial* p, const TLweSampleFFT* sample, const TLweParams* params) {
+	FakeTLweFFT* fres = fake(result);
+	const FakeTLweFFT* fsample = fake(sample);
+	const FakeLagrangeHalfCPolynomial* fp = fake(p);
 
-	for (int i=0; i<=k; i++)
-	    LagrangeHalfCPolynomialAddMul(result->a+i,p,sample->a+i);
-    }
-
-    // result = p*sample
-    EXPORT void tLweFFTMulR(TLweSampleFFT* result, const LagrangeHalfCPolynomial* p, const TLweSampleFFT* sample, const TLweParams* params) {
-	const int k = params->k;
-
-	for (int i=0; i<=k; i++)
-	    LagrangeHalfCPolynomialMul(result->a+i,p,sample->a+i);
-    }
-
-    // result = result - p*sample
-    EXPORT void tLweFFTSubMulRTo(TLweSampleFFT* result, const LagrangeHalfCPolynomial* p, const TLweSampleFFT* sample, const TLweParams* params) {
-	const int k = params->k;
-
-	for (int i=0; i<=k; i++)
-	    LagrangeHalfCPolynomialSubMul(result->a+i,p,sample->a+i);
+	const IntPolynomial* pval = fp->getIntPolynomialPtr();
+	torusPolynomialAddMulRKaratsuba(fres->message, pval, fsample->message);
+	fres->current_variance += fsample->current_variance*intPolynomialNormSq2(pval);
     }
 
 
 }
+
+#endif // FAKES_TLWE_FFT_H
