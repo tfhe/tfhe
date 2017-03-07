@@ -1,337 +1,209 @@
-/* **************************
-Fakes for TLWE fft (ILA do it!!!!)
-************************** */
-
 namespace {
 
     // Fake TLWE structure 
-    struct FakeTLwe {
-    static const int FAKE_TLWE_UID = 542354312; // precaution: distinguish fakes from trues
-    const int fake_uid;
-    TorusPolynomial* message;
-    double current_variance;
+    struct FakeTLweFFT {
+	static const int FAKE_TYPE_UID = 816458235; // precaution: distinguish fakes from trues
+	const int fake_uid;
+	TorusPolynomial* message;
+	double current_variance;
 
-    //this padding is here to make sure that FakeTLwe and TLweSample have the same size
-    char unused_padding[sizeof(TLweSample)-sizeof(long)-sizeof(TorusPolynomial*)-sizeof(double)];
-    
-    // construct
-    FakeTLwe(int N):fake_uid(FAKE_TLWE_UID) {
-        message = new_TorusPolynomial(N);
-        current_variance = 0.;
-    }
+	//this padding is here to make sure that FakeTLwe and TLweSample have the same size
+	char unused_padding[sizeof(TLweSampleFFT)-sizeof(long)-sizeof(TorusPolynomial*)-sizeof(double)];
 
-    // delete
-    ~FakeTLwe() {
-        assert(sizeof(FakeTLwe)==sizeof(TLweSample));
-        if (fake_uid!=FAKE_TLWE_UID) abort();
-        delete_TorusPolynomial(message);
-    }
-    FakeTLwe(const FakeTLwe&)=delete;
-    void operator=(const FakeTLwe&)=delete;
+	// construct
+	FakeTLwe(int N):fake_uid(FAKE_TYPE_UID) {
+	    message = new_TorusPolynomial(N);
+	    current_variance = 0.;
+	}
+
+	// delete
+	~FakeTLwe() {
+	    if (fake_uid!=FAKE_TYPE_UID) abort();
+	    delete_TorusPolynomial(message);
+	}
+	FakeTLwe(const FakeTLwe&)=delete;
+	void operator=(const FakeTLwe&)=delete;
     };
 
 
 
     // At compile time, we verify that the two structures have exactly the same size
-    static_assert (sizeof(FakeTLwe) == sizeof(TLweSample), "Error: Size is not correct");
+    static_assert (sizeof(FakeTLweFFT) == sizeof(TLweSampleFFT), "Error: Size is not correct");
 
     // fake functons 
-    inline FakeTLwe* fake(TLweSample* sample) {
-    FakeTLwe* reps = (FakeTLwe*) sample;
-    if (reps->fake_uid!=FakeTLwe::FAKE_TLWE_UID) abort();
-    return reps; 
+    inline FakeTLweFFT* fake(TLweSampleFFT* sample) {
+	FakeTLweFFT* reps = (FakeTLweFFT*) sample;
+	if (reps->fake_uid!=FakeTLweFFT::FAKE_TYPE_UID) abort();
+	return reps; 
     }
-    inline const FakeTLwe* fake(const TLweSample* sample) {
-    const FakeTLwe* reps = (const FakeTLwe*) sample;
-    if (reps->fake_uid!=FakeTLwe::FAKE_TLWE_UID) abort();
-    return reps; 
-    }
-
-    
-
-    // A new array containing TLWE samples (not a TGSW!!!) --> why?
-    inline TLweSample* fake_new_TLweSample_array(int nbelts, const TLweParams* params) {
-        int N = params->N;
-        //TLweSample* arr = (TLweSample*) malloc(nbelts*sizeof(TLweSample));
-        //for (int i=0; i<nbelts; i++) new(arr+i) FakeTLwe(N); 
-        FakeTLwe* arr = (FakeTLwe*) malloc(nbelts*sizeof(FakeTLwe));
-        for (int i=0; i<nbelts; i++) new(arr+i) FakeTLwe(N);
-        return (TLweSample*) arr;
+    inline const FakeTLweFFT* fake(const TLweSampleFFT* sample) {
+	const FakeTLweFFT* reps = (const FakeTLweFFT*) sample;
+	if (reps->fake_uid!=FakeTLweFFT::FAKE_TYPE_UID) abort();
+	return reps; 
     }
 
-    // 
+
+    //-----------------------------------------
+    //  constructor/destructor
+    //-----------------------------------------
+
     #define USE_FAKE_new_TLweSample_array \
-    inline TLweSample* new_TLweSample_array(int nbelts, const TLweParams* params) { \
+    inline TLweSampleFFT* new_TLweSample_array(int nbelts, const TLweParams* params) { \
         return fake_new_TLweSample_array(nbelts,params); \
     }
 
-    inline void fake_delete_TLweSample_array(int nbelts, TLweSample* sample) {
-        FakeTLwe* arr = fake(sample);
-        for (int i=0; i<nbelts; i++) (arr+i)->~FakeTLwe();
+    inline void fake_delete_TLweSample_array(int nbelts, TLweSampleFFT* sample) {
+        FakeTLweFFT* arr = fake(sample);
+        for (int i=0; i<nbelts; i++) (arr+i)->~FakeTLweFFT();
         free(arr);
     }
 
-
-
-    // Fake symmetric encryption of a Torus polynomial message (encryption is a noiseless trivial sample)
-    inline void fake_tLweSymEncrypt(TLweSample* result, TorusPolynomial* message, double alpha, const TLweKey* key) {
-        FakeTLwe* fres = fake(result);
-
-        torusPolynomialCopy(fres->message, message);
-        fres->current_variance = alpha*alpha;
-    }
-    #define USE_FAKE_tLweSymEncrypt \
-    inline void tLweSymEncrypt(TLweSample* result, TorusPolynomial* message, double alpha, const TLweKey* key) { \
-        fake_tLweSymEncrypt(result, message, alpha, key); \
+    // 
+    #define USE_FAKE_delete_TLweSample_array \
+    inline void delete_TLweSample_array(int nbelts, TLweSampleFFT* samples) { \
+        fake_delete_TLweSample_array(nbelts,samples); \
     }
 
 
 
-    // Fake symmetric encryption of a Torus message (encryption is a noiseless trivial sample)
-    inline void fake_tLweSymEncryptT(TLweSample* result, Torus32 message, double alpha, const TLweKey* key) { 
-        int N = key->params->N;
-        FakeTLwe* fres = fake(result);
-
-        fres->message->coefsT[0] = message;
-        for (int j = 1; j < N; ++j) fres->message->coefsT[j] = 0;
-        fres->current_variance = alpha*alpha;
-    }
-    #define USE_FAKE_tLweSymEncryptT \
-    inline void tLweSymEncryptT(TLweSample* result, Torus32 message, double alpha, const TLweKey* key) { \
-        fake_tLweSymEncryptT(result, message, alpha, key); \
+    inline TLweSampleFFT* fake_new_TLweSampleFFT(const TLweParams* params) {
+        int N = params->N;
+        FakeTLweFFT* reps = (FakeTLweFFT*) malloc(sizeof(FakeTLweFFT));
+        new(reps) FakeTLweFFT(N);
+        return (TLweSampleFFT*) reps;
     }
 
-
-
-    // Fake Torus polynomial phase (samples are noiseless trivial) 
-    inline void fake_tLwePhase(TorusPolynomial* phase, const TLweSample* sample, const TLweKey* key) { 
-        const FakeTlwe* fsamp = fake(sample);
-
-        torusPolynomialCopy(phase, fsamp->message);
+    // 
+    #define USE_FAKE_new_TLweSampleFFT \
+    inline TLweSampleFFT* new_TLweSampleFFT(const TLweParams* params) { \
+        return fake_new_TLweSampleFFT(params); \
     }
-    #define USE_FAKE_tLwePhase \
-    inline void tLwePhase(TorusPolynomial* phase, const TLweSample* sample, const TLweKey* key) { \
-        fake_tLwePhase(phase,sample,key); \
+
+    inline void fake_delete_TLweSampleFFT(TLweSampleFFT* sample) {
+        FakeTLweFFT* ptr = fake(sample);
+        (ptr)->~FakeTLweFFT();
+        free(ptr);
+    }
+
+    // 
+#define USE_FAKE_delete_TLweSampleFFT \
+    inline void delete_TLweSampleFFT(TLweSampleFFT* sample) { \
+	fake_delete_TLweSampleFFT(sample); \
     }
 
 
+    //-----------------------------------------------
+    //  functions
+    //-----------------------------------------------
 
-    // Fake Torus polynomial approximate phase (samples are noiseless trivial) 
-    inline void fake_tLweApproxPhase(TorusPolynomial* message, const TorusPolynomial* phase, int Msize, int N) { 
-        torusPolynomialCopy(message, phase);
+
+    // Computes the inverse FFT of the coefficients of the TLWE sample
+    inline void fake_tLweToFFTConvert(TLweSampleFFT* result, const TLweSample* source, const TLweParams* params){
+	const FakeTLwe* fs = fake(source);
+	FakeTLweFFT* fres = fake(result);
+
+	TorusPolynomial_copy(fres->message, fs->message);
+	fres->current_variance=fs->current_variance;
     }
-    #define USE_FAKE_tLweApproxPhase \
-    inline void tLweApproxPhase(TorusPolynomial* message, const TorusPolynomial* phase, int Msize, int N) { \
-        fake_tLweApproxPhase(message, phase, Msize, N); \
-    }
 
-
-
-    // Fake decryption of a Torus polynomial message
-    inline void fake_tLweSymDecrypt(TorusPolynomial* result, const TLweSample* sample, const TLweKey* key, int Msize) { 
-        int N = key->params->N;
-        TorusPolynomial* phase;
-
-        fake_tLwePhase(phase, sample, key);
-        fake_tLweApproxPhase(result, phase, Msize, N);
-    }
-    #define USE_FAKE_tLweSymDecrypt \
-    inline void tLweSymDecrypt(TorusPolynomial* result, const TLweSample* sample, const TLweKey* key, int Msize) { \
-        fake_tLweSymDecrypt(result, sample, key, Msize); \
+#define USE_FAKE_tLweToFFTConvert \
+    inline void tLweToFFTConvert(TLweSampleFFT* result, const TLweSample* source, const TLweParams* params){ \
+	fake_tLweToFFTConvert(result, source, params); \
     }
 
 
+    // Computes the FFT of the coefficients of the TLWEfft sample
+    inline void fake_tLweFromFFTConvert(TLweSample* result, const TLweSampleFFT* source, const TLweParams* params){
+	FakeTLweFFT* fs = fake(source);
+	FakeTLwe* fres = fake(result);
 
-    // Fake decryption of a Torus message
-    inline Torus32 fake_tLweSymDecryptT(const TLweSample* sample, const TLweKey* key, int Msize) { 
-        Torus32 message;
-        int N = key->params->N;
-        TorusPolynomial* phase;
-        TorusPolynomial* approx_phase;
-
-        fake_tLwePhase(phase, sample, key);
-        fake_tLweApproxPhase(approx_phase, phase, Msize, N);
-        message = approx_phase->coefsT[0];
-
-        return message;
-    }
-    #define USE_FAKE_tLweSymDecryptT \
-    inline Torus32 tLweSymDecryptT(const TLweSample* sample, const TLweKey* key, int Msize) { \
-        return fake_tLweSymDecryptT(sample, key, Msize); \
+	TorusPolynomial_copy(fres->message, fs->message);
+	fres->current_variance=fs->current_variance;
     }
 
 
+#define  tLweFromFFTConvert \
+    inline void tLweFromFFTConvert(TLweSample* result, const TLweSampleFFT* source, const TLweParams* params) { \
+	fake_tLweFromFFTConvert(result, source, params); \
+    }
 
-
-
-
-
-
-    // Arithmetic operations on TLwe samples
-
+    //Arithmetic operations on TLwe samples
     /** result = (0,0) */
-    inline void fake_tLweClear(TLweSample* result, const TLweParams* params) {
-        FakeTLwe* fres = fake(result);
+    inline void fake_tLweFFTClear(TLweSampleFFT* result, const TLweParams* params){
+	FakeTLweFFT* fres = fake(result);
 
-        torusPolynomialClear(fres->message);
-        fres->current_variance = 0.;
-    }
-    #define USE_FAKE_tLweClear \
-    inline void tLweClear(TLweSample* result, const TLweParams* params) { \
-        fake_tLweClear(result, params); \
+	TorusPolynomial_clear(fres->message);
+	fres->current_variance=0;
     }
 
-
-
-    /** result = sample */
-    inline void fake_tLweCopy(TLweSample* result, const TLweSample* sample, const TLweParams* params) { 
-        const FakeTlwe* fsamp = fake(sample);
-        FakeTLwe* fres = fake(result);
-
-        torusPolynomialCopy(fres->message, fsamp->message);
-        fres->current_variance = fsamp->current_variance;
-    }
-    #define USE_FAKE_tLweCopy \
-    inline void tLweCopy(TLweSample* result, const TLweSample* sample, const TLweParams* params) { \
-        fake_tLweCopy(result,sample,params); \
+#define USE_FAKE_tLweFFTClear \
+    inline void tLweFFTClear(TLweSampleFFT* result, const TLweParams* params) { \
+	fake_tLweFFTClear(result, params); \
     }
 
 
-
-    /** result = (0,mu) */
-    inline void fake_tLweNoiselessTrivial(TLweSample* result, const TorusPolynomial* mu, const TLweParams* params) { 
-        FakeTLwe* fres = fake(result);
-
-        torusPolynomialCopy(fres->message, mu);
-        fres->current_variance = 0.;
-    }
-    #define USE_FAKE_tLweNoiselessTrivial \
-    inline void tLweNoiselessTrivial(TLweSample* result, const TorusPolynomial* mu, const TLweParams* params) { \
-        fake_tLweNoiselessTrivial(result,mu,params); \
+    /** result = (0,mu) where mu is a torus polynomial */
+    inline void fake_tLweFFTNoiselessTrivial(TLweSampleFFT* result, const TorusPolynomial* mu, const TLweParams* params){
+	FakeTLweFFT* fres = fake(result);
+	
+	TorusPolynomial_copy(fres->message, mu);
+	fres->current_variance = 0.;
     }
 
+#define USE_FAKE_tLweFFTNoiselessTrivial \
+    inline void tLweFFTNoiselessTrivial(TLweSampleFFT* result, const TorusPolynomial* mu, const TLweParams* params) { \
+	fake_tLweFFTNoiselessTrivial(result, mu, params); \
+    }
 
+    /** result = (0,mu) where mu is constant*/
+    EXPORT void tLweFFTNoiselessTrivialT(TLweSampleFFT* result, const Torus32 mu, const TLweParams* params){
+	FakeTLweFFT* fres = fake(result);
+	
+	TorusPolynomial_clear(fres->message);
+	fres->message.coefsT[0]=mu;
+	fres->current_variance = 0.;
+    }
 
     /** result = result + sample */
-    inline void fake_tLweAddTo(TLweSample* result, const TLweSample* sample, const TLweParams* params) { 
-        const FakeTlwe* fsamp = fake(sample);
-        FakeTLwe* fres = fake(result);
-
-        torusPolynomialAddTo(fres->message, fsamp->message);
-        fres->current_variance += fsamp->current_variance;
-    }
-    #define USE_FAKE_tLweAddTo \
-    inline void tLweAddTo(TLweSample* result, const TLweSample* sample, const TLweParams* params) { \
-        fake_tLweAddTo(result,sample,params); \
-    }
-
-
+    //EXPORT void tLweFFTAddTo(TLweSampleFFT* result, const TLweSampleFFT* sample, const TLweParams* params);
+    //Let's postpone this to make sure we actually need it
 
     /** result = result - sample */
-    inline void fake_tLweSubTo(TLweSample* result, const TLweSample* sample, const TLweParams* params) { 
-        const FakeTlwe* fsamp = fake(sample);
-        FakeTLwe* fres = fake(result);
-
-        torusPolynomialSubTo(fres->message, fsamp->message);
-        fres->current_variance += fsamp->current_variance;
-    }
-    #define USE_FAKE_tLweSubTo \
-    inline void tLweSubTo(TLweSample* result, const TLweSample* sample, const TLweParams* params) { \
-        fake_tLweSubTo(result,sample,params); \
-    }
-
-
+    //EXPORT void tLweFFTSubTo(TLweSampleFFT* result, const TLweSampleFFT* sample, const TLweParams* params);
+    //Let's postpone this to make sure we actually need it
 
     /** result = result + p.sample */
-    inline void fake_tLweAddMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params) { 
-        const FakeTlwe* fsamp = fake(sample);
-        FakeTLwe* fres = fake(result);
-
-        torusPolynomialAddMulZTo(fres->message, p, fsamp->message);
-        fres->current_variance += p*fsamp->current_variance;
-    }
-    #define USE_FAKE_tLweAddMulTo \
-    inline void tLweAddMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params) { \
-        fake_tLweAddMulTo(result,p,sample,params); \
-    }
-
-
+    //EXPORT void tLweFFTAddMulZTo(TLweSampleFFT* result, int p, const TLweSampleFFT* sample, const TLweParams* params);
+    //Let's postpone this to make sure we actually need it
 
     /** result = result - p.sample */
-    inline void fake_tLweSubMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params) { 
-        const FakeTlwe* fsamp = fake(sample);
-        FakeTLwe* fres = fake(result);
-
-        torusPolynomialSubMulZTo(fres->message, p, fsamp->message);
-        fres->current_variance += p*fsamp->current_variance;
-    }
-    #define USE_FAKE_tLweSubMulTo \
-    inline void tLweSubMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params) { \
-        fake_tLweSubMulTo(result,p,sample,params); \
-    }
+    //EXPORT void tLweFFTSubMulZTo(TLweSampleFFT* result, int p, const TLweSampleFFT* sample, const TLweParams* params);
+    //Let's postpone this to make sure we actually need it
 
 
+    // result = result + p*sample
+    EXPORT void tLweFFTAddMulRTo(TLweSampleFFT* result, const LagrangeHalfCPolynomial* p, const TLweSampleFFT* sample, const TLweParams* params) {
+	const int k = params->k;
 
-    /** create an homogeneous tlwe sample*/
-    inline void fake_tLweSymEncryptZero(TLweSample* result, double alpha, const TLweKey* key) { 
-        FakeTLwe* fres = fake(result);
-
-        torusPolynomialClear(fres->message);
-        fres->current_variance = alpha*alpha;
-    }
-    #define USE_FAKE_tLweSymEncryptZero \
-    inline void tLweSymEncryptZero(TLweSample* result, double alpha, const TLweKey* key) { \
-        fake_tLweSymEncryptZero(result,alpha,key); \
+	for (int i=0; i<=k; i++)
+	    LagrangeHalfCPolynomialAddMul(result->a+i,p,sample->a+i);
     }
 
+    // result = p*sample
+    EXPORT void tLweFFTMulR(TLweSampleFFT* result, const LagrangeHalfCPolynomial* p, const TLweSampleFFT* sample, const TLweParams* params) {
+	const int k = params->k;
 
-
-
-    /** result = result + p.sample */
-    inline void fake_tLweAddMulRTo(TLweSample* result, const IntPolynomial* p, const TLweSample* sample, const TLweParams* params) { 
-        const FakeTlwe* fsamp = fake(sample);
-        FakeTLwe* fres = fake(result);
-        
-        torusPolynomialMultNaive(fres->message, p, fsamp->message);
-        fres->current_variance += intPolynomialNorm2sq(p)*fsamp->current_variance; 
-    }
-    #define USE_FAKE_tLweAddMulRTo \
-    inline void tLweAddMulRTo(TLweSample* result, const IntPolynomial* p, const TLweSample* sample, const TLweParams* params) { \
-        fake_tLweAddMulRTo(result,p,sample,params); \
+	for (int i=0; i<=k; i++)
+	    LagrangeHalfCPolynomialMul(result->a+i,p,sample->a+i);
     }
 
+    // result = result - p*sample
+    EXPORT void tLweFFTSubMulRTo(TLweSampleFFT* result, const LagrangeHalfCPolynomial* p, const TLweSampleFFT* sample, const TLweParams* params) {
+	const int k = params->k;
 
-
-
-    /** result = (X^{a}-1)*source */
-    inline void fake_tLweMulByXaiMinusOne(TLweSample* result, int ai, const TLweSample* bk, const TLweParams* params) { 
-        const FakeTlwe* fbk = fake(bk);
-        FakeTLwe* fres = fake(result);
-
-        torusPolynomialMulByXaiMinusOne(fres->message, ai, fbk->message);
-        fres->current_variance = 2*fbk->current_variance; 
+	for (int i=0; i<=k; i++)
+	    LagrangeHalfCPolynomialSubMul(result->a+i,p,sample->a+i);
     }
-    #define USE_FAKE_tLweMulByXaiMinusOne \
-    inline void tLweMulByXaiMinusOne(TLweSample* result, int ai, const TLweSample* bk, const TLweParams* params) { \
-        fake_tLweMulByXaiMinusOne(result,ai,bk,params); \
-    }
+
 
 }
-
-
-
-
-// Ring
-// Est-ce qu'on doit aussi faker les clés?
-// EXPORT void tLweKeyGen(TLweKey* result);
-
-
-////////////////////////////////////////////
-// these functions are not implemented, and will probably never be
-// implemented
-// EXPORT void tLwePolyCombination(TLweSample* result, const int* combi, const TLweSample* samples, const TLweParams* params);
-//EXPORT void tLweExtractLweSample(LweSample* result, const TLweSample* x, const LweParams* params,  const TLweParams* rparams);
-//extractions TLwe -> Lwe
-//EXPORT void tLweExtractKey(LweKey* result, const TLweKey*); //sans doute un param supplémentaire
-//EXPORT void tLweExtractSample(LweSample* result, const TLweSample* x);
-///////////////////////////////////////////

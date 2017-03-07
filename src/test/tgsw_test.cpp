@@ -625,7 +625,7 @@ namespace {
             IntPolynomial* mu = new_random_IntPolynomial(N);
             TorusPolynomial* poly = new_TorusPolynomial(N);
             
-            tGswNoiselessTrivial(res, mu, param);
+            //RESETtGswNoiselessTrivial(res, mu, param);
             for (int bloc=0; bloc<=k; bloc++) {
                 for (int i=0; i<l; ++i)
                 {
