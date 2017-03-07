@@ -21,7 +21,8 @@ set(SRCS
     tlwe.cpp
     tlwe-functions.cpp
     tgsw-functions.cpp
-    tlwefftoperations.cpp
+    tlwe-fft-operations.cpp
+    tgsw-fft-operations.cpp
     toruspolynomial-functions.cpp
     boot-gates.cpp
     lwe-keyswitch-functions.cpp

@@ -23,8 +23,8 @@ using namespace std;
 
 #ifndef NDEBUG
 extern const TLweKey* debug_accum_key;
-extern const TLweKey* debug_extract_key;
-extern const TLweKey* debug_in_key;
+extern const LweKey* debug_extract_key;
+extern const LweKey* debug_in_key;
 #endif
 
 
@@ -74,35 +74,29 @@ EXPORT void tGswFFTClear(TGswSampleFFT* result, const TGswParams* params) {
 }    
 
 // Decomposition wrt H
-EXPORT void tGswLagrangeHalfCPolynomialDecompH(LagrangeHalfCPolynomial* reps, const LagrangeHalfCPolynomial* pol, const TGswParams* params) {
-    const int l = params->l;
-    const int N = params->tlwe_params->N;
-    //TODO attention, this prevents parallelization...
-    static TorusPolynomial* a = new_TorusPolynomial(N);
-    static IntPolynomial*grep "word" myfile.txt deca = new_IntPolynomial_array(l,N);
-
-    TorusPolynomial_fft(a,pol);
-    tGswTorus32PolynomialDecompH(deca, a, params);
-    for (int j=0; j<l; j++) {
-    IntPolynomial_ifft(reps+j,deca+j);
-    }
-}
+EXPORT void tGswLagrangeHalfCPolynomialDecompH(LagrangeHalfCPolynomial* reps, const LagrangeHalfCPolynomial* pol, const TGswParams* params, int DELETE);
 
 // External product (*): accum = gsw (*) accum 
-EXPORT void tGswFFTExternMulToTLwe(TLweSampleFFT* accum, TGswSampleFFT* gsw, const TGswParams* params) {
+EXPORT void tGswFFTExternMulToTLwe(TLweSample* accum, TGswSampleFFT* gsw, const TGswParams* params) {
     const TLweParams* tlwe_params=params->tlwe_params;
     const int k = tlwe_params->k;
     const int l = params->l;
     const int kpl = params->kpl;
     const int N = tlwe_params->N;
     //TODO attention, this prevents parallelization...
-    static LagrangeHalfCPolynomial* decomps=new_LagrangeHalfCPolynomial_array(kpl,N);
+    static IntPolynomial* deca = new_IntPolynomial_array(kpl,N); //decomposed accumulator 
+    static LagrangeHalfCPolynomial* decaFFT=new_LagrangeHalfCPolynomial_array(kpl,N); //fft version
+    static TLweSampleFFT* tmpa = new_TLweSampleFFT(tlwe_params);
 
     for (int i=0; i<=k; i++)
-    tGswLagrangeHalfCPolynomialDecompH(decomps+i*l,accum->a+i, params);
-    tLweFFTClear(accum, tlwe_params);
+	tGswTorus32PolynomialDecompH(deca+i*l,accum->a+i, params);
     for (int p=0; p<kpl; p++)
-    tLweFFTAddMulRTo(accum, decomps+p, gsw->all_samples+p, tlwe_params);
+	IntPolynomial_ifft(decaFFT+p,deca+p);
+
+    tLweFFTClear(tmpa, tlwe_params);
+    for (int p=0; p<kpl; p++)
+	tLweFFTAddMulRTo(tmpa, decaFFT+p, gsw->all_samples+p, tlwe_params);
+    tLweFromFFTConvert(accum, tmpa, tlwe_params);
 }
 
 // result = (X^ai -1)*bki  
@@ -201,11 +195,9 @@ EXPORT void tfhe_bootstrapFFT(LweSample* result, const LweBootstrappingKeyFFT* b
 
     // Accumulateur acc = fft((0, testvect))
     TLweSample* acc = new_TLweSample(accum_params);
-    TLweSampleFFT* accFFT = new_TLweSampleFFT(accum_params);
 
-    // acc and accFFt will be used for tfhe_bootstrapFFT, acc1=acc will be used for tfhe_bootstrap
+    // acc will be used for tfhe_bootstrapFFT, acc1=acc will be used for tfhe_bootstrap
     tLweNoiselessTrivial(acc, testvectbis, accum_params);
-    tLweToFFTConvert(accFFT, acc, accum_params);
 
     TGswSample* temp = new_TGswSample(bk_params);
     TGswSampleFFT* tempFFT = new_TGswSampleFFT(bk_params);
@@ -225,13 +217,12 @@ EXPORT void tfhe_bootstrapFFT(LweSample* result, const LweBootstrappingKeyFFT* b
         if (bara!=0) {
             tGswFFTMulByXaiMinusOne(tempFFT, bara, bk->bk+i, bk_params);
             tGswFFTAddH(tempFFT, bk_params);
-            tGswFFTExternMulToTLwe(accFFT, tempFFT, bk_params);
+            tGswFFTExternMulToTLwe(acc, tempFFT, bk_params);
         }
 
 //NICOLAS: et surtout, j'ai ajouté celui-ci!
 #ifndef NDEBUG
-            tLweFromFFTConvert(acc, accFFT, accum_params);
-        tLwePhase(phase,acc,debug_accum_key);  //celui-ci, c'est la phase de acc (FFT)
+	tLwePhase(phase,acc,debug_accum_key);  //celui-ci, c'est la phase de acc (FFT)
     if (debug_in_key->key[i]==1) correctOffset = (correctOffset+bara)%Nx2; 
         torusPolynomialMulByXai(testvectbis, correctOffset, testvect); //celui-ci, c'est la phase idéale (calculée sans bruit avec la clé privée)
     for (int j=0; j<N; j++) {
@@ -240,7 +231,6 @@ EXPORT void tfhe_bootstrapFFT(LweSample* result, const LweBootstrappingKeyFFT* b
 #endif
 
     }
-    tLweFromFFTConvert(acc, accFFT, accum_params);
 
 
     // Sample extract
@@ -257,7 +247,6 @@ EXPORT void tfhe_bootstrapFFT(LweSample* result, const LweBootstrappingKeyFFT* b
     delete_LweSample(u);
     delete_TGswSampleFFT(tempFFT); 
     delete_TGswSample(temp);
-    delete_TLweSampleFFT(accFFT);
     delete_TLweSample(acc);
     delete_TorusPolynomial(testvectbis);
     delete_TorusPolynomial(testvect);

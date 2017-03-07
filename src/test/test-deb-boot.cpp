@@ -54,7 +54,7 @@ EXPORT void tGswToFFTConvert(TGswSampleFFT* result, const TGswSample* source, co
 EXPORT void tGswFromFFTConvert(TGswSample* result, const TGswSampleFFT* source, const TGswParams* params);
 EXPORT void tGswFFTMulByXaiMinusOne(TGswSampleFFT* result, const int ai, const TGswSampleFFT* bki, const TGswParams* params);
 EXPORT void tGswFFTAddH(TGswSampleFFT* result, const TGswParams* params);
-EXPORT void tGswFFTExternMulToTLwe(TLweSampleFFT* accum, TGswSampleFFT* gsw, const TGswParams* params);
+EXPORT void tGswFFTExternMulToTLwe(TLweSample* accum, TGswSampleFFT* gsw, const TGswParams* params);
 
 
 
@@ -185,14 +185,12 @@ int main(int argc, char** argv) {
     // Accumulateur 
     TLweSample* acc = new_TLweSample(accum_params);
     TLweSample* acc1 = new_TLweSample(accum_params);
-    TLweSampleFFT* accFFT = new_TLweSampleFFT(accum_params);
 
     // acc and accFFt will be used for tfhe_bootstrapFFT, acc1=acc will be used for tfhe_bootstrap
     tLweNoiselessTrivial(acc, testvectbis, accum_params);
     for (int i = 0; i < k+1; ++i)
         for (int j = 0; j < N; ++j)
                 acc1->a[i].coefsT[j] = acc->a[i].coefsT[j];
-    tLweToFFTConvert(accFFT, acc, accum_params);
     //tLweFromFFTConvert(acc, accFFT, accum_params);
     //for (int j=0; j<N; j++) {
     //	printf("Before start: Acc index %d: %d vs expected %d\n",j,acc->b->coefsT[j],acc->b->coefsT[j]);
@@ -220,8 +218,7 @@ int main(int argc, char** argv) {
         if (bara!=0) {
             tGswFFTMulByXaiMinusOne(tempFFT, bara, bk->bk+i, bk_params);
             tGswFFTAddH(tempFFT, bk_params);
-            tGswFFTExternMulToTLwe(accFFT, tempFFT, bk_params);
-            tLweFromFFTConvert(acc, accFFT, accum_params);
+            tGswFFTExternMulToTLwe(acc, tempFFT, bk_params);
         }
 
         if (bara1!=0) {
@@ -250,7 +247,6 @@ int main(int argc, char** argv) {
         */
         //tLweToFFTConvert(accFFT, acc, accum_params); 
     }
-    tLweFromFFTConvert(acc, accFFT, accum_params);
 
 
 
@@ -281,7 +277,6 @@ int main(int argc, char** argv) {
     delete_LweSample(u);
     delete_TGswSampleFFT(tempFFT); 
     delete_TGswSample(temp);
-    delete_TLweSampleFFT(accFFT);
     delete_TLweSample(acc1);
     delete_TLweSample(acc);
     delete_TorusPolynomial(testvectbis);
