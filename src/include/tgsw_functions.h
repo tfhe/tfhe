@@ -45,7 +45,7 @@ EXPORT void tGswMulByXaiMinusOne(TGswSample* result, int ai, const TGswSample* b
 EXPORT void tGswExternMulToTLwe(TLweSample* accum, const TGswSample* sample,const TGswParams* params);
 
 /** result = (0,mu) */
-EXPORT void tGswNoiselessTrivial(TGswSample* result, const TorusPolynomial* mu, const TGswParams* params);
+EXPORT void tGswNoiselessTrivial(TGswSample* result, const IntPolynomial* mu, const TGswParams* params);
 
 /** result = result + sample */
 EXPORT void tGswAddTo(TGswSample* result, const TGswSample* sample, const TGswParams* params);

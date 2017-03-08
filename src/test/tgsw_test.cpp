@@ -109,6 +109,7 @@ namespace {
 #define INCLUDE_TGSW_TLWE_DECOMP_H
 #define INCLUDE_TGSW_TORUS32POLYNOMIAL_DECOMP_H
 #define INCLUDE_TGSW_EXTERN_PRODUCT
+#define INCLUDE_TGSW_NOISELESS_TRIVIAL
 #include "../libtfhe/tgsw-functions.cpp"
     };
 
@@ -130,6 +131,7 @@ namespace {
 #define INCLUDE_TGSW_TLWE_DECOMP_H
 #define INCLUDE_TGSW_TORUS32POLYNOMIAL_DECOMP_H
 #define INCLUDE_TGSW_EXTERN_PRODUCT
+#define INCLUDE_TGSW_NOISELESS_TRIVIAL
 #include "../libtfhe/tgsw-functions.cpp"
     };
 
@@ -477,18 +479,79 @@ namespace {
 
 
 
-    // ILA: attention!
-    ////fonction de decomposition
     //EXPORT void tGswTorus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const TGswParams* params);
+    // sample: torus polynomial with N coefficients
+    // result: int polynomial with Nl coefficients
+    // ILA: reverifier!
     TEST_F(TGswDirectTest, tGswTorus32PolynomialDecompH) {
-	ASSERT_FALSE(42);//TODO Ilaria
-    }
+        for (const TGswParams* param: all_params) {
+            int N = param->tlwe_params->N;
+            int l = param->l;
+            Torus32* h = param->h;
+            
+            IntPolynomial* result = new_IntPolynomial(N*l);
+            TorusPolynomial* sample = new_TorusPolynomial(N);
+            torusPolynomialUniform(sample);
+            Torus32 test;
+
+            tGswTorus32PolynomialDecompH(result, sample, param);
+            for (int i=0; i<N; ++i) {
+                // recomposition
+                test = 0;
+                for (int j=0; j<l; ++j) {
+                    int t = i*l+j; 
+                    test += result->coefs[t]*h[j];
+                }
+                ASSERT_TRUE(abs(t32tod(test - sample->coefsT[i]))==0);
+            }
+            
+            delete_TorusPolynomial(sample);
+            delete_IntPolynomial(result);
+        }
+	}
+
+
+
     //EXPORT void tGswTLweDecompH(IntPolynomial* result, const TLweSample* sample,const TGswParams* params);	
+    // Test direct Result*H donne le bon resultat
+    // sample: TLweSample composed by k+1 torus polynomials, each with N coefficients
+    // result: int polynomial with Nl(k+1) coefficients
+    // ILA: reverifier!
+    TEST_F(TGswDirectTest, tGswTLweDecompH) {
+        for (const TGswParams* param: all_params) {
+            int N = param->tlwe_params->N;
+            int k = param->tlwe_params->k;
+            int l = param->l;
+            Torus32* h = param->h;
+
+            IntPolynomial* result = new_IntPolynomial(N*l*(k+1));
+            TLweSample* sample = new_TLweSample(param->tlwe_params);
+            // sample randomly generated 
+            for (int bloc=0; bloc<=k; ++bloc) {
+                torusPolynomialUniform(&sample->a[bloc]);
+            }
+            Torus32 test;
+
+            tGswTLweDecompH(result, sample, param);
+            for (int bloc=0; bloc<=k; ++bloc) {
+                for (int i=0; i<N; ++i) {
+                    // recomposition
+                    test = 0;
+                    for (int j=0; j<l; ++j) {
+                        int t = (bloc*N*l)+i*l+j;
+                        test += result->coefs[t]*h[j];
+                    }
+                    ASSERT_TRUE(abs(t32tod(test - sample->a[bloc].coefsT[i]))==0);
+                }
+            }
+
+            delete_TLweSample(sample);
+            delete_IntPolynomial(result);
+        }
+    }
 
 
 
-
-/*
     ////TODO: Ilaria.Theoreme3.5
     //EXPORT void tGswExternProduct(TLweSample* result, const TGswSample* a, const TLweSample* b, const TGswParams* params);
     TEST_F(TGswTest, tGswExternProduct) {
@@ -505,12 +568,12 @@ namespace {
             TorusPolynomial* mures = new_TorusPolynomial(N);
             
             tGswSymEncrypt(a, mua, alpha, key);
-            tLweSymEncrypt(b, mub, alpha, key->key);
+            tLweSymEncrypt(b, mub, alpha, &key->tlwe_key);
 
             torusPolynomialMultNaive(mures, mua, mub);
             tGswExternProduct(res, a, b, key->params);
             
-            FakeTLwe* r = fake(&res);
+            FakeTLwe* r = fake(res);
             ASSERT_TRUE(torusPolynomialNormInftyDist(r->message,mures)==0);
             //ASSERT_TRUE(si->current_variance==alpha);
 
@@ -522,7 +585,7 @@ namespace {
             delete_TGswSample(a);
         }
     }
-*/
+
 
 
 
@@ -576,7 +639,6 @@ namespace {
 
 
 
-/*
     ////ligne 5 algo,mult externe
     //EXPORT void tGswExternMulToTLwe(TLweSample* accum, const TGswSample* sample, const TGswParams* params);
     //accum *= sample
@@ -592,13 +654,13 @@ namespace {
             torusPolynomialUniform(mess);
             
             tGswSymEncrypt(sample, mu, alpha, key);
-            tLweSymEncrypt(accum, mess, alpha, key->key);
+            tLweSymEncrypt(accum, mess, alpha, &key->tlwe_key);
 
             // mess *= mu
             torusPolynomialMultNaive(mess, mu, mess);
             tGswExternMulToTLwe(accum,sample,key->params);
 
-            FakeTLwe* acc = fake(&accum);
+            FakeTLwe* acc = fake(accum);
             ASSERT_TRUE(torusPolynomialNormInftyDist(acc->message,mess)==0);
             //ASSERT_TRUE(si->current_variance==alpha);
 
@@ -608,13 +670,12 @@ namespace {
             delete_TGswSample(sample);
         }
     }
-*/
+
 
 
 
     /** result = (0,mu) */
-    //ILA: pourquoi mu est un TorusPoly? Cette fonction semble ne pas etre definie (et les suivantes non plus)...
-    //EXPORT void tGswNoiselessTrivial(TGswSample* result, const TorusPolynomial* mu, const TGswParams* params);
+    //EXPORT void tGswNoiselessTrivial(TGswSample* result, const IntPolynomial* mu, const TGswParams* params);
     TEST_F(TGswTest, tGswNoiselessTrivial) {
         for (const TGswParams* param: all_params) {
             int l = param->l;
@@ -647,19 +708,15 @@ namespace {
 
 
 
-
+    // ILA: Not used for now
     /** result = result + sample */
     //EXPORT void tGswAddTo(TGswSample* result, const TGswSample* sample, const TGswParams* params);
-
     /** result = result - sample */
     //EXPORT void tGswSubTo(TLweSample* result, const TLweSample* sample, const TLweParams* params);
     /** result = result + p.sample */
     //EXPORT void tGswAddMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params);
     /** result = result - p.sample */
     //EXPORT void tGswSubMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params);
-
-
-
 
 }//namespace
 
