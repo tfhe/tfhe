@@ -58,57 +58,6 @@ EXPORT void tLweFFTClear(TLweSampleFFT* result, const TLweParams* params){
     result->current_variance = 0.;
 }
 
-/** result = (0,mu) where mu is a torus polynomial */
-EXPORT void tLweFFTNoiselessTrivial(TLweSampleFFT* result, const TorusPolynomial* mu, const TLweParams* params){
-    int k = params->k;
-
-    for (int i = 0; i < k; ++i) 
-        LagrangeHalfCPolynomialClear(&result->a[i]);
-    TorusPolynomial_ifft(result->b, mu);
-    result->current_variance = 0.;
-}
-
-/** result = (0,mu) where mu is constant*/
-EXPORT void tLweFFTNoiselessTrivialT(TLweSampleFFT* result, const Torus32 mu, const TLweParams* params){
-    const int k = params->k;
-    
-    for (int i = 0; i < k; ++i) 
-        LagrangeHalfCPolynomialClear(&result->a[i]);
-    LagrangeHalfCPolynomialSetTorusConstant(result->b,mu);
-    result->current_variance = 0.;
-}
-
-/** result = result + sample */
-EXPORT void tLweFFTAddTo(TLweSampleFFT* result, const TLweSampleFFT* sample, const TLweParams* params);
-//Let's postpone this to make sure we actually need it
-//{
-//    int k = params->k;
-//
-//    for (int i = 0; i < k; ++i) 
-//  AddToLagrangeHalfCPolynomial(&result->a[i], &sample->a[i]);
-//    AddToLagrangeHalfCPolynomial(result->b, sample->b);
-//    result->current_variance += sample->current_variance; //à revoir//OK si c'est la variance
-//}
-
-/** result = result - sample */
-EXPORT void tLweFFTSubTo(TLweSampleFFT* result, const TLweSampleFFT* sample, const TLweParams* params);
-
-/** result = result + p.sample */
-EXPORT void tLweFFTAddMulZTo(TLweSampleFFT* result, int p, const TLweSampleFFT* sample, const TLweParams* params);
-//Let's postpone this to make sure we actually need it
-//{
-//    int k = params->k;
-//
-//    for (int i = 0; i < k; ++i) 
-//  torusPolynomialAddMulZTo(&result->a[i], p, &sample->a[i]);
-//    torusPolynomialAddMulZTo(result->b, p, sample->b);
-//    result->current_variance += (p*p)*sample->current_variance;
-//}
-
-/** result = result - p.sample */
-EXPORT void tLweFFTSubMulZTo(TLweSampleFFT* result, int p, const TLweSampleFFT* sample, const TLweParams* params);
-
-
 
 // result = result + p*sample
 EXPORT void tLweFFTAddMulRTo(TLweSampleFFT* result, const LagrangeHalfCPolynomial* p, const TLweSampleFFT* sample, const TLweParams* params) {
@@ -116,22 +65,6 @@ EXPORT void tLweFFTAddMulRTo(TLweSampleFFT* result, const LagrangeHalfCPolynomia
     
     for (int i=0; i<=k; i++)
         LagrangeHalfCPolynomialAddMul(result->a+i,p,sample->a+i);
-}
-
-// result = p*sample
-EXPORT void tLweFFTMulR(TLweSampleFFT* result, const LagrangeHalfCPolynomial* p, const TLweSampleFFT* sample, const TLweParams* params) {
-    const int k = params->k;
-    
-    for (int i=0; i<=k; i++)
-    LagrangeHalfCPolynomialMul(result->a+i,p,sample->a+i);
-}
-
-// result = result - p*sample
-EXPORT void tLweFFTSubMulRTo(TLweSampleFFT* result, const LagrangeHalfCPolynomial* p, const TLweSampleFFT* sample, const TLweParams* params) {
-    const int k = params->k;
-    
-    for (int i=0; i<=k; i++)
-    LagrangeHalfCPolynomialSubMul(result->a+i,p,sample->a+i);
 }
 
     

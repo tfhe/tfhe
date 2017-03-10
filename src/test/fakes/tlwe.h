@@ -1,3 +1,6 @@
+#ifndef FAKES_TLWE_H
+#define FAKES_TLWE_H
+
 /* **************************
 Fakes for TLWE 
 ************************** */
@@ -368,3 +371,5 @@ namespace {
 //EXPORT void tLweExtractKey(LweKey* result, const TLweKey*); //sans doute un param supplémentaire
 //EXPORT void tLweExtractSample(LweSample* result, const TLweSample* x);
 ///////////////////////////////////////////
+
+#endif //FAKES_TLWE_H

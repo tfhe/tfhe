@@ -73,9 +73,6 @@ EXPORT void tGswFFTClear(TGswSampleFFT* result, const TGswParams* params) {
     tLweFFTClear(result->all_samples+p, params->tlwe_params);
 }    
 
-// Decomposition wrt H
-EXPORT void tGswLagrangeHalfCPolynomialDecompH(LagrangeHalfCPolynomial* reps, const LagrangeHalfCPolynomial* pol, const TGswParams* params, int DELETE);
-
 // External product (*): accum = gsw (*) accum 
 EXPORT void tGswFFTExternMulToTLwe(TLweSample* accum, TGswSampleFFT* gsw, const TGswParams* params) {
     const TLweParams* tlwe_params=params->tlwe_params;
