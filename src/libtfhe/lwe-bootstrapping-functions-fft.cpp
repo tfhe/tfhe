@@ -1,20 +1,6 @@
 /*
- * Funzioni fft bootstrap come nel nuovo articolo tipo blind rotate, cmux ecc
-
- blind rotate TGSW sample è in fft, idem in rotatebootsextract
- external product: TLweSample normale et TGswSample en fft
-
-
- come puoi programmare in modo da poter esportare i dati sul cloud, cambiare parametri, serializazione dei chiffr etc
- interfaccia utilizzatore con tutte le porte 
-
-
-Non dovrebbe esserci un .h da qualche parte?
-*/
-
-
-
-
+ * Bootstrapping FFT functions
+ */
 
 
 #ifndef TFHE_TEST_ENVIRONMENT
@@ -162,52 +148,3 @@ EXPORT void tfhe_bootstrap_FFT(LweSample* result,
 
 
 
-
-
-
-
-
-
-// #if defined INCLUDE_ALL || defined INCLUDE_TFHE_CREATEBOOTSTRAPPINGKEY_FFT
-/**
- * 
- */
-
-/*
-
-EXPORT void tfhe_createLweBootstrappingKey_FFT(
-    LweBootstrappingKeyFFT* bk, 
-    const LweKey* key_in, 
-    const TGswKey* rgsw_key) {
-
-    assert(bk->bk_params==rgsw_key->params);
-    assert(bk->in_out_params==key_in->params);
-
-    const LweParams* in_out_params = bk->in_out_params; 
-    const TGswParams* bk_params = bk->bk_params;
-    const TLweParams* accum_params = bk_params->tlwe_params;
-    const LweParams* extract_params = &accum_params->extracted_lweparams;
-
-    //LweKeySwitchKey* ks; ///< the keyswitch key (s'->s)
-    const TLweKey* accum_key = &rgsw_key->tlwe_key;
-    LweKey* extracted_key = new_LweKey(extract_params);
-    tLweExtractKey(extracted_key, accum_key);
-    lweCreateKeySwitchKey(bk->ks, extracted_key, key_in);
-    delete_LweKey(extracted_key);
-
-    //TGswSample* bk; ///< the bootstrapping key (s->s")
-    int* kin = key_in->key;
-    const double alpha = accum_params->alpha_min;
-    const int n = in_out_params->n;
-    //const int kpl = bk_params->kpl;
-    //const int k = accum_params->k;
-    //const int N = accum_params->N;
-    //cout << "create the bootstrapping key bk ("  << "  " << n*kpl*(k+1)*N*4 << " bytes)" << endl;
-    //cout << "  with noise_stdev: " << alpha << endl;
-    for (int i=0; i<n; i++) {
-    tGswSymEncryptInt(&bk->bk[i], kin[i], alpha, rgsw_key);
-    }
-}
-#endif
-
-*/
