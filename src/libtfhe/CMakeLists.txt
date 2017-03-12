@@ -27,6 +27,7 @@ set(SRCS
     boot-gates.cpp
     lwe-keyswitch-functions.cpp
     lwe-bootstrapping-functions.cpp
+    lwe-bootstrapping-functions-fft.cpp
     )
 
 
