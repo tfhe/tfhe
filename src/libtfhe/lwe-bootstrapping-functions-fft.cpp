@@ -152,18 +152,12 @@ EXPORT void tfhe_bootstrap_FFT(LweSample* result,
 
 
 
-/*
-Oui, il faudrait qu'on ait un create bootstrapping key, qui réutilise le
-plus possible de code des versions non-FFT:
-sans doute, le plus simple, est-ce que tu peux faire un
-bootstrappingkey_to_fft_convert, qui convertit une clé de bootstrapping
-non-FFT en une clé FFT?
-*/
-
-
-
 
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_BOOTSTRAPPINGKEY_TO_FFT_CONVERT
+/**
+ * The result is a LweBootstrappingKeyFFT
+ * @param bk The bootstrapping (+ keyswitch key)
+ */
 EXPORT LweBootstrappingKeyFFT* tfhe_BootstrappingKey_to_FFT_convert(const LweBootstrappingKey* bk) {
 
     const LweParams* in_out_params = bk->in_out_params; 
