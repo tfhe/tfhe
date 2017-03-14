@@ -45,7 +45,7 @@ EXPORT void tGswMulByXaiMinusOne(TGswSample* result, int ai, const TGswSample* b
 EXPORT void tGswExternMulToTLwe(TLweSample* accum, const TGswSample* sample,const TGswParams* params);
 
 /** result = (0,mu) */
-EXPORT void tGswNoiselessTrivial(TGswSample* result, const TorusPolynomial* mu, const TGswParams* params);
+EXPORT void tGswNoiselessTrivial(TGswSample* result, const IntPolynomial* mu, const TGswParams* params);
 
 /** result = result + sample */
 EXPORT void tGswAddTo(TGswSample* result, const TGswSample* sample, const TGswParams* params);
@@ -64,8 +64,7 @@ EXPORT void tGswToFFTConvert(TGswSampleFFT* result, const TGswSample* source, co
 EXPORT void tGswFromFFTConvert(TGswSample* result, const TGswSampleFFT* source, const TGswParams* params);
 EXPORT void tGswFFTAddH(TGswSampleFFT* result, const TGswParams* params);
 EXPORT void tGswFFTClear(TGswSampleFFT* result, const TGswParams* params);
-EXPORT void tGswLagrangeHalfCPolynomialDecompH(LagrangeHalfCPolynomial* reps, const LagrangeHalfCPolynomial* pol, const TGswParams* params);
-EXPORT void tGswFFTExternMulToTLwe(TLweSampleFFT* accum, TGswSampleFFT* gsw, const TGswParams* params);
+EXPORT void tGswFFTExternMulToTLwe(TLweSample* accum, TGswSampleFFT* gsw, const TGswParams* params);
 EXPORT void tGswFFTMulByXaiMinusOne(TGswSampleFFT* result, const int ai, const TGswSampleFFT* bki, const TGswParams* params);
 
 EXPORT void tfhe_createLweBootstrappingKeyFFT(LweBootstrappingKeyFFT* bk, const LweKey* key_in, const TGswKey* rgsw_key);

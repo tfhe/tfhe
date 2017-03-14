@@ -20,11 +20,14 @@ set(SRCS
     tgsw.cpp
     tlwe.cpp
     tlwe-functions.cpp
-    tlwefftoperations.cpp
+    tgsw-functions.cpp
+    tlwe-fft-operations.cpp
+    tgsw-fft-operations.cpp
     toruspolynomial-functions.cpp
     boot-gates.cpp
     lwe-keyswitch-functions.cpp
     lwe-bootstrapping-functions.cpp
+    lwe-bootstrapping-functions-fft.cpp
     )
 
 

@@ -9,6 +9,9 @@ set(GOOGLETEST_SOURCES
     lwe_test.cpp
     polynomial_test.cpp
     tlwe_test.cpp
+    tgsw_test.cpp
+    tlwe_fft_test.cpp
+    tgsw_fft_test.cpp
     lwekeyswitch_test.cpp
     bootstrapping_test.cpp
     )

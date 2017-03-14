@@ -204,6 +204,19 @@ EXPORT void tLweMulByXaiMinusOne(TLweSample* result, int ai, const TLweSample* b
         torusPolynomialMulByXaiMinusOne(&result->a[i],ai,&bk->a[i]);
 }
 
+/** result += (0,x) */
+EXPORT void tLweAddTTo(TLweSample* result, const int pos, const Torus32 x, const TLweParams* params){
+    result->a[pos].coefsT[0]+=x;
+}
+
+/** result += p*(0,x) */
+EXPORT void tLweAddRTTo(TLweSample* result, const int pos, const IntPolynomial* p, const Torus32 x, const TLweParams* params){
+    const int N = params->N;
+    
+    for (int i=0; i<N; i++)
+	result->a[pos].coefsT[i]+=p->coefs[i]*x;
+}
+
 
 
 

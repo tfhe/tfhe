@@ -81,9 +81,10 @@ namespace {
 	TorusPolynomial* expectedAccumMessage = new_TorusPolynomial(N);
 	torusPolynomialCopy(expectedAccumMessage,initAccumMessage);
 	//double expectedAccumVariance=initAlphaAccum*initAlphaAccum;
-	TLweSample* accum = new_TLweSample(accum_params);
-	tLweNoiselessTrivial(accum, initAccumMessage, accum_params);
-	accum->current_variance=initAlphaAccum*initAlphaAccum;
+	TLweSample* accum = fake_new_TLweSample(accum_params);
+	FakeTLwe* faccum = fake(accum);
+	torusPolynomialCopy(faccum->message, initAccumMessage);
+	faccum->current_variance = initAlphaAccum*initAlphaAccum;
 	//call bootstraprotate: one iteration at a time
 	for (int i=0; i<n; i++) {
 	    tfhe_bootstrapRotate(accum,bk+i,bara+i,1,bk_params);
@@ -95,12 +96,12 @@ namespace {
 	    for (int j=0; j<N; j++) ASSERT_EQ(expectedAccumMessage->coefsT[j],accum->b->coefsT[j]);
 	}
 	//Now, bootstraprotate: all iterations at once (same offset)
-	tLweNoiselessTrivial(accum, initAccumMessage, accum_params);
-	accum->current_variance=initAlphaAccum*initAlphaAccum;
+	torusPolynomialCopy(faccum->message, initAccumMessage);
+	faccum->current_variance=initAlphaAccum*initAlphaAccum;
 	tfhe_bootstrapRotate(accum,bk,bara,n,bk_params);
 	for (int j=0; j<N; j++) ASSERT_EQ(expectedAccumMessage->coefsT[j],accum->b->coefsT[j]);
 	//cleanup everything
-	delete_TLweSample(accum);
+	fake_delete_TLweSample(accum);
 	delete_TorusPolynomial(expectedAccumMessage);
 	delete_TorusPolynomial(initAccumMessage);
 	delete[] bara;

@@ -38,6 +38,11 @@ EXPORT void tLweSymEncryptZero(TLweSample* result, double alpha, const TLweKey* 
 /** result = result + p.sample */
 EXPORT void tLweAddMulRTo(TLweSample* result, const IntPolynomial* p, const TLweSample* sample, const TLweParams* params);
 
+/** result += (0...,0,x,0,...,0) */
+EXPORT void tLweAddTTo(TLweSample* result, const int pos, const Torus32 x, const TLweParams* params);
+
+/** result += p*(0...,0,x,0,...,0) */
+EXPORT void tLweAddRTTo(TLweSample* result, const int pos, const IntPolynomial* p, const Torus32 x, const TLweParams* params);
 
 // EXPORT void tLwePolyCombination(TLweSample* result, const int* combi, const TLweSample* samples, const TLweParams* params);
 
@@ -55,14 +60,6 @@ EXPORT void tLweExtractKey(LweKey* result, const TLweKey*); //sans doute un para
 EXPORT void tLweToFFTConvert(TLweSampleFFT* result, const TLweSample* source, const TLweParams* params);
 EXPORT void tLweFromFFTConvert(TLweSample* result, const TLweSampleFFT* source, const TLweParams* params);
 EXPORT void tLweFFTClear(TLweSampleFFT* result, const TLweParams* params);
-EXPORT void tLweFFTNoiselessTrivial(TLweSampleFFT* result, const TorusPolynomial* mu, const TLweParams* params);
-EXPORT void tLweFFTNoiselessTrivialT(TLweSampleFFT* result, const Torus32 mu, const TLweParams* params);
-EXPORT void tLweFFTAddTo(TLweSampleFFT* result, const TLweSampleFFT* sample, const TLweParams* params);
-EXPORT void tLweFFTSubTo(TLweSampleFFT* result, const TLweSampleFFT* sample, const TLweParams* params);
-EXPORT void tLweFFTAddMulZTo(TLweSampleFFT* result, int p, const TLweSampleFFT* sample, const TLweParams* params);
-EXPORT void tLweFFTSubMulZTo(TLweSampleFFT* result, int p, const TLweSampleFFT* sample, const TLweParams* params);
 EXPORT void tLweFFTAddMulRTo(TLweSampleFFT* result, const LagrangeHalfCPolynomial* p, const TLweSampleFFT* sample, const TLweParams* params);
-EXPORT void tLweFFTMulR(TLweSampleFFT* result, const LagrangeHalfCPolynomial* p, const TLweSampleFFT* sample, const TLweParams* params);
-EXPORT void tLweFFTSubMulRTo(TLweSampleFFT* result, const LagrangeHalfCPolynomial* p, const TLweSampleFFT* sample, const TLweParams* params);
 
 #endif// TLWE_FUNCTIONS_H

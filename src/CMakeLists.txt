@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 #set(CMAKE_VERBOSE_MAKEFILE ON)
 #set(CMAKE_RULE_MESSAGES ON)
 
+set(CMAKE_CONFIGURATION_TYPES Debug Optim CACHE TYPE INTERNAL FORCE)
 set(CMAKE_BUILD_TYPE "optim" CACHE STRING "Build Type: Debug or Optim")
 set(ENABLE_FFTW OFF CACHE BOOL "Enable the FFTW FFT processor (GPL)")
 set(ENABLE_NAYUKI_PORTABLE ON CACHE BOOL "Enable the Nayuki portable FFT processor (MIT)")
