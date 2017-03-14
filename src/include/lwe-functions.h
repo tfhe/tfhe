@@ -42,6 +42,9 @@ EXPORT Torus32 lweSymDecrypt(const LweSample* sample, const LweKey* key, const i
 /** result = (0,0) */
 EXPORT void lweClear(LweSample* result, const LweParams* params);
 
+/** result = sample */
+EXPORT void lweCopy(LweSample* result, const LweSample* sample, const LweParams* params);
+
 /** result = (0,mu) */
 EXPORT void lweNoiselessTrivial(LweSample* result, Torus32 mu, const LweParams* params);
 

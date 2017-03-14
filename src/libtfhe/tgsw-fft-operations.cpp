@@ -148,7 +148,7 @@ EXPORT void tfhe_createLweBootstrappingKeyFFT(LweBootstrappingKeyFFT* bk, const 
     const int n = in_out_params->n;
     for (int i=0; i<n; i++) {
     tGswSymEncryptInt(tmpsample, kin[i], alpha, rgsw_key);
-    tGswToFFTConvert(&bk->bk[i], tmpsample, bk_params);
+    tGswToFFTConvert(&bk->bkFFT[i], tmpsample, bk_params);
     }
     delete_TGswSample(tmpsample);
 }
@@ -212,7 +212,7 @@ EXPORT void tfhe_bootstrapFFT(LweSample* result, const LweBootstrappingKeyFFT* b
         int bara=modSwitchFromTorus32(-x->a[i],Nx2);
         
         if (bara!=0) {
-            tGswFFTMulByXaiMinusOne(tempFFT, bara, bk->bk+i, bk_params);
+            tGswFFTMulByXaiMinusOne(tempFFT, bara, bk->bkFFT+i, bk_params);
             tGswFFTAddH(tempFFT, bk_params);
             tGswFFTExternMulToTLwe(acc, tempFFT, bk_params);
         }

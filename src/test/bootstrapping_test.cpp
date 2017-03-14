@@ -43,9 +43,9 @@ namespace {
             USE_FAKE_tGswAddH;
 	    USE_FAKE_tGswExternMulToTLwe;
 
-#define INCLUDE_TFHE_BOOTSTRAPROTATE
+#define INCLUDE_TFHE_BLIND_ROTATE
 #include "../libtfhe/lwe-bootstrapping-functions.cpp"
-#undef INCLUDE_TFHE_BOOTSTRAPROTATE
+#undef INCLUDE_TFHE_BLIND_ROTATE
 
     };
 
@@ -57,7 +57,7 @@ namespace {
      * @param bara An array of n coefficients between 0 and 2N-1
      * @param bk_params The parameters of bk
      */
-    //EXPORT void tfhe_bootstrapRotate(TLweSample* accum, 
+    //EXPORT void tfhe_BlindRotate(TLweSample* accum, 
     //	    const TGswSample* bk, 
     //	    const int* bara,
     //	    const int n,
@@ -87,7 +87,7 @@ namespace {
 	faccum->current_variance = initAlphaAccum*initAlphaAccum;
 	//call bootstraprotate: one iteration at a time
 	for (int i=0; i<n; i++) {
-	    tfhe_bootstrapRotate(accum,bk+i,bara+i,1,bk_params);
+	    tfhe_BlindRotate(accum,bk+i,bara+i,1,bk_params);
 	    if (key->key[i]==1 && bara[i]!=0) {
 		expectedOffset=(expectedOffset+bara[i])%(2*N);
 		torusPolynomialMulByXai(expectedAccumMessage,expectedOffset,initAccumMessage);
@@ -98,7 +98,7 @@ namespace {
 	//Now, bootstraprotate: all iterations at once (same offset)
 	torusPolynomialCopy(faccum->message, initAccumMessage);
 	faccum->current_variance=initAlphaAccum*initAlphaAccum;
-	tfhe_bootstrapRotate(accum,bk,bara,n,bk_params);
+	tfhe_BlindRotate(accum,bk,bara,n,bk_params);
 	for (int j=0; j<N; j++) ASSERT_EQ(expectedAccumMessage->coefsT[j],accum->b->coefsT[j]);
 	//cleanup everything
 	fake_delete_TLweSample(accum);
@@ -113,11 +113,11 @@ namespace {
     class LweBootstrapRotateExtractTest: public ::testing::Test {
 	public:
 
-	    USE_FAKE_tfhe_bootstrapRotate;
+	    USE_FAKE_tfhe_BlindRotate;
 
-#define INCLUDE_TFHE_BOOTSTRAPROTATEEXTRACT
+#define INCLUDE_TFHE_BLIND_ROTATE_AND_EXTRACT
 #include "../libtfhe/lwe-bootstrapping-functions.cpp"
-#undef INCLUDE_TFHE_BOOTSTRAPROTATEEXTRACT
+#undef INCLUDE_TFHE_BLIND_ROTATE_AND_EXTRACT
 
     };
 
@@ -154,7 +154,7 @@ namespace {
 	    //const double initAlphaAccum=0.2;
 
 	    //run the function
-	    tfhe_bootstrapRotateExtract(result,v,bk,barb,bara,n,bk_params);
+	    tfhe_BlindRotateAndExtract(result,v,bk,barb,bara,n,bk_params);
 
 	    //verify
 	    int offset = barb;
@@ -175,7 +175,7 @@ namespace {
     class LweBootstrapTest: public ::testing::Test {
 	public:
 
-	    USE_FAKE_tfhe_bootstrapRotateExtract;
+	    USE_FAKE_tfhe_BlindRotateAndExtract;
 
 #define INCLUDE_TFHE_BOOTSTRAP
 #include "../libtfhe/lwe-bootstrapping-functions.cpp"

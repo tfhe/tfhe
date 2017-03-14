@@ -105,13 +105,21 @@ int main(int argc, char** argv) {
     TGswKey* key_bk = new_TGswKey(bk_params);
     tGswKeyGen(key_bk);
 
+    /*
+    // Before...
     // bk used for tfhe_bootstrapFFT, bk1 used for tfhe_bootstrap
     LweBootstrappingKeyFFT* bk = new_LweBootstrappingKeyFFT(in_params, bk_params);
     tfhe_createLweBootstrappingKeyFFT(bk, key, key_bk);
     LweBootstrappingKey* bk1 = new_LweBootstrappingKey(in_params, bk_params);
     for (int i=0; i<n; i++) {
         tGswFromFFTConvert(&bk1->bk[i], &bk->bk[i], bk_params);
-    }
+    } 
+    */
+    // The BootstrappingKeyFFT is created by converting the BootstrappingKey
+    // bk used for tfhe_bootstrapFFT, bk1 used for tfhe_bootstrap
+    LweBootstrappingKey* bk1 = new_LweBootstrappingKey(in_params, bk_params);
+    tfhe_createLweBootstrappingKey(bk1, key, key_bk);
+    LweBootstrappingKeyFFT* bk = new_LweBootstrappingKeyFFT(bk1);
 
     
     // test omega
@@ -216,7 +224,7 @@ int main(int argc, char** argv) {
         int bara1=modSwitchFromTorus32(-x->a[i],Nx2);
         
         if (bara!=0) {
-            tGswFFTMulByXaiMinusOne(tempFFT, bara, bk->bk+i, bk_params);
+            tGswFFTMulByXaiMinusOne(tempFFT, bara, bk->bkFFT+i, bk_params);
             tGswFFTAddH(tempFFT, bk_params);
             tGswFFTExternMulToTLwe(acc, tempFFT, bk_params);
         }

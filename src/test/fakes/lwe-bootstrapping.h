@@ -92,7 +92,7 @@ inline void fake_tfhe_createLweBootstrappingKey(
  * @param bara An array of n coefficients between 0 and 2N-1
  * @param bk_params The parameters of bk
  */
-inline void fake_tfhe_bootstrapRotate(TLweSample* accum, 
+inline void fake_tfhe_BlindRotate(TLweSample* accum, 
 	const TGswSample* bk, 
 	const int* bara,
 	const int n,
@@ -111,13 +111,13 @@ inline void fake_tfhe_bootstrapRotate(TLweSample* accum,
     //TODO update the variance
 }
 
-#define USE_FAKE_tfhe_bootstrapRotate \
-    inline void tfhe_bootstrapRotate(TLweSample* accum, \
+#define USE_FAKE_tfhe_BlindRotate \
+    inline void tfhe_BlindRotate(TLweSample* accum, \
 	    const TGswSample* bk, \
 	    const int* bara, \
 	    const int n, \
 	    const TGswParams* bk_params) { \
-	fake_tfhe_bootstrapRotate(accum,bk,bara,n,bk_params); \
+	fake_tfhe_BlindRotate(accum,bk,bara,n,bk_params); \
     }
 
 /**
@@ -129,7 +129,7 @@ inline void fake_tfhe_bootstrapRotate(TLweSample* accum,
  * @param bara An array of n coefficients between 0 and 2N-1
  * @param bk_params The parameters of bk
  */
-inline void fake_tfhe_bootstrapRotateExtract(LweSample* result, 
+inline void fake_tfhe_BlindRotateAndExtract(LweSample* result, 
 	const TorusPolynomial* v,
 	const TGswSample* bk, 
 	const int barb,
@@ -151,15 +151,15 @@ inline void fake_tfhe_bootstrapRotateExtract(LweSample* result,
     result->current_variance=0; //TODO variance
 }
 
-#define USE_FAKE_tfhe_bootstrapRotateExtract \
-    inline void tfhe_bootstrapRotateExtract(LweSample* result, \
+#define USE_FAKE_tfhe_BlindRotateAndExtract \
+    inline void tfhe_BlindRotateAndExtract(LweSample* result, \
 	    const TorusPolynomial* v, \
 	    const TGswSample* bk, \
 	    const int barb, \
 	    const int* bara, \
 	    const int n, \
 	    const TGswParams* bk_params) { \
-	fake_tfhe_bootstrapRotateExtract(result,v,bk,barb,bara,n,bk_params); \
+	fake_tfhe_BlindRotateAndExtract(result,v,bk,barb,bara,n,bk_params); \
     }
 
 
@@ -193,7 +193,7 @@ inline void fake_tfhe_bootstrap(LweSample* result,
     //the initial testvec = [mu,mu,mu,...,mu]
     for (int i=0;i<N;i++) testvect->coefsT[i]=mu;
 
-    fake_tfhe_bootstrapRotateExtract(u, testvect, bk->bk, barb, bara, n, bk_params);
+    fake_tfhe_BlindRotateAndExtract(u, testvect, bk->bk, barb, bara, n, bk_params);
 
     lweKeySwitch(result, bk->ks, u);
 
