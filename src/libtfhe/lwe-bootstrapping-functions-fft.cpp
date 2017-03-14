@@ -23,7 +23,7 @@ using namespace std;
  * @param bara An array of n coefficients between 0 and 2N-1
  * @param bk_params The parameters of bk
  */
-EXPORT void tfhe_BlindRotate_FFT(TLweSample* accum, 
+EXPORT void tfhe_blindRotate_FFT(TLweSample* accum, 
     const TGswSampleFFT* bk, 
     const int* bara, 
     const int n, 
@@ -60,7 +60,7 @@ EXPORT void tfhe_BlindRotate_FFT(TLweSample* accum,
  * @param bara An array of n coefficients between 0 and 2N-1
  * @param bk_params The parameters of bk
  */
-EXPORT void tfhe_BlindRotateAndExtract_FFT(LweSample* result, 
+EXPORT void tfhe_blindRotateAndExtract_FFT(LweSample* result, 
     const TorusPolynomial* v, 
     const TGswSampleFFT* bk, 
     const int barb,
@@ -82,7 +82,7 @@ EXPORT void tfhe_BlindRotateAndExtract_FFT(LweSample* result,
     if (barb!=0) torusPolynomialMulByXai(testvectbis, _2N-barb, v);
     tLweNoiselessTrivial(acc, testvectbis, accum_params);
     // Blind rotation
-    tfhe_BlindRotate_FFT(acc, bk, bara, n, bk_params);
+    tfhe_blindRotate_FFT(acc, bk, bara, n, bk_params);
     // Extraction
     tLweExtractLweSample(result, acc, extract_params, accum_params);
 
@@ -135,7 +135,7 @@ EXPORT void tfhe_bootstrap_FFT(LweSample* result,
     for (int i=0;i<N;i++) testvect->coefsT[i]=mu;
 
     // Bootstrapping rotation and extraction
-    tfhe_BlindRotateAndExtract_FFT(u, testvect, bk->bkFFT, barb, bara, n, bk_params);
+    tfhe_blindRotateAndExtract_FFT(u, testvect, bk->bkFFT, barb, bara, n, bk_params);
     // Key switching
     lweKeySwitch(result, bk->ks, u);
 

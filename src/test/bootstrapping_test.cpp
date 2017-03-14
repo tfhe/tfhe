@@ -87,7 +87,7 @@ namespace {
 	faccum->current_variance = initAlphaAccum*initAlphaAccum;
 	//call bootstraprotate: one iteration at a time
 	for (int i=0; i<n; i++) {
-	    tfhe_BlindRotate(accum,bk+i,bara+i,1,bk_params);
+	    tfhe_blindRotate(accum,bk+i,bara+i,1,bk_params);
 	    if (key->key[i]==1 && bara[i]!=0) {
 		expectedOffset=(expectedOffset+bara[i])%(2*N);
 		torusPolynomialMulByXai(expectedAccumMessage,expectedOffset,initAccumMessage);
@@ -98,7 +98,7 @@ namespace {
 	//Now, bootstraprotate: all iterations at once (same offset)
 	torusPolynomialCopy(faccum->message, initAccumMessage);
 	faccum->current_variance=initAlphaAccum*initAlphaAccum;
-	tfhe_BlindRotate(accum,bk,bara,n,bk_params);
+	tfhe_blindRotate(accum,bk,bara,n,bk_params);
 	for (int j=0; j<N; j++) ASSERT_EQ(expectedAccumMessage->coefsT[j],accum->b->coefsT[j]);
 	//cleanup everything
 	fake_delete_TLweSample(accum);
@@ -154,7 +154,7 @@ namespace {
 	    //const double initAlphaAccum=0.2;
 
 	    //run the function
-	    tfhe_BlindRotateAndExtract(result,v,bk,barb,bara,n,bk_params);
+	    tfhe_blindRotateAndExtract(result,v,bk,barb,bara,n,bk_params);
 
 	    //verify
 	    int offset = barb;
