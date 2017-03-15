@@ -327,10 +327,14 @@ namespace {
     inline void fake_tLweAddMulRTo(TLweSample* result, const IntPolynomial* p, const TLweSample* sample, const TLweParams* params) { 
         const FakeTLwe* fsamp = fake(sample);
         FakeTLwe* fres = fake(result);
+	TorusPolynomial* tmp = new_TorusPolynomial(params->N);
         
-        torusPolynomialMultNaive(fres->message, p, fsamp->message);
-        fres->current_variance += intPolynomialNorm2sq(p)*fsamp->current_variance; 
+        torusPolynomialMultKaratsuba(tmp, p, fsamp->message);
+        torusPolynomialAddTo(fres->message, tmp);
+
+	fres->current_variance += intPolynomialNorm2sq(p)*fsamp->current_variance; 
     }
+
     #define USE_FAKE_tLweAddMulRTo \
     inline void tLweAddMulRTo(TLweSample* result, const IntPolynomial* p, const TLweSample* sample, const TLweParams* params) { \
         fake_tLweAddMulRTo(result,p,sample,params); \
@@ -345,7 +349,7 @@ namespace {
         FakeTLwe* fres = fake(result);
 
         torusPolynomialMulByXaiMinusOne(fres->message, ai, fbk->message);
-        fres->current_variance = 2*fbk->current_variance; 
+        fres->current_variance = (ai==0?1:2)*fbk->current_variance; 
     }
     #define USE_FAKE_tLweMulByXaiMinusOne \
     inline void tLweMulByXaiMinusOne(TLweSample* result, int ai, const TLweSample* bk, const TLweParams* params) { \

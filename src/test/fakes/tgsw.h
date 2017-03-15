@@ -149,6 +149,12 @@ namespace {
 	intPolynomialAddTo(fres->message,message);
     }
 
+#define USE_FAKE_tGswAddMuH \
+    inline void tGswAddMuH(TGswSample* result, const IntPolynomial* message, const TGswParams* params) { \
+	return fake_tGswAddMuH(result,message, params); \
+    }
+
+    
 
     // Result += mu*H, mu integer
     inline void fake_tGswAddMuIntH(TGswSample* result, const int message, const TGswParams* params) {
@@ -156,11 +162,21 @@ namespace {
 	fres->message->coefs[0]+=message;
     }
 
+#define USE_FAKE_tGswAddMuIntH \
+    inline void tGswAddMuIntH(TGswSample* result, const int message, const TGswParams* params) { \
+	return fake_tGswAddMuIntH(result,message, params); \
+    }
+
     // Result = tGsw(0)
     inline void fake_tGswEncryptZero(TGswSample* result, double alpha, const TGswKey* key) {
 	FakeTGsw* fres = fake(result);
 	intPolynomialClear(fres->message);
-	fres->current_variance=alpha;
+	fres->current_variance=alpha*alpha;
+    }
+
+#define USE_FAKE_tGswEncryptZero \
+    inline void tGswEncryptZero(TGswSample* result, double alpha, const TGswKey* key) { \
+    fake_tGswEncryptZero(result, alpha, key); \
     }
 
     //fonction de decomposition
