@@ -164,8 +164,9 @@ EXPORT void tGswExternMulToTLwe(TLweSample* accum, const TGswSample* sample,cons
 
     tGswTLweDecompH(dec,accum,params);
     tLweClear(accum,par);
-    for (int i=0; i<kpl;i++) 
+    for (int i=0; i<kpl;i++) {
         tLweAddMulRTo(accum,&dec[i],&sample->all_sample[i],par);
+    }
 
     delete_IntPolynomial_array(kpl, dec);
 }

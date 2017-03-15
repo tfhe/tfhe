@@ -58,6 +58,7 @@ namespace {
     const TGswParams* params2048_1 = new_TGswParams(4,8,new_TLweParams(2048,1,0.,1.));
     const TGswParams* params2048_2 = new_TGswParams(3,10,new_TLweParams(2048,2,0.,1.));
     vector<const TGswParams*> all_params = {params512_1, params512_2, params1024_1, params1024_2, params2048_1, params2048_2};
+    vector<const TGswParams*> all_params1024 = {params1024_1, params1024_2};
 
     const TGswKey* key512_1 = new_random_key(params512_1);
     const TGswKey* key512_2 = new_random_key(params512_2);
@@ -66,6 +67,7 @@ namespace {
     const TGswKey* key2048_1 = new_random_key(params2048_1);
     const TGswKey* key2048_2 = new_random_key(params2048_2);
     vector<const TGswKey*> all_keys = {key512_1, key512_2, key1024_1, key1024_2, key2048_1, key2048_2};
+    vector<const TGswKey*> all_keys1024 = {key1024_1, key1024_2};
 
     /* Tolerance factor for the equality between two TorusPolynomial */
     const double toler = 1e-8; 
@@ -95,34 +97,90 @@ namespace {
 	    USE_FAKE_new_TLweSample;
 	    USE_FAKE_delete_TLweSample;
 
-/*
+            inline void tGswAddH(TGswSample* result, const TGswParams* params) { abort(); FAIL() << "FORBIDDEN"; }
+            inline void tGswAddMuH(TGswSample* result, const IntPolynomial* message, const TGswParams* params) { abort(); FAIL() << "FORBIDDEN"; }
+            inline void tGswAddMuIntH(TGswSample* result, const int message, const TGswParams* params) { abort(); FAIL() << "FORBIDDEN"; }
+            inline void tGswTorus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const TGswParams* params) { abort(); FAIL() << "FORBIDDEN"; }
+
+	    //this function creates a fixed (random-looking) result,
+	    //whose seed is the sample
+	    inline void tGswTLweDecompH(IntPolynomial* result, const TLweSample* sample,const TGswParams* params) {
+		int kpl = params->kpl;
+		int N = params->tlwe_params->N;
+		const FakeTLwe* seed = fake(sample);
+		for (int i=0; i<kpl; i++)
+		    for (int j=0; j<N; j++)
+			result[i].coefs[j]=(i+3*j+seed->message->coefsT[j])%25-12;
+	    }	
+
+	    //this function will create a fixed (random-looking) TGsw sample
+	    inline void fullyRandomTGsw(TGswSample* result, double alpha, const TGswParams* params) {
+		int kpl = params->kpl;
+		FakeTLwe* resrows = fake(result->all_sample);
+		for (int i=0; i<kpl; i++) {
+		    torusPolynomialUniform(resrows[i].message);
+		    resrows[i].current_variance=alpha*alpha;
+		}
+	    }	
+
+
+
 #define INCLUDE_TGSW_INIT
 #define INCLUDE_TGSW_DESTROY
 #define INCLUDE_TGSW_KEYGEN
 #define INCLUDE_TGSW_CLEAR
-#define INCLUDE_TGSW_ADD_H
-#define INCLUDE_TGSW_ADD_MU_H
-#define INCLUDE_TGSW_ADD_MU_INT_H
+//#define INCLUDE_TGSW_ADD_H
+//#define INCLUDE_TGSW_ADD_MU_H
+//#define INCLUDE_TGSW_ADD_MU_INT_H
 #define INCLUDE_TGSW_ENCRYPT_ZERO
 #define INCLUDE_TGSW_MUL_BY_XAI_MINUS_ONE
 #define INCLUDE_TGSW_EXTERN_MUL_TO_TLWE
-//#define INCLUDE_TGSW_SYM_ENCRYPT
-//#define INCLUDE_TGSW_SYM_ENCRYPT_INT
-//#define INCLUDE_TGSW_ENCRYPT_B
-//#define INCLUDE_TGSW_DECRYPT
-#define INCLUDE_TGSW_TLWE_DECOMP_H
-#define INCLUDE_TGSW_TORUS32POLYNOMIAL_DECOMP_H
+#define INCLUDE_TGSW_SYM_ENCRYPT
+#define INCLUDE_TGSW_SYM_ENCRYPT_INT
+#define INCLUDE_TGSW_ENCRYPT_B
+#define INCLUDE_TGSW_DECRYPT
+//#define INCLUDE_TGSW_TLWE_DECOMP_H
+//#define INCLUDE_TGSW_TORUS32POLYNOMIAL_DECOMP_H_OLD
+//#define INCLUDE_TGSW_TORUS32POLYNOMIAL_DECOMP_H
 #define INCLUDE_TGSW_EXTERN_PRODUCT
 #define INCLUDE_TGSW_NOISELESS_TRIVIAL
-*/
-#define INCLUDE_ALL
+#define INCLUDE_TGSW_ALLOC_FUNCTION
+#define INCLUDE_TGSW_ALLOC_ARRAY_FUNCTION
+#define INCLUDE_TGSW_FREE_FUNCTION
+#define INCLUDE_TGSW_FREE_ARRAY_FUNCTION
+#define INCLUDE_TGSW_INIT_ARRAY_FUNCTION
+#define INCLUDE_TGSW_DESTROY_ARRAY_FUNCTION
+#define INCLUDE_TGSW_NEW_FUNCTION
+#define INCLUDE_TGSW_NEW_ARRAY_FUNCTION
+#define INCLUDE_TGSW_DELETE_FUNCTION
+#define INCLUDE_TGSW_DELETE_ARRAY_FUNCTION
 #include "../libtfhe/tgsw-functions.cpp"
     };
 
     /* This class fixture is for testing tgsw functions that entirely
      * do direct access to raw coefficients: no fake is used */
+    //EXPORT void tGswAddMuH(TGswSample* result, const IntPolynomial* message, const TGswParams* params);
+    //EXPORT void tGswAddMuIntH(TGswSample* result, const int message, const TGswParams* params);
+    //EXPORT void tGswTorus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const TGswParams* params);
+    //EXPORT void tGswTLweDecompH(IntPolynomial* result, const TLweSample* sample,const TGswParams* params);	
     class TGswDirectTest: public ::testing::Test {
 	public:
+	    
+	//this function will create a fixed (random-looking) TGsw sample
+	inline void fullyRandomTGsw(TGswSample* result, double alpha, const TGswParams* params) {
+	    int l = params->l;
+	    int k = params->tlwe_params->k;
+
+	    for (int i=0; i<=k; i++) {
+		for (int j=0; j<l; j++) {
+		    TLweSample* row = &result->bloc_sample[i][j];
+		    for (int u=0; u<=k; u++) {
+			torusPolynomialUniform(row->a+u);
+		    }
+		    row->current_variance=alpha*alpha;
+		}
+	    }
+	}
     };
 
     /* This class fixture is for testing tgsw functions that call other 
@@ -132,16 +190,16 @@ namespace {
 
 	    USE_FAKE_new_TGswSample;
 	    USE_FAKE_delete_TGswSample;
-	    USE_FAKE_tGswMulByXaiMinusOne;
             USE_FAKE_tGswAddH;
             USE_FAKE_tGswAddMuH;
             USE_FAKE_tGswAddMuIntH;
 	    USE_FAKE_tGswEncryptZero;
-	    //USE_FAKE_tGswExternMulToTLwe;
+	    USE_FAKE_tGswClear;
 
 #define INCLUDE_TGSW_SYM_ENCRYPT
 #define INCLUDE_TGSW_SYM_ENCRYPT_INT
 #define INCLUDE_TGSW_ENCRYPT_B
+#define INCLUDE_TGSW_NOISELESS_TRIVIAL
 
 #include "../libtfhe/tgsw-functions.cpp"
     };
@@ -308,43 +366,42 @@ namespace {
 
     //// Result += H
     //EXPORT void tGswAddH(TGswSample* result, const TGswParams* params);
-    //ILA: on devrait verifier aussi la variance?
     TEST_F(TGswDirectTest, tGswAddH) {
-	for (const TGswKey* key: all_keys) {
-	    TGswSample* s = new_TGswSample(key->params);
-	    TGswSample* stemp = new_TGswSample(key->params);
-	    int kpl = key->params->kpl;
-	    int l = key->params->l;
-	    int k = key->params->tlwe_params->k;
-	    int N = key->params->tlwe_params->N;
-	    Torus32* h = key->params->h;
-	    IntPolynomial* mess = new_random_IntPolynomial(N);
+	for (const TGswParams* params: all_params) {
+	    TGswSample* s = new_TGswSample(params);
+	    TGswSample* stemp = new_TGswSample(params);
+	    int kpl = params->kpl;
+	    int l = params->l;
+	    int k = params->tlwe_params->k;
+	    int N = params->tlwe_params->N;
+	    Torus32* h = params->h;
 	    double alpha = 4.2; // valeur pseudo aleatoire fixé
-	    tGswSymEncrypt(s, mess, alpha, key);
 
-	    // stemp is equal to s
+	    // make a full random TGSW
+	    fullyRandomTGsw(s, alpha, params);
+	    
+	    // copy s to stemp
 	    for (int i = 0; i < kpl; ++i){
-		tLweCopy(&stemp->all_sample[i], &s->all_sample[i], key->params->tlwe_params);
+		tLweCopy(&stemp->all_sample[i], &s->all_sample[i], params->tlwe_params);
 	    }
 
-	    tGswAddH(s,key->params);
+	    tGswAddH(s,params);
+
+	    //verify all coefficients
 	    for (int bloc=0; bloc<=k; bloc++) {
-		for (int i=0; i<l; ++i)
-		{
-		    int t = bloc*l+i;
-		    stemp->all_sample[t].a[bloc].coefsT[0] += h[i];
-
-		    //ILA: the function torusPolynomialNormInftyDist(poly1,poly2) doesn't work
-		    double dist = 0;
-		    for (int j=0; j<N; ++j){
-			double r = abs(t32tod(s->all_sample[t].a[bloc].coefsT[j] - stemp->all_sample[t].a[bloc].coefsT[j]));
-			if (r>dist) {dist = r;}
+		for (int i=0; i<l; ++i) {
+		    ASSERT_EQ(s->bloc_sample[bloc][i].current_variance,stemp->bloc_sample[bloc][i].current_variance);
+		    for (int u=0; u<=k; u++) {
+			//verify that pol[bloc][i][u]=initial[bloc][i][u]+(bloc==u?hi:0)
+			TorusPolynomial* newpol = &s->bloc_sample[bloc][i].a[u];
+			TorusPolynomial* oldpol = &stemp->bloc_sample[bloc][i].a[u];
+			ASSERT_EQ(newpol->coefsT[0],oldpol->coefsT[0]+(bloc==u?h[i]:0));
+			for (int j=1; j<N; j++)
+			    ASSERT_EQ(newpol->coefsT[j],oldpol->coefsT[j]);
 		    }
-		    ASSERT_TRUE(dist==0);
-		}                              
+		}
 	    }
 
-	    delete_IntPolynomial(mess);
 	    delete_TGswSample(stemp);
 	    delete_TGswSample(s);
 	}
@@ -353,44 +410,48 @@ namespace {
 
     //// Result += mu*H
     //EXPORT void tGswAddMuH(TGswSample* result, const IntPolynomial* message, const TGswParams* params);
-    //ILA: on devrait verifier aussi la variance?
     TEST_F(TGswDirectTest, tGswAddMuH) {
-	for (const TGswKey* key: all_keys) {
-	    TGswSample* s = new_TGswSample(key->params);
-	    TGswSample* stemp = new_TGswSample(key->params);
-	    int kpl = key->params->kpl;
-	    int l = key->params->l;
-	    int k = key->params->tlwe_params->k;
-	    int N = key->params->tlwe_params->N;
-	    Torus32* h = key->params->h;
-	    IntPolynomial* mess = new_random_IntPolynomial(N);
-	    IntPolynomial* mu = new_random_IntPolynomial(N);
+	for (const TGswParams* params: all_params) {
+	    TGswSample* s = new_TGswSample(params);
+	    TGswSample* stemp = new_TGswSample(params);
+	    int kpl = params->kpl;
+	    int l = params->l;
+	    int k = params->tlwe_params->k;
+	    int N = params->tlwe_params->N;
+	    Torus32* h = params->h;
 	    double alpha = 4.2; // valeur pseudo aleatoire fixé
-	    tGswSymEncrypt(s, mess, alpha, key);
+	    IntPolynomial* mess = new_random_IntPolynomial(N);
 
-	    // stemp is equal to s
+	    // make a full random TGSW
+	    fullyRandomTGsw(s, alpha, params);
+
+	    
+	    // copy s to stemp
 	    for (int i = 0; i < kpl; ++i){
-		tLweCopy(&stemp->all_sample[i], &s->all_sample[i], key->params->tlwe_params);
+		tLweCopy(&stemp->all_sample[i], &s->all_sample[i], params->tlwe_params);
 	    }
 
-	    tGswAddMuH(s, mu, key->params);
+	    tGswAddMuH(s,mess,params);
+
+	    //verify all coefficients
 	    for (int bloc=0; bloc<=k; bloc++) {
-		for (int i=0; i<l; ++i)
-		{
-		    int t = bloc*l+i;
-		    for (int j=0; j<N; j++) stemp->all_sample[t].a[bloc].coefsT[j] = mu->coefs[j]*h[i];
-
-		    //ILA: the function torusPolynomialNormInftyDist(poly1,poly2) doesn't work
-		    double dist = 0;
-		    for (int j=0; j<N; ++j){
-			double r = abs(t32tod(s->all_sample[t].a[bloc].coefsT[j] - stemp->all_sample[t].a[bloc].coefsT[j]));
-			if (r>dist) {dist = r;}
+		for (int i=0; i<l; ++i) {
+		    ASSERT_EQ(s->bloc_sample[bloc][i].current_variance,stemp->bloc_sample[bloc][i].current_variance);
+		    for (int u=0; u<=k; u++) {
+			//verify that pol[bloc][i][u]=initial[bloc][i][u]+(bloc==u?hi*mess:0)
+			TorusPolynomial* newpol = &s->bloc_sample[bloc][i].a[u];
+			TorusPolynomial* oldpol = &stemp->bloc_sample[bloc][i].a[u];
+			if (bloc==u) {
+			    for (int j=0; j<N; j++)
+				ASSERT_EQ(newpol->coefsT[j],oldpol->coefsT[j]+h[i]*mess->coefs[j]);
+			} else {
+			    for (int j=0; j<N; j++)
+				ASSERT_EQ(newpol->coefsT[j],oldpol->coefsT[j]);
+			}
 		    }
-		    ASSERT_TRUE(dist==0);
-		}                              
+		}
 	    }
 
-	    delete_IntPolynomial(mu);
 	    delete_IntPolynomial(mess);
 	    delete_TGswSample(stemp);
 	    delete_TGswSample(s);
@@ -403,39 +464,41 @@ namespace {
     //// Result += mu*H, mu integer
     //EXPORT void tGswAddMuIntH(TGswSample* result, const int message, const TGswParams* params);
     TEST_F(TGswDirectTest, tGswAddMuIntH) {
-	for (const TGswKey* key: all_keys) {
-	    TGswSample* s = new_TGswSample(key->params);
-	    TGswSample* stemp = new_TGswSample(key->params);
-	    int kpl = key->params->kpl;
-	    int l = key->params->l;
-	    int k = key->params->tlwe_params->k;
-	    int N = key->params->tlwe_params->N;
-	    Torus32* h = key->params->h;
-	    int mess = rand()%2; // ILA: ça suffit?
-	    int mu = rand()%2; // ILA: ça suffit?
+	for (const TGswParams* params: all_params) {
+	    TGswSample* s = new_TGswSample(params);
+	    TGswSample* stemp = new_TGswSample(params);
+	    int kpl = params->kpl;
+	    int l = params->l;
+	    int k = params->tlwe_params->k;
+	    int N = params->tlwe_params->N;
+	    Torus32* h = params->h;
 	    double alpha = 4.2; // valeur pseudo aleatoire fixé
-	    tGswSymEncryptInt(s, mess, alpha, key);
+	    int mess = rand()*2345-1234;
 
-	    // stemp is equal to s
+	    // make a full random TGSW
+	    fullyRandomTGsw(s, alpha, params);
+
+	    
+	    // copy s to stemp
 	    for (int i = 0; i < kpl; ++i){
-		tLweCopy(&stemp->all_sample[i], &s->all_sample[i], key->params->tlwe_params);
+		tLweCopy(&stemp->all_sample[i], &s->all_sample[i], params->tlwe_params);
 	    }
 
-	    tGswAddMuIntH(s, mu, key->params);
-	    for (int bloc=0; bloc<=k; bloc++) {
-		for (int i=0; i<l; ++i)
-		{
-		    int t = bloc*l+i;
-		    stemp->all_sample[t].a[bloc].coefsT[0] = mu*h[i];
+	    tGswAddMuIntH(s,mess,params);
 
-		    //ILA: the function torusPolynomialNormInftyDist(poly1,poly2) doesn't work
-		    double dist = 0;
-		    for (int j=0; j<N; ++j){
-			double r = abs(t32tod(s->all_sample[t].a[bloc].coefsT[j] - stemp->all_sample[t].a[bloc].coefsT[j]));
-			if (r>dist) {dist = r;}
+	    //verify all coefficients
+	    for (int bloc=0; bloc<=k; bloc++) {
+		for (int i=0; i<l; ++i) {
+		    ASSERT_EQ(s->bloc_sample[bloc][i].current_variance,stemp->bloc_sample[bloc][i].current_variance);
+		    for (int u=0; u<=k; u++) {
+			//verify that pol[bloc][i][u]=initial[bloc][i][u]+(bloc==u?hi*mess:0)
+			TorusPolynomial* newpol = &s->bloc_sample[bloc][i].a[u];
+			TorusPolynomial* oldpol = &stemp->bloc_sample[bloc][i].a[u];
+			ASSERT_EQ(newpol->coefsT[0],oldpol->coefsT[0]+(bloc==u?h[i]*mess:0));
+			for (int j=1; j<N; j++)
+			    ASSERT_EQ(newpol->coefsT[j],oldpol->coefsT[j]);
 		    }
-		    ASSERT_TRUE(dist==0);
-		}                              
+		}
 	    }
 
 	    delete_TGswSample(stemp);
@@ -478,31 +541,36 @@ namespace {
     //EXPORT void tGswTorus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const TGswParams* params);
     // sample: torus polynomial with N coefficients
     // result: int polynomial with Nl coefficients
-    // ILA: reverifier!
     TEST_F(TGswDirectTest, tGswTorus32PolynomialDecompH) {
 	for (const TGswParams* param: all_params) {
 	    int N = param->tlwe_params->N;
 	    int l = param->l;
+	    int Bgbit = param->Bgbit;
 	    Torus32* h = param->h;
 
-	    IntPolynomial* result = new_IntPolynomial(N*l);
+	    //compute the tolerance
+	    int toler = 0;
+	    if (Bgbit*l<32) toler = 1 << (32-Bgbit*l);
+	    //printf("%d,%d,%d\n",Bgbit,l,toler);
+
+	    IntPolynomial* result = new_IntPolynomial_array(l,N);
 	    TorusPolynomial* sample = new_TorusPolynomial(N);
 	    torusPolynomialUniform(sample);
-	    Torus32 test;
 
 	    tGswTorus32PolynomialDecompH(result, sample, param);
+
+	    
 	    for (int i=0; i<N; ++i) {
 		// recomposition
-		test = 0;
+		Torus32 test = 0;
 		for (int j=0; j<l; ++j) {
-		    int t = i*l+j; 
-		    test += result->coefs[t]*h[j];
+		    test += result[j].coefs[i]*h[j];
 		}
-		ASSERT_TRUE(abs(t32tod(test - sample->coefsT[i]))==0);
+		ASSERT_LE(abs(test-sample->coefsT[i]),toler); //exact or approx decomposition
 	    }
 
 	    delete_TorusPolynomial(sample);
-	    delete_IntPolynomial(result);
+	    delete_IntPolynomial_array(l,result);
 	}
     }
 
@@ -512,37 +580,42 @@ namespace {
     // Test direct Result*H donne le bon resultat
     // sample: TLweSample composed by k+1 torus polynomials, each with N coefficients
     // result: int polynomial with Nl(k+1) coefficients
-    // ILA: reverifier!
     TEST_F(TGswDirectTest, tGswTLweDecompH) {
 	for (const TGswParams* param: all_params) {
 	    int N = param->tlwe_params->N;
 	    int k = param->tlwe_params->k;
+	    int Bgbit = param->Bgbit;
 	    int l = param->l;
+	    int kpl = param->kpl;
 	    Torus32* h = param->h;
 
-	    IntPolynomial* result = new_IntPolynomial(N*l*(k+1));
+	    //compute the tolerance
+	    int toler = 0;
+	    if (Bgbit*l<32) toler = 1 << (32-Bgbit*l);
+	    //printf("%d,%d,%d\n",Bgbit,l,toler);
+
+	    IntPolynomial* result = new_IntPolynomial_array(kpl,N);
 	    TLweSample* sample = new_TLweSample(param->tlwe_params);
+	    
 	    // sample randomly generated 
 	    for (int bloc=0; bloc<=k; ++bloc) {
 		torusPolynomialUniform(&sample->a[bloc]);
 	    }
-	    Torus32 test;
-
+	    
 	    tGswTLweDecompH(result, sample, param);
+
 	    for (int bloc=0; bloc<=k; ++bloc) {
-		for (int i=0; i<N; ++i) {
-		    // recomposition
-		    test = 0;
+		for (int i=0; i<N; i++) { 
+		    Torus32 test = 0;
 		    for (int j=0; j<l; ++j) {
-			int t = (bloc*N*l)+i*l+j;
-			test += result->coefs[t]*h[j];
+			test += result[bloc*l+j].coefs[i]*h[j];
 		    }
-		    ASSERT_TRUE(abs(t32tod(test - sample->a[bloc].coefsT[i]))==0);
+		    ASSERT_LE(abs(test-sample->a[bloc].coefsT[i]),toler); //exact or approx decomposition
 		}
 	    }
 
 	    delete_TLweSample(sample);
-	    delete_IntPolynomial(result);
+	    delete_IntPolynomial_array(kpl,result);
 	}
     }
 
@@ -550,35 +623,45 @@ namespace {
 
     ////TODO: Ilaria.Theoreme3.5
     //EXPORT void tGswExternProduct(TLweSample* result, const TGswSample* a, const TLweSample* b, const TGswParams* params);
-    TEST_F(TGswDirectTest, tGswExternProduct) {
-	for (const TGswKey* key: all_keys) {
-	    int N = key->params->tlwe_params->N;
-	    TGswSample* a = new_TGswSample(key->params);
-	    TLweSample* b = new_TLweSample(key->params->tlwe_params);
-	    TLweSample* res = new_TLweSample(key->params->tlwe_params);
+    TEST_F(TGswTest, tGswExternProduct) {
+	for (const TGswParams* params: all_params) {
+	    const int N = params->tlwe_params->N;
+	    const int kpl = params->kpl;
+
+	    TGswSample* sample = new_TGswSample(params);
+	    
+	    TLweSample* result = new_TLweSample(params->tlwe_params);
+	    TLweSample* b = new_TLweSample(params->tlwe_params);
+	    FakeTLwe* fresult = fake(result);
+	    FakeTLwe* fb = fake(b);
+	    FakeTLwe* fsamplerows = fake(sample->all_sample);
 	    double alpha = 4.2; // valeur pseudo aleatoire fixé
 
-	    IntPolynomial* mua = new_random_IntPolynomial(N);
-	    TorusPolynomial* mub = new_TorusPolynomial(N);
-	    torusPolynomialUniform(mub);
-	    TorusPolynomial* mures = new_TorusPolynomial(N);
 
-	    tGswSymEncrypt(a, mua, alpha, key);
-	    tLweSymEncrypt(b, mub, alpha, &key->tlwe_key);
+	    fullyRandomTGsw(sample, alpha, params);
+	    torusPolynomialUniform(fb->message);
 
-	    torusPolynomialMultNaive(mures, mua, mub);
-	    tGswExternProduct(res, a, b, key->params);
+	    IntPolynomial* decomp = new_IntPolynomial_array(kpl,N);
+	    tGswTLweDecompH(decomp, b, params);
+	    TorusPolynomial* expectedRes = new_TorusPolynomial(N);
+            TorusPolynomial* tmp = new_TorusPolynomial(N);
 
-	    FakeTLwe* r = fake(res);
-	    ASSERT_TRUE(torusPolynomialNormInftyDist(r->message,mures)==0);
-	    //ASSERT_TRUE(si->current_variance==alpha);
+	    torusPolynomialClear(expectedRes);
+	    for (int i=0; i<kpl; i++) {
+		torusPolynomialMultKaratsuba(tmp, decomp+i, fsamplerows[i].message);
+		torusPolynomialAddTo(expectedRes, tmp);
+	    }
 
-	    delete_TorusPolynomial(mures);
-	    delete_TorusPolynomial(mub);
-	    delete_IntPolynomial(mua);
-	    delete_TLweSample(res);
+	    tGswExternProduct(result,sample,b,params);
+
+	    ASSERT_EQ(torusPolynomialNormInftyDist(fresult->message,expectedRes),0);
+
+	    delete_TorusPolynomial(tmp);
+	    delete_TorusPolynomial(expectedRes);
+	    delete_IntPolynomial_array(kpl, decomp);
 	    delete_TLweSample(b);
-	    delete_TGswSample(a);
+	    delete_TLweSample(result);
+	    delete_TGswSample(sample);
 	}
     }
 
@@ -601,10 +684,7 @@ namespace {
 		//generate all rows at random
 		FakeTLwe* fresrows = fake(res->all_sample);
 		FakeTLwe* fbkrows = fake(bk->all_sample);
-		for (int i=0; i<kpl; i++) {
-		    torusPolynomialUniform(fbkrows[i].message);
-		    fbkrows[i].current_variance=alpha*alpha;
-		}
+		fullyRandomTGsw(bk,alpha,key->params);
 
 		tGswMulByXaiMinusOne(res, ai, bk, key->params);
 
@@ -630,28 +710,38 @@ namespace {
     //accum *= sample
     TEST_F(TGswTest, tGswExternMulToTLwe) {
 	for (const TGswKey* key: all_keys) {
-	    int N = key->params->tlwe_params->N;
-	    TGswSample* sample = new_TGswSample(key->params);
-	    TLweSample* accum = new_TLweSample(key->params->tlwe_params);
+	    const TGswParams* params = key->params;
+	    const int N = params->tlwe_params->N;
+	    const int kpl = params->kpl;
+
+	    TGswSample* sample = new_TGswSample(params);
+	    TLweSample* accum = new_TLweSample(params->tlwe_params);
+	    FakeTLwe* faccum = fake(accum);
+	    FakeTLwe* fsamplerows = fake(sample->all_sample);
 	    double alpha = 4.2; // valeur pseudo aleatoire fixé
 
-	    IntPolynomial* mu = new_random_IntPolynomial(N);
-	    TorusPolynomial* mess = new_TorusPolynomial(N);
-	    torusPolynomialUniform(mess);
 
-	    tGswSymEncrypt(sample, mu, alpha, key);
-	    tLweSymEncrypt(accum, mess, alpha, &key->tlwe_key);
+	    fullyRandomTGsw(sample, alpha, params);
+	    torusPolynomialUniform(faccum->message);
 
-	    // mess *= mu
-	    torusPolynomialMultNaive(mess, mu, mess);
-	    tGswExternMulToTLwe(accum,sample,key->params);
+	    IntPolynomial* decomp = new_IntPolynomial_array(kpl,N);
+	    tGswTLweDecompH(decomp, accum, params);
+	    TorusPolynomial* expectedRes = new_TorusPolynomial(N);
+            TorusPolynomial* tmp = new_TorusPolynomial(N);
 
-	    FakeTLwe* acc = fake(accum);
-	    ASSERT_TRUE(torusPolynomialNormInftyDist(acc->message,mess)==0);
-	    //ASSERT_TRUE(si->current_variance==alpha);
+	    torusPolynomialClear(expectedRes);
+	    for (int i=0; i<kpl; i++) {
+		torusPolynomialMultKaratsuba(tmp, decomp+i, fsamplerows[i].message);
+		torusPolynomialAddTo(expectedRes, tmp);
+	    }
 
-	    delete_TorusPolynomial(mess);
-	    delete_IntPolynomial(mu);
+	    tGswExternMulToTLwe(accum,sample,params);
+
+	    ASSERT_EQ(torusPolynomialNormInftyDist(faccum->message,expectedRes),0);
+
+	    delete_TorusPolynomial(tmp);
+	    delete_TorusPolynomial(expectedRes);
+	    delete_IntPolynomial_array(kpl, decomp);
 	    delete_TLweSample(accum);
 	    delete_TGswSample(sample);
 	}
@@ -662,30 +752,19 @@ namespace {
 
     /** result = (0,mu) */
     //EXPORT void tGswNoiselessTrivial(TGswSample* result, const IntPolynomial* mu, const TGswParams* params);
-    TEST_F(TGswTest, tGswNoiselessTrivial) {
+    TEST_F(TGswFakeTest, tGswNoiselessTrivial) {
 	for (const TGswParams* param: all_params) {
-	    int l = param->l;
-	    int k = param->tlwe_params->k;
 	    int N = param->tlwe_params->N;
-	    Torus32* h = param->h;
 	    TGswSample* res = new_TGswSample(param);
 	    IntPolynomial* mu = new_random_IntPolynomial(N);
-	    TorusPolynomial* poly = new_TorusPolynomial(N);
+	    FakeTGsw* fres = fake(res);
 
-	    //RESETtGswNoiselessTrivial(res, mu, param);
-	    for (int bloc=0; bloc<=k; bloc++) {
-		for (int i=0; i<l; ++i)
-		{
-		    int t = bloc*l+i;
-		    FakeTLwe* rt = fake(&res->all_sample[t]);
+	    tGswNoiselessTrivial(res, mu, param);
+	   
+	    for (int j=0; j<N; j++) 
+		ASSERT_EQ(fres->message->coefs[j],mu->coefs[j]);
+	    ASSERT_EQ(fres->current_variance,0.);
 
-		    for (int j=0; j<N; j++) poly->coefsT[j] = mu->coefs[j]*h[i];
-		    ASSERT_TRUE(torusPolynomialNormInftyDist(poly,rt->message)==0);
-		    ASSERT_TRUE(rt->current_variance==0);
-		}                              
-	    }
-
-	    delete_TorusPolynomial(poly);
 	    delete_IntPolynomial(mu);
 	    delete_TGswSample(res);
 	}
