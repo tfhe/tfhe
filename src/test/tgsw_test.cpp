@@ -344,7 +344,7 @@ namespace {
 	    tGswClear(s,param);
 	    for (int i=0; i<kpl; i++) {
 		FakeTLwe* si = fake(&s->all_sample[i]);
-		ASSERT_TRUE(torusPolynomialNormInftyDist(si->message,zeroPol)==0);
+		ASSERT_EQ(torusPolynomialNormInftyDist(si->message,zeroPol),0);
 	    }
 
 	    delete_TorusPolynomial(zeroPol);
@@ -525,7 +525,7 @@ namespace {
 	    tGswEncryptZero(s, alpha, key);
 	    for (int i=0; i<kpl; ++i) {
 		FakeTLwe* si = fake(&s->all_sample[i]);
-		ASSERT_TRUE(torusPolynomialNormInftyDist(si->message,zeroPol)==0);
+		ASSERT_EQ(torusPolynomialNormInftyDist(si->message,zeroPol),0);
 		ASSERT_EQ(si->current_variance,alpha*alpha);
 	    }
 
@@ -690,7 +690,7 @@ namespace {
 
 		for (int i=0; i<kpl; i++) {
 		    torusPolynomialMulByXaiMinusOne(poly,ai,fbkrows[i].message);
-		    ASSERT_TRUE(torusPolynomialNormInftyDist(fresrows[i].message,poly)==0);
+		    ASSERT_EQ(torusPolynomialNormInftyDist(fresrows[i].message,poly),0);
 		    ASSERT_EQ(fresrows[i].current_variance,(ai==0?1:2)*fbkrows[i].current_variance);
 		}
 
