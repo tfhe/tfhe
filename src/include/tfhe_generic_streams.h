@@ -21,6 +21,7 @@ class Istream {
 	virtual ~Istream() {};
 };
 
+
 /**
  * This is a generic Ostream wrapper: supports fputs()
  */
@@ -32,6 +33,46 @@ class Ostream {
 	virtual void fputs(const std::string& s) const=0;
 	virtual ~Ostream() {};
 };
+
+class StdIstream : public Istream {
+    std::istream& in;
+    public:
+    StdIstream(std::istream& in): in(in) {}
+    virtual void getLine(std::string& reps) const;
+    virtual bool feof() const;
+    virtual ~StdIstream() {};
+};
+
+class CIstream : public Istream {
+    FILE* F;
+    public:
+    CIstream(FILE* F): F(F) {}
+    virtual void getLine(std::string& reps) const;
+    virtual bool feof() const;
+    virtual ~CIstream() {};
+};
+
+
+class StdOstream : public Ostream{
+    std::ostream& out;
+    public:
+    StdOstream(std::ostream& out): out(out) {}
+    virtual void fputs(const std::string& s) const;
+    virtual ~StdOstream() {};
+};
+
+class COstream : public Ostream {
+    FILE* F;
+    public:
+    COstream(FILE* F): F(F) {}
+    virtual void fputs(const std::string& s) const;
+    virtual ~COstream() {};
+};
+
+COstream to_Ostream(FILE* F);
+StdOstream to_Ostream(std::ostream& out);
+CIstream to_Istream(FILE* F);
+StdIstream to_Istream(std::istream& in);
 
 /**
  * This is a property map: a title and a set of name-value properties.

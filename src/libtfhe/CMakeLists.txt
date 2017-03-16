@@ -29,6 +29,7 @@ set(SRCS
     lwe-bootstrapping-functions.cpp
     lwe-bootstrapping-functions-fft.cpp
     tfhe_io.cpp
+    tfhe_generic_streams.cpp
     )
 
 
