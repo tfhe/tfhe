@@ -1,6 +1,7 @@
 #include <tfhe_io.h>
 #include <map>
 #include <string>
+#include <tfhe_generic_streams.h>
 
 using namespace std;
 
