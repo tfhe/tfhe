@@ -10,8 +10,8 @@ class Istream {
     public:
 	/**
 	 * this function reads a line from the stream F, and stores the result in the string reps
-	 * '\r' characters are ignored, 
-	 * '\n' stops the reading, and is not included in the result
+	 * '\r' characters are consumed and ignored, 
+	 * '\n' stops the reading, and is consumed but not included in the result
 	 */
 	virtual void getLine(std::string& reps) const=0;
 	/**
@@ -20,6 +20,9 @@ class Istream {
 	virtual bool feof() const=0;
 	virtual ~Istream() {};
 };
+
+class CIstream; //subclass specialized for C FILE* streams
+class StdIstream; //subclass specialized for C++ istream streams
 
 
 /**
@@ -34,45 +37,16 @@ class Ostream {
 	virtual ~Ostream() {};
 };
 
-class StdIstream : public Istream {
-    std::istream& in;
-    public:
-    StdIstream(std::istream& in): in(in) {}
-    virtual void getLine(std::string& reps) const;
-    virtual bool feof() const;
-    virtual ~StdIstream() {};
-};
 
-class CIstream : public Istream {
-    FILE* F;
-    public:
-    CIstream(FILE* F): F(F) {}
-    virtual void getLine(std::string& reps) const;
-    virtual bool feof() const;
-    virtual ~CIstream() {};
-};
+class COstream; //subclass specialized for C FILE* streams
+class StdOstream; //subclass specialized for C++ ostream streams
 
-
-class StdOstream : public Ostream{
-    std::ostream& out;
-    public:
-    StdOstream(std::ostream& out): out(out) {}
-    virtual void fputs(const std::string& s) const;
-    virtual ~StdOstream() {};
-};
-
-class COstream : public Ostream {
-    FILE* F;
-    public:
-    COstream(FILE* F): F(F) {}
-    virtual void fputs(const std::string& s) const;
-    virtual ~COstream() {};
-};
 
 COstream to_Ostream(FILE* F);
 StdOstream to_Ostream(std::ostream& out);
 CIstream to_Istream(FILE* F);
 StdIstream to_Istream(std::istream& in);
+
 
 /**
  * This is a property map: a title and a set of name-value properties.
@@ -113,6 +87,62 @@ void delete_TextModeProperties(TextModeProperties* ptr);
  * Prints a property map to a generic Ostream.
  */
 void print_TextModeProperties_toOStream(const Ostream& out, const TextModeProperties* props);
+
+
+//-----------------------------------------------------------------
+// And now, the specialization details of the stream subclasses
+//-----------------------------------------------------------------
+
+/**
+ * Specialization of the Istream wrapper around std::istream
+ */
+class StdIstream : public Istream {
+    std::istream& in;
+    public:
+    StdIstream(std::istream& in): in(in) {}
+    virtual void getLine(std::string& reps) const;
+    virtual bool feof() const;
+    virtual ~StdIstream() {};
+};
+
+/**
+ * Specialization of the Istream wrapper around FILE*
+ */
+class CIstream : public Istream {
+    FILE* F;
+    public:
+    CIstream(FILE* F): F(F) {}
+    virtual void getLine(std::string& reps) const;
+    virtual bool feof() const;
+    virtual ~CIstream() {};
+};
+
+
+/**
+ * Specialization of the Ostream wrapper around std::istream
+ */
+class StdOstream : public Ostream{
+    std::ostream& out;
+    public:
+    StdOstream(std::ostream& out): out(out) {}
+    virtual void fputs(const std::string& s) const;
+    virtual ~StdOstream() {};
+};
+
+/**
+ * Specialization of the Ostream wrapper around FILE*
+ */
+class COstream : public Ostream {
+    FILE* F;
+    public:
+    COstream(FILE* F): F(F) {}
+    virtual void fputs(const std::string& s) const;
+    virtual ~COstream() {};
+};
+
+
+
+
 
 #endif // TFHE_GENERIC_STREAMS_H
 
