@@ -27,7 +27,7 @@ void getline(FILE* F, string& reps) {
     }
 }
 
-bool feof(istream& in) { return (bool) in; }
+bool feof(istream& in) { return ! ((bool) in); }
 
 void fputs(ostream& out, const string& line) {
     out << line;
@@ -51,14 +51,16 @@ TextModeProperties* new_TextModeProperties(STREAM& F) {
 	    reps->setTypeTitle(titleType);
 	    endDelimitor=string("-----END ")+titleType+string("-----");
 	    content_started=true;
+	    cerr << "Object: " << titleType << endl;
 	    continue;
 	}
-	if (!content_started) continue; //ignore anything before body
+	if (!content_started) { cerr << "ignoring: " << line << endl; continue;}  //ignore anything before body 
 	if (line == endDelimitor) {
+	    cerr << "EndObject: " << reps->getTypeTitle() << endl;
 	    return reps;
 	}
 	size_t pos = line.find(": ");
-	if (pos==string::npos) { cerr << "ignoring " << line << endl; continue; }
+	if (pos==string::npos) { cerr << "ignoring: " << line << endl; continue; }
 	string name = line.substr(0,pos);
 	string value = line.substr(pos+2);
 	cerr << "prop: " << name << "->" << value << endl;
@@ -98,12 +100,12 @@ void export_lweParams(STREAM& F, const LweParams* lweparams) {
 }
 
 template<typename STREAM>
-const LweParams* read_new_lweParams(STREAM& F) {
+LweParams* read_new_lweParams(STREAM& F) {
     TextModeProperties* props = new_TextModeProperties(F);
     if (props->getTypeTitle() != string("LWEPARAMS")) abort();
     int n = stoi(props->getProperty("n"));
-    double alpha_min = stoi(props->getProperty("alpha_min"));
-    double alpha_max = stoi(props->getProperty("alpha_max"));
+    double alpha_min = stold(props->getProperty("alpha_min"));
+    double alpha_max = stold(props->getProperty("alpha_max"));
     delete_TextModeProperties(props);
     return new_LweParams(n,alpha_min,alpha_max);
 }
@@ -124,11 +126,11 @@ EXPORT void export_lweParams_toStream(ostream& F, const LweParams* lweparams) { 
  * This constructor function reads and creates a LWEParams from a stream. The result
  * must be deleted with delete_lweParams();
  */
-EXPORT const LweParams* new_lweParams_fromStream(std::istream& in) { return read_new_lweParams(in); }
+EXPORT LweParams* new_lweParams_fromStream(std::istream& in) { return read_new_lweParams(in); }
 
 /**
  * This constructor function reads and creates a LWEParams from a File. The result
  * must be deleted with delete_lweParams();
  */
-EXPORT const LweParams* new_lweParams_fromFile(FILE* F)  { return read_new_lweParams(F); }
+EXPORT LweParams* new_lweParams_fromFile(FILE* F)  { return read_new_lweParams(F); }
 
