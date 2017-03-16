@@ -39,6 +39,22 @@ EXPORT void export_lweParams_toStream(std::ostream& out, const LweParams* lwepar
  */
 EXPORT const LweParams* new_lweParams_fromStream(std::istream& in);
 
+
+//---------------------------------------------------------------
+
+class TextModeProperties {
+    public:
+	virtual const std::string& getTypeTitle() const =0;
+	virtual const std::string& getProperty(const std::string& name) const =0;
+	virtual void setTypeTitle(const std::string& title)=0;
+	virtual void setProperty(const std::string& name, const std::string& value)=0;
+	virtual ~TextModeProperties();
+};
+
+TextModeProperties* new_TextModeProperties_fromFile(FILE* F);
+TextModeProperties* new_TextModeProperties_fromStream(std::istream& F);
+void delete_TextModeProperties(TextModeProperties* ptr);
+
 #endif
 
 #endif // TFHE_IO_H
