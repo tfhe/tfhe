@@ -14,6 +14,7 @@ set(GOOGLETEST_SOURCES
     tgsw_fft_test.cpp
     lwekeyswitch_test.cpp
     bootstrapping_test.cpp
+    io_test.cpp
     )
 
 foreach (FFT_PROCESSOR IN LISTS FFT_PROCESSORS) 
