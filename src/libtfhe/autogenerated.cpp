@@ -125,6 +125,10 @@ EXPORT void delete_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey* ob
     free_LweBootstrappingKey_array(nbelts,obj);
 }
 #include "lwebootstrappingkey.h" 
+
+
+
+
 //allocate memory space for a LweBootstrappingKeyFFT
 
 EXPORT LweBootstrappingKeyFFT* alloc_LweBootstrappingKeyFFT() {
@@ -144,12 +148,12 @@ EXPORT void free_LweBootstrappingKeyFFT_array(int nbelts, LweBootstrappingKeyFFT
 
 //initialize the key structure
 //(equivalent of the C++ constructor)
-EXPORT void init_LweBootstrappingKeyFFT(LweBootstrappingKeyFFT* obj, const LweParams* in_out_params, const TGswParams* bk_params) {
-    new(obj) LweBootstrappingKeyFFT(in_out_params,bk_params);
+EXPORT void init_LweBootstrappingKeyFFT(LweBootstrappingKeyFFT* obj, const LweBootstrappingKey* bk) {
+    new(obj) LweBootstrappingKeyFFT(bk);
 }
-EXPORT void init_LweBootstrappingKeyFFT_array(int nbelts, LweBootstrappingKeyFFT* obj, const LweParams* in_out_params, const TGswParams* bk_params) {
+EXPORT void init_LweBootstrappingKeyFFT_array(int nbelts, LweBootstrappingKeyFFT* obj, const LweBootstrappingKey* bk) {
     for (int i=0; i<nbelts; i++) {
-	new(obj+i) LweBootstrappingKeyFFT(in_out_params,bk_params);
+	new(obj+i) LweBootstrappingKeyFFT(bk);
     }
 }
 
@@ -166,12 +170,12 @@ EXPORT void destroy_LweBootstrappingKeyFFT_array(int nbelts, LweBootstrappingKey
  
 //allocates and initialize the LweBootstrappingKeyFFT structure
 //(equivalent of the C++ new)
-EXPORT LweBootstrappingKeyFFT* new_LweBootstrappingKeyFFT(const LweParams* in_out_params, const TGswParams* bk_params) {
-    return new LweBootstrappingKeyFFT(in_out_params,bk_params);
+EXPORT LweBootstrappingKeyFFT* new_LweBootstrappingKeyFFT(const LweBootstrappingKey* bk) {
+    return new LweBootstrappingKeyFFT(bk);
 }
-EXPORT LweBootstrappingKeyFFT* new_LweBootstrappingKeyFFT_array(int nbelts, const LweParams* in_out_params, const TGswParams* bk_params) {
+EXPORT LweBootstrappingKeyFFT* new_LweBootstrappingKeyFFT_array(int nbelts, const LweBootstrappingKey* bk) {
     LweBootstrappingKeyFFT* obj = alloc_LweBootstrappingKeyFFT_array(nbelts);
-    init_LweBootstrappingKeyFFT_array(nbelts,obj,in_out_params,bk_params);
+    init_LweBootstrappingKeyFFT_array(nbelts,obj,bk);
     return obj;
 }
 

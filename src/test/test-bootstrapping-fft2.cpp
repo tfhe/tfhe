@@ -68,16 +68,20 @@ int main(int argc, char** argv) {
     TGswKey* key_bk = new_TGswKey(params_bk);
     tGswKeyGen(key_bk);
 
-    LweBootstrappingKeyFFT* bk = new_LweBootstrappingKeyFFT(params_in, params_bk);
-    tfhe_createLweBootstrappingKeyFFT(bk, key, key_bk);
+    // The BootstrappingKeyFFT is created by converting the BootstrappingKey
+    LweBootstrappingKey* bk = new_LweBootstrappingKey(params_in, params_bk);
+    tfhe_createLweBootstrappingKey(bk, key, key_bk);
+    LweBootstrappingKeyFFT* bkFFT = new_LweBootstrappingKeyFFT(bk);
 
     LweSample* test = new_LweSample(params_in);
     LweSample* test_out = new_LweSample(params_in);
     
-    const Torus32 mu1 = modSwitchToTorus32(1,2);
-    const Torus32 mu0 = modSwitchToTorus32(0,2);
+    // const Torus32 mu1 = modSwitchToTorus32(1,2);
+    // const Torus32 mu0 = modSwitchToTorus32(0,2);
+    const Torus32 mu = modSwitchToTorus32(1,4);
 
-    Torus32 mu_in = modSwitchToTorus32(1,2);
+    // Torus32 mu_in = modSwitchToTorus32(1,2);
+    Torus32 mu_in = modSwitchToTorus32(-1,4);
     lweSymEncrypt(test, mu_in, alpha_in, key);
 
 #ifndef NDEBUG
@@ -93,10 +97,12 @@ int main(int argc, char** argv) {
     int nbtrials = 50;
     clock_t begin = clock();
     for (int i=0; i<nbtrials; i++)
-	tfhe_bootstrapFFT(test_out, bk, mu1, mu0, test);
+	// tfhe_bootstrapFFT(test_out, bkFFT, mu1, mu0, test);
+    tfhe_bootstrap_FFT(test_out, bkFFT, mu, test);
     clock_t end = clock();
     cout << "finished bootstrapping (microsecs)... " << (end-begin)/double(nbtrials) << endl;
-    Torus32 mu_out = lweSymDecrypt(test_out, key, 2);
+    // Torus32 mu_out = lweSymDecrypt(test_out, key, 2);
+    Torus32 mu_out = lweSymDecrypt(test_out, key, 4);
     cout << "end_variance: " << test_out->current_variance << endl;
 
     if (mu_in != mu_out) dieDramatically("et Zut!");
@@ -104,7 +110,8 @@ int main(int argc, char** argv) {
 
     delete_LweSample(test_out);
     delete_LweSample(test);
-    delete_LweBootstrappingKeyFFT(bk);
+    delete_LweBootstrappingKeyFFT(bkFFT);
+    delete_LweBootstrappingKey(bk);
     delete_TGswKey(key_bk);
     delete_LweKey(key);
     delete_TGswParams(params_bk);

@@ -34,7 +34,7 @@ namespace {
 */
 
 
-    class LweBootstrapRotateTest: public ::testing::Test {
+    class TfheBlindRotateTest: public ::testing::Test {
 	public:
 
 	    USE_FAKE_new_TGswSample;
@@ -43,9 +43,8 @@ namespace {
             USE_FAKE_tGswAddH;
 	    USE_FAKE_tGswExternMulToTLwe;
 
-#define INCLUDE_TFHE_BOOTSTRAPROTATE
+#define INCLUDE_TFHE_BLIND_ROTATE
 #include "../libtfhe/lwe-bootstrapping-functions.cpp"
-#undef INCLUDE_TFHE_BOOTSTRAPROTATE
 
     };
 
@@ -57,12 +56,12 @@ namespace {
      * @param bara An array of n coefficients between 0 and 2N-1
      * @param bk_params The parameters of bk
      */
-    //EXPORT void tfhe_bootstrapRotate(TLweSample* accum, 
+    //EXPORT void tfhe_BlindRotate(TLweSample* accum, 
     //	    const TGswSample* bk, 
     //	    const int* bara,
     //	    const int n,
     //	    const TGswParams* bk_params) {
-    TEST_F(LweBootstrapRotateTest,tfheBootstrapRotateTest) {
+    TEST_F(TfheBlindRotateTest,tfheBlindRotateTest) {
 	LweKey* key = new_LweKey(in_params);
 	lweKeyGen(key);
 	TGswKey* key_bk = new_TGswKey(bk_params);
@@ -87,7 +86,7 @@ namespace {
 	faccum->current_variance = initAlphaAccum*initAlphaAccum;
 	//call bootstraprotate: one iteration at a time
 	for (int i=0; i<n; i++) {
-	    tfhe_bootstrapRotate(accum,bk+i,bara+i,1,bk_params);
+	    tfhe_blindRotate(accum,bk+i,bara+i,1,bk_params);
 	    if (key->key[i]==1 && bara[i]!=0) {
 		expectedOffset=(expectedOffset+bara[i])%(2*N);
 		torusPolynomialMulByXai(expectedAccumMessage,expectedOffset,initAccumMessage);
@@ -98,7 +97,7 @@ namespace {
 	//Now, bootstraprotate: all iterations at once (same offset)
 	torusPolynomialCopy(faccum->message, initAccumMessage);
 	faccum->current_variance=initAlphaAccum*initAlphaAccum;
-	tfhe_bootstrapRotate(accum,bk,bara,n,bk_params);
+	tfhe_blindRotate(accum,bk,bara,n,bk_params);
 	for (int j=0; j<N; j++) ASSERT_EQ(expectedAccumMessage->coefsT[j],accum->b->coefsT[j]);
 	//cleanup everything
 	fake_delete_TLweSample(accum);
@@ -110,14 +109,13 @@ namespace {
 	delete_LweKey(key);
     }
 
-    class LweBootstrapRotateExtractTest: public ::testing::Test {
+    class TfheBlindRotateAndExtractTest: public ::testing::Test {
 	public:
 
-	    USE_FAKE_tfhe_bootstrapRotate;
+	    USE_FAKE_tfhe_blindRotate;
 
-#define INCLUDE_TFHE_BOOTSTRAPROTATEEXTRACT
+#define INCLUDE_TFHE_BLIND_ROTATE_AND_EXTRACT
 #include "../libtfhe/lwe-bootstrapping-functions.cpp"
-#undef INCLUDE_TFHE_BOOTSTRAPROTATEEXTRACT
 
     };
 
@@ -130,7 +128,7 @@ namespace {
      * @param bara An array of n coefficients between 0 and 2N-1
      * @param bk_params The parameters of bk
      */
-    TEST_F(LweBootstrapRotateExtractTest,tfheBootstrapRotateExtractTest) {
+    TEST_F(TfheBlindRotateAndExtractTest,tfheBlindRotateAndExtractTest) {
 	const int NB_TRIALS=30;
 
 	LweKey* key = new_LweKey(in_params);
@@ -154,7 +152,7 @@ namespace {
 	    //const double initAlphaAccum=0.2;
 
 	    //run the function
-	    tfhe_bootstrapRotateExtract(result,v,bk,barb,bara,n,bk_params);
+	    tfhe_blindRotateAndExtract(result,v,bk,barb,bara,n,bk_params);
 
 	    //verify
 	    int offset = barb;
@@ -172,14 +170,13 @@ namespace {
     }
 
 
-    class LweBootstrapTest: public ::testing::Test {
+    class TfheBootstrapTest: public ::testing::Test {
 	public:
 
-	    USE_FAKE_tfhe_bootstrapRotateExtract;
+	    USE_FAKE_tfhe_blindRotateAndExtract;
 
 #define INCLUDE_TFHE_BOOTSTRAP
 #include "../libtfhe/lwe-bootstrapping-functions.cpp"
-#undef INCLUDE_TFHE_BOOTSTRAP
 
     };
     /**
@@ -192,7 +189,7 @@ namespace {
     //EXPORT void tfhe_bootstrap(LweSample* result, 
     //	const LweBootstrappingKey* bk, 
     //	Torus32 mu, const LweSample* x)
-    TEST_F(LweBootstrapTest,tfheBootstrapTest) {
+    TEST_F(TfheBootstrapTest,tfheBootstrapTest) {
 	const Torus32 TEST_MU=123456789;
 	const int NB_TRIALS=30;
 	const int Nx2= 2*N;
@@ -239,7 +236,7 @@ namespace {
 
     }
 
-    class LweCreateBootstrapKeyTest: public ::testing::Test {
+    class TfheCreateBootstrapKeyTest: public ::testing::Test {
 	public:
 
 
@@ -266,7 +263,7 @@ namespace {
     //	LweBootstrappingKey* bk, 
     //	const LweKey* key_in, 
     //	const TGswKey* rgsw_key) 
-    TEST_F(LweCreateBootstrapKeyTest,createBootstrappingKeyTest) {
+    TEST_F(TfheCreateBootstrapKeyTest,createBootstrappingKeyTest) {
 	LweKey* key = new_LweKey(in_params);
 	lweKeyGen(key);
 	TGswKey* key_bk = new_TGswKey(bk_params);

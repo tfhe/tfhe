@@ -10,7 +10,8 @@ using namespace std;
 #endif
 
 
-#if defined INCLUDE_ALL || defined INCLUDE_TFHE_BOOTSTRAPROTATE
+#if defined INCLUDE_ALL || defined INCLUDE_TFHE_BLIND_ROTATE
+#undef INCLUDE_TFHE_BLIND_ROTATE
 /**
  * multiply the accumulator by X^sum(bara_i.s_i)
  * @param accum the TLWE sample to multiply
@@ -18,7 +19,7 @@ using namespace std;
  * @param bara An array of n coefficients between 0 and 2N-1
  * @param bk_params The parameters of bk
  */
-EXPORT void tfhe_bootstrapRotate(TLweSample* accum, 
+EXPORT void tfhe_blindRotate(TLweSample* accum, 
 	const TGswSample* bk, 
 	const int* bara,
 	const int n,
@@ -35,7 +36,8 @@ EXPORT void tfhe_bootstrapRotate(TLweSample* accum,
 }
 #endif 
 
-#if defined INCLUDE_ALL || defined INCLUDE_TFHE_BOOTSTRAPROTATEEXTRACT
+#if defined INCLUDE_ALL || defined INCLUDE_TFHE_BLIND_ROTATE_AND_EXTRACT
+#undef INCLUDE_TFHE_BLIND_ROTATE_AND_EXTRACT
 /**
  * result = LWE(v_p) where p=barb-sum(bara_i.s_i) mod 2N
  * @param result the output LWE sample
@@ -45,7 +47,7 @@ EXPORT void tfhe_bootstrapRotate(TLweSample* accum,
  * @param bara An array of n coefficients between 0 and 2N-1
  * @param bk_params The parameters of bk
  */
-EXPORT void tfhe_bootstrapRotateExtract(LweSample* result, 
+EXPORT void tfhe_blindRotateAndExtract(LweSample* result, 
 	const TorusPolynomial* v,
 	const TGswSample* bk, 
 	const int barb,
@@ -63,7 +65,7 @@ EXPORT void tfhe_bootstrapRotateExtract(LweSample* result,
     if (barb!=0)
 	torusPolynomialMulByXai(testvectbis, _2N-barb, v);
     tLweNoiselessTrivial(acc, testvectbis, accum_params);
-    tfhe_bootstrapRotate(acc, bk, bara, n, bk_params);
+    tfhe_blindRotate(acc, bk, bara, n, bk_params);
     tLweExtractLweSample(result, acc, extract_params, accum_params);
 
     delete_TLweSample(acc);
@@ -73,6 +75,7 @@ EXPORT void tfhe_bootstrapRotateExtract(LweSample* result,
    
 
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_BOOTSTRAP
+#undef INCLUDE_TFHE_BOOTSTRAP
 /**
  * result = LWE(mu) iff phase(x)>0, LWE(-mu) iff phase(x)<0
  * @param result The resulting LweSample
@@ -103,7 +106,7 @@ EXPORT void tfhe_bootstrap(LweSample* result,
     //the initial testvec = [mu,mu,mu,...,mu]
     for (int i=0;i<N;i++) testvect->coefsT[i]=mu;
 
-    tfhe_bootstrapRotateExtract(u, testvect, bk->bk, barb, bara, n, bk_params);
+    tfhe_blindRotateAndExtract(u, testvect, bk->bk, barb, bara, n, bk_params);
 
     lweKeySwitch(result, bk->ks, u);
 
@@ -114,6 +117,7 @@ EXPORT void tfhe_bootstrap(LweSample* result,
 #endif
 
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_CREATEBOOTSTRAPPINGKEY
+#undef INCLUDE_TFHE_CREATEBOOTSTRAPPINGKEY
 EXPORT void tfhe_createLweBootstrappingKey(
 	LweBootstrappingKey* bk, 
 	const LweKey* key_in, 
@@ -147,3 +151,6 @@ EXPORT void tfhe_createLweBootstrappingKey(
     }
 }
 #endif
+
+
+#undef INCLUDE_ALL

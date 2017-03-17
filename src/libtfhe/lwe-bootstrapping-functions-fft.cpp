@@ -15,7 +15,7 @@ using namespace std;
 #endif
 
 
-#if defined INCLUDE_ALL || defined INCLUDE_TFHE_BOOTSTRAPROTATE_FFT
+#if defined INCLUDE_ALL || defined INCLUDE_TFHE_BLIND_ROTATE_FFT
 /**
  * multiply the accumulator by X^sum(bara_i.s_i)
  * @param accum the TLWE sample to multiply
@@ -23,7 +23,7 @@ using namespace std;
  * @param bara An array of n coefficients between 0 and 2N-1
  * @param bk_params The parameters of bk
  */
-EXPORT void tfhe_bootstrapRotate_FFT(TLweSample* accum, 
+EXPORT void tfhe_blindRotate_FFT(TLweSample* accum, 
     const TGswSampleFFT* bk, 
     const int* bara, 
     const int n, 
@@ -50,7 +50,7 @@ EXPORT void tfhe_bootstrapRotate_FFT(TLweSample* accum,
 
 
 
-#if defined INCLUDE_ALL || defined INCLUDE_TFHE_BOOTSTRAPROTATEEXTRACT_FFT
+#if defined INCLUDE_ALL || defined INCLUDE_TFHE_BLIND_ROTATE_AND_EXTRACT_FFT
 /**
  * result = LWE(v_p) where p=barb-sum(bara_i.s_i) mod 2N
  * @param result the output LWE sample
@@ -60,7 +60,7 @@ EXPORT void tfhe_bootstrapRotate_FFT(TLweSample* accum,
  * @param bara An array of n coefficients between 0 and 2N-1
  * @param bk_params The parameters of bk
  */
-EXPORT void tfhe_bootstrapRotateExtract_FFT(LweSample* result, 
+EXPORT void tfhe_blindRotateAndExtract_FFT(LweSample* result, 
     const TorusPolynomial* v, 
     const TGswSampleFFT* bk, 
     const int barb,
@@ -82,7 +82,7 @@ EXPORT void tfhe_bootstrapRotateExtract_FFT(LweSample* result,
     if (barb!=0) torusPolynomialMulByXai(testvectbis, _2N-barb, v);
     tLweNoiselessTrivial(acc, testvectbis, accum_params);
     // Blind rotation
-    tfhe_bootstrapRotate_FFT(acc, bk, bara, n, bk_params);
+    tfhe_blindRotate_FFT(acc, bk, bara, n, bk_params);
     // Extraction
     tLweExtractLweSample(result, acc, extract_params, accum_params);
 
@@ -135,7 +135,7 @@ EXPORT void tfhe_bootstrap_FFT(LweSample* result,
     for (int i=0;i<N;i++) testvect->coefsT[i]=mu;
 
     // Bootstrapping rotation and extraction
-    tfhe_bootstrapRotateExtract_FFT(u, testvect, bk->bk, barb, bara, n, bk_params);
+    tfhe_blindRotateAndExtract_FFT(u, testvect, bk->bkFFT, barb, bara, n, bk_params);
     // Key switching
     lweKeySwitch(result, bk->ks, u);
 
@@ -153,48 +153,4 @@ EXPORT void tfhe_bootstrap_FFT(LweSample* result,
 
 
 
-#if defined INCLUDE_ALL || defined INCLUDE_TFHE_BOOTSTRAPPINGKEY_TO_FFT_CONVERT
-/**
- * The result is a LweBootstrappingKeyFFT
- * @param bk The bootstrapping (+ keyswitch key)
- */
-EXPORT LweBootstrappingKeyFFT* tfhe_BootstrappingKey_to_FFT_convert(const LweBootstrappingKey* bk) {
-
-    const LweParams* in_out_params = bk->in_out_params; 
-    const TGswParams* bk_params = bk->bk_params;
-    
-    const int n = bk->ks->n;
-    const int t = bk->ks->t;
-    const int base = bk->ks->base;
-
-    const int kpl = bk_params->kpl;
-    const int k = bk_params->tlwe_params->k;
-    
-
-    // New LweBK FFT
-    LweBootstrappingKeyFFT* bkFFT = new_LweBootstrappingKeyFFT(in_out_params, bk_params);
-
-    // Copy the KeySwitching key
-    for(int i=0; i<n; i++) {
-        for(int j=0; j<t; j++){
-            for(int p=0; p<base; p++){
-                for (int q=0; q<k; ++q){
-                    bkFFT->ks->ks[i][j][p].a[q] = bk->ks->ks[i][j][p].a[q];
-                }
-                bkFFT->ks->ks[i][j][p].b = bk->ks->ks[i][j][p].b;
-            }
-        }
-    }
-
-    // Bootstrapping Key FFT
-    for (int i=0; i<n; ++i) {
-        for (int j=0; j<kpl; ++j) {
-            tLweToFFTConvert(bkFFT->bk[i].all_samples+j, bk->bk[i].all_sample+j, bk_params->tlwe_params);
-        }
-    }
-
-
-    return bkFFT;
-}
-#endif
 
