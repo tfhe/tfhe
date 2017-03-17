@@ -34,7 +34,7 @@ namespace {
 */
 
 
-    class LweBootstrapRotateTest: public ::testing::Test {
+    class TfheBlindRotateTest: public ::testing::Test {
 	public:
 
 	    USE_FAKE_new_TGswSample;
@@ -45,7 +45,6 @@ namespace {
 
 #define INCLUDE_TFHE_BLIND_ROTATE
 #include "../libtfhe/lwe-bootstrapping-functions.cpp"
-#undef INCLUDE_TFHE_BLIND_ROTATE
 
     };
 
@@ -62,7 +61,7 @@ namespace {
     //	    const int* bara,
     //	    const int n,
     //	    const TGswParams* bk_params) {
-    TEST_F(LweBootstrapRotateTest,tfheBootstrapRotateTest) {
+    TEST_F(TfheBlindRotateTest,tfheBlindRotateTest) {
 	LweKey* key = new_LweKey(in_params);
 	lweKeyGen(key);
 	TGswKey* key_bk = new_TGswKey(bk_params);
@@ -110,14 +109,13 @@ namespace {
 	delete_LweKey(key);
     }
 
-    class LweBootstrapRotateExtractTest: public ::testing::Test {
+    class TfheBlindRotateAndExtractTest: public ::testing::Test {
 	public:
 
-	    USE_FAKE_tfhe_BlindRotate;
+	    USE_FAKE_tfhe_blindRotate;
 
 #define INCLUDE_TFHE_BLIND_ROTATE_AND_EXTRACT
 #include "../libtfhe/lwe-bootstrapping-functions.cpp"
-#undef INCLUDE_TFHE_BLIND_ROTATE_AND_EXTRACT
 
     };
 
@@ -130,7 +128,7 @@ namespace {
      * @param bara An array of n coefficients between 0 and 2N-1
      * @param bk_params The parameters of bk
      */
-    TEST_F(LweBootstrapRotateExtractTest,tfheBootstrapRotateExtractTest) {
+    TEST_F(TfheBlindRotateAndExtractTest,tfheBlindRotateAndExtractTest) {
 	const int NB_TRIALS=30;
 
 	LweKey* key = new_LweKey(in_params);
@@ -172,14 +170,13 @@ namespace {
     }
 
 
-    class LweBootstrapTest: public ::testing::Test {
+    class TfheBootstrapTest: public ::testing::Test {
 	public:
 
-	    USE_FAKE_tfhe_BlindRotateAndExtract;
+	    USE_FAKE_tfhe_blindRotateAndExtract;
 
 #define INCLUDE_TFHE_BOOTSTRAP
 #include "../libtfhe/lwe-bootstrapping-functions.cpp"
-#undef INCLUDE_TFHE_BOOTSTRAP
 
     };
     /**
@@ -192,7 +189,7 @@ namespace {
     //EXPORT void tfhe_bootstrap(LweSample* result, 
     //	const LweBootstrappingKey* bk, 
     //	Torus32 mu, const LweSample* x)
-    TEST_F(LweBootstrapTest,tfheBootstrapTest) {
+    TEST_F(TfheBootstrapTest,tfheBootstrapTest) {
 	const Torus32 TEST_MU=123456789;
 	const int NB_TRIALS=30;
 	const int Nx2= 2*N;
@@ -239,7 +236,7 @@ namespace {
 
     }
 
-    class LweCreateBootstrapKeyTest: public ::testing::Test {
+    class TfheCreateBootstrapKeyTest: public ::testing::Test {
 	public:
 
 
@@ -266,7 +263,7 @@ namespace {
     //	LweBootstrappingKey* bk, 
     //	const LweKey* key_in, 
     //	const TGswKey* rgsw_key) 
-    TEST_F(LweCreateBootstrapKeyTest,createBootstrappingKeyTest) {
+    TEST_F(TfheCreateBootstrapKeyTest,createBootstrappingKeyTest) {
 	LweKey* key = new_LweKey(in_params);
 	lweKeyGen(key);
 	TGswKey* key_bk = new_TGswKey(bk_params);

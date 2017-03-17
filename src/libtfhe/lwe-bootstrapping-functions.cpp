@@ -11,6 +11,7 @@ using namespace std;
 
 
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_BLIND_ROTATE
+#undef INCLUDE_TFHE_BLIND_ROTATE
 /**
  * multiply the accumulator by X^sum(bara_i.s_i)
  * @param accum the TLWE sample to multiply
@@ -36,6 +37,7 @@ EXPORT void tfhe_blindRotate(TLweSample* accum,
 #endif 
 
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_BLIND_ROTATE_AND_EXTRACT
+#undef INCLUDE_TFHE_BLIND_ROTATE_AND_EXTRACT
 /**
  * result = LWE(v_p) where p=barb-sum(bara_i.s_i) mod 2N
  * @param result the output LWE sample
@@ -73,6 +75,7 @@ EXPORT void tfhe_blindRotateAndExtract(LweSample* result,
    
 
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_BOOTSTRAP
+#undef INCLUDE_TFHE_BOOTSTRAP
 /**
  * result = LWE(mu) iff phase(x)>0, LWE(-mu) iff phase(x)<0
  * @param result The resulting LweSample
@@ -114,6 +117,7 @@ EXPORT void tfhe_bootstrap(LweSample* result,
 #endif
 
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_CREATEBOOTSTRAPPINGKEY
+#undef INCLUDE_TFHE_CREATEBOOTSTRAPPINGKEY
 EXPORT void tfhe_createLweBootstrappingKey(
 	LweBootstrappingKey* bk, 
 	const LweKey* key_in, 
@@ -147,3 +151,6 @@ EXPORT void tfhe_createLweBootstrappingKey(
     }
 }
 #endif
+
+
+#undef INCLUDE_ALL
