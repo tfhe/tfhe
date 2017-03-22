@@ -146,7 +146,7 @@ EXPORT TLweParams* new_tLweParams_fromFile(FILE* F)  { return read_new_tLweParam
 
 
 
-
+#if 0
 /* ****************************
  * TGSW params
 **************************** */
@@ -171,7 +171,6 @@ void export_tGswParams(const Ostream& F, const TGswParams* tgswparams) {
     delete_TextModeProperties(props);
 }
 
-
 /**
  * This constructor function reads and creates a TGswParams from a generic stream. The result
  * must be deleted with delete_TGswParams();
@@ -187,7 +186,6 @@ TGswParams* read_new_tGswParams(const Istream& F) {
     delete_TextModeProperties(props);
     return new_TGswParams(l,Bgbit,tlweparams);
 }
-
 
 /**
  * This function prints the tLwe parameters to a file
@@ -211,3 +209,4 @@ EXPORT TGswParams* new_tGswParams_fromStream(std::istream& in) { return read_new
  * must be deleted with delete_TGswParams();
  */
 EXPORT TGswParams* new_tGswParams_fromFile(FILE* F)  { return read_new_tGswParams(to_Istream(F)); }
+#endif

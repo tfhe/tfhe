@@ -14,6 +14,9 @@ class Istream {
 	 * '\n' stops the reading, and is consumed but not included in the result
 	 */
 	virtual void getLine(std::string& reps) const=0;
+
+    virtual void fread(const void* data, size_t bytes) const=0;
+
 	/**
 	 * tests for the end of the inputstream
 	 */
@@ -34,6 +37,7 @@ class Ostream {
 	 * prints a string in the outputstream. No endline character is added.
 	 */
 	virtual void fputs(const std::string& s) const=0;
+    virtual void fwrite(void* data, size_t bytes) const =0;
 	virtual ~Ostream() {};
 };
 
@@ -101,6 +105,7 @@ class StdIstream : public Istream {
     public:
     StdIstream(std::istream& in): in(in) {}
     virtual void getLine(std::string& reps) const;
+    virtual void fread(const void* data, size_t bytes) const;
     virtual bool feof() const;
     virtual ~StdIstream() {};
 };
@@ -113,6 +118,7 @@ class CIstream : public Istream {
     public:
     CIstream(FILE* F): F(F) {}
     virtual void getLine(std::string& reps) const;
+    virtual void fread(const void* data, size_t bytes) const;
     virtual bool feof() const;
     virtual ~CIstream() {};
 };
@@ -126,6 +132,7 @@ class StdOstream : public Ostream{
     public:
     StdOstream(std::ostream& out): out(out) {}
     virtual void fputs(const std::string& s) const;
+    virtual void fwrite(void* data, size_t bytes) const;
     virtual ~StdOstream() {};
 };
 
@@ -137,6 +144,7 @@ class COstream : public Ostream {
     public:
     COstream(FILE* F): F(F) {}
     virtual void fputs(const std::string& s) const;
+    virtual void fwrite(void* data, size_t bytes) const;
     virtual ~COstream() {};
 };
 
