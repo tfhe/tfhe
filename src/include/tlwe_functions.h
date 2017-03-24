@@ -48,6 +48,7 @@ EXPORT void tLweAddRTTo(TLweSample* result, const int pos, const IntPolynomial* 
 
 EXPORT void tLweMulByXaiMinusOne(TLweSample* result, int ai, const TLweSample* bk, const TLweParams* params);
 
+EXPORT void tLweExtractLweSampleIndex(LweSample* result, const TLweSample* x, const int index, const LweParams* params,  const TLweParams* rparams);
 EXPORT void tLweExtractLweSample(LweSample* result, const TLweSample* x, const LweParams* params,  const TLweParams* rparams);
 
 

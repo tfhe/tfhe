@@ -10,6 +10,26 @@ using namespace std;
 #endif
 
 
+/*
+// ILA : créér à chaque fois un nouveau sample TLWE ce n'est pas un bon choix
+void tfhe_cMux(TLweSample* accum, const TGswSample* bki, const int barai, const TGswParams* bk_params) {
+    TLweSample* temp = new_TLweSample(bk_params->tlwe_params);
+
+    // ACC = BKi*[(X^barai-1)*ACC]+ACC
+    // temp = (X^barai-1)*ACC
+    tLweMulByXaiMinusOne(temp, barai, accum, bk_params->tlwe_params);
+    // temp *= BKi
+    tGswExternMulToTLwe(temp, bki, bk_params);
+    // ACC += temp
+    tLweAddTo(accum, temp, bk_params->tlwe_params);
+
+    delete_TLweSample(temp);
+}
+*/
+
+
+
+
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_BLIND_ROTATE
 #undef INCLUDE_TFHE_BLIND_ROTATE
 /**
@@ -24,15 +44,31 @@ EXPORT void tfhe_blindRotate(TLweSample* accum,
 	const int* bara,
 	const int n,
 	const TGswParams* bk_params) {
-    TGswSample* temp = new_TGswSample(bk_params);
+    //TGswSample* temp = new_TGswSample(bk_params);
+    TLweSample* temp = new_TLweSample(bk_params->tlwe_params);
+
     for (int i=0; i<n; i++) {
 	const int barai=bara[i];
 	if (barai==0) continue; //indeed, this is an easy case!
+
+    // ACC = BKi*[(X^barai-1)*ACC]+ACC
+    // temp = (X^barai-1)*ACC
+    tLweMulByXaiMinusOne(temp, barai, accum, bk_params->tlwe_params);
+    // temp *= BKi
+    tGswExternMulToTLwe(temp, bk+i, bk_params);
+    // ACC += temp
+    tLweAddTo(accum, temp, bk_params->tlwe_params);
+
+    //tfhe_cMux(accum, bk+i, barai, bk_params);
+    /*
 	tGswMulByXaiMinusOne(temp, barai, bk+i, bk_params);
 	tGswAddH(temp, bk_params);
 	tGswExternMulToTLwe(accum, temp, bk_params);
+    */
     }
-    delete_TGswSample(temp);
+    delete_TLweSample(temp);
+    
+    //delete_TGswSample(temp);
 }
 #endif 
 

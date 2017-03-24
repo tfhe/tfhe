@@ -74,7 +74,7 @@ EXPORT void tGswFFTClear(TGswSampleFFT* result, const TGswParams* params) {
 }    
 
 // External product (*): accum = gsw (*) accum 
-EXPORT void tGswFFTExternMulToTLwe(TLweSample* accum, TGswSampleFFT* gsw, const TGswParams* params) {
+EXPORT void tGswFFTExternMulToTLwe(TLweSample* accum, const TGswSampleFFT* gsw, const TGswParams* params) {
     const TLweParams* tlwe_params=params->tlwe_params;
     const int k = tlwe_params->k;
     const int l = params->l;

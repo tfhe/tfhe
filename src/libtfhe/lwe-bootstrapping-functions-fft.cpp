@@ -15,6 +15,24 @@ using namespace std;
 #endif
 
 
+/*
+// ILA : créér à chaque fois un nouveau sample TLWE ce n'est pas un bon choix
+void tfhe_cMux_FFT(TLweSample* accum, const TGswSampleFFT* bki, const int barai, const TGswParams* bk_params) {
+    TLweSample* temp = new_TLweSample(bk_params->tlwe_params);
+
+    // ACC = BKi*[(X^barai-1)*ACC]+ACC
+    // temp = (X^barai-1)*ACC
+    tLweMulByXaiMinusOne(temp, barai, accum, bk_params->tlwe_params);
+    // temp *= BKi
+    tGswFFTExternMulToTLwe(temp, bki, bk_params);
+    // ACC += temp
+    tLweAddTo(accum, temp, bk_params->tlwe_params);
+
+    delete_TLweSample(temp);
+}
+*/
+
+
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_BLIND_ROTATE_FFT
 /**
  * multiply the accumulator by X^sum(bara_i.s_i)
@@ -29,18 +47,30 @@ EXPORT void tfhe_blindRotate_FFT(TLweSample* accum,
     const int n, 
     const TGswParams* bk_params) {
 
-    TGswSampleFFT* temp = new_TGswSampleFFT(bk_params);
-    
+    //TGswSampleFFT* temp = new_TGswSampleFFT(bk_params);
+    TLweSample* temp = new_TLweSample(bk_params->tlwe_params);
+
     for (int i=0; i<n; i++) {
         const int barai=bara[i];
         if (barai==0) continue; //indeed, this is an easy case!
-        // ILA: for now we do acc = acc * ( H + (X^{bara[i]}-1)*bk[i] )
-        // but we should change it with the new formula
+        
+        // ACC = BKi*[(X^barai-1)*ACC]+ACC
+        // temp = (X^barai-1)*ACC
+        tLweMulByXaiMinusOne(temp, barai, accum, bk_params->tlwe_params);
+        // temp *= BKi
+        tGswFFTExternMulToTLwe(temp, bk+i, bk_params);
+        // ACC += temp
+        tLweAddTo(accum, temp, bk_params->tlwe_params);
+
+        // tfhe_cMux_FFT(accum, bk+i, barai, bk_params);
+        /*
         tGswFFTMulByXaiMinusOne(temp, barai, bk+i, bk_params);
         tGswFFTAddH(temp, bk_params);
         tGswFFTExternMulToTLwe(accum, temp, bk_params);
+        */
     }
-    delete_TGswSampleFFT(temp);
+    delete_TLweSample(temp);
+    //delete_TGswSampleFFT(temp);
 }
 #endif 
 
