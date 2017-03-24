@@ -216,7 +216,7 @@ void read_tLweSample(const Istream& F, TLweSample* sample, const TLweParams* par
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != TLWE_SAMPLE_TYPE_UID) abort();
     for (int i = 0; i <= k; ++i) {
-        F.fread(&sample->a[i], sizeof(Torus32)*N);
+        F.fread(sample->a[i].coefsT, sizeof(Torus32)*N);
     }
     F.fread(&sample->current_variance, sizeof(double));
 }
@@ -226,7 +226,7 @@ void write_tLweSample(const Ostream& F, const TLweSample* sample, const TLwePara
     const int k = params->k;
     F.fwrite(&TLWE_SAMPLE_TYPE_UID, sizeof(int32_t));
     for (int i = 0; i <= k; ++i) {
-        F.fwrite(&sample->a[i], sizeof(Torus32)*N);
+        F.fwrite(sample->a[i].coefsT, sizeof(Torus32)*N);
     }
     F.fwrite(&sample->current_variance, sizeof(double));
 }
@@ -239,7 +239,7 @@ void write_tLweSample(const Ostream& F, const TLweSample* sample, const TLwePara
 /* ****************************
  * TLWE FFT samples
 **************************** */
-
+/*
 void read_tLweSampleFFT(const Istream& F, TLweSampleFFT* sample, const TLweParams* params) {
     const int k = params->k;
     int32_t type_uid;
@@ -260,7 +260,7 @@ void write_tLweSampleFFT(const Ostream& F, const TLweSampleFFT* sample, const TL
     }
     F.fwrite(&sample->current_variance, sizeof(double));
 }
-
+*/
 
 
 
@@ -277,7 +277,7 @@ void read_tLweKey(const Istream& F, TLweKey* key) {
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != TLWE_KEY_TYPE_UID) abort();
     for (int i = 0; i < k; ++i) {
-        F.fread(&key->key[i], sizeof(int)*N);
+        F.fread(key->key[i].coefs, sizeof(int)*N);
     }
     
 }
@@ -287,7 +287,7 @@ void write_tLweKey(const Ostream& F, const TLweKey* key) {
     const int k = key->params->k;
     F.fwrite(&TLWE_KEY_TYPE_UID, sizeof(int32_t));
     for (int i = 0; i < k; ++i) {
-        F.fwrite(&key->key[i], sizeof(int)*N);
+        F.fwrite(key->key[i].coefs, sizeof(int)*N);
     }
 }
 
@@ -340,6 +340,7 @@ TGswParams* read_new_tGswParams(const Istream& F) {
     if (props->getTypeTitle() != string("TGSWPARAMS")) abort();
     int l = props->getProperty_long("l");
     int Bgbit = props->getProperty_long("Bgbit");
+    // ATTENTION ici!!!
     TLweParams* tlweparams = read_new_tLweParams(F);
     delete_TextModeProperties(props);
     return new_TGswParams(l,Bgbit,tlweparams);
@@ -407,7 +408,7 @@ void write_tGswSample(const Ostream& F, const TGswSample* sample, const TGswPara
 /* ****************************
  * TGSW FFT samples
 **************************** */
-
+/*
 void read_tGswSampleFFT(const Istream& F, TGswSampleFFT* sample, const TGswParams* params) {
     const int kpl = params->kpl;
     int32_t type_uid;
@@ -428,7 +429,7 @@ void write_tGswSampleFFT(const Ostream& F, const TGswSampleFFT* sample, const TG
         write_tLweSampleFFT(F, &sample->all_samples[i], params->tlwe_params);
     }
 }
-
+*/
 
 
 
@@ -446,7 +447,7 @@ void read_tGswKey(const Istream& F, TGswKey* key) {
     if (type_uid != TGSW_KEY_TYPE_UID) abort();
 
     for (int i = 0; i < k; ++i) {
-        F.fread(&key->key[i], sizeof(int)*N);
+        F.fread(key->key[i].coefs, sizeof(int)*N);
     }
 }
 
@@ -457,7 +458,7 @@ void write_tGswKey(const Ostream& F, const TGswKey* key) {
     F.fwrite(&TGSW_KEY_TYPE_UID, sizeof(int32_t));
     
     for (int i = 0; i < k; ++i) {
-        F.fwrite(&key->key[i], sizeof(int)*N);
+        F.fwrite(key->key[i].coefs, sizeof(int)*N);
     }
 }
 
