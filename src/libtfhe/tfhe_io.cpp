@@ -2,6 +2,7 @@
 #include <map>
 #include <string>
 #include <tfhe_generic_streams.h>
+#include <tfhe_garbage_collector.h>
 
 using namespace std;
 
@@ -320,30 +321,48 @@ void write_tLweKey(const Ostream& F, const TLweKey* key) {
 
 /**
  * This function prints the tGsw parameters to a generic stream
+ * It only prints the TGSW section, not the Tlwe parameters
  */
-void export_tGswParams(const Ostream& F, const TGswParams* tgswparams) {
+void export_tGswParams_section(const Ostream& F, const TGswParams* tgswparams) {
     TextModeProperties* props = new_TextModeProperties_blank();
     props->setTypeTitle("TGSWPARAMS");
     props->setProperty_long("l", tgswparams->l);
     props->setProperty_long("Bgbit", tgswparams->Bgbit);
     print_TextModeProperties_toOStream(F, props);
     delete_TextModeProperties(props);
-    export_tLweParams(F, tgswparams->tlwe_params);
 }
 
 /**
- * This constructor function reads and creates a TGswParams from a generic stream. The result
- * must be deleted with delete_TGswParams();
+ * This function prints the tGsw parameters to a generic stream
  */
-TGswParams* read_new_tGswParams(const Istream& F) {
+void export_tGswParams(const Ostream& F, const TGswParams* tgswparams) {
+    export_tLweParams(F, tgswparams->tlwe_params);
+    export_tGswParams_section(F, tgswparams);
+}
+
+/**
+ * This constructor function reads and creates a TGswParams from a generic stream, and an TlweParams object. 
+ * The result must be deleted with delete_TGswParams();
+ */
+TGswParams* read_new_tGswParams_section(const Istream& F, const TLweParams* tlwe_params) {
     TextModeProperties* props = new_TextModeProperties_fromIstream(F);
     if (props->getTypeTitle() != string("TGSWPARAMS")) abort();
     int l = props->getProperty_long("l");
     int Bgbit = props->getProperty_long("Bgbit");
     // ATTENTION ici!!!
-    TLweParams* tlweparams = read_new_tLweParams(F);
     delete_TextModeProperties(props);
-    return new_TGswParams(l,Bgbit,tlweparams);
+    return new_TGswParams(l,Bgbit,tlwe_params);
+}
+
+/**
+ * This wrapper constructor function reads and creates a TGswParams from a generic stream. 
+ * The result must be deleted with delete_TGswParams(), but the inner
+ * TlweParams will be garbage-collected automatically;
+ */
+TGswParams* read_new_tGswParams(const Istream& F) {
+    TLweParams* tlwe_params = read_new_tLweParams(F);
+    global_tfheGarbageCollector.register_param(tlwe_params);
+    return read_new_tGswParams_section(F, tlwe_params);
 }
 
 
