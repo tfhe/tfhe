@@ -58,16 +58,6 @@ EXPORT void tLweExtractLweSample(LweSample* result, const TLweSample* x, const L
     result->b=x->b->coefsT[0];
 }
 
-//these functions call the bootstrapping, assuming that the message space is {0,1/4} 
-EXPORT void lweNand(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b);
-EXPORT void lweOr(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b);
-EXPORT void lweAnd(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b);
-EXPORT void lweXor(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b);
-// mux(a,b,c) = a?b:c = a et b + not(a) et c 
-EXPORT void lweMux(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b, const LweSample* c);
-EXPORT void lweNot(LweSample* result, LweSample* a);
-
-
 //leveled functions
 
 //Lwe to SemiRing Bootstrapping
