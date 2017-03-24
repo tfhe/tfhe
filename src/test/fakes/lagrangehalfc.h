@@ -136,7 +136,7 @@ namespace {
     }
 
 
-inline void IntPolynomial_ifft(LagrangeHalfCPolynomial* result, const IntPolynomial* p) {
+inline void fake_IntPolynomial_ifft(LagrangeHalfCPolynomial* result, const IntPolynomial* p) {
     FakeLagrangeHalfCPolynomial* fres = fake(result);
     fres->set_intPolynomial(p);
 }

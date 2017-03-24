@@ -53,6 +53,15 @@ namespace {
     //  constructor/destructor
     //-----------------------------------------
 
+
+    inline TLweSampleFFT* fake_new_TLweSampleFFT_array(int nbelts, const TLweParams* params) {
+	int N = params->N;
+	FakeTLweFFT* reps = (FakeTLweFFT*) malloc(sizeof(FakeTLweFFT)*nbelts);
+	for (int i=0; i<nbelts; i++) new(reps+i) FakeTLweFFT(N);
+	return (TLweSampleFFT*) reps;
+    }
+
+
 #define USE_FAKE_new_TLweSampleFFT_array \
     inline TLweSampleFFT* new_TLweSampleFFT_array(int nbelts, const TLweParams* params) { \
 	return fake_new_TLweSampleFFT_array(nbelts,params); \
@@ -67,7 +76,7 @@ namespace {
     // 
 #define USE_FAKE_delete_TLweSampleFFT_array \
     inline void delete_TLweSampleFFT_array(int nbelts, TLweSampleFFT* samples) { \
-	fake_delete_TLweSample_array(nbelts,samples); \
+	fake_delete_TLweSampleFFT_array(nbelts,samples); \
     }
 
 
@@ -128,7 +137,7 @@ namespace {
     }
 
 
-#define  tLweFromFFTConvert \
+#define  USE_FAKE_tLweFromFFTConvert \
     inline void tLweFromFFTConvert(TLweSample* result, const TLweSampleFFT* source, const TLweParams* params) { \
 	fake_tLweFromFFTConvert(result, source, params); \
     }
@@ -157,6 +166,11 @@ namespace {
 	const IntPolynomial* pval = fp->getIntPolynomialPtr();
 	torusPolynomialAddMulRKaratsuba(fres->message, pval, fsample->message);
 	fres->current_variance += fsample->current_variance*intPolynomialNormSq2(pval);
+    }
+
+#define USE_FAKE_tLweFFTAddMulRTo \
+    inline void tLweFFTAddMulRTo(TLweSampleFFT* result, const LagrangeHalfCPolynomial* p, const TLweSampleFFT* sample, const TLweParams* params) { \
+	fake_tLweFFTAddMulRTo(result, p, sample, params); \
     }
 
 

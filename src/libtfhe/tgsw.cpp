@@ -49,18 +49,15 @@ TGswKey::~TGswKey() {
 
 
 
-TGswSampleFFT::TGswSampleFFT(const TGswParams* params): k(params->tlwe_params->k), l(params->l) {
-    all_samples = new_TLweSampleFFT_array((k+1)*l,params->tlwe_params);
+TGswSampleFFT::TGswSampleFFT(const TGswParams* params, TLweSampleFFT* all_samples_raw): k(params->tlwe_params->k), l(params->l) {
+    all_samples = all_samples_raw;
     sample = new TLweSampleFFT*[(k+1)*l];
 
     for (int p = 0; p < (k+1); ++p)
 	sample[p] = all_samples + p*l;
-
-    //current_variance = 0;
 }
 
 TGswSampleFFT::~TGswSampleFFT() {
-    delete_TLweSampleFFT_array((k+1)*l,all_samples);
     delete[] sample;
 }
 

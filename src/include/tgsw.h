@@ -69,7 +69,7 @@ struct TGswSampleFFT {
     const int l;
 
 #ifdef __cplusplus
-    TGswSampleFFT(const TGswParams* params);
+    TGswSampleFFT(const TGswParams* params, TLweSampleFFT* all_samples);
     ~TGswSampleFFT();
     TGswSampleFFT(const TGswSampleFFT&) = delete;
     void operator=(const TGswSampleFFT&) = delete;

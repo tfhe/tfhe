@@ -550,66 +550,6 @@ EXPORT void delete_TGswParams_array(int nbelts, TGswParams* obj) {
     free_TGswParams_array(nbelts,obj);
 }
 #include "tgsw.h" 
-#include "tgsw.h" 
-//allocate memory space for a TGswSampleFFT
-
-EXPORT TGswSampleFFT* alloc_TGswSampleFFT() {
-    return (TGswSampleFFT*) malloc(sizeof(TGswSampleFFT));
-}
-EXPORT TGswSampleFFT* alloc_TGswSampleFFT_array(int nbelts) {
-    return (TGswSampleFFT*) malloc(nbelts*sizeof(TGswSampleFFT));
-}
-
-//free memory space for a LweKey
-EXPORT void free_TGswSampleFFT(TGswSampleFFT* ptr) {
-    free(ptr);
-}
-EXPORT void free_TGswSampleFFT_array(int nbelts, TGswSampleFFT* ptr) {
-    free(ptr);
-}
-
-//initialize the key structure
-//(equivalent of the C++ constructor)
-EXPORT void init_TGswSampleFFT(TGswSampleFFT* obj, const TGswParams* params) {
-    new(obj) TGswSampleFFT(params);
-}
-EXPORT void init_TGswSampleFFT_array(int nbelts, TGswSampleFFT* obj, const TGswParams* params) {
-    for (int i=0; i<nbelts; i++) {
-	new(obj+i) TGswSampleFFT(params);
-    }
-}
-
-//destroys the TGswSampleFFT structure
-//(equivalent of the C++ destructor)
-EXPORT void destroy_TGswSampleFFT(TGswSampleFFT* obj) {
-    obj->~TGswSampleFFT();
-}
-EXPORT void destroy_TGswSampleFFT_array(int nbelts, TGswSampleFFT* obj) {
-    for (int i=0; i<nbelts; i++) {
-	(obj+i)->~TGswSampleFFT();
-    }
-}
- 
-//allocates and initialize the TGswSampleFFT structure
-//(equivalent of the C++ new)
-EXPORT TGswSampleFFT* new_TGswSampleFFT(const TGswParams* params) {
-    return new TGswSampleFFT(params);
-}
-EXPORT TGswSampleFFT* new_TGswSampleFFT_array(int nbelts, const TGswParams* params) {
-    TGswSampleFFT* obj = alloc_TGswSampleFFT_array(nbelts);
-    init_TGswSampleFFT_array(nbelts,obj,params);
-    return obj;
-}
-
-//destroys and frees the TGswSampleFFT structure
-//(equivalent of the C++ delete)
-EXPORT void delete_TGswSampleFFT(TGswSampleFFT* obj) {
-    delete obj;
-}
-EXPORT void delete_TGswSampleFFT_array(int nbelts, TGswSampleFFT* obj) {
-    destroy_TGswSampleFFT_array(nbelts,obj);
-    free_TGswSampleFFT_array(nbelts,obj);
-}
 #include "tlwe.h" 
 //allocate memory space for a TLweKey
 
