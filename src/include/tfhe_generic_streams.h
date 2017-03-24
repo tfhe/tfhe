@@ -3,6 +3,27 @@
 
 #include <string>
 
+/*
+ * Types for the different samples
+ * LWE 42: n Torus32 (a), 1 Torus32 (b), 1 double (current_variance)
+ * TLWE 84: (k+1)N Torus32 (a), 1 double (current_variance)
+ * TGSW 168: (k+1)l TLWE 
+ */
+const int32_t LWE_SAMPLE_TYPE_UID = 42;
+const int32_t TLWE_SAMPLE_TYPE_UID = 84;
+const int32_t TLWE_SAMPLE_FFT_TYPE_UID = 83;
+const int32_t TGSW_SAMPLE_TYPE_UID = 168;
+const int32_t TGSW_SAMPLE_FFT_TYPE_UID = 167;
+/*
+ * Types for the different keys
+ * LWE 42: n Torus32 (a), 1 Torus32 (b), 1 double (current_variance)
+ * TLWE 84: (k+1)N Torus32 (a), 1 double (current_variance)
+ * TGSW 168: (k+1)l TLWE 
+ */
+const int32_t LWE_KEY_TYPE_UID = 43;
+const int32_t TLWE_KEY_TYPE_UID = 85;
+const int32_t TGSW_KEY_TYPE_UID = 169;
+
 /**
  * This is a generic Istream wrapper: supports getLine() and feof()
  */
@@ -14,6 +35,9 @@ class Istream {
 	 * '\n' stops the reading, and is consumed but not included in the result
 	 */
 	virtual void getLine(std::string& reps) const=0;
+
+    virtual void fread(void* data, size_t bytes) const=0;
+
 	/**
 	 * tests for the end of the inputstream
 	 */
@@ -34,6 +58,7 @@ class Ostream {
 	 * prints a string in the outputstream. No endline character is added.
 	 */
 	virtual void fputs(const std::string& s) const=0;
+    virtual void fwrite(const void* data, size_t bytes) const =0;
 	virtual ~Ostream() {};
 };
 
@@ -101,6 +126,7 @@ class StdIstream : public Istream {
     public:
     StdIstream(std::istream& in): in(in) {}
     virtual void getLine(std::string& reps) const;
+    virtual void fread(void* data, size_t bytes) const;
     virtual bool feof() const;
     virtual ~StdIstream() {};
 };
@@ -113,6 +139,7 @@ class CIstream : public Istream {
     public:
     CIstream(FILE* F): F(F) {}
     virtual void getLine(std::string& reps) const;
+    virtual void fread(void* data, size_t bytes) const;
     virtual bool feof() const;
     virtual ~CIstream() {};
 };
@@ -126,6 +153,7 @@ class StdOstream : public Ostream{
     public:
     StdOstream(std::ostream& out): out(out) {}
     virtual void fputs(const std::string& s) const;
+    virtual void fwrite(const void* data, size_t bytes) const;
     virtual ~StdOstream() {};
 };
 
@@ -137,6 +165,7 @@ class COstream : public Ostream {
     public:
     COstream(FILE* F): F(F) {}
     virtual void fputs(const std::string& s) const;
+    virtual void fwrite(const void* data, size_t bytes) const;
     virtual ~COstream() {};
 };
 

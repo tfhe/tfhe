@@ -30,6 +30,7 @@ set(SRCS
     lwe-bootstrapping-functions-fft.cpp
     tfhe_io.cpp
     tfhe_generic_streams.cpp
+    tfhe_garbage_collector.cpp
     )
 
 

@@ -48,6 +48,7 @@ class MapTextModeProperties: public TextModeProperties {
 
 
 void StdIstream::getLine(string& reps) const { std::getline(in, reps); }
+void StdIstream::fread(void* data, size_t bytes) const { in.read((char*) data, bytes); }
 bool StdIstream::feof() const { return ! ((bool) in); }
 
 void CIstream::getLine(string& reps) const { 
@@ -58,14 +59,20 @@ void CIstream::getLine(string& reps) const {
 	reps.push_back(c);
     }
 }
+void CIstream::fread(void* data, size_t bytes) const { 
+    size_t read = std::fread(data, 1, bytes, F);
+    if (read!=bytes) abort(); 
+}
 bool CIstream::feof() const { return std::feof(F); }
 
 
 void StdOstream::fputs(const string& s) const { out << s; }
+void StdOstream::fwrite(const void* data, size_t bytes) const { out.write((char*) data, bytes); }
 
 void COstream::fputs(const string& s) const { 
     std::fputs(s.c_str(), F);
 }
+void COstream::fwrite(const void* data, size_t bytes) const { std::fwrite(data, 1, bytes, F); }
 
 CIstream to_Istream(FILE* F) { return CIstream(F); }
 StdIstream to_Istream(std::istream& in) { return StdIstream(in); }
