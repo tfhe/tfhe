@@ -74,18 +74,20 @@ EXPORT LweParams* new_lweParams_fromFile(FILE* F)  { return read_new_lweParams(t
 **************************** */
 
 void read_lweSample(const Istream& F, LweSample* sample, const LweParams* params) {
+    const int n = params->n;
     int32_t type_uid;
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != LWE_SAMPLE_TYPE_UID) abort();
-    F.fread(sample->a, sizeof(Torus32)*params->n);
+    F.fread(sample->a, sizeof(Torus32)*n);
     F.fread(&sample->b, sizeof(Torus32));
     F.fread(&sample->current_variance, sizeof(double));
 }
 
 
 void write_lweSample(const Ostream& F, const LweSample* sample, const LweParams* params) {
+    const int n = params->n;
     F.fwrite(&LWE_SAMPLE_TYPE_UID, sizeof(int32_t));
-    F.fwrite(sample->a, sizeof(Torus32)*params->n);
+    F.fwrite(sample->a, sizeof(Torus32)*n);
     F.fwrite(&sample->b, sizeof(Torus32));
     F.fwrite(&sample->current_variance, sizeof(double));
 }
@@ -101,16 +103,18 @@ void write_lweSample(const Ostream& F, const LweSample* sample, const LweParams*
 // the key has been previously defined, and the parameters are already given 
 
 void read_lweKey(const Istream& F, LweKey* key) {
+    const int n = key->params->n;
     int32_t type_uid;
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != LWE_KEY_TYPE_UID) abort();
-    F.fread(key->key, sizeof(int)*key->params->n);
+    F.fread(key->key, sizeof(int)*n);
 }
 
 
 void write_lweKey(const Ostream& F, const LweKey* key) {
+    const int n = key->params->n;
     F.fwrite(&LWE_KEY_TYPE_UID, sizeof(int32_t));
-    F.fwrite(key->key, sizeof(int)*key->params->n);
+    F.fwrite(key->key, sizeof(int)*n);
 }
 
 
@@ -206,18 +210,29 @@ EXPORT TLweParams* new_tLweParams_fromFile(FILE* F)  { return read_new_tLweParam
 **************************** */
 
 void read_tLweSample(const Istream& F, TLweSample* sample, const TLweParams* params) {
+    const int N = params->N;
+    const int k = params->k;
     int32_t type_uid;
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != TLWE_SAMPLE_TYPE_UID) abort();
-    F.fread(sample->a, sizeof(Torus32)*params->N*(params->k+1));
+    for (int i = 0; i <= k; ++i) {
+        F.fread(&sample->a[i], sizeof(Torus32)*N);
+    }
     F.fread(&sample->current_variance, sizeof(double));
 }
 
 void write_tLweSample(const Ostream& F, const TLweSample* sample, const TLweParams* params) {
+    const int N = params->N;
+    const int k = params->k;
     F.fwrite(&TLWE_SAMPLE_TYPE_UID, sizeof(int32_t));
-    F.fwrite(sample->a, sizeof(Torus32)*params->N*(params->k+1));
+    for (int i = 0; i <= k; ++i) {
+        F.fwrite(&sample->a[i], sizeof(Torus32)*N);
+    }
     F.fwrite(&sample->current_variance, sizeof(double));
 }
+
+
+
 
 
 
@@ -226,19 +241,26 @@ void write_tLweSample(const Ostream& F, const TLweSample* sample, const TLwePara
 **************************** */
 
 void read_tLweSampleFFT(const Istream& F, TLweSampleFFT* sample, const TLweParams* params) {
+    const int k = params->k;
     int32_t type_uid;
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != TLWE_SAMPLE_FFT_TYPE_UID) abort();
-    F.fread(sample->a, sizeof(LagrangeHalfCPolynomial)*(params->k+1));
+    for (int i = 0; i <= k; ++i) {
+        F.fread(&sample->a[i], sizeof(LagrangeHalfCPolynomial));
+    }
     F.fread(&sample->current_variance, sizeof(double));
 }
 
 
 void write_tLweSampleFFT(const Ostream& F, const TLweSampleFFT* sample, const TLweParams* params) {
+    const int k = params->k;
     F.fwrite(&TLWE_SAMPLE_FFT_TYPE_UID, sizeof(int32_t));
-    F.fwrite(sample->a, sizeof(LagrangeHalfCPolynomial)*(params->k+1));
+    for (int i = 0; i <= k; ++i) {
+        F.fwrite(&sample->a[i], sizeof(LagrangeHalfCPolynomial));
+    }
     F.fwrite(&sample->current_variance, sizeof(double));
 }
+
 
 
 
@@ -249,17 +271,25 @@ void write_tLweSampleFFT(const Ostream& F, const TLweSampleFFT* sample, const TL
 // the key has been previously defined, and the parameters are already given 
 
 void read_tLweKey(const Istream& F, TLweKey* key) {
+    const int N = key->params->N;
+    const int k = key->params->k;
     int32_t type_uid;
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != TLWE_KEY_TYPE_UID) abort();
-    F.fread(key->key, sizeof(int)*key->params->N*key->params->k);
+    for (int i = 0; i < k; ++i) {
+        F.fread(&key->key[i], sizeof(int)*N);
+    }
+    
 }
 
 void write_tLweKey(const Ostream& F, const TLweKey* key) {
+    const int N = key->params->N;
+    const int k = key->params->k;
     F.fwrite(&TLWE_KEY_TYPE_UID, sizeof(int32_t));
-    F.fwrite(key->key, sizeof(int)*key->params->N*key->params->k);
+    for (int i = 0; i < k; ++i) {
+        F.fwrite(&key->key[i], sizeof(int)*N);
+    }
 }
-
 
 
 
@@ -316,7 +346,6 @@ TGswParams* read_new_tGswParams(const Istream& F) {
 }
 
 
-
 /**
  * This function prints the tLwe parameters to a file
  */
@@ -345,13 +374,15 @@ EXPORT TGswParams* new_tGswParams_fromFile(FILE* F)  { return read_new_tGswParam
 
 
 
+
+
 /* ****************************
  * TGSW samples
 **************************** */
 
 void read_tGswSample(const Istream& F, TGswSample* sample, const TGswParams* params) {
+    const int kpl = params->kpl;
     int32_t type_uid;
-    int kpl = params->kpl;
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != TGSW_SAMPLE_TYPE_UID) abort();
 
@@ -361,7 +392,7 @@ void read_tGswSample(const Istream& F, TGswSample* sample, const TGswParams* par
 }
 
 void write_tGswSample(const Ostream& F, const TGswSample* sample, const TGswParams* params) {
-    int kpl = params->kpl;
+    const int kpl = params->kpl;
     F.fwrite(&TGSW_SAMPLE_TYPE_UID, sizeof(int32_t));
 
     for (int i = 0; i < kpl; ++i) {
@@ -378,8 +409,8 @@ void write_tGswSample(const Ostream& F, const TGswSample* sample, const TGswPara
 **************************** */
 
 void read_tGswSampleFFT(const Istream& F, TGswSampleFFT* sample, const TGswParams* params) {
+    const int kpl = params->kpl;
     int32_t type_uid;
-    int kpl = params->kpl;
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != TGSW_SAMPLE_FFT_TYPE_UID) abort();
 
@@ -390,7 +421,7 @@ void read_tGswSampleFFT(const Istream& F, TGswSampleFFT* sample, const TGswParam
 
 
 void write_tGswSampleFFT(const Ostream& F, const TGswSampleFFT* sample, const TGswParams* params) {
-    int kpl = params->kpl;
+    const int kpl = params->kpl;
     F.fwrite(&TGSW_SAMPLE_FFT_TYPE_UID, sizeof(int32_t));
 
     for (int i = 0; i < kpl; ++i) {
@@ -408,15 +439,26 @@ void write_tGswSampleFFT(const Ostream& F, const TGswSampleFFT* sample, const TG
 // the key has been previously defined, and the parameters are already given 
 
 void read_tGswKey(const Istream& F, TGswKey* key) {
+    const int N = key->params->tlwe_params->N;
+    const int k = key->params->tlwe_params->k;
     int32_t type_uid;
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != TGSW_KEY_TYPE_UID) abort();
 
-    F.fread(key->key, sizeof(int)*key->params->tlwe_params->N*key->params->tlwe_params->k);
+    for (int i = 0; i < k; ++i) {
+        F.fread(&key->key[i], sizeof(int)*N);
+    }
 }
 
 
 void write_tGswKey(const Ostream& F, const TGswKey* key) {
+    const int N = key->params->tlwe_params->N;
+    const int k = key->params->tlwe_params->k;
     F.fwrite(&TGSW_KEY_TYPE_UID, sizeof(int32_t));
-    F.fwrite(key->key, sizeof(int)*key->params->tlwe_params->N*key->params->tlwe_params->k);
+    
+    for (int i = 0; i < k; ++i) {
+        F.fwrite(&key->key[i], sizeof(int)*N);
+    }
 }
+
+
