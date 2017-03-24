@@ -59,7 +59,10 @@ void CIstream::getLine(string& reps) const {
 	reps.push_back(c);
     }
 }
-void CIstream::fread(void* data, size_t bytes) const { std::fread(data, 1, bytes, F); }
+void CIstream::fread(void* data, size_t bytes) const { 
+    size_t read = std::fread(data, 1, bytes, F);
+    if (read!=bytes) abort(); 
+}
 bool CIstream::feof() const { return std::feof(F); }
 
 

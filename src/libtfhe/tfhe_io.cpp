@@ -2,6 +2,7 @@
 #include <map>
 #include <string>
 #include <tfhe_generic_streams.h>
+#include <tfhe_garbage_collector.h>
 
 using namespace std;
 
@@ -216,7 +217,7 @@ void read_tLweSample(const Istream& F, TLweSample* sample, const TLweParams* par
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != TLWE_SAMPLE_TYPE_UID) abort();
     for (int i = 0; i <= k; ++i) {
-        F.fread(&sample->a[i], sizeof(Torus32)*N);
+        F.fread(sample->a[i].coefsT, sizeof(Torus32)*N);
     }
     F.fread(&sample->current_variance, sizeof(double));
 }
@@ -226,7 +227,7 @@ void write_tLweSample(const Ostream& F, const TLweSample* sample, const TLwePara
     const int k = params->k;
     F.fwrite(&TLWE_SAMPLE_TYPE_UID, sizeof(int32_t));
     for (int i = 0; i <= k; ++i) {
-        F.fwrite(&sample->a[i], sizeof(Torus32)*N);
+        F.fwrite(sample->a[i].coefsT, sizeof(Torus32)*N);
     }
     F.fwrite(&sample->current_variance, sizeof(double));
 }
@@ -239,7 +240,7 @@ void write_tLweSample(const Ostream& F, const TLweSample* sample, const TLwePara
 /* ****************************
  * TLWE FFT samples
 **************************** */
-
+/*
 void read_tLweSampleFFT(const Istream& F, TLweSampleFFT* sample, const TLweParams* params) {
     const int k = params->k;
     int32_t type_uid;
@@ -260,7 +261,7 @@ void write_tLweSampleFFT(const Ostream& F, const TLweSampleFFT* sample, const TL
     }
     F.fwrite(&sample->current_variance, sizeof(double));
 }
-
+*/
 
 
 
@@ -277,7 +278,7 @@ void read_tLweKey(const Istream& F, TLweKey* key) {
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != TLWE_KEY_TYPE_UID) abort();
     for (int i = 0; i < k; ++i) {
-        F.fread(&key->key[i], sizeof(int)*N);
+        F.fread(key->key[i].coefs, sizeof(int)*N);
     }
     
 }
@@ -287,7 +288,7 @@ void write_tLweKey(const Ostream& F, const TLweKey* key) {
     const int k = key->params->k;
     F.fwrite(&TLWE_KEY_TYPE_UID, sizeof(int32_t));
     for (int i = 0; i < k; ++i) {
-        F.fwrite(&key->key[i], sizeof(int)*N);
+        F.fwrite(key->key[i].coefs, sizeof(int)*N);
     }
 }
 
@@ -320,29 +321,48 @@ void write_tLweKey(const Ostream& F, const TLweKey* key) {
 
 /**
  * This function prints the tGsw parameters to a generic stream
+ * It only prints the TGSW section, not the Tlwe parameters
  */
-void export_tGswParams(const Ostream& F, const TGswParams* tgswparams) {
+void export_tGswParams_section(const Ostream& F, const TGswParams* tgswparams) {
     TextModeProperties* props = new_TextModeProperties_blank();
     props->setTypeTitle("TGSWPARAMS");
     props->setProperty_long("l", tgswparams->l);
     props->setProperty_long("Bgbit", tgswparams->Bgbit);
     print_TextModeProperties_toOStream(F, props);
     delete_TextModeProperties(props);
-    export_tLweParams(F, tgswparams->tlwe_params);
 }
 
 /**
- * This constructor function reads and creates a TGswParams from a generic stream. The result
- * must be deleted with delete_TGswParams();
+ * This function prints the tGsw parameters to a generic stream
  */
-TGswParams* read_new_tGswParams(const Istream& F) {
+void export_tGswParams(const Ostream& F, const TGswParams* tgswparams) {
+    export_tLweParams(F, tgswparams->tlwe_params);
+    export_tGswParams_section(F, tgswparams);
+}
+
+/**
+ * This constructor function reads and creates a TGswParams from a generic stream, and an TlweParams object. 
+ * The result must be deleted with delete_TGswParams();
+ */
+TGswParams* read_new_tGswParams_section(const Istream& F, const TLweParams* tlwe_params) {
     TextModeProperties* props = new_TextModeProperties_fromIstream(F);
     if (props->getTypeTitle() != string("TGSWPARAMS")) abort();
     int l = props->getProperty_long("l");
     int Bgbit = props->getProperty_long("Bgbit");
-    TLweParams* tlweparams = read_new_tLweParams(F);
+    // ATTENTION ici!!!
     delete_TextModeProperties(props);
-    return new_TGswParams(l,Bgbit,tlweparams);
+    return new_TGswParams(l,Bgbit,tlwe_params);
+}
+
+/**
+ * This wrapper constructor function reads and creates a TGswParams from a generic stream. 
+ * The result must be deleted with delete_TGswParams(), but the inner
+ * TlweParams will be garbage-collected automatically;
+ */
+TGswParams* read_new_tGswParams(const Istream& F) {
+    TLweParams* tlwe_params = read_new_tLweParams(F);
+    global_tfheGarbageCollector.register_param(tlwe_params);
+    return read_new_tGswParams_section(F, tlwe_params);
 }
 
 
@@ -407,7 +427,7 @@ void write_tGswSample(const Ostream& F, const TGswSample* sample, const TGswPara
 /* ****************************
  * TGSW FFT samples
 **************************** */
-
+/*
 void read_tGswSampleFFT(const Istream& F, TGswSampleFFT* sample, const TGswParams* params) {
     const int kpl = params->kpl;
     int32_t type_uid;
@@ -428,7 +448,7 @@ void write_tGswSampleFFT(const Ostream& F, const TGswSampleFFT* sample, const TG
         write_tLweSampleFFT(F, &sample->all_samples[i], params->tlwe_params);
     }
 }
-
+*/
 
 
 
@@ -446,7 +466,7 @@ void read_tGswKey(const Istream& F, TGswKey* key) {
     if (type_uid != TGSW_KEY_TYPE_UID) abort();
 
     for (int i = 0; i < k; ++i) {
-        F.fread(&key->key[i], sizeof(int)*N);
+        F.fread(key->key[i].coefs, sizeof(int)*N);
     }
 }
 
@@ -457,7 +477,7 @@ void write_tGswKey(const Ostream& F, const TGswKey* key) {
     F.fwrite(&TGSW_KEY_TYPE_UID, sizeof(int32_t));
     
     for (int i = 0; i < k; ++i) {
-        F.fwrite(&key->key[i], sizeof(int)*N);
+        F.fwrite(key->key[i].coefs, sizeof(int)*N);
     }
 }
 
