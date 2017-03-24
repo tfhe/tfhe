@@ -790,66 +790,6 @@ EXPORT void delete_TLweSample_array(int nbelts, TLweSample* obj) {
     destroy_TLweSample_array(nbelts,obj);
     free_TLweSample_array(nbelts,obj);
 }
-#include "tlwe.h" 
-//allocate memory space for a TLweSampleFFT
-
-EXPORT TLweSampleFFT* alloc_TLweSampleFFT() {
-    return (TLweSampleFFT*) malloc(sizeof(TLweSampleFFT));
-}
-EXPORT TLweSampleFFT* alloc_TLweSampleFFT_array(int nbelts) {
-    return (TLweSampleFFT*) malloc(nbelts*sizeof(TLweSampleFFT));
-}
-
-//free memory space for a LweKey
-EXPORT void free_TLweSampleFFT(TLweSampleFFT* ptr) {
-    free(ptr);
-}
-EXPORT void free_TLweSampleFFT_array(int nbelts, TLweSampleFFT* ptr) {
-    free(ptr);
-}
-
-//initialize the key structure
-//(equivalent of the C++ constructor)
-EXPORT void init_TLweSampleFFT(TLweSampleFFT* obj, const TLweParams* params) {
-    new(obj) TLweSampleFFT(params);
-}
-EXPORT void init_TLweSampleFFT_array(int nbelts, TLweSampleFFT* obj, const TLweParams* params) {
-    for (int i=0; i<nbelts; i++) {
-	new(obj+i) TLweSampleFFT(params);
-    }
-}
-
-//destroys the TLweSampleFFT structure
-//(equivalent of the C++ destructor)
-EXPORT void destroy_TLweSampleFFT(TLweSampleFFT* obj) {
-    obj->~TLweSampleFFT();
-}
-EXPORT void destroy_TLweSampleFFT_array(int nbelts, TLweSampleFFT* obj) {
-    for (int i=0; i<nbelts; i++) {
-	(obj+i)->~TLweSampleFFT();
-    }
-}
- 
-//allocates and initialize the TLweSampleFFT structure
-//(equivalent of the C++ new)
-EXPORT TLweSampleFFT* new_TLweSampleFFT(const TLweParams* params) {
-    return new TLweSampleFFT(params);
-}
-EXPORT TLweSampleFFT* new_TLweSampleFFT_array(int nbelts, const TLweParams* params) {
-    TLweSampleFFT* obj = alloc_TLweSampleFFT_array(nbelts);
-    init_TLweSampleFFT_array(nbelts,obj,params);
-    return obj;
-}
-
-//destroys and frees the TLweSampleFFT structure
-//(equivalent of the C++ delete)
-EXPORT void delete_TLweSampleFFT(TLweSampleFFT* obj) {
-    delete obj;
-}
-EXPORT void delete_TLweSampleFFT_array(int nbelts, TLweSampleFFT* obj) {
-    destroy_TLweSampleFFT_array(nbelts,obj);
-    free_TLweSampleFFT_array(nbelts,obj);
-}
 #include "polynomials.h" 
 //allocate memory space for a TorusPolynomial
 
