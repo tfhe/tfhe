@@ -731,8 +731,7 @@ namespace {
 
 	    torusPolynomialClear(expectedRes);
 	    for (int i=0; i<kpl; i++) {
-		torusPolynomialMultKaratsuba(tmp, decomp+i, fsamplerows[i].message);
-		torusPolynomialAddTo(expectedRes, tmp);
+		torusPolynomialAddMulRKaratsuba(expectedRes, decomp+i, fsamplerows[i].message);
 	    }
 
 	    tGswExternMulToTLwe(accum,sample,params);

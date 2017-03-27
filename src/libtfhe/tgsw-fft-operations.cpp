@@ -92,10 +92,7 @@ EXPORT void tGswFFTExternMulToTLwe(TLweSample* accum, const TGswSampleFFT* gsw, 
     const int l = params->l;
     const int kpl = params->kpl;
     const int N = tlwe_params->N;
-    //TODO attention, this prevents parallelization...
-    //static IntPolynomial* deca = new_IntPolynomial_array(kpl,N); //decomposed accumulator 
-    //static LagrangeHalfCPolynomial* decaFFT=new_LagrangeHalfCPolynomial_array(kpl,N); //fft version
-    //static TLweSampleFFT* tmpa = new_TLweSampleFFT(tlwe_params);
+    //TODO attention, improve these new/delete...
     IntPolynomial* deca = new_IntPolynomial_array(kpl,N); //decomposed accumulator 
     LagrangeHalfCPolynomial* decaFFT=new_LagrangeHalfCPolynomial_array(kpl,N); //fft version
     TLweSampleFFT* tmpa = new_TLweSampleFFT(tlwe_params);
@@ -106,8 +103,9 @@ EXPORT void tGswFFTExternMulToTLwe(TLweSample* accum, const TGswSampleFFT* gsw, 
 	IntPolynomial_ifft(decaFFT+p,deca+p);
 
     tLweFFTClear(tmpa, tlwe_params);
-    for (int p=0; p<kpl; p++)
+    for (int p=0; p<kpl; p++) {
 	tLweFFTAddMulRTo(tmpa, decaFFT+p, gsw->all_samples+p, tlwe_params);
+    }
     tLweFromFFTConvert(accum, tmpa, tlwe_params);
 
     delete_TLweSampleFFT(tmpa);

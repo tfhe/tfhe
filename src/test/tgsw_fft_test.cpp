@@ -58,8 +58,11 @@ namespace {
 	//of bla as a seed.
 	void fake_tGswTorus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* bla, const TGswParams* params) {
 	    const int N = params->tlwe_params->N;
+	    const int l = params->l;
 	    const size_t seed = (size_t) bla;
-	    for (int i=0; i<N; i++) result->coefs[i]=(17+i*seed)%3;
+	    for (int p=0; p<l; p++)
+		for (int i=0; i<N; i++) 
+		    result[p].coefs[i]=(17+i*seed)%3;
 	}
 	void tGswTorus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* bla, const TGswParams* params) {
 	    fake_tGswTorus32PolynomialDecompH(result, bla, params);
@@ -231,7 +234,7 @@ namespace {
 	    TLweSample* accum = new_TLweSample(tlwe_params);
 	    TGswSampleFFT* gsw = new_TGswSampleFFT(params);
 	    FakeTLweFFT* fgsw = fake(gsw->all_samples);
-	    //FakeTLwe* faccum = fake(accum);
+	    FakeTLwe* faccum = fake(accum);
 
 	    //initialize random values
 	    tGswSampleFFTUniform(gsw, params);
@@ -245,13 +248,15 @@ namespace {
 	    //compute the same product
 	    TorusPolynomial* expected_res = new_TorusPolynomial(N);
 	    torusPolynomialClear(expected_res);
-	    for (int i=0; i<kpl; i++)
+	    for (int i=0; i<kpl; i++) {
 		torusPolynomialAddMulRKaratsuba(expected_res, dec+i, fgsw[i].message);
+	    }
 
-	    //do the operation
+	    //do the operation: accum *= gsw
 	    tGswFFTExternMulToTLwe(accum, gsw, params);
 
 	    //verify the result
+	    ASSERT_EQ(torusPolynomialNormInftyDist(faccum->message, expected_res),0);
 
 	    delete_TorusPolynomial(expected_res);
 	    delete_IntPolynomial_array(kpl,dec);
@@ -261,7 +266,7 @@ namespace {
     }
     //EXPORT void tGswFFTMulByXaiMinusOne(TGswSampleFFT* result, const int ai, const TGswSampleFFT* bki, const TGswParams* params);
     TEST_F(TGswFFTTest, tGswFFTMulByXaiMinusOne) {
-	//TODO
+	//TODO: A supprimer
     }
 
 }//namespace
