@@ -1,5 +1,7 @@
 #ifndef TFHE_IO_H
 #define TFHE_IO_H
+///@file
+///@brief This file declares the Input/Output functions
 
 #include "tfhe_core.h"
 #include "lwekey.h"
@@ -51,16 +53,6 @@ EXPORT void export_lweParams_toStream(std::ostream& out, const LweParams* lwepar
 EXPORT LweParams* new_lweParams_fromStream(std::istream& in);
 
 #endif
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -188,8 +188,8 @@ namespace {
     class TGswFakeTest: public ::testing::Test {
 	public:
 
-	    USE_FAKE_new_TGswSample;
-	    USE_FAKE_delete_TGswSample;
+	    USE_FAKE_init_TGswSample;
+	    USE_FAKE_destroy_TGswSample;
             USE_FAKE_tGswAddH;
             USE_FAKE_tGswAddMuH;
             USE_FAKE_tGswAddMuIntH;

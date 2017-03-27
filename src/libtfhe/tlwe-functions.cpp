@@ -6,7 +6,7 @@
 #include "numeric_functions.h"
 #include "polynomials_arithmetic.h"
 #include "lagrangehalfc_arithmetic.h"
-
+#include "tfhe_generic_templates.h"
 using namespace std;
 
 
@@ -218,8 +218,22 @@ EXPORT void tLweAddRTTo(TLweSample* result, const int pos, const IntPolynomial* 
 }
 
 
+EXPORT void init_TLweKey(TLweKey* obj, const TLweParams* params) {
+    new(obj) TLweKey(params);
+}
+EXPORT void destroy_TLweKey(TLweKey* obj) {
+    (obj)->~TLweKey();
+}
 
+EXPORT void init_TLweSample(TLweSample* obj, const TLweParams* params) {
+    new(obj) TLweSample(params);
+}
+EXPORT void destroy_TLweSample(TLweSample* obj) {
+    (obj)->~TLweSample();
+}
 
+USE_DEFAULT_CONSTRUCTOR_DESTRUCTOR_IMPLEMENTATIONS1(TLweKey,TLweParams);
+USE_DEFAULT_CONSTRUCTOR_DESTRUCTOR_IMPLEMENTATIONS1(TLweSample,TLweParams);
 
 
 

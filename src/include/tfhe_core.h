@@ -10,6 +10,7 @@
 //reasons, or to bind it with non C++ code.
 #ifdef __cplusplus
 #define EXPORT extern "C"
+#include "tfhe_generic_templates.h"
 #else
 #define EXPORT 
 #endif

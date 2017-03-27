@@ -1,6 +1,9 @@
 #ifndef TFHE_GENERIC_STREAMS_H
 #define TFHE_GENERIC_STREAMS_H
 
+///@file
+///@brief This file declares tools and constantsused for Input/Output serialization
+
 #include <string>
 
 /*

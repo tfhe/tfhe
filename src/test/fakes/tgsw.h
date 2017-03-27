@@ -12,6 +12,9 @@ namespace {
 	IntPolynomial* message;
 	double current_variance;
 
+    //this padding is here to make sure that FakeTLwe and TLweSample have the same size
+    char unused_padding[sizeof(TGswSample)-sizeof(long)-sizeof(IntPolynomial*)-sizeof(double)];
+    
     // construct
 	FakeTGsw(int N):fake_uid(FAKE_TGSW_UID) {
 	    message = new_IntPolynomial(N);
@@ -27,6 +30,9 @@ namespace {
 	void operator=(const FakeTGsw&)=delete;
     };
 
+    // At compile time, we verify that the two structures have exactly the same size
+    static_assert (sizeof(FakeTGsw) == sizeof(TGswSample), "Error: Size is not correct");
+
 
 
 
@@ -41,6 +47,27 @@ namespace {
 	return reps; 
     }
 
+
+    inline void fake_init_TGswSample(TGswSample* ptr, const TGswParams* params) {
+	int N = params->tlwe_params->N;
+	FakeTGsw* arr = (FakeTGsw*) ptr;
+	new(arr) FakeTGsw(N); 
+    }
+
+#define USE_FAKE_init_TGswSample \
+    inline void init_TGswSample(TGswSample* ptr, const TGswParams* params) { \
+	return fake_init_TGswSample(ptr,params); \
+    }
+
+    inline void fake_destroy_TGswSample(TGswSample* ptr) {
+	FakeTGsw* arr = (FakeTGsw*) ptr;
+	(arr)->~FakeTGsw(); 
+    }
+
+#define USE_FAKE_destroy_TGswSample \
+    inline void destroy_TGswSample(TGswSample* ptr) { \
+	return fake_destroy_TGswSample(ptr); \
+    }
 
     inline TGswSample* fake_new_TGswSample_array(int nbelts, const TGswParams* params) {
 	int N = params->tlwe_params->N;
