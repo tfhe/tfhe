@@ -85,6 +85,7 @@ namespace {
     inline TLweSample* fake_new_TLweSample(const TLweParams* params) {
         int N = params->N;
         FakeTLwe* reps = (FakeTLwe*) malloc(sizeof(FakeTLwe));
+	((TLweSample*) reps)->a=((TorusPolynomial*) long(rand())); //it is necessary to fake-initialize this chunk, because one of tgswFFT tests needs it
         new(reps) FakeTLwe(N);
         return (TLweSample*) reps;
     }
@@ -333,6 +334,7 @@ namespace {
         torusPolynomialAddTo(fres->message, tmp);
 
 	fres->current_variance += intPolynomialNorm2sq(p)*fsamp->current_variance; 
+	delete_TorusPolynomial(tmp);
     }
 
     #define USE_FAKE_tLweAddMulRTo \

@@ -242,8 +242,9 @@ namespace {
 
 	    //simulate the same decomposition as in the fake function
 	    IntPolynomial* dec = new_IntPolynomial_array(kpl,N);
-	    for (int i=0; i<=k; i++)
+	    for (int i=0; i<=k; i++) {
 		fake_tGswTorus32PolynomialDecompH(dec+i*l, accum->a+i, params);
+	    }
 
 	    //compute the same product
 	    TorusPolynomial* expected_res = new_TorusPolynomial(N);
