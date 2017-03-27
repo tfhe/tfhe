@@ -15,22 +15,17 @@ using namespace std;
 #endif
 
 
-/*
-// ILA : créér à chaque fois un nouveau sample TLWE ce n'est pas un bon choix
-void tfhe_cMux_FFT(TLweSample* accum, const TGswSampleFFT* bki, const int barai, const TGswParams* bk_params) {
-    TLweSample* temp = new_TLweSample(bk_params->tlwe_params);
 
+void tfhe_MuxRotate_FFT(TLweSample* result, const TLweSample* accum, const TGswSampleFFT* bki, const int barai, const TGswParams* bk_params) {
     // ACC = BKi*[(X^barai-1)*ACC]+ACC
     // temp = (X^barai-1)*ACC
-    tLweMulByXaiMinusOne(temp, barai, accum, bk_params->tlwe_params);
+    tLweMulByXaiMinusOne(result, barai, accum, bk_params->tlwe_params);
     // temp *= BKi
-    tGswFFTExternMulToTLwe(temp, bki, bk_params);
+    tGswFFTExternMulToTLwe(result, bki, bk_params);
     // ACC += temp
-    tLweAddTo(accum, temp, bk_params->tlwe_params);
-
-    delete_TLweSample(temp);
+    tLweAddTo(result, accum, bk_params->tlwe_params);
 }
-*/
+
 
 
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_BLIND_ROTATE_FFT
@@ -49,11 +44,13 @@ EXPORT void tfhe_blindRotate_FFT(TLweSample* accum,
 
     //TGswSampleFFT* temp = new_TGswSampleFFT(bk_params);
     TLweSample* temp = new_TLweSample(bk_params->tlwe_params);
+    TLweSample* temp2 = temp;
+    TLweSample* temp3 = accum; 
 
     for (int i=0; i<n; i++) {
         const int barai=bara[i];
         if (barai==0) continue; //indeed, this is an easy case!
-        
+        /*
         // ACC = BKi*[(X^barai-1)*ACC]+ACC
         // temp = (X^barai-1)*ACC
         tLweMulByXaiMinusOne(temp, barai, accum, bk_params->tlwe_params);
@@ -61,14 +58,19 @@ EXPORT void tfhe_blindRotate_FFT(TLweSample* accum,
         tGswFFTExternMulToTLwe(temp, bk+i, bk_params);
         // ACC += temp
         tLweAddTo(accum, temp, bk_params->tlwe_params);
-
-        // tfhe_cMux_FFT(accum, bk+i, barai, bk_params);
+        */
+        tfhe_MuxRotate_FFT(temp2, temp3, bk+i, barai, bk_params);
+        swap(temp2,temp3);
         /*
         tGswFFTMulByXaiMinusOne(temp, barai, bk+i, bk_params);
         tGswFFTAddH(temp, bk_params);
         tGswFFTExternMulToTLwe(accum, temp, bk_params);
         */
     }
+    if (temp3 != accum) {
+        tLweCopy(accum, temp3, bk_params->tlwe_params);
+    }
+    
     delete_TLweSample(temp);
     //delete_TGswSampleFFT(temp);
 }

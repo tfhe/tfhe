@@ -10,22 +10,17 @@ using namespace std;
 #endif
 
 
-/*
-// ILA : créér à chaque fois un nouveau sample TLWE ce n'est pas un bon choix
-void tfhe_cMux(TLweSample* accum, const TGswSample* bki, const int barai, const TGswParams* bk_params) {
-    TLweSample* temp = new_TLweSample(bk_params->tlwe_params);
 
+void tfhe_MuxRotate(TLweSample* result, const TLweSample* accum, const TGswSample* bki, const int barai, const TGswParams* bk_params) {
     // ACC = BKi*[(X^barai-1)*ACC]+ACC
     // temp = (X^barai-1)*ACC
-    tLweMulByXaiMinusOne(temp, barai, accum, bk_params->tlwe_params);
+    tLweMulByXaiMinusOne(result, barai, accum, bk_params->tlwe_params);
     // temp *= BKi
-    tGswExternMulToTLwe(temp, bki, bk_params);
+    tGswExternMulToTLwe(result, bki, bk_params);
     // ACC += temp
-    tLweAddTo(accum, temp, bk_params->tlwe_params);
-
-    delete_TLweSample(temp);
+    tLweAddTo(result, accum, bk_params->tlwe_params);
 }
-*/
+
 
 
 
@@ -39,35 +34,30 @@ void tfhe_cMux(TLweSample* accum, const TGswSample* bki, const int barai, const 
  * @param bara An array of n coefficients between 0 and 2N-1
  * @param bk_params The parameters of bk
  */
-EXPORT void tfhe_blindRotate(TLweSample* accum, 
-	const TGswSample* bk, 
-	const int* bara,
-	const int n,
-	const TGswParams* bk_params) {
+EXPORT void tfhe_blindRotate(TLweSample* accum, const TGswSample* bk, const int* bara, const int n, const TGswParams* bk_params) {
+    
     //TGswSample* temp = new_TGswSample(bk_params);
     TLweSample* temp = new_TLweSample(bk_params->tlwe_params);
+    TLweSample* temp2 = temp;
+    TLweSample* temp3 = accum; 
 
     for (int i=0; i<n; i++) {
 	const int barai=bara[i];
 	if (barai==0) continue; //indeed, this is an easy case!
-
-    // ACC = BKi*[(X^barai-1)*ACC]+ACC
-    // temp = (X^barai-1)*ACC
-    tLweMulByXaiMinusOne(temp, barai, accum, bk_params->tlwe_params);
-    // temp *= BKi
-    tGswExternMulToTLwe(temp, bk+i, bk_params);
-    // ACC += temp
-    tLweAddTo(accum, temp, bk_params->tlwe_params);
-
-    //tfhe_cMux(accum, bk+i, barai, bk_params);
+    
+    tfhe_MuxRotate(temp2, temp3, bk+i, barai, bk_params);
+    swap(temp2, temp3);
     /*
 	tGswMulByXaiMinusOne(temp, barai, bk+i, bk_params);
 	tGswAddH(temp, bk_params);
 	tGswExternMulToTLwe(accum, temp, bk_params);
     */
     }
-    delete_TLweSample(temp);
+    if (temp3 != accum) {
+        tLweCopy(accum, temp3, bk_params->tlwe_params);
+    }
     
+    delete_TLweSample(temp);
     //delete_TGswSample(temp);
 }
 #endif 

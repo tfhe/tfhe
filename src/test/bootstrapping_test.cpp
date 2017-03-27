@@ -38,10 +38,14 @@ namespace {
 	public:
 
 	    USE_FAKE_new_TGswSample;
+        USE_FAKE_new_TLweSample;
+        USE_FAKE_delete_TLweSample;
 	    USE_FAKE_delete_TGswSample;
-	    USE_FAKE_tGswMulByXaiMinusOne;
-            USE_FAKE_tGswAddH;
+	    USE_FAKE_tLweMulByXaiMinusOne;
+        // USE_FAKE_tGswAddH;
 	    USE_FAKE_tGswExternMulToTLwe;
+        USE_FAKE_tLweAddTo;
+        USE_FAKE_tLweCopy;
 
 #define INCLUDE_TFHE_BLIND_ROTATE
 #include "../libtfhe/lwe-bootstrapping-functions.cpp"

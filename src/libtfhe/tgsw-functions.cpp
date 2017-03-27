@@ -156,7 +156,7 @@ EXPORT void tGswMulByXaiMinusOne(TGswSample* result, int ai, const TGswSample* b
 //Update l'accumulateur ligne 5 de l'algo toujours
 //void tGswTLweDecompH(IntPolynomial* result, const TLweSample* sample,const TGswParams* params);
 //accum *= sample
-EXPORT void tGswExternMulToTLwe(TLweSample* accum, const TGswSample* sample,const TGswParams* params){
+EXPORT void tGswExternMulToTLwe(TLweSample* accum, const TGswSample* sample, const TGswParams* params){
     const TLweParams* par=params->tlwe_params;
     const int N=par->N;
     const int kpl=params->kpl;
