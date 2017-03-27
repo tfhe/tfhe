@@ -50,21 +50,28 @@ namespace {
     //  constructor/destructor
     //-----------------------------------------
 
-    #define USE_FAKE_new_TGswSample_array \
-    inline TGswSampleFFT* new_TGswSample_array(int nbelts, const TGswParams* params) { \
-        return fake_new_TGswSample_array(nbelts,params); \
+    inline TGswSampleFFT* fake_new_TGswSampleFFT_array(int nbelts, const TGswParams* params) {
+        int N = params->N;
+        FakeTGswFFT* reps = (FakeTGswFFT*) malloc(nbelts*sizeof(FakeTGswFFT));
+        for (int i=0; i<nbelts; i++) new(reps+i) FakeTGswFFT(params);
+        return (TGswSampleFFT*) reps;
     }
 
-    inline void fake_delete_TGswSample_array(int nbelts, TGswSampleFFT* sample) {
+#define USE_FAKE_new_TGswSampleFFT_array \
+    inline TGswSampleFFT* new_TGswSampleFFT_array(int nbelts, const TGswParams* params) { \
+        return fake_new_TGswSampleFFT_array(nbelts,params); \
+    }
+
+    inline void fake_delete_TGswSampleFFT_array(int nbelts, TGswSampleFFT* sample) {
         FakeTGswFFT* arr = fake(sample);
         for (int i=0; i<nbelts; i++) (arr+i)->~FakeTGswFFT();
         free(arr);
     }
 
     // 
-    #define USE_FAKE_delete_TGswSample_array \
-    inline void delete_TGswSample_array(int nbelts, TGswSampleFFT* samples) { \
-        fake_delete_TGswSample_array(nbelts,samples); \
+#define USE_FAKE_delete_TGswSampleFFT_array \
+    inline void delete_TGswSampleFFT_array(int nbelts, TGswSampleFFT* samples) { \
+        fake_delete_TGswSampleFFT_array(nbelts,samples); \
     }
 
 
@@ -72,12 +79,12 @@ namespace {
     inline TGswSampleFFT* fake_new_TGswSampleFFT(const TGswParams* params) {
         int N = params->N;
         FakeTGswFFT* reps = (FakeTGswFFT*) malloc(sizeof(FakeTGswFFT));
-        new(reps) FakeTGswFFT(N);
+        new(reps) FakeTGswFFT(params);
         return (TGswSampleFFT*) reps;
     }
 
     // 
-    #define USE_FAKE_new_TGswSampleFFT \
+#define USE_FAKE_new_TGswSampleFFT \
     inline TGswSampleFFT* new_TGswSampleFFT(const TGswParams* params) { \
         return fake_new_TGswSampleFFT(params); \
     }

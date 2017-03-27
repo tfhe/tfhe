@@ -54,7 +54,7 @@ struct TLweSampleFFT {
     double current_variance; ///< avg variance of the sample
     const int k; //required during the destructor call...
 #ifdef __cplusplus
-    TLweSampleFFT(const TLweParams* params);
+    TLweSampleFFT(const TLweParams* params, LagrangeHalfCPolynomial* a, double current_variance);
     ~TLweSampleFFT();
     TLweSampleFFT(const TLweSampleFFT&) = delete;
     void operator=(const TLweSampleFFT&) = delete;

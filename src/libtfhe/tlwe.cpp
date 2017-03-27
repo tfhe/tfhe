@@ -57,14 +57,13 @@ TLweSample::~TLweSample() {
     delete_TorusPolynomial_array(k+1, a);
 }
 
-TLweSampleFFT::TLweSampleFFT(const TLweParams* params): k(params->k) {
+TLweSampleFFT::TLweSampleFFT(const TLweParams* params, LagrangeHalfCPolynomial* arr, double current_variance): k(params->k) {
     //a is a table of k+1 polynomials, b is an alias for &a[k]
-    a = new_LagrangeHalfCPolynomial_array(k+1, params->N);
+    a = arr;
     b = a+k;
     current_variance = 0;
 }
 
 TLweSampleFFT::~TLweSampleFFT() {
-    delete_LagrangeHalfCPolynomial_array(k+1, a);
 }
 

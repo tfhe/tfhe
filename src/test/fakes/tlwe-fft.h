@@ -1,6 +1,7 @@
 #ifndef FAKES_TLWE_FFT_H
 #define FAKES_TLWE_FFT_H
 
+#include "./tlwe.h"
 #include "./lagrangehalfc.h"
 
 namespace {
@@ -52,42 +53,51 @@ namespace {
     //  constructor/destructor
     //-----------------------------------------
 
-    #define USE_FAKE_new_TLweSampleFFT_array \
+
+    inline TLweSampleFFT* fake_new_TLweSampleFFT_array(int nbelts, const TLweParams* params) {
+	int N = params->N;
+	FakeTLweFFT* reps = (FakeTLweFFT*) malloc(sizeof(FakeTLweFFT)*nbelts);
+	for (int i=0; i<nbelts; i++) new(reps+i) FakeTLweFFT(N);
+	return (TLweSampleFFT*) reps;
+    }
+
+
+#define USE_FAKE_new_TLweSampleFFT_array \
     inline TLweSampleFFT* new_TLweSampleFFT_array(int nbelts, const TLweParams* params) { \
-        return fake_new_TLweSampleFFT_array(nbelts,params); \
+	return fake_new_TLweSampleFFT_array(nbelts,params); \
     }
 
     inline void fake_delete_TLweSampleFFT_array(int nbelts, TLweSampleFFT* sample) {
-        FakeTLweFFT* arr = fake(sample);
-        for (int i=0; i<nbelts; i++) (arr+i)->~FakeTLweFFT();
-        free(arr);
+	FakeTLweFFT* arr = fake(sample);
+	for (int i=0; i<nbelts; i++) (arr+i)->~FakeTLweFFT();
+	free(arr);
     }
 
     // 
-    #define USE_FAKE_delete_TLweSampleFFT_array \
+#define USE_FAKE_delete_TLweSampleFFT_array \
     inline void delete_TLweSampleFFT_array(int nbelts, TLweSampleFFT* samples) { \
-        fake_delete_TLweSample_array(nbelts,samples); \
+	fake_delete_TLweSampleFFT_array(nbelts,samples); \
     }
 
 
 
     inline TLweSampleFFT* fake_new_TLweSampleFFT(const TLweParams* params) {
-        int N = params->N;
-        FakeTLweFFT* reps = (FakeTLweFFT*) malloc(sizeof(FakeTLweFFT));
-        new(reps) FakeTLweFFT(N);
-        return (TLweSampleFFT*) reps;
+	int N = params->N;
+	FakeTLweFFT* reps = (FakeTLweFFT*) malloc(sizeof(FakeTLweFFT));
+	new(reps) FakeTLweFFT(N);
+	return (TLweSampleFFT*) reps;
     }
 
     // 
-    #define USE_FAKE_new_TLweSampleFFT \
+#define USE_FAKE_new_TLweSampleFFT \
     inline TLweSampleFFT* new_TLweSampleFFT(const TLweParams* params) { \
-        return fake_new_TLweSampleFFT(params); \
+	return fake_new_TLweSampleFFT(params); \
     }
 
     inline void fake_delete_TLweSampleFFT(TLweSampleFFT* sample) {
-        FakeTLweFFT* ptr = fake(sample);
-        (ptr)->~FakeTLweFFT();
-        free(ptr);
+	FakeTLweFFT* ptr = fake(sample);
+	(ptr)->~FakeTLweFFT();
+	free(ptr);
     }
 
     // 
@@ -127,7 +137,7 @@ namespace {
     }
 
 
-#define  tLweFromFFTConvert \
+#define  USE_FAKE_tLweFromFFTConvert \
     inline void tLweFromFFTConvert(TLweSample* result, const TLweSampleFFT* source, const TLweParams* params) { \
 	fake_tLweFromFFTConvert(result, source, params); \
     }
@@ -158,7 +168,12 @@ namespace {
 	fres->current_variance += fsample->current_variance*intPolynomialNormSq2(pval);
     }
 
+#define USE_FAKE_tLweFFTAddMulRTo \
+    inline void tLweFFTAddMulRTo(TLweSampleFFT* result, const LagrangeHalfCPolynomial* p, const TLweSampleFFT* sample, const TLweParams* params) { \
+	fake_tLweFFTAddMulRTo(result, p, sample, params); \
+    }
 
-}
+
+} //end namespace
 
 #endif // FAKES_TLWE_FFT_H

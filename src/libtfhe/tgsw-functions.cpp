@@ -160,6 +160,7 @@ EXPORT void tGswExternMulToTLwe(TLweSample* accum, const TGswSample* sample, con
     const TLweParams* par=params->tlwe_params;
     const int N=par->N;
     const int kpl=params->kpl;
+    //TODO: improve this new/delete
     IntPolynomial* dec =new_IntPolynomial_array(kpl,N);
 
     tGswTLweDecompH(dec,accum,params);
