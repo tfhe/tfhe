@@ -29,14 +29,6 @@ const LweKey* debug_in_key;
 //TODO: mettre les mêmes fonctions arithmétiques que pour Lwe
 //      pour les opérations externes, prévoir int et intPolynomial
 
-//extractions TLwe -> Lwe
-EXPORT void tLweExtractKey(LweKey* result, const TLweKey*); //sans doute un param supplémentaire
-EXPORT void tLweExtractSample(LweSample* result, const TLweSample* x);
-
-//extraction TGsw -> SemiTGsw
-EXPORT void tGswExtractKey(SemiTGswSample* result, const TGswKey* key);
-EXPORT void tGswExtractSample(TLweSample* result, const TGswSample* x);
-
 
 /*//calcule l'arrondi inférieur d'un élément Torus32
   int bar(uint64_t b, uint64_t Nx2){
@@ -46,36 +38,28 @@ EXPORT void tGswExtractSample(TLweSample* result, const TGswSample* x);
 
 
 
-EXPORT void tLweExtractLweSample(LweSample* result, const TLweSample* x, const LweParams* params,  const TLweParams* rparams) {
+EXPORT void tLweExtractLweSampleIndex(LweSample* result, const TLweSample* x, const int index, const LweParams* params,  const TLweParams* rparams) {
     const int N = rparams->N;
     const int k = rparams->k;
     assert(params->n == k*N);
+
     for (int i=0; i<k; i++) {
-	result->a[i*N]=x->a[i].coefsT[0];
-	for (int j=1; j<N; j++)
-	    result->a[i*N+j]=-x->a[i].coefsT[N-j];
+      for (int j=0; j<=index; j++)
+        result->a[i*N+j] = x->a[i].coefsT[index-j];
+      for (int j=index+1; j<N; j++)
+        result->a[i*N+j] = -x->a[i].coefsT[N+index-j];
     }
-    result->b=x->b->coefsT[0];
+    result->b = x->b->coefsT[index];
 }
 
-//these functions call the bootstrapping, assuming that the message space is {0,1/4} 
-EXPORT void lweNand(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b);
-EXPORT void lweOr(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b);
-EXPORT void lweAnd(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b);
-EXPORT void lweXor(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b);
-// mux(a,b,c) = a?b:c = a et b + not(a) et c 
-EXPORT void lweMux(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b, const LweSample* c);
-EXPORT void lweNot(LweSample* result, LweSample* a);
-
-
-//leveled functions
-
-//Lwe to SemiRing Bootstrapping
-EXPORT void semiRingBootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LweSample* x);
 
 
 
-// EXPORT void tGswPolyCombination(LweSample* result, const int* combi, const LweSample* samples, const LweParams* params);
+EXPORT void tLweExtractLweSample(LweSample* result, const TLweSample* x, const LweParams* params,  const TLweParams* rparams) {
+    tLweExtractLweSampleIndex(result, x, 0, params, rparams);
+}
+
+
 
 //extractions Ring Lwe -> Lwe
 EXPORT void tLweExtractKey(LweKey* result, const TLweKey* key) //sans doute un param supplémentaire
@@ -89,11 +73,3 @@ EXPORT void tLweExtractKey(LweKey* result, const TLweKey* key) //sans doute un p
     }
 }
 
-
-
-//extraction TGsw -> Gsw
-// EXPORT void gswKeyExtract(TLweKey* result, const TGswKey* key); //sans doute un param supplémentaire
-// EXPORT void gswSampleExtract(TLweSample* result, const TGswSample* x);
-
-//bootstrapping
-// EXPORT void tfhe_bootstrap(LweSample* result, const LweBootstrappingKey* bk, double mu1, double mu0, const LweSample* x);
