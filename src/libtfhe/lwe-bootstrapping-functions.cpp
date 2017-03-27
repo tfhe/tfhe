@@ -10,6 +10,21 @@ using namespace std;
 #endif
 
 
+
+void tfhe_MuxRotate(TLweSample* result, const TLweSample* accum, const TGswSample* bki, const int barai, const TGswParams* bk_params) {
+    // ACC = BKi*[(X^barai-1)*ACC]+ACC
+    // temp = (X^barai-1)*ACC
+    tLweMulByXaiMinusOne(result, barai, accum, bk_params->tlwe_params);
+    // temp *= BKi
+    tGswExternMulToTLwe(result, bki, bk_params);
+    // ACC += temp
+    tLweAddTo(result, accum, bk_params->tlwe_params);
+}
+
+
+
+
+
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_BLIND_ROTATE
 #undef INCLUDE_TFHE_BLIND_ROTATE
 /**
@@ -19,20 +34,31 @@ using namespace std;
  * @param bara An array of n coefficients between 0 and 2N-1
  * @param bk_params The parameters of bk
  */
-EXPORT void tfhe_blindRotate(TLweSample* accum, 
-	const TGswSample* bk, 
-	const int* bara,
-	const int n,
-	const TGswParams* bk_params) {
-    TGswSample* temp = new_TGswSample(bk_params);
+EXPORT void tfhe_blindRotate(TLweSample* accum, const TGswSample* bk, const int* bara, const int n, const TGswParams* bk_params) {
+    
+    //TGswSample* temp = new_TGswSample(bk_params);
+    TLweSample* temp = new_TLweSample(bk_params->tlwe_params);
+    TLweSample* temp2 = temp;
+    TLweSample* temp3 = accum; 
+
     for (int i=0; i<n; i++) {
 	const int barai=bara[i];
 	if (barai==0) continue; //indeed, this is an easy case!
+    
+    tfhe_MuxRotate(temp2, temp3, bk+i, barai, bk_params);
+    swap(temp2, temp3);
+    /*
 	tGswMulByXaiMinusOne(temp, barai, bk+i, bk_params);
 	tGswAddH(temp, bk_params);
 	tGswExternMulToTLwe(accum, temp, bk_params);
+    */
     }
-    delete_TGswSample(temp);
+    if (temp3 != accum) {
+        tLweCopy(accum, temp3, bk_params->tlwe_params);
+    }
+    
+    delete_TLweSample(temp);
+    //delete_TGswSample(temp);
 }
 #endif 
 

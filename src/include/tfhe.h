@@ -21,9 +21,6 @@
 
 #include "lwebootstrappingkey.h"
 
-//extraction TGsw -> SemiTGsw
-EXPORT void tGswExtractKey(SemiTGswSample* result, const TGswKey* key);
-EXPORT void tGswExtractSample(TLweSample* result, const TGswSample* x);
 
 //Lwe to Lwe Single gate bootstrapping
 EXPORT void lweToLweBootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LweSample* x);
@@ -39,14 +36,8 @@ EXPORT void homNOT(LweSample* result, const LweSample* c1, const LweParams* para
 
 // TODO syncronize names with new files
 // mux(a,b,c) = a?b:c = a et b + not(a) et c 
-EXPORT void lweMux(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b, const LweSample* c);
+// EXPORT void lweMux(LweSample* result, const LweBootstrappingKey* bk, const LweSample* a, const LweSample* b, const LweSample* c);
 
-
-
-//leveled functions
-
-//Lwe to SemiRing Bootstrapping
-EXPORT void semiRingBootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu1, Torus32 mu0, const LweSample* x);
 
 
 #endif //TFHE_H
