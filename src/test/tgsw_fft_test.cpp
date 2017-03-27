@@ -54,15 +54,15 @@ namespace {
 	USE_FAKE_IntPolynomial_ifft;
 	USE_FAKE_tLweFFTAddMulRTo;
 
-	void tGswTorus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* bla, const TGswParams* params) {
-	    const int N = params->tlwe_params->N;
-	    const size_t seed = (size_t) bla;
-	    for (int i=0; i<N; i++) result->coefs[i]=(17+i*seed)%3;
-	}
+	//this function generates a totally random fake integer decomposition, using just the address
+	//of bla as a seed.
 	void fake_tGswTorus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* bla, const TGswParams* params) {
 	    const int N = params->tlwe_params->N;
 	    const size_t seed = (size_t) bla;
 	    for (int i=0; i<N; i++) result->coefs[i]=(17+i*seed)%3;
+	}
+	void tGswTorus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* bla, const TGswParams* params) {
+	    fake_tGswTorus32PolynomialDecompH(result, bla, params);
 	}
 
 
@@ -101,6 +101,9 @@ namespace {
 #include "../libtfhe/tgsw-functions.cpp"
 	
 
+	//this function will be used to generate a fake GSW sample: all
+	//rows are fake uniformly distributed tlwe. (there is no integer
+	//message in the GSW)
 	void tGswSampleUniform(TGswSample* result, const TGswParams* params) {
 	    const int kpl = params->kpl;
 
@@ -111,6 +114,9 @@ namespace {
 	    }
 	}
 
+	//this function will be used to generate a fake GSWFFT sample: all
+	//rows are fake uniformly distributed tlwe. (there is no integer
+	//message in the GSW)
 	void tGswSampleFFTUniform(TGswSampleFFT* result, const TGswParams* params) {
 	    const int kpl = params->kpl;
 
@@ -120,6 +126,8 @@ namespace {
 		fs->current_variance=rand()/double(RAND_MAX);
 	    }
 	}
+
+	//this function will be used to generate a fake TLWE sample
 	void tLweSampleUniform(TLweSample* result, const TLweParams* params) {
 	    FakeTLwe* fres = fake(result);
 	    
