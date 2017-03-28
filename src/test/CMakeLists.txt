@@ -14,6 +14,7 @@ set(GOOGLETEST_SOURCES
     tgsw_fft_test.cpp
     lwekeyswitch_test.cpp
     bootstrapping_test.cpp
+    bootstrapping_test_fft.cpp
     io_test.cpp
     lagrangehalfc_test.cpp
     )
