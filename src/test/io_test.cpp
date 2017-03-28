@@ -35,18 +35,18 @@ TEST(IOTest, LweParamsIO) {
 
 TEST(IOTest, TLweParamsIO) {
     for (const TLweParams* params: allparams_tlwe) {
-    ostringstream oss;
+	ostringstream oss;
 
-    export_tLweParams_toStream(cout, params);
-    export_tLweParams_toStream(oss, params);
-    string result = oss.str();
-    istringstream iss(result);
-    TLweParams* blah = new_tLweParams_fromStream(iss);
-        ASSERT_EQ(blah->N, params->N);  
-        ASSERT_EQ(blah->k, params->k);  
-        ASSERT_DOUBLE_EQ(blah->alpha_min, params->alpha_min);   
-        ASSERT_DOUBLE_EQ(blah->alpha_max, params->alpha_max);
-    delete_TLweParams(blah);
+	export_tLweParams_toStream(cout, params);
+	export_tLweParams_toStream(oss, params);
+	string result = oss.str();
+	istringstream iss(result);
+	TLweParams* blah = new_tLweParams_fromStream(iss);
+	ASSERT_EQ(blah->N, params->N);  
+	ASSERT_EQ(blah->k, params->k);  
+	ASSERT_DOUBLE_EQ(blah->alpha_min, params->alpha_min);   
+	ASSERT_DOUBLE_EQ(blah->alpha_max, params->alpha_max);
+	delete_TLweParams(blah);
     }   
 }
 
@@ -55,19 +55,19 @@ TEST(IOTest, TLweParamsIO) {
 
 TEST(IOTest, TGswParamsIO) {
     for (const TGswParams* params: allparams_tgsw) {
-    ostringstream oss;
+	ostringstream oss;
 
-    export_tGswParams_toStream(cout, params);
-    export_tGswParams_toStream(oss, params);
-    string result = oss.str();
-    istringstream iss(result);
-    TGswParams* blah = new_tGswParams_fromStream(iss);
-        ASSERT_EQ(blah->l, params->l);  
-        ASSERT_EQ(blah->Bgbit, params->Bgbit);  
-        ASSERT_EQ(blah->tlwe_params->N, params->tlwe_params->N);  
-        ASSERT_EQ(blah->tlwe_params->k, params->tlwe_params->k); 
-        ASSERT_DOUBLE_EQ(blah->tlwe_params->alpha_min, params->tlwe_params->alpha_min);   
-        ASSERT_DOUBLE_EQ(blah->tlwe_params->alpha_max, params->tlwe_params->alpha_max);
-    delete_TGswParams(blah);
+	export_tGswParams_toStream(cout, params);
+	export_tGswParams_toStream(oss, params);
+	string result = oss.str();
+	istringstream iss(result);
+	TGswParams* blah = new_tGswParams_fromStream(iss);
+	ASSERT_EQ(blah->l, params->l);  
+	ASSERT_EQ(blah->Bgbit, params->Bgbit);  
+	ASSERT_EQ(blah->tlwe_params->N, params->tlwe_params->N);  
+	ASSERT_EQ(blah->tlwe_params->k, params->tlwe_params->k); 
+	ASSERT_DOUBLE_EQ(blah->tlwe_params->alpha_min, params->tlwe_params->alpha_min);   
+	ASSERT_DOUBLE_EQ(blah->tlwe_params->alpha_max, params->tlwe_params->alpha_max);
+	delete_TGswParams(blah);
     }   
 }

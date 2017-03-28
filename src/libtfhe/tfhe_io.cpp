@@ -19,7 +19,7 @@ using namespace std;
 /**
  * This function prints the lwe parameters to a generic stream
  */
-void export_lweParams(const Ostream& F, const LweParams* lweparams) {
+void write_lweParams(const Ostream& F, const LweParams* lweparams) {
     TextModeProperties* props = new_TextModeProperties_blank();
     props->setTypeTitle("LWEPARAMS");
     props->setProperty_long("n", lweparams->n);
@@ -47,13 +47,13 @@ LweParams* read_new_lweParams(const Istream& F) {
 /**
  * This function prints the lwe parameters to a file
  */
-EXPORT void export_lweParams_toFile(FILE* F, const LweParams* lweparams) { export_lweParams(to_Ostream(F),lweparams); }
+EXPORT void export_lweParams_toFile(FILE* F, const LweParams* lweparams) { write_lweParams(to_Ostream(F),lweparams); }
 
 /**
  * This constructor function reads and creates a LWEParams from a File. The result
  * must be deleted with delete_lweParams();
  */
-EXPORT void export_lweParams_toStream(ostream& F, const LweParams* lweparams) { export_lweParams(to_Ostream(F),lweparams); }
+EXPORT void export_lweParams_toStream(ostream& F, const LweParams* lweparams) { write_lweParams(to_Ostream(F),lweparams); }
 
 /**
  * This constructor function reads and creates a LWEParams from a stream. The result
@@ -101,9 +101,13 @@ void write_lweSample(const Ostream& F, const LweSample* sample, const LweParams*
 /* ****************************
  * LWE key
 **************************** */
-// the key has been previously defined, and the parameters are already given 
 
-void read_lweKey(const Istream& F, LweKey* key) {
+/**
+ * reads the the coefficients of the key in an already initialized key structure
+ * @param F the input stream
+ * @param key the destination key
+ */
+void read_lweKey_content(const Istream& F, LweKey* key) {
     const int n = key->params->n;
     int32_t type_uid;
     F.fread(&type_uid, sizeof(int32_t));
@@ -112,13 +116,66 @@ void read_lweKey(const Istream& F, LweKey* key) {
 }
 
 
-void write_lweKey(const Ostream& F, const LweKey* key) {
+/**
+ * writes the the coefficients of the key (not the parameters) to the stream
+ * @param F the output stream
+ * @param key the input key
+ */
+void write_lweKey_content(const Ostream& F, const LweKey* key) {
     const int n = key->params->n;
     F.fwrite(&LWE_KEY_TYPE_UID, sizeof(int32_t));
     F.fwrite(key->key, sizeof(int)*n);
 }
 
+/**
+ * this reads a new lweKey (params + content). The read params are garbage-collected, 
+ * the output key needs to be deleted by the user (with delete_LweKey). 
+ * @param F the input stream
+ * @Return the key
+ */
+LweKey* read_new_lweKey(const Istream& F) {
+    LweParams* params = read_new_lweParams(F);
+    global_tfheGarbageCollector.register_param(params);
+    LweKey* key = new_LweKey(params);
+    read_lweKey_content(F,key);
+    return key;
+}
 
+
+/**
+ * this writes a lweKey (params + content) to a stream. 
+ * @param F the output stream
+ * @Return the key
+ */
+void write_lweKey(const Ostream& F, const LweKey* key) {
+    write_lweParams(F,key->params);
+    write_lweKey_content(F,key);
+}
+
+
+
+/**
+ * This function prints the lwe parameters to a file
+ */
+EXPORT void export_lweKey_toFile(FILE* F, const LweKey* lwekey) { write_lweKey(to_Ostream(F),lwekey); }
+
+/**
+ * This constructor function reads and creates a LWEKey from a File. The result
+ * must be deleted with delete_lweKey();
+ */
+EXPORT void export_lweKey_toStream(ostream& F, const LweKey* lwekey) { write_lweKey(to_Ostream(F),lwekey); }
+
+/**
+ * This constructor function reads and creates a LWEKey from a stream. The result
+ * must be deleted with delete_lweKey();
+ */
+EXPORT LweKey* new_lweKey_fromStream(std::istream& in) { return read_new_lweKey(to_Istream(in)); }
+
+/**
+ * This constructor function reads and creates a LWEKey from a File. The result
+ * must be deleted with delete_lweKey();
+ */
+EXPORT LweKey* new_lweKey_fromFile(FILE* F)  { return read_new_lweKey(to_Istream(F)); }
 
 
 
