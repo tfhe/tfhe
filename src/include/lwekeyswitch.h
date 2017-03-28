@@ -20,7 +20,7 @@ struct LweKeySwitchKey {
     // de taille n pointe vers ks1 un tableau dont les cases sont espaceés de ell positions
 
 #ifdef __cplusplus
-    LweKeySwitchKey(int n, int t, int basebit, const LweParams* out_params);
+    LweKeySwitchKey(int n, int t, int basebit, const LweParams* out_params, LweSample* ks0_raw);
     ~LweKeySwitchKey();
     LweKeySwitchKey(const LweKeySwitchKey&) = delete;
     void operator=(const LweKeySwitchKey&) = delete;

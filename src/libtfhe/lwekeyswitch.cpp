@@ -1,13 +1,12 @@
 #include "lwekeyswitch.h"
 
-
-LweKeySwitchKey::LweKeySwitchKey(int n, int t, int basebit, const LweParams* out_params){
+LweKeySwitchKey::LweKeySwitchKey(int n, int t, int basebit, const LweParams* out_params, LweSample* ks0_raw){
     this->basebit=basebit;
     this->out_params=out_params; 
     this->n=n;
     this->t=t;
     this->base=1<<basebit;
-    ks0_raw = new_LweSample_array(n*t*base,out_params);
+    this->ks0_raw = ks0_raw;
     ks1_raw = new LweSample*[n*t];
     ks = new LweSample**[n];
 
@@ -19,7 +18,6 @@ LweKeySwitchKey::LweKeySwitchKey(int n, int t, int basebit, const LweParams* out
 }
 
 LweKeySwitchKey::~LweKeySwitchKey() {
-	delete_LweSample_array(n*t*base,ks0_raw);
     delete[] ks1_raw;
     delete[] ks;
 }
