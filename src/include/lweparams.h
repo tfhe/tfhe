@@ -1,5 +1,5 @@
-#ifndef LwePARAMS_H
-#define LwePARAMS_H
+#ifndef LWEPARAMS_H
+#define LWEPARAMS_H
 
 ///@file
 ///@brief This file contains the declaration of lwe parameters structures
@@ -55,4 +55,4 @@ EXPORT LweParams* new_LweParams_array(int nbelts, int n, double alpha_min, doubl
 EXPORT void delete_LweParams(LweParams* obj);
 EXPORT void delete_LweParams_array(int nbelts, LweParams* obj);
 
-#endif //LwePARAMS_H
+#endif //LWEPARAMS_H

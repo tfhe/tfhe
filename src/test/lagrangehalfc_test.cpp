@@ -112,6 +112,7 @@ TEST(LagrangeHalfcTest, LagrangeHalfCPolynomialAddTorusConstant) {
 
 	delete_LagrangeHalfCPolynomial(afft);
 	delete_TorusPolynomial(b);
+	delete_TorusPolynomial(aPlusCste);
 	delete_TorusPolynomial(a);
     }
 }

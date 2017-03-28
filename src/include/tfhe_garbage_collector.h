@@ -1,6 +1,9 @@
 #ifndef TFHE_GARBAGE_COLLECTOR_H
 #define TFHE_GARBAGE_COLLECTOR_H
 
+///@file
+///@brief This file declares a small garbage collector used for constant parameters
+
 #ifndef __cplusplus
 #error This file should only be included in a C++ file, for internal use only
 #endif

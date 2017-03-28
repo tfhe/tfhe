@@ -1,5 +1,5 @@
-#ifndef LweKEYSWITCH_H
-#define LweKEYSWITCH_H
+#ifndef LWEKEYSWITCH_H
+#define LWEKEYSWITCH_H
 
 ///@file
 ///@brief This file contains the declaration of LWE keyswitch structures
@@ -55,4 +55,4 @@ EXPORT LweKeySwitchKey* new_LweKeySwitchKey_array(int nbelts, int n, int t, int 
 EXPORT void delete_LweKeySwitchKey(LweKeySwitchKey* obj);
 EXPORT void delete_LweKeySwitchKey_array(int nbelts, LweKeySwitchKey* obj);
 
-#endif // LweKEYSWITCH_H
+#endif // LWEKEYSWITCH_H

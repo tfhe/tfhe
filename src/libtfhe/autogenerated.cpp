@@ -188,66 +188,6 @@ EXPORT void delete_LweBootstrappingKeyFFT_array(int nbelts, LweBootstrappingKeyF
     destroy_LweBootstrappingKeyFFT_array(nbelts,obj);
     free_LweBootstrappingKeyFFT_array(nbelts,obj);
 }
-#include "lwekey.h" 
-//allocate memory space for a LweKey
-
-EXPORT LweKey* alloc_LweKey() {
-    return (LweKey*) malloc(sizeof(LweKey));
-}
-EXPORT LweKey* alloc_LweKey_array(int nbelts) {
-    return (LweKey*) malloc(nbelts*sizeof(LweKey));
-}
-
-//free memory space for a LweKey
-EXPORT void free_LweKey(LweKey* ptr) {
-    free(ptr);
-}
-EXPORT void free_LweKey_array(int nbelts, LweKey* ptr) {
-    free(ptr);
-}
-
-//initialize the key structure
-//(equivalent of the C++ constructor)
-EXPORT void init_LweKey(LweKey* obj, const LweParams* params) {
-    new(obj) LweKey(params);
-}
-EXPORT void init_LweKey_array(int nbelts, LweKey* obj, const LweParams* params) {
-    for (int i=0; i<nbelts; i++) {
-	new(obj+i) LweKey(params);
-    }
-}
-
-//destroys the LweKey structure
-//(equivalent of the C++ destructor)
-EXPORT void destroy_LweKey(LweKey* obj) {
-    obj->~LweKey();
-}
-EXPORT void destroy_LweKey_array(int nbelts, LweKey* obj) {
-    for (int i=0; i<nbelts; i++) {
-	(obj+i)->~LweKey();
-    }
-}
- 
-//allocates and initialize the LweKey structure
-//(equivalent of the C++ new)
-EXPORT LweKey* new_LweKey(const LweParams* params) {
-    return new LweKey(params);
-}
-EXPORT LweKey* new_LweKey_array(int nbelts, const LweParams* params) {
-    LweKey* obj = alloc_LweKey_array(nbelts);
-    init_LweKey_array(nbelts,obj,params);
-    return obj;
-}
-
-//destroys and frees the LweKey structure
-//(equivalent of the C++ delete)
-EXPORT void delete_LweKey(LweKey* obj) {
-    delete obj;
-}
-EXPORT void delete_LweKey_array(int nbelts, LweKey* obj) {
-    destroy_LweKey_array(nbelts,obj);
-    free_LweKey_array(nbelts,obj);
-}
 #include "lwekeyswitch.h" 
 //allocate memory space for a LweKeySwitchKey
 
@@ -367,66 +307,6 @@ EXPORT void delete_LweParams(LweParams* obj) {
 EXPORT void delete_LweParams_array(int nbelts, LweParams* obj) {
     destroy_LweParams_array(nbelts,obj);
     free_LweParams_array(nbelts,obj);
-}
-#include "lwesamples.h" 
-//allocate memory space for a LweSample
-
-EXPORT LweSample* alloc_LweSample() {
-    return (LweSample*) malloc(sizeof(LweSample));
-}
-EXPORT LweSample* alloc_LweSample_array(int nbelts) {
-    return (LweSample*) malloc(nbelts*sizeof(LweSample));
-}
-
-//free memory space for a LweKey
-EXPORT void free_LweSample(LweSample* ptr) {
-    free(ptr);
-}
-EXPORT void free_LweSample_array(int nbelts, LweSample* ptr) {
-    free(ptr);
-}
-
-//initialize the key structure
-//(equivalent of the C++ constructor)
-EXPORT void init_LweSample(LweSample* obj, const LweParams* params) {
-    new(obj) LweSample(params);
-}
-EXPORT void init_LweSample_array(int nbelts, LweSample* obj, const LweParams* params) {
-    for (int i=0; i<nbelts; i++) {
-	new(obj+i) LweSample(params);
-    }
-}
-
-//destroys the LweSample structure
-//(equivalent of the C++ destructor)
-EXPORT void destroy_LweSample(LweSample* obj) {
-    obj->~LweSample();
-}
-EXPORT void destroy_LweSample_array(int nbelts, LweSample* obj) {
-    for (int i=0; i<nbelts; i++) {
-	(obj+i)->~LweSample();
-    }
-}
- 
-//allocates and initialize the LweSample structure
-//(equivalent of the C++ new)
-EXPORT LweSample* new_LweSample(const LweParams* params) {
-    return new LweSample(params);
-}
-EXPORT LweSample* new_LweSample_array(int nbelts, const LweParams* params) {
-    LweSample* obj = alloc_LweSample_array(nbelts);
-    init_LweSample_array(nbelts,obj,params);
-    return obj;
-}
-
-//destroys and frees the LweSample structure
-//(equivalent of the C++ delete)
-EXPORT void delete_LweSample(LweSample* obj) {
-    delete obj;
-}
-EXPORT void delete_LweSample_array(int nbelts, LweSample* obj) {
-    destroy_LweSample_array(nbelts,obj);
-    free_LweSample_array(nbelts,obj);
 }
 
 #include "tgsw.h" 
@@ -551,66 +431,6 @@ EXPORT void delete_TGswParams_array(int nbelts, TGswParams* obj) {
 }
 #include "tgsw.h" 
 #include "tlwe.h" 
-//allocate memory space for a TLweKey
-
-EXPORT TLweKey* alloc_TLweKey() {
-    return (TLweKey*) malloc(sizeof(TLweKey));
-}
-EXPORT TLweKey* alloc_TLweKey_array(int nbelts) {
-    return (TLweKey*) malloc(nbelts*sizeof(TLweKey));
-}
-
-//free memory space for a LweKey
-EXPORT void free_TLweKey(TLweKey* ptr) {
-    free(ptr);
-}
-EXPORT void free_TLweKey_array(int nbelts, TLweKey* ptr) {
-    free(ptr);
-}
-
-//initialize the key structure
-//(equivalent of the C++ constructor)
-EXPORT void init_TLweKey(TLweKey* obj, const TLweParams* params) {
-    new(obj) TLweKey(params);
-}
-EXPORT void init_TLweKey_array(int nbelts, TLweKey* obj, const TLweParams* params) {
-    for (int i=0; i<nbelts; i++) {
-	new(obj+i) TLweKey(params);
-    }
-}
-
-//destroys the TLweKey structure
-//(equivalent of the C++ destructor)
-EXPORT void destroy_TLweKey(TLweKey* obj) {
-    obj->~TLweKey();
-}
-EXPORT void destroy_TLweKey_array(int nbelts, TLweKey* obj) {
-    for (int i=0; i<nbelts; i++) {
-	(obj+i)->~TLweKey();
-    }
-}
- 
-//allocates and initialize the TLweKey structure
-//(equivalent of the C++ new)
-EXPORT TLweKey* new_TLweKey(const TLweParams* params) {
-    return new TLweKey(params);
-}
-EXPORT TLweKey* new_TLweKey_array(int nbelts, const TLweParams* params) {
-    TLweKey* obj = alloc_TLweKey_array(nbelts);
-    init_TLweKey_array(nbelts,obj,params);
-    return obj;
-}
-
-//destroys and frees the TLweKey structure
-//(equivalent of the C++ delete)
-EXPORT void delete_TLweKey(TLweKey* obj) {
-    delete obj;
-}
-EXPORT void delete_TLweKey_array(int nbelts, TLweKey* obj) {
-    destroy_TLweKey_array(nbelts,obj);
-    free_TLweKey_array(nbelts,obj);
-}
-#include "tlwe.h" 
 //allocate memory space for a TLweParams
 
 EXPORT TLweParams* alloc_TLweParams() {
@@ -669,66 +489,6 @@ EXPORT void delete_TLweParams(TLweParams* obj) {
 EXPORT void delete_TLweParams_array(int nbelts, TLweParams* obj) {
     destroy_TLweParams_array(nbelts,obj);
     free_TLweParams_array(nbelts,obj);
-}
-#include "tlwe.h" 
-//allocate memory space for a TLweSample
-
-EXPORT TLweSample* alloc_TLweSample() {
-    return (TLweSample*) malloc(sizeof(TLweSample));
-}
-EXPORT TLweSample* alloc_TLweSample_array(int nbelts) {
-    return (TLweSample*) malloc(nbelts*sizeof(TLweSample));
-}
-
-//free memory space for a LweKey
-EXPORT void free_TLweSample(TLweSample* ptr) {
-    free(ptr);
-}
-EXPORT void free_TLweSample_array(int nbelts, TLweSample* ptr) {
-    free(ptr);
-}
-
-//initialize the key structure
-//(equivalent of the C++ constructor)
-EXPORT void init_TLweSample(TLweSample* obj, const TLweParams* params) {
-    new(obj) TLweSample(params);
-}
-EXPORT void init_TLweSample_array(int nbelts, TLweSample* obj, const TLweParams* params) {
-    for (int i=0; i<nbelts; i++) {
-	new(obj+i) TLweSample(params);
-    }
-}
-
-//destroys the TLweSample structure
-//(equivalent of the C++ destructor)
-EXPORT void destroy_TLweSample(TLweSample* obj) {
-    obj->~TLweSample();
-}
-EXPORT void destroy_TLweSample_array(int nbelts, TLweSample* obj) {
-    for (int i=0; i<nbelts; i++) {
-	(obj+i)->~TLweSample();
-    }
-}
- 
-//allocates and initialize the TLweSample structure
-//(equivalent of the C++ new)
-EXPORT TLweSample* new_TLweSample(const TLweParams* params) {
-    return new TLweSample(params);
-}
-EXPORT TLweSample* new_TLweSample_array(int nbelts, const TLweParams* params) {
-    TLweSample* obj = alloc_TLweSample_array(nbelts);
-    init_TLweSample_array(nbelts,obj,params);
-    return obj;
-}
-
-//destroys and frees the TLweSample structure
-//(equivalent of the C++ delete)
-EXPORT void delete_TLweSample(TLweSample* obj) {
-    delete obj;
-}
-EXPORT void delete_TLweSample_array(int nbelts, TLweSample* obj) {
-    destroy_TLweSample_array(nbelts,obj);
-    free_TLweSample_array(nbelts,obj);
 }
 #include "polynomials.h" 
 //allocate memory space for a TorusPolynomial
