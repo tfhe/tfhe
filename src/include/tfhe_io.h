@@ -54,7 +54,62 @@ EXPORT LweParams* new_lweParams_fromStream(std::istream& in);
 
 #endif
 
+/* ****************************
+ * LWE sample
+**************************** */
 
+/**
+ * This function prints the lwe sample to a file
+ */
+EXPORT void export_lweSample_toFile(FILE* F, const LweSample* lwesample, const LweParams* params);
+
+/**
+ * This function reads a LWESample from a stream in an
+ * already allocated lwesample.
+ */
+EXPORT void import_lweSample_fromFile(FILE* F, LweSample* lwesample, const LweParams* params);
+
+#ifdef __cplusplus
+
+/**
+ * This function prints the lwe sample to a stream
+ */
+EXPORT void export_lweSample_toStream(std::ostream& F, const LweSample* lwesample, const LweParams* params);
+
+/**
+ * This function reads a LWESample from a stream in an
+ * already allocated lwesample.
+ */
+EXPORT void import_lweSample_fromStream(std::istream& in, LweSample* lwesample, const LweParams* params);
+
+#endif
+
+
+/**
+ * This function prints the lwe parameters to a file
+ */
+EXPORT void export_lweKey_toFile(FILE* F, const LweKey* lwekey);
+
+/**
+ * This constructor function reads and creates a LWEKey from a File. The result
+ * must be deleted with delete_lweKey();
+ */
+EXPORT LweKey* new_lweKey_fromFile(FILE* F);
+
+#ifdef __cplusplus
+
+/**
+ * This function prints the lwe parameters to a stream
+ */
+EXPORT void export_lweKey_toStream(std::ostream& F, const LweKey* lwekey);
+
+/**
+ * This constructor function reads and creates a LWEKey from a stream. The result
+ * must be deleted with delete_lweKey();
+ */
+EXPORT LweKey* new_lweKey_fromStream(std::istream& in);
+
+#endif
 
 
 /* ********************************************************
