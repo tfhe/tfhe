@@ -84,6 +84,9 @@ EXPORT void import_lweSample_fromStream(std::istream& in, LweSample* lwesample, 
 
 #endif
 
+/* ****************************
+ * LWE key
+**************************** */
 
 /**
  * This function prints the lwe parameters to a file
@@ -148,8 +151,65 @@ EXPORT TLweParams* new_tLweParams_fromStream(std::istream& in);
 #endif
 
 
+/* ****************************
+ * TLWE sample
+**************************** */
 
+/**
+ * This function prints the tlwe sample to a file
+ */
+EXPORT void export_tlweSample_toFile(FILE* F, const TLweSample* tlwesample, const TLweParams* params);
 
+/**
+ * This function reads a TLWESample from a stream in an
+ * already allocated tlwesample.
+ */
+EXPORT void import_tlweSample_fromFile(FILE* F, TLweSample* tlwesample, const TLweParams* params);
+
+#ifdef __cplusplus
+
+/**
+ * This function prints the tlwe sample to a stream
+ */
+EXPORT void export_tlweSample_toStream(std::ostream& F, const TLweSample* tlwesample, const TLweParams* params);
+
+/**
+ * This function reads a TLWESample from a stream in an
+ * already allocated tlwesample.
+ */
+EXPORT void import_tlweSample_fromStream(std::istream& in, TLweSample* tlwesample, const TLweParams* params);
+
+#endif
+
+/* ****************************
+ * TLWE key
+**************************** */
+
+/**
+ * This function prints the tlwe parameters to a file
+ */
+EXPORT void export_tlweKey_toFile(FILE* F, const TLweKey* tlwekey);
+
+/**
+ * This constructor function reads and creates a TLWEKey from a File. The result
+ * must be deleted with delete_tlweKey();
+ */
+EXPORT TLweKey* new_tlweKey_fromFile(FILE* F);
+
+#ifdef __cplusplus
+
+/**
+ * This function prints the tlwe parameters to a stream
+ */
+EXPORT void export_tlweKey_toStream(std::ostream& F, const TLweKey* tlwekey);
+
+/**
+ * This constructor function reads and creates a TLWEKey from a stream. The result
+ * must be deleted with delete_tlweKey();
+ */
+EXPORT TLweKey* new_tlweKey_fromStream(std::istream& F);
+
+#endif
 
 
 
@@ -193,7 +253,65 @@ EXPORT TGswParams* new_tGswParams_fromStream(std::istream& in);
 #endif
 
 
+/* ****************************
+ * TGSW sample
+**************************** */
 
+/**
+ * This function prints the tgsw sample to a file
+ */
+EXPORT void export_tgswSample_toFile(FILE* F, const TGswSample* tgswsample, const TGswParams* params);
+
+/**
+ * This function reads a TGSWSample from a stream in an
+ * already allocated tgswsample.
+ */
+EXPORT void import_tgswSample_fromFile(FILE* F, TGswSample* tgswsample, const TGswParams* params);
+
+#ifdef __cplusplus
+
+/**
+ * This function prints the tgsw sample to a stream
+ */
+EXPORT void export_tgswSample_toStream(std::ostream& F, const TGswSample* tgswsample, const TGswParams* params);
+
+/**
+ * This function reads a TGSWSample from a stream in an
+ * already allocated tgswsample.
+ */
+EXPORT void import_tgswSample_fromStream(std::istream& F, TGswSample* tgswsample, const TGswParams* params);
+
+#endif
+
+/* ****************************
+ * TGSW key
+**************************** */
+
+/**
+ * This function prints the tgsw parameters to a file
+ */
+EXPORT void export_tgswKey_toFile(FILE* F, const TGswKey* tgswkey);
+
+/**
+ * This constructor function reads and creates a TGSWKey from a File. The result
+ * must be deleted with delete_tgswKey();
+ */
+EXPORT TGswKey* new_tgswKey_fromFile(FILE* F);
+
+#ifdef __cplusplus
+
+/**
+ * This function prints the tgsw parameters to a stream
+ */
+EXPORT void export_tgswKey_toStream(std::ostream& F, const TGswKey* tgswkey);
+
+/**
+ * This constructor function reads and creates a TGSWKey from a stream. The result
+ * must be deleted with delete_tgswKey();
+ */
+EXPORT TGswKey* new_tgswKey_fromStream(std::istream& F);
+
+#endif
 
 
 
