@@ -1,8 +1,63 @@
 #ifndef FAKE_LWE_KEYSWITCH_H
 #define FAKE_LWE_KEYSWITCH_H
 
-#include <tfhe.h>
+#include "tfhe.h"
+#include "tfhe_core.h"
+#include "lwesamples.h"
 #include "./lwe.h"
+
+
+// Fake LWE structure 
+struct FakeLweKeySwitchKey {
+    static const int FAKE_KS_UID=25789314; // precaution: do not confuse fakes with trues
+    const int fake_uid;
+    LweSample*** ks;
+    double current_variance;
+
+    // construct
+    FakeLweKeySwitchKey(int n, int t, int basebit, const LweParams* out_params):fake_uid(FAKE_KS_UID) {
+        int base = 1<<basebit;
+        ks0_raw = new_LweSample_array(n*t*base,out_params);
+        ks1_raw = new LweSample*[n*t];
+        ks = new LweSample**[n];
+
+        for (int p = 0; p < n*t; ++p)
+            ks1_raw[p] = ks0_raw + base*p;
+        for (int p = 0; p < n; ++p)
+            ks[p] = ks1_raw + t*p;
+        
+        current_variance = 0.;
+    }
+
+    // delete
+    ~FakeLweKeySwitchKey() {
+        if (fake_uid!=FAKE_KS_UID) abort();
+        delete_LweSample_array(ks0_raw);
+        delete[] ks1_raw;
+        delete[] ks;
+    }
+    FakeLweKeySwitchKey(const FakeLweKeySwitchKey&)=delete;
+    void operator=(const FakeLweKeySwitchKey&)=delete;
+};
+
+
+
+
+inline FakeLweKeySwitchKey* fake(LweSample*** sample) {
+    FakeLweKeySwitchKey* reps = (FakeLweKeySwitchKey*) sample;
+    if (reps->fake_uid!=FakeLweKeySwitchKey::FAKE_KS_UID) abort();
+    return reps; 
+}
+inline const FakeLweKeySwitchKey* fake(const LweSample*** sample) {
+    const FakeLweKeySwitchKey* reps = (const FakeLweKeySwitchKey*) sample;
+    if (reps->fake_uid!=FakeLweKeySwitchKey::FAKE_KS_UID) abort();
+    return reps; 
+}
+
+
+
+
+
 
 /**
  * fills the KeySwitching key array
