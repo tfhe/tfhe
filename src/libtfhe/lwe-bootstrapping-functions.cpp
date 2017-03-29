@@ -62,6 +62,9 @@ EXPORT void tfhe_blindRotate(TLweSample* accum, const TGswSample* bk, const int*
 }
 #endif 
 
+
+
+
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_BLIND_ROTATE_AND_EXTRACT
 #undef INCLUDE_TFHE_BLIND_ROTATE_AND_EXTRACT
 /**
@@ -80,6 +83,7 @@ EXPORT void tfhe_blindRotateAndExtract(LweSample* result,
 	const int* bara,
 	const int n,
 	const TGswParams* bk_params) {
+
     const TLweParams* accum_params = bk_params->tlwe_params;
     const LweParams* extract_params = &accum_params->extracted_lweparams;
     const int N = accum_params->N;

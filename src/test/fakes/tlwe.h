@@ -1,6 +1,9 @@
 #ifndef FAKES_TLWE_H
 #define FAKES_TLWE_H
 
+#include "./lwe.h"
+
+
 /* **************************
 Fakes for TLWE 
 ************************** */

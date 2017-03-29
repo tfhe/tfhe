@@ -8,44 +8,44 @@
 struct FakeLweBootstrappingKey{
     const LweParams* in_out_params; ///< paramètre de l'input et de l'output. key: s
     const TGswParams* bk_params; ///< params of the Gsw elems in bk. key: s"
-    const TLweParams* accum_params; ///< params of the accum variable key: s"
-    const LweParams* extract_params; ///< params after extraction: key: s' 
     TGswSample* bk; ///< the bootstrapping key (s->s")
     LweKeySwitchKey* ks; ///< the keyswitch key (s'->s)
 
     FakeLweBootstrappingKey(const LweParams* in_out_params, const TGswParams* bk_params) {
-	this->in_out_params = in_out_params;
-	this->bk_params= bk_params;
-	this->accum_params= bk_params->tlwe_params;
-	this->extract_params=&accum_params->extracted_lweparams;
-	const int n = in_out_params->n;
-	const int N = extract_params->n;
-	const int kslength = 15;
-	const int basebit = 2;
+    	this->in_out_params = in_out_params;
+    	this->bk_params= bk_params;
+    	const int n = in_out_params->n;
+    	const int kslength = 15;
+    	const int basebit = 2;
 
-	this->bk = fake_new_TGswSample_array(n,this->bk_params);
-    // ks doir etre fake comme le reste
-    this->ks=new_LweKeySwitchKey(N, kslength, basebit, in_out_params);
+    	this->bk = fake_new_TGswSample_array(n,this->bk_params);
+        this->ks= fake_new_LweKeySwitchKey(n, kslength, basebit);
     }
     ~FakeLweBootstrappingKey() {
-	delete_LweKeySwitchKey(ks);
-	fake_delete_TGswSample_array(in_out_params->n,bk);
+    	fake_delete_LweKeySwitchKey(ks);
+    	fake_delete_TGswSample_array(in_out_params->n,bk);
     }
     FakeLweBootstrappingKey(const LweBootstrappingKey&) = delete;
     void operator=(const FakeLweBootstrappingKey&) = delete;  
 };
+
+
+
 
 FakeLweBootstrappingKey* fake(LweBootstrappingKey* key) {
     FakeLweBootstrappingKey* fkey = (FakeLweBootstrappingKey*) key;
     fake(fkey->bk); //test if bk is a fake
     return fkey;
 }
-
 const FakeLweBootstrappingKey* fake(const LweBootstrappingKey* key) {
     const FakeLweBootstrappingKey* fkey = (const FakeLweBootstrappingKey*) key;
     fake(fkey->bk); //test if bk is a fake
     return fkey;
 }
+
+
+
+
 
 inline LweBootstrappingKey* fake_new_LweBootstrappingKey(const LweParams* in_out_params, const TGswParams* bk_params) {
     return (LweBootstrappingKey*) new FakeLweBootstrappingKey(in_out_params, bk_params);
@@ -55,6 +55,9 @@ inline void fake_delete_LweBootstrappingKey(LweBootstrappingKey* bk) {
     FakeLweBootstrappingKey* fbk = fake(bk);
     delete fbk;
 }
+
+
+
 
 inline void fake_tfhe_createLweBootstrappingKey(
 	LweBootstrappingKey* bk, 
@@ -95,27 +98,22 @@ inline void fake_tfhe_createLweBootstrappingKey(
  * @param bara An array of n coefficients between 0 and 2N-1
  * @param bk_params The parameters of bk
  */
-inline void fake_tfhe_blindRotate(TLweSample* accum, 
-	const TGswSample* bk, 
-	const int* bara,
-	const int n,
-	const TGswParams* bk_params) {
+inline void fake_tfhe_blindRotate(FakeTLwe* accum, const TGswSample* bk, const int* bara, const int n, const TGswParams* bk_params) {
+    
     int offset = 0;
     for (int i=0; i<n; i++) {
-	const int si = fake(bk+i)->message->coefs[0];
-	const int barai=bara[i];
-	if (barai==0 || si==0) continue; //indeed, this is an easy case!
-	offset = (offset + barai*si) % (2*bk_params->tlwe_params->N);
+    	const int si = fake(bk+i)->message->coefs[0];
+    	const int barai=bara[i];
+    	if (barai==0 || si==0) continue; //indeed, this is an easy case!
+    	offset = (offset + barai*si) % (2*bk_params->tlwe_params->N); // sum_{i=...n-1} barai*si mod 2N
     }
     //TODO: make a fake function for that
-    torusPolynomialCopy(accum->a,accum->b);
-    torusPolynomialMulByXai(accum->b,offset,accum->a);
-    torusPolynomialClear(accum->a);
+    torusPolynomialMulByXai(accum->message,offset,accum->message);
     //TODO update the variance
 }
 
 #define USE_FAKE_tfhe_blindRotate \
-    inline void tfhe_blindRotate(TLweSample* accum, \
+    inline void tfhe_blindRotate(FakeTLwe* accum, \
 	    const TGswSample* bk, \
 	    const int* bara, \
 	    const int n, \
@@ -132,30 +130,30 @@ inline void fake_tfhe_blindRotate(TLweSample* accum,
  * @param bara An array of n coefficients between 0 and 2N-1
  * @param bk_params The parameters of bk
  */
-inline void fake_tfhe_blindRotateAndExtract(LweSample* result, 
+inline void fake_tfhe_blindRotateAndExtract(FakeLwe* result, 
 	const TorusPolynomial* v,
 	const TGswSample* bk, 
 	const int barb,
 	const int* bara,
 	const int n,
 	const TGswParams* bk_params) {
-    const TLweParams* accum_params = bk_params->tlwe_params;
-    const LweParams* extract_params = &accum_params->extracted_lweparams;
-    const int N = accum_params->N;
+
+    const int N = bk_params->tlwe_params->N;
     const int _2N = 2*N;
 
+    // or maybe use the fake_tfhe_blindRotate
     int offset = barb;
     for (int i=0; i<n; i++) {
-	int si = fake(bk+i)->message->coefs[0];
-	offset = (offset + _2N - si*bara[i])%(_2N);
+	   int si = fake(bk+i)->message->coefs[0];
+	   offset = (offset + _2N - si*bara[i])%(_2N);
     }
-    Torus32 message = offset<N?v->coefsT[offset]:-v->coefsT[offset-N];
-    lweNoiselessTrivial(result,message,extract_params);
+    
+    result->message = (offset<N)?(v->coefsT[offset]):(-v->coefsT[offset-N]);
     result->current_variance=0; //TODO variance
 }
 
 #define USE_FAKE_tfhe_blindRotateAndExtract \
-    inline void tfhe_blindRotateAndExtract(LweSample* result, \
+    inline void tfhe_blindRotateAndExtract(FakeLwe* result, \
 	    const TorusPolynomial* v, \
 	    const TGswSample* bk, \
 	    const int barb, \
@@ -173,12 +171,12 @@ inline void fake_tfhe_blindRotateAndExtract(LweSample* result,
  * @param mu The output message (if phase(x)>0)
  * @param x The input sample
  */
-inline void fake_tfhe_bootstrap(LweSample* result, 
+inline void fake_tfhe_bootstrap(FakeLwe* result, 
 	const LweBootstrappingKey* bk, 
 	Torus32 mu, const LweSample* x){
+
     const TGswParams* bk_params = bk->bk_params;
     const TLweParams* accum_params = bk->accum_params;
-    const LweParams* extract_params = &accum_params->extracted_lweparams;
     const LweParams* in_params = bk->in_out_params;
     const int N=accum_params->N;
     const int Nx2= 2*N;
@@ -186,7 +184,7 @@ inline void fake_tfhe_bootstrap(LweSample* result,
 
     TorusPolynomial* testvect=new_TorusPolynomial(N);
     int* bara = new int[N];
-    LweSample* u = new_LweSample(extract_params);
+    //LweSample* u = new_LweSample(extract_params);
 
     int barb=modSwitchFromTorus32(x->b,Nx2);
     for (int i=0; i<n; i++) {
@@ -196,48 +194,21 @@ inline void fake_tfhe_bootstrap(LweSample* result,
     //the initial testvec = [mu,mu,mu,...,mu]
     for (int i=0;i<N;i++) testvect->coefsT[i]=mu;
 
-    fake_tfhe_blindRotateAndExtract(u, testvect, bk->bk, barb, bara, n, bk_params);
+    //fake_tfhe_blindRotateAndExtract(u, testvect, bk->bk, barb, bara, n, bk_params);
+    fake_tfhe_blindRotateAndExtract(result, testvect, bk->bk, barb, bara, n, bk_params);
+    // lweKeySwitch(result, bk->ks, u);
+    fake_lweKeySwitch(result, bk->ks, result);
 
-    lweKeySwitch(result, bk->ks, u);
-
-    delete_LweSample(u);
+    //delete_LweSample(u);
     delete[] bara;
     delete_TorusPolynomial(testvect);
 }
 
-#if defined INCLUDE_ALL || defined INCLUDE_TFHE_CREATEBOOTSTRAPPINGKEY
-EXPORT void tfhe_createLweBootstrappingKey(
-	LweBootstrappingKey* bk, 
-	const LweKey* key_in, 
-	const TGswKey* rgsw_key) {
-    assert(bk->bk_params==rgsw_key->params);
-    assert(bk->in_out_params==key_in->params);
-
-    const LweParams* in_out_params = bk->in_out_params; 
-    const TGswParams* bk_params = bk->bk_params;
-    const TLweParams* accum_params = bk_params->tlwe_params;
-    const LweParams* extract_params = &accum_params->extracted_lweparams;
-
-    //LweKeySwitchKey* ks; ///< the keyswitch key (s'->s)
-    const TLweKey* accum_key = &rgsw_key->tlwe_key;
-    LweKey* extracted_key = new_LweKey(extract_params);
-    tLweExtractKey(extracted_key, accum_key);
-    lweCreateKeySwitchKey(bk->ks, extracted_key, key_in);
-    delete_LweKey(extracted_key);
-
-    //TGswSample* bk; ///< the bootstrapping key (s->s")
-    int* kin = key_in->key;
-    const double alpha = accum_params->alpha_min;
-    const int n = in_out_params->n;
-    const int kpl = bk_params->kpl;
-    const int k = accum_params->k;
-    const int N = accum_params->N;
-    cout << "create the bootstrapping key bk ("  << "  " << n*kpl*(k+1)*N*4 << " bytes)" << endl;
-    cout << "  with noise_stdev: " << alpha << endl;
-    for (int i=0; i<n; i++) {
-	tGswSymEncryptInt(&bk->bk[i], kin[i], alpha, rgsw_key);
-    }
+#define USE_FAKE_tfhe_bootstrap \
+inline void tfhe_bootstrap(FakeLwe* result, const LweBootstrappingKey* bk, Torus32 mu, const LweSample* x) { \
+    fake_tfhe_bootstrap(result,bk,mu,x); \
 }
-#endif
+
+
 
 #endif // FAKE_LWE_BOOTSTRAPPING_H

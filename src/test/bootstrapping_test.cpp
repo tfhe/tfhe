@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 //#include <gmock/gmock.h>
 #include "tfhe.h"
+#include "fakes/tlwe.h"
 #include "fakes/tgsw.h"
 #include "fakes/lwe-bootstrapping.h"
 #define TFHE_TEST_ENVIRONMENT 1
@@ -66,51 +67,55 @@ namespace {
     //	    const int n,
     //	    const TGswParams* bk_params) {
     TEST_F(TfheBlindRotateTest,tfheBlindRotateTest) {
-	LweKey* key = new_LweKey(in_params);
-	lweKeyGen(key);
-	TGswKey* key_bk = new_TGswKey(bk_params);
-	tGswKeyGen(key_bk);
-	TGswSample* bk = fake_new_TGswSample_array(n, bk_params);
-	//create bara
-	int* bara = new int[n];
-	for (int i=0; i<n; i++) bara[i]=rand()%(2*N);
-	//create bk
-	for (int i=0; i<n; i++) fake_tGswSymEncryptInt(bk+i,key->key[i],alpha_bk,key_bk);
-	//create accum
-	TorusPolynomial* initAccumMessage = new_TorusPolynomial(N);
-	torusPolynomialUniform(initAccumMessage);
-	const double initAlphaAccum=0.2;
-	int expectedOffset=0;
-	TorusPolynomial* expectedAccumMessage = new_TorusPolynomial(N);
-	torusPolynomialCopy(expectedAccumMessage,initAccumMessage);
-	//double expectedAccumVariance=initAlphaAccum*initAlphaAccum;
-	TLweSample* accum = fake_new_TLweSample(accum_params);
-	FakeTLwe* faccum = fake(accum);
-	torusPolynomialCopy(faccum->message, initAccumMessage);
-	faccum->current_variance = initAlphaAccum*initAlphaAccum;
-	//call bootstraprotate: one iteration at a time
-	for (int i=0; i<n; i++) {
-	    tfhe_blindRotate(accum,bk+i,bara+i,1,bk_params);
-	    if (key->key[i]==1 && bara[i]!=0) {
-		expectedOffset=(expectedOffset+bara[i])%(2*N);
-		torusPolynomialMulByXai(expectedAccumMessage,expectedOffset,initAccumMessage);
-	    }
-	    //printf("i=%d,si=%d,barai=%d,offset=%d\n",i,key->key[i],bara[i],expectedOffset);
-	    for (int j=0; j<N; j++) ASSERT_EQ(expectedAccumMessage->coefsT[j],accum->b->coefsT[j]);
-	}
-	//Now, bootstraprotate: all iterations at once (same offset)
-	torusPolynomialCopy(faccum->message, initAccumMessage);
-	faccum->current_variance=initAlphaAccum*initAlphaAccum;
-	tfhe_blindRotate(accum,bk,bara,n,bk_params);
-	for (int j=0; j<N; j++) ASSERT_EQ(expectedAccumMessage->coefsT[j],accum->b->coefsT[j]);
-	//cleanup everything
-	fake_delete_TLweSample(accum);
-	delete_TorusPolynomial(expectedAccumMessage);
-	delete_TorusPolynomial(initAccumMessage);
-	delete[] bara;
-	fake_delete_TGswSample_array(n,bk);
-	delete_TGswKey(key_bk);
-	delete_LweKey(key);
+
+    	LweKey* key = new_LweKey(in_params);
+    	lweKeyGen(key);
+    	TGswKey* key_bk = new_TGswKey(bk_params);
+    	tGswKeyGen(key_bk);
+    	TGswSample* bk = fake_new_TGswSample_array(n, bk_params);
+
+    	//create bara
+    	int* bara = new int[n];
+    	for (int i=0; i<n; i++) bara[i]=rand()%(2*N);
+    	//create bk
+    	for (int i=0; i<n; i++) fake_tGswSymEncryptInt(bk+i,key->key[i],alpha_bk,key_bk);
+    	//create accum
+    	TorusPolynomial* initAccumMessage = new_TorusPolynomial(N);
+    	torusPolynomialUniform(initAccumMessage);
+    	const double initAlphaAccum=0.2;
+    	int expectedOffset=0;
+    	TorusPolynomial* expectedAccumMessage = new_TorusPolynomial(N);
+    	torusPolynomialCopy(expectedAccumMessage,initAccumMessage);
+    	//double expectedAccumVariance=initAlphaAccum*initAlphaAccum;
+    	TLweSample* accum = fake_new_TLweSample(accum_params);
+    	FakeTLwe* faccum = fake(accum);
+    	torusPolynomialCopy(faccum->message, initAccumMessage);
+    	faccum->current_variance = initAlphaAccum*initAlphaAccum;
+    	
+        //call bootstraprotate: one iteration at a time
+    	for (int i=0; i<n; i++) {
+    	    tfhe_blindRotate(accum,bk+i,bara+i,1,bk_params);
+    	    if (key->key[i]==1 && bara[i]!=0) {
+        		expectedOffset=(expectedOffset+bara[i])%(2*N);
+        		torusPolynomialMulByXai(expectedAccumMessage,expectedOffset,initAccumMessage);
+    	    }
+    	    //printf("i=%d,si=%d,barai=%d,offset=%d\n",i,key->key[i],bara[i],expectedOffset);
+    	    for (int j=0; j<N; j++) ASSERT_EQ(expectedAccumMessage->coefsT[j],accum->b->coefsT[j]);
+    	}
+    	//Now, bootstraprotate: all iterations at once (same offset)
+    	torusPolynomialCopy(faccum->message, initAccumMessage);
+    	faccum->current_variance=initAlphaAccum*initAlphaAccum;
+    	tfhe_blindRotate(accum,bk,bara,n,bk_params);
+    	for (int j=0; j<N; j++) ASSERT_EQ(expectedAccumMessage->coefsT[j],accum->b->coefsT[j]);
+    	
+        //cleanup everything
+    	fake_delete_TLweSample(accum);
+    	delete_TorusPolynomial(expectedAccumMessage);
+    	delete_TorusPolynomial(initAccumMessage);
+    	delete[] bara;
+    	fake_delete_TGswSample_array(n,bk);
+    	delete_TGswKey(key_bk);
+    	delete_LweKey(key);
     }
 
     class TfheBlindRotateAndExtractTest: public ::testing::Test {
