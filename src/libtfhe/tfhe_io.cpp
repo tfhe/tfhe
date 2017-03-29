@@ -19,7 +19,7 @@ using namespace std;
 /**
  * This function prints the lwe parameters to a generic stream
  */
-void export_lweParams(const Ostream& F, const LweParams* lweparams) {
+void write_lweParams(const Ostream& F, const LweParams* lweparams) {
     TextModeProperties* props = new_TextModeProperties_blank();
     props->setTypeTitle("LWEPARAMS");
     props->setProperty_long("n", lweparams->n);
@@ -47,13 +47,13 @@ LweParams* read_new_lweParams(const Istream& F) {
 /**
  * This function prints the lwe parameters to a file
  */
-EXPORT void export_lweParams_toFile(FILE* F, const LweParams* lweparams) { export_lweParams(to_Ostream(F),lweparams); }
+EXPORT void export_lweParams_toFile(FILE* F, const LweParams* lweparams) { write_lweParams(to_Ostream(F),lweparams); }
 
 /**
  * This constructor function reads and creates a LWEParams from a File. The result
  * must be deleted with delete_lweParams();
  */
-EXPORT void export_lweParams_toStream(ostream& F, const LweParams* lweparams) { export_lweParams(to_Ostream(F),lweparams); }
+EXPORT void export_lweParams_toStream(ostream& F, const LweParams* lweparams) { write_lweParams(to_Ostream(F),lweparams); }
 
 /**
  * This constructor function reads and creates a LWEParams from a stream. The result
@@ -94,6 +94,29 @@ void write_lweSample(const Ostream& F, const LweSample* sample, const LweParams*
 }
 
 
+/**
+ * This function prints the lwe sample to a file
+ */
+EXPORT void export_lweSample_toFile(FILE* F, const LweSample* lwesample, const LweParams* params) { write_lweSample(to_Ostream(F),lwesample, params); }
+
+/**
+ * This function prints the lwe sample to a stream
+ */
+EXPORT void export_lweSample_toStream(ostream& F, const LweSample* lwesample, const LweParams* params) { write_lweSample(to_Ostream(F),lwesample, params); }
+
+/**
+ * This function reads a LWESample from a stream in an
+ * already allocated lwesample.
+ */
+EXPORT void import_lweSample_fromStream(std::istream& in, LweSample* lwesample, const LweParams* params) { read_lweSample(to_Istream(in), lwesample, params); }
+
+/**
+ * This function reads a LWESample from a stream in an
+ * already allocated lwesample.
+ */
+EXPORT void import_lweSample_fromFile(FILE* F, LweSample* lwesample, const LweParams* params)  { read_lweSample(to_Istream(F), lwesample, params); }
+
+
 
 
 
@@ -101,9 +124,13 @@ void write_lweSample(const Ostream& F, const LweSample* sample, const LweParams*
 /* ****************************
  * LWE key
 **************************** */
-// the key has been previously defined, and the parameters are already given 
 
-void read_lweKey(const Istream& F, LweKey* key) {
+/**
+ * reads the the coefficients of the key in an already initialized key structure
+ * @param F the input stream
+ * @param key the destination key
+ */
+void read_lweKey_content(const Istream& F, LweKey* key) {
     const int n = key->params->n;
     int32_t type_uid;
     F.fread(&type_uid, sizeof(int32_t));
@@ -112,27 +139,65 @@ void read_lweKey(const Istream& F, LweKey* key) {
 }
 
 
-void write_lweKey(const Ostream& F, const LweKey* key) {
+/**
+ * writes the the coefficients of the key (not the parameters) to the stream
+ * @param F the output stream
+ * @param key the input key
+ */
+void write_lweKey_content(const Ostream& F, const LweKey* key) {
     const int n = key->params->n;
     F.fwrite(&LWE_KEY_TYPE_UID, sizeof(int32_t));
     F.fwrite(key->key, sizeof(int)*n);
 }
 
+/**
+ * this reads a new lweKey (params + content). The read params are garbage-collected, 
+ * the output key needs to be deleted by the user (with delete_LweKey). 
+ * @param F the input stream
+ * @Return the key
+ */
+LweKey* read_new_lweKey(const Istream& F) {
+    LweParams* params = read_new_lweParams(F);
+    global_tfheGarbageCollector.register_param(params);
+    LweKey* key = new_LweKey(params);
+    read_lweKey_content(F,key);
+    return key;
+}
+
+
+/**
+ * this writes a lweKey (params + content) to a stream. 
+ * @param F the output stream
+ * @Return the key
+ */
+void write_lweKey(const Ostream& F, const LweKey* key) {
+    write_lweParams(F,key->params);
+    write_lweKey_content(F,key);
+}
 
 
 
+/**
+ * This function prints the lwe parameters to a file
+ */
+EXPORT void export_lweKey_toFile(FILE* F, const LweKey* lwekey) { write_lweKey(to_Ostream(F),lwekey); }
 
+/**
+ * This function prints the lwe parameters to a stream
+ */
+EXPORT void export_lweKey_toStream(ostream& F, const LweKey* lwekey) { write_lweKey(to_Ostream(F),lwekey); }
 
+/**
+ * This constructor function reads and creates a LWEKey from a stream. The result
+ * must be deleted with delete_lweKey();
+ */
+EXPORT LweKey* new_lweKey_fromStream(std::istream& in) { return read_new_lweKey(to_Istream(in)); }
 
-
-
-
-
-
-
-
-
-
+/**
+ * This constructor function reads and creates a LWEKey from a File. The result
+ * must be deleted with delete_lweKey();
+ */
+EXPORT LweKey* new_lweKey_fromFile(FILE* F)  { return read_new_lweKey(to_Istream(F)); }
 
 
 
@@ -151,7 +216,7 @@ void write_lweKey(const Ostream& F, const LweKey* key) {
 /**
  * This function prints the tlwe parameters to a generic stream
  */
-void export_tLweParams(const Ostream& F, const TLweParams* tlweparams) {
+void write_tLweParams(const Ostream& F, const TLweParams* tlweparams) {
     TextModeProperties* props = new_TextModeProperties_blank();
     props->setTypeTitle("TLWEPARAMS");
     props->setProperty_long("N", tlweparams->N);
@@ -182,13 +247,13 @@ TLweParams* read_new_tLweParams(const Istream& F) {
 /**
  * This function prints the tLwe parameters to a file
  */
-EXPORT void export_tLweParams_toFile(FILE* F, const TLweParams* tlweparams) { export_tLweParams(to_Ostream(F),tlweparams); }
+EXPORT void export_tLweParams_toFile(FILE* F, const TLweParams* tlweparams) { write_tLweParams(to_Ostream(F),tlweparams); }
 
 /**
  * This constructor function reads and creates a TLWEParams from a File. The result
  * must be deleted with delete_TLweParams();
  */
-EXPORT void export_tLweParams_toStream(ostream& F, const TLweParams* tlweparams) { export_tLweParams(to_Ostream(F),tlweparams); }
+EXPORT void export_tLweParams_toStream(ostream& F, const TLweParams* tlweparams) { write_tLweParams(to_Ostream(F),tlweparams); }
 
 /**
  * This constructor function reads and creates a TLWEParams from a stream. The result
@@ -233,7 +298,28 @@ void write_tLweSample(const Ostream& F, const TLweSample* sample, const TLwePara
 }
 
 
+/**
+ * This function prints the tlwe sample to a file
+ */
+EXPORT void export_tlweSample_toFile(FILE* F, const TLweSample* tlwesample, const TLweParams* params) { write_tLweSample(to_Ostream(F),tlwesample, params); }
 
+/**
+ * This function reads a TLWESample from a stream in an
+ * already allocated tlwesample.
+ */
+EXPORT void import_tlweSample_fromFile(FILE* F, TLweSample* tlwesample, const TLweParams* params) { read_tLweSample(to_Istream(F),tlwesample, params); }
+
+
+/**
+ * This function prints the tlwe sample to a stream
+ */
+EXPORT void export_tlweSample_toStream(std::ostream& F, const TLweSample* tlwesample, const TLweParams* params) { write_tLweSample(to_Ostream(F),tlwesample, params); }
+
+/**
+ * This function reads a TLWESample from a stream in an
+ * already allocated tlwesample.
+ */
+EXPORT void import_tlweSample_fromStream(std::istream& F, TLweSample* tlwesample, const TLweParams* params)  { read_tLweSample(to_Istream(F),tlwesample, params); }
 
 
 
@@ -269,9 +355,11 @@ void write_tLweSampleFFT(const Ostream& F, const TLweSampleFFT* sample, const TL
 /* ****************************
  * TLWE key
 **************************** */
-// the key has been previously defined, and the parameters are already given 
 
-void read_tLweKey(const Istream& F, TLweKey* key) {
+/**
+ * reads the coefficients of a tlweKey, which has been previously be instantiated (the parameters are already given)
+ */ 
+void read_tLweKey_content(const Istream& F, TLweKey* key) {
     const int N = key->params->N;
     const int k = key->params->k;
     int32_t type_uid;
@@ -279,11 +367,13 @@ void read_tLweKey(const Istream& F, TLweKey* key) {
     if (type_uid != TLWE_KEY_TYPE_UID) abort();
     for (int i = 0; i < k; ++i) {
         F.fread(key->key[i].coefs, sizeof(int)*N);
-    }
-    
+    }    
 }
 
-void write_tLweKey(const Ostream& F, const TLweKey* key) {
+/**
+ * writes the coefficients of a tlweKey
+ */ 
+void write_tLweKey_content(const Ostream& F, const TLweKey* key) {
     const int N = key->params->N;
     const int k = key->params->k;
     F.fwrite(&TLWE_KEY_TYPE_UID, sizeof(int32_t));
@@ -292,20 +382,51 @@ void write_tLweKey(const Ostream& F, const TLweKey* key) {
     }
 }
 
+/**
+ * reads and creates the parameters and coefficients of a tlweKey.
+ * The result needs to be deleted by the user (with delete_TLweKey)
+ */ 
+TLweKey* read_new_tLweKey(const Istream& F) {
+    TLweParams* params = read_new_tLweParams(F);
+    global_tfheGarbageCollector.register_param(params);
+    TLweKey* key = new_TLweKey(params);
+    read_tLweKey_content(F,key);
+    return key;
+}
+
+/**
+ * writes the coefficients of a tlweKey
+ */ 
+void write_tLweKey(const Ostream& F, const TLweKey* key) {
+    write_tLweParams(F,key->params);
+    write_tLweKey_content(F,key);
+}
 
 
 
 
+/**
+ * This function prints the tlwe parameters to a file
+ */
+EXPORT void export_tlweKey_toFile(FILE* F, const TLweKey* tlwekey) { write_tLweKey(to_Ostream(F),tlwekey); }
+
+/**
+ * This constructor function reads and creates a TLWEKey from a File. The result
+ * must be deleted with delete_tlweKey();
+ */
+EXPORT TLweKey* new_tlweKey_fromFile(FILE* F) { return read_new_tLweKey(to_Istream(F)); }
 
 
+/**
+ * This function prints the tlwe parameters to a stream
+ */
+EXPORT void export_tlweKey_toStream(std::ostream& F, const TLweKey* tlwekey) { write_tLweKey(to_Ostream(F),tlwekey); }
 
-
-
-
-
-
-
-
+/**
+ * This constructor function reads and creates a TLWEKey from a stream. The result
+ * must be deleted with delete_tlweKey();
+ */
+EXPORT TLweKey* new_tlweKey_fromStream(std::istream& F) { return read_new_tLweKey(to_Istream(F)); }
 
 
 
@@ -323,7 +444,7 @@ void write_tLweKey(const Ostream& F, const TLweKey* key) {
  * This function prints the tGsw parameters to a generic stream
  * It only prints the TGSW section, not the Tlwe parameters
  */
-void export_tGswParams_section(const Ostream& F, const TGswParams* tgswparams) {
+void write_tGswParams_section(const Ostream& F, const TGswParams* tgswparams) {
     TextModeProperties* props = new_TextModeProperties_blank();
     props->setTypeTitle("TGSWPARAMS");
     props->setProperty_long("l", tgswparams->l);
@@ -335,9 +456,9 @@ void export_tGswParams_section(const Ostream& F, const TGswParams* tgswparams) {
 /**
  * This function prints the tGsw parameters to a generic stream
  */
-void export_tGswParams(const Ostream& F, const TGswParams* tgswparams) {
-    export_tLweParams(F, tgswparams->tlwe_params);
-    export_tGswParams_section(F, tgswparams);
+void write_tGswParams(const Ostream& F, const TGswParams* tgswparams) {
+    write_tLweParams(F, tgswparams->tlwe_params);
+    write_tGswParams_section(F, tgswparams);
 }
 
 /**
@@ -369,13 +490,13 @@ TGswParams* read_new_tGswParams(const Istream& F) {
 /**
  * This function prints the tLwe parameters to a file
  */
-EXPORT void export_tGswParams_toFile(FILE* F, const TGswParams* tgswparams) { export_tGswParams(to_Ostream(F),tgswparams); }
+EXPORT void export_tGswParams_toFile(FILE* F, const TGswParams* tgswparams) { write_tGswParams(to_Ostream(F),tgswparams); }
 
 /**
  * This constructor function reads and creates a TGSWParams from a File. The result
  * must be deleted with delete_TGswParams();
  */
-EXPORT void export_tGswParams_toStream(ostream& F, const TGswParams* tgswparams) { export_tGswParams(to_Ostream(F),tgswparams); }
+EXPORT void export_tGswParams_toStream(ostream& F, const TGswParams* tgswparams) { write_tGswParams(to_Ostream(F),tgswparams); }
 
 /**
  * This constructor function reads and creates a TGSWParams from a stream. The result
@@ -420,7 +541,28 @@ void write_tGswSample(const Ostream& F, const TGswSample* sample, const TGswPara
     }
 }
 
+/**
+ * This function prints the tgsw sample to a file
+ */
+EXPORT void export_tgswSample_toFile(FILE* F, const TGswSample* tgswsample, const TGswParams* params) { write_tGswSample(to_Ostream(F),tgswsample,params); }
 
+/**
+ * This function reads a TGSWSample from a stream in an
+ * already allocated tgswsample.
+ */
+EXPORT void import_tgswSample_fromFile(FILE* F, TGswSample* tgswsample, const TGswParams* params)  { read_tGswSample(to_Istream(F),tgswsample,params); }
+
+
+/**
+ * This function prints the tgsw sample to a stream
+ */
+EXPORT void export_tgswSample_toStream(std::ostream& F, const TGswSample* tgswsample, const TGswParams* params) { write_tGswSample(to_Ostream(F),tgswsample,params); }
+
+/**
+ * This function reads a TGSWSample from a stream in an
+ * already allocated tgswsample.
+ */
+EXPORT void import_tgswSample_fromStream(std::istream& F, TGswSample* tgswsample, const TGswParams* params) { read_tGswSample(to_Istream(F),tgswsample,params); }
 
 
 
@@ -456,9 +598,11 @@ void write_tGswSampleFFT(const Ostream& F, const TGswSampleFFT* sample, const TG
 /* ****************************
  * TGSW key
 **************************** */
-// the key has been previously defined, and the parameters are already given 
 
-void read_tGswKey(const Istream& F, TGswKey* key) {
+/**
+ * reads a tgsw key coefficients in a previously defined structure
+ */ 
+void read_tGswKey_content(const Istream& F, TGswKey* key) {
     const int N = key->params->tlwe_params->N;
     const int k = key->params->tlwe_params->k;
     int32_t type_uid;
@@ -471,7 +615,10 @@ void read_tGswKey(const Istream& F, TGswKey* key) {
 }
 
 
-void write_tGswKey(const Ostream& F, const TGswKey* key) {
+/**
+ * writes the tgsw key coefficients
+ */ 
+void write_tGswKey_content(const Ostream& F, const TGswKey* key) {
     const int N = key->params->tlwe_params->N;
     const int k = key->params->tlwe_params->k;
     F.fwrite(&TGSW_KEY_TYPE_UID, sizeof(int32_t));
@@ -481,4 +628,45 @@ void write_tGswKey(const Ostream& F, const TGswKey* key) {
     }
 }
 
+/**
+ * reads a tgsw key coefficients in a previously defined structure
+ */ 
+TGswKey* read_new_tGswKey(const Istream& F) {
+    TGswParams* params = read_new_tGswParams(F);
+    global_tfheGarbageCollector.register_param(params);
+    TGswKey* key = new_TGswKey(params);
+    read_tGswKey_content(F, key);
+    return key;
+}
+
+/**
+ * writes the tgsw key coefficients
+ */ 
+void write_tGswKey(const Ostream& F, const TGswKey* key) {
+    write_tGswParams(F,key->params);
+    write_tGswKey_content(F,key);
+}
+
+/**
+ * This function prints the tgsw parameters to a file
+ */
+EXPORT void export_tgswKey_toFile(FILE* F, const TGswKey* tgswkey) { write_tGswKey(to_Ostream(F), tgswkey); }
+
+/**
+ * This constructor function reads and creates a TGSWKey from a File. The result
+ * must be deleted with delete_tgswKey();
+ */
+EXPORT TGswKey* new_tgswKey_fromFile(FILE* F) { return read_new_tGswKey(to_Istream(F)); }
+
+
+/**
+ * This function prints the tgsw parameters to a stream
+ */
+EXPORT void export_tgswKey_toStream(std::ostream& F, const TGswKey* tgswkey)  { write_tGswKey(to_Ostream(F), tgswkey); }
+
+/**
+ * This constructor function reads and creates a TGSWKey from a stream. The result
+ * must be deleted with delete_tgswKey();
+ */
+EXPORT TGswKey* new_tgswKey_fromStream(std::istream& F) { return read_new_tGswKey(to_Istream(F)); }
 

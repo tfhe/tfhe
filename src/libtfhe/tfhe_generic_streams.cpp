@@ -103,22 +103,22 @@ TextModeProperties* new_TextModeProperties_fromIstream(const Istream& F) {
 	    reps->setTypeTitle(titleType);
 	    endDelimitor=string("-----END ")+titleType+string("-----");
 	    content_started=true;
-	    cerr << "Object: " << titleType << endl;
+	    //cerr << "Object: " << titleType << endl;
 	    continue;
 	}
 	if (!content_started) { cerr << "ignoring: " << line << endl; continue;}  //ignore anything before body 
 	if (line == endDelimitor) {
-	    cerr << "EndObject: " << reps->getTypeTitle() << endl;
+	    //cerr << "EndObject: " << reps->getTypeTitle() << endl;
 	    return reps;
 	}
 	size_t pos = line.find(": ");
 	if (pos==string::npos) { cerr << "ignoring: " << line << endl; continue; }
 	string name = line.substr(0,pos);
 	string value = line.substr(pos+2);
-	cerr << "prop: " << name << "->" << value << endl;
+	//cerr << "prop: " << name << "->" << value << endl;
 	reps->setProperty(name, value);
     }
-    cerr << "error reading text object" << endl;
+    //cerr << "error reading text object" << endl;
     return NULL;
 }
 
