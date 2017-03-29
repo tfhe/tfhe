@@ -2,58 +2,37 @@
 #define FAKE_LWE_KEYSWITCH_H
 
 #include "tfhe.h"
-#include "tfhe_core.h"
-#include "lwesamples.h"
 #include "./lwe.h"
 
 
 
-/*
-// Fake LWE structure 
+
 struct FakeLweKeySwitchKey {
-    static const int FAKE_KS_UID=25789314; // precaution: do not confuse fakes with trues
-    const int fake_uid;
-    LweSample*** ks;
-    double current_variance;
+    static const long FAKE_LWEKEYSWITCH_UID = 956475132024584l; // precaution: distinguish fakes from trues
+    const long fake_uid;
+    const int n;
+    const int t;
+    const int basebit;
+    const int base;
+    double variance_overhead;
+
+    //this padding is here to make sure that FakeLweKeySwitchKey and LweKeySwitchKey have the same size
+    char unused_padding[sizeof(LweKeySwitchKey)-sizeof(long)-4*sizeof(int)-sizeof(double)];
 
     // construct
-    FakeLweKeySwitchKey(int n, int t, int basebit, const LweParams* out_params):fake_uid(FAKE_KS_UID) {
-        int base = 1<<basebit;
-        ks0_raw = new_LweSample_array(n*t*base,out_params);
-        ks1_raw = new LweSample*[n*t];
-        ks = new LweSample**[n];
-
-        for (int p = 0; p < n*t; ++p)
-            ks1_raw[p] = ks0_raw + base*p;
-        for (int p = 0; p < n; ++p)
-            ks[p] = ks1_raw + t*p;
-        
-        current_variance = 0.;
+    FakeLweKeySwitchKey(int n, int t, int basebit): fake_uid(FAKE_LWEKEYSWITCH_UID), 
+    n(n), t(t), 
+    basebit(basebit), 
+    base(1<<basebit) {
+        variance_overhead = 0.; // ILA: attention!
     }
 
     // delete
     ~FakeLweKeySwitchKey() {
-        if (fake_uid!=FAKE_KS_UID) abort();
-        delete_LweSample_array(ks0_raw);
-        delete[] ks1_raw;
-        delete[] ks;
+        if (fake_uid!=FAKE_LWEKEYSWITCH_UID) abort();
     }
     FakeLweKeySwitchKey(const FakeLweKeySwitchKey&)=delete;
     void operator=(const FakeLweKeySwitchKey&)=delete;
-};
-*/
-
-
-class FakeLweKeySwitchKey {
-    public:
-    static const long FAKE_LWEKEYSWITCH_UID = 956475132024584l; // precaution: distinguish fakes from trues
-    const long fake_uid;
-    double variance_overhead;
-
-    //this padding is here to make sure that FakeTLwe and TLweSample have the same size
-    char unused_padding[sizeof(LweKeySwitchKey)-sizeof(long)-sizeof(double)];
-
-    FakeLweKeySwitchKey(): fake_uid(FAKE_LWE_KEYSWITCH_H) {}
 };
 
 // At compile time, we verify that the two structures have exactly the same size

@@ -15,6 +15,9 @@ struct FakeLwe {
     Torus32 message;
     double current_variance;
 
+    //this padding is here to make sure that FakeLwe and LweSample have the same size
+    char unused_padding[sizeof(LweSample)-sizeof(int)-sizeof(Torus32)-sizeof(double)];
+
     // construct
     FakeLwe():fake_uid(FAKE_LWE_UID) {
         current_variance = 0.;
@@ -27,6 +30,14 @@ struct FakeLwe {
     FakeLwe(const FakeLwe&)=delete;
     void operator=(const FakeLwe&)=delete;
 };
+
+
+
+// At compile time, we verify that the two structures have exactly the same size
+static_assert (sizeof(FakeLwe) == sizeof(LweSample), "Error: Size is not correct");
+
+
+
 
 
 
