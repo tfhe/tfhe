@@ -49,16 +49,64 @@ inline const FakeLwe* fake(const LweSample* sample) {
 
 
 
-// Fake symetric encryption of a Torus message
-inline void fake_lweSymEncrypt(LweSample* result, Torus32 message, double alpha, const LweKey* key) {
-    lweNoiselessTrivial(result,message,key->params);
-    result->current_variance=alpha*alpha;
+inline LweSample* fake_new_LweSample() {
+    FakeLwe* reps = (FakeLwe*) malloc(sizeof(FakeLwe));
+    new(reps) FakeLwe();
+    return (LweSample*) reps;
 }
 
-#define USE_FAKE_lweSymEncrypt \
-    inline void lweSymEncrypt(LweSample* result, Torus32 message, double alpha, const LweKey* key) { \
-    return fake_lweSymEncrypt(result,message,alpha,key); \
+#define USE_FAKE_new_LweSample \
+inline LweSample* new_LweSample() { \
+    return fake_new_LweSample(); \
 }
+
+inline void fake_delete_LweSample(LweSample* sample) {
+    FakeLwe* ptr = fake(sample);
+    (ptr)->~FakeLwe();
+    free(ptr);
+}
+
+#define USE_FAKE_delete_LweSample \
+inline void delete_LweSample(LweSample* sample) { \
+    fake_delete_LweSample(sample); \
+}
+
+
+
+
+
+
+
+
+inline LweSample* fake_new_LweSample_array(int nbelts) {
+    FakeLwe* arr = (FakeLwe*) malloc(nbelts*sizeof(FakeLwe));
+    for (int i=0; i<nbelts; i++) new(arr+i) FakeLwe();
+    return (LweSample*) arr;
+}
+
+#define USE_FAKE_new_LweSample_array \
+inline LweSample* new_LweSample_array(int nbelts) { \
+    return fake_new_LweSample_array(nbelts); \
+}
+
+inline void fake_delete_LweSample_array(int nbelts, LweSample* sample) {
+    FakeLwe* arr = fake(sample);
+    for (int i=0; i<nbelts; i++) (arr+i)->~FakeLwe();
+    free(arr);
+}
+
+#define USE_FAKE_delete_LweSample_array \
+inline void delete_LweSample_array(int nbelts, LweSample* samples) { \
+    fake_delete_LweSample_array(nbelts,samples); \
+}
+
+
+
+
+
+
+
+
 
 
 
@@ -74,6 +122,34 @@ inline Torus32 fake_lweVariance(const LweSample* sample) {
 
 
 
+
+
+
+// Fake symetric encryption of a Torus message
+inline void fake_lweSymEncrypt(LweSample* result, Torus32 message, double alpha, const LweKey* key) {
+    FakeLwe* fres = fake(result);
+    fres->message = message;
+    fres->current_variance = alpha*alpha; 
+}
+
+#define USE_FAKE_lweSymEncrypt \
+    inline void lweSymEncrypt(LweSample* result, Torus32 message, double alpha, const LweKey* key) { \
+    return fake_lweSymEncrypt(result,message,alpha,key); \
+}
+
+
+
+// Noiseless trivial of a Torus message
+inline void fake_lweNoiselessTrivial(LweSample* result, Torus32 message, const LweKey* key) {
+    FakeLwe* fres = fake(result);
+    fres->message = message;
+    fres->current_variance = 0; 
+}
+
+#define USE_FAKE_lweNoiselessTrivial \
+    inline void lweNoiselessTrivial(LweSample* result, Torus32 message, const LweKey* key) { \
+    return fake_lweNoiselessTrivial(result,message,key); \
+}
 
 
 

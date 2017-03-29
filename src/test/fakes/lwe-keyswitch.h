@@ -9,8 +9,6 @@
 
 
 /*
-<<<<<<< HEAD
-
 // Fake LWE structure 
 struct FakeLweKeySwitchKey {
     static const int FAKE_KS_UID=25789314; // precaution: do not confuse fakes with trues
@@ -43,19 +41,19 @@ struct FakeLweKeySwitchKey {
     FakeLweKeySwitchKey(const FakeLweKeySwitchKey&)=delete;
     void operator=(const FakeLweKeySwitchKey&)=delete;
 };
-
-
 */
-class FakeLweKeyswitchKey {
+
+
+class FakeLweKeySwitchKey {
     public:
     static const long FAKE_LWEKEYSWITCH_UID = 956475132024584l; // precaution: distinguish fakes from trues
     const long fake_uid;
-    const double variance_overhead;
+    double variance_overhead;
 
     //this padding is here to make sure that FakeTLwe and TLweSample have the same size
     char unused_padding[sizeof(LweKeySwitchKey)-sizeof(long)-sizeof(double)];
 
-    FakeLweKeyswitchKey(): fake_uid(FAKE_LWE_KEYSWITCH_H) {}
+    FakeLweKeySwitchKey(): fake_uid(FAKE_LWE_KEYSWITCH_H) {}
 };
 
 // At compile time, we verify that the two structures have exactly the same size
@@ -64,14 +62,14 @@ static_assert (sizeof(FakeLweKeySwitchKey) == sizeof(LweKeySwitchKey), "Error: S
 
 
 inline FakeLweKeySwitchKey* fake(LweKeySwitchKey* key) {
-    FakeLweKeyswitchKey* reps = (FakeLweKeyswitchKey*) key;
-    if (reps->fake_uid!=FakeLweKeyswitchKey::FAKE_LWEKEYSWITCH_UID) abort();
+    FakeLweKeySwitchKey* reps = (FakeLweKeySwitchKey*) key;
+    if (reps->fake_uid!=FakeLweKeySwitchKey::FAKE_LWEKEYSWITCH_UID) abort();
     return reps;
 }
 
 inline const FakeLweKeySwitchKey* fake(const LweKeySwitchKey* key) {
-    const FakeLweKeyswitchKey* reps = (const FakeLweKeyswitchKey*) key;
-    if (reps->fake_uid!=FakeLweKeyswitchKey::FAKE_LWEKEYSWITCH_UID) abort();
+    const FakeLweKeySwitchKey* reps = (const FakeLweKeySwitchKey*) key;
+    if (reps->fake_uid!=FakeLweKeySwitchKey::FAKE_LWEKEYSWITCH_UID) abort();
     return reps;
 }
 
@@ -157,14 +155,14 @@ void fake_lweKeySwitchTranslate_fromArray(LweSample* result,
 
 inline void fake_lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key){
     const double variance = out_key->params->alpha_min*out_key->params->alpha_min;
-    const int n=ks->n;
-    const int basebit=ks->basebit;
-    const int t=ks->t;
+    const int n=result->n;
+    const int basebit=result->basebit;
+    const int t=result->t;
     const double epsilon2 = pow(0.5,2*(basebit*t+1));
 
     const double variance_overhead = n*t*variance+n*epsilon2;
 
-    FakeLweKeyswitchKey* fres = fake(result);
+    FakeLweKeySwitchKey* fres = fake(result);
     fres->variance_overhead = variance_overhead;
 }
 
@@ -177,7 +175,7 @@ inline void fake_lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in
 //sample=(a',b')
 inline void fake_lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, const LweSample* sample){
     FakeLwe* fres = fake(result);
-    const FakeLweKeyswitchKey* fks = fake(ks);
+    const FakeLweKeySwitchKey* fks = fake(ks);
     const FakeLwe* fsample = fake(sample);
 
     fres->message = fsample->message;
