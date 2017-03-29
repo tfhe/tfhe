@@ -167,4 +167,32 @@ inline void fake_lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, cons
     } 
 
 
+
+
+
+
+
+inline LweKeySwitchKey* fake_new_LweKeySwitchKey(int n, int t, int basebit) {
+    FakeLweKeySwitchKey* ks = (FakeLweKeySwitchKey*) malloc(sizeof(FakeLweKeySwitchKey));
+    return (LweKeySwitchKey*) ks;
+}
+
+#define USE_FAKE_new_LweKeySwitchKey \
+inline LweKeySwitchKey* new_LweKeySwitchKey(int n, int t, int basebit) { \
+    return fake_new_LweKeySwitchKey(n,t,basebit); \
+}
+
+
+inline void fake_delete_LweKeySwitchKey(int n, int t, int basebit, LweKeySwitchKey* ks) {
+    FakeLweKeySwitchKey* fks = fake(ks);
+    free(fks);
+}
+
+#define USE_FAKE_delete_LweKeySwitchKey \
+inline void delete_LweKeySwitchKey(int n, int t, int basebit, LweKeySwitchKey* ks) { \
+    fake_delete_LweKeySwitchKey(n,t,basebit,ks); \
+}
+
+
+
 #endif // FAKE_LWE_KEYSWITCH_H
