@@ -116,6 +116,7 @@ EXPORT void tfhe_blindRotateAndExtract(LweSample* result,
 EXPORT void tfhe_bootstrap(LweSample* result, 
 	const LweBootstrappingKey* bk, 
 	Torus32 mu, const LweSample* x){
+    
     const TGswParams* bk_params = bk->bk_params;
     const TLweParams* accum_params = bk->accum_params;
     const LweParams* extract_params = &accum_params->extracted_lweparams;

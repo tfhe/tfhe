@@ -151,7 +151,7 @@ inline void fake_lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in
     }
 
 
-/*
+
 //sample=(a',b')
 inline void fake_lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, const LweSample* sample){
     FakeLwe* fres = fake(result);
@@ -166,20 +166,9 @@ inline void fake_lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, cons
     inline void lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, const LweSample* sample) { \
 	fake_lweKeySwitch(result, ks, sample); \
     } 
-*/
 
-//sample=(a',b')
-inline void fake_lweKeySwitch(FakeLwe* result, const LweKeySwitchKey* ks, const FakeLwe* sample){
-    const FakeLweKeySwitchKey* fks = fake(ks);
-    
-    result->message = sample->message;
-    result->current_variance = sample->current_variance+fks->variance_overhead;
-}
 
-#define USE_FAKE_lweKeySwitch \
-    inline void lweKeySwitch(FakeLwe* result, const LweKeySwitchKey* ks, const FakeLwe* sample) { \
-    fake_lweKeySwitch(result, ks, sample); \
-    } 
+
 
 
 
@@ -187,7 +176,7 @@ inline void fake_lweKeySwitch(FakeLwe* result, const LweKeySwitchKey* ks, const 
 
 
 inline LweKeySwitchKey* fake_new_LweKeySwitchKey(int n, int t, int basebit) {
-    FakeLweKeySwitchKey* ks = (FakeLweKeySwitchKey*) malloc(sizeof(FakeLweKeySwitchKey));
+    FakeLweKeySwitchKey* ks = new FakeLweKeySwitchKey(n,t,basebit);
     return (LweKeySwitchKey*) ks;
 }
 
@@ -199,7 +188,7 @@ inline LweKeySwitchKey* new_LweKeySwitchKey(int n, int t, int basebit) { \
 
 inline void fake_delete_LweKeySwitchKey(LweKeySwitchKey* ks) {
     FakeLweKeySwitchKey* fks = fake(ks);
-    free(fks);
+    delete fks;
 }
 
 #define USE_FAKE_delete_LweKeySwitchKey \

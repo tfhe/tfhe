@@ -144,6 +144,7 @@ EXPORT void torusPolynomialMulByXai(TorusPolynomial* result, int a, const TorusP
     Torus32* in =source->coefsT; 
 
     assert(a>=0 && a<2*N);
+    assert(result != source);
 
     if (a<N) {
 	for (int i=0;i<a;i++)//sur que i-a<0

@@ -29,6 +29,7 @@ void tfhe_MuxRotate_FFT(TLweSample* result, const TLweSample* accum, const TGswS
 
 
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_BLIND_ROTATE_FFT
+#undef INCLUDE_TFHE_BLIND_ROTATE_FFT
 /**
  * multiply the accumulator by X^sum(bara_i.s_i)
  * @param accum the TLWE sample to multiply
@@ -37,7 +38,7 @@ void tfhe_MuxRotate_FFT(TLweSample* result, const TLweSample* accum, const TGswS
  * @param bk_params The parameters of bk
  */
 EXPORT void tfhe_blindRotate_FFT(TLweSample* accum, 
-    const TGswSampleFFT* bk, 
+    const TGswSampleFFT* bkFFT, 
     const int* bara, 
     const int n, 
     const TGswParams* bk_params) {
@@ -51,7 +52,7 @@ EXPORT void tfhe_blindRotate_FFT(TLweSample* accum,
         const int barai=bara[i];
         if (barai==0) continue; //indeed, this is an easy case!
         
-        tfhe_MuxRotate_FFT(temp2, temp3, bk+i, barai, bk_params);
+        tfhe_MuxRotate_FFT(temp2, temp3, bkFFT+i, barai, bk_params);
         swap(temp2,temp3);
         /*
         tGswFFTMulByXaiMinusOne(temp, barai, bk+i, bk_params);
@@ -75,6 +76,7 @@ EXPORT void tfhe_blindRotate_FFT(TLweSample* accum,
 
 
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_BLIND_ROTATE_AND_EXTRACT_FFT
+#undef INCLUDE_TFHE_BLIND_ROTATE_AND_EXTRACT_FFT
 /**
  * result = LWE(v_p) where p=barb-sum(bara_i.s_i) mod 2N
  * @param result the output LWE sample
@@ -124,6 +126,7 @@ EXPORT void tfhe_blindRotateAndExtract_FFT(LweSample* result,
    
 
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_BOOTSTRAP_FFT
+#undef INCLUDE_TFHE_BOOTSTRAP_FFT
 /**
  * result = LWE(mu) iff phase(x)>0, LWE(-mu) iff phase(x)<0
  * @param result The resulting LweSample
