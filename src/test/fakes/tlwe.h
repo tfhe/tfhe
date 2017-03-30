@@ -361,6 +361,23 @@ namespace {
         fake_tLweMulByXaiMinusOne(result,ai,bk,params); \
     }
 
+
+
+
+
+    /** result = ExtractLweSample(x) */
+    inline void fake_tLweExtractLweSample(LweSample* result, const TLweSample* x, const LweParams* params,  const TLweParams* rparams) { 
+        const FakeTLwe* fx = fake(x);
+        FakeLwe* fres = fake(result);
+
+        fres->message = fx->message->coefsT[0];
+        fres->current_variance = fx->current_variance;
+    }
+    #define USE_FAKE_tLweExtractLweSample \
+    inline void tLweExtractLweSample(LweSample* result, const TLweSample* x, const LweParams* params,  const TLweParams* rparams) { \
+        fake_tLweExtractLweSample(result,x,params,rparams); \
+    }
+
 }
 
 

@@ -121,7 +121,15 @@ namespace {
     class TfheBlindRotateAndExtractTest: public ::testing::Test {
 	public:
 
+        USE_FAKE_new_TGswSample;
+        USE_FAKE_new_TLweSample;
+        USE_FAKE_delete_TLweSample;
+        USE_FAKE_delete_TGswSample;
+        USE_FAKE_new_TGswSample_array;
+        USE_FAKE_delete_TGswSample_array;
+        USE_FAKE_tGswSymEncryptInt;
 	    USE_FAKE_tfhe_blindRotate;
+        USE_FAKE_tLweExtractLweSample;
 
 #define INCLUDE_TFHE_BLIND_ROTATE_AND_EXTRACT
 #include "../libtfhe/lwe-bootstrapping-functions.cpp"
