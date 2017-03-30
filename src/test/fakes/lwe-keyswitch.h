@@ -125,10 +125,7 @@ void fake_lweKeySwitchTranslate_fromArray(LweSample* result,
 	    const LweSample*** ks, const LweParams* params, \
 	    const Torus32* ai, \
 	    const int n, const int t, const int basebit){ \
-	fake_lweKeySwitchTranslate_fromArray(result, \
-		ks, params, \
-		ai, \
-		n, t, basebit); \
+        fake_lweKeySwitchTranslate_fromArray(result, ks, params, ai, n, t, basebit); \
     }
 
 
