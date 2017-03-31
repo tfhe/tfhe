@@ -16,6 +16,9 @@ struct FakeLweBootstrappingKey{
     FakeLweBootstrappingKey(const LweParams* in_out_params, const TGswParams* bk_params) {
     	this->in_out_params = in_out_params;
     	this->bk_params= bk_params;
+        this->accum_params = bk_params->tlwe_params; 
+        this->extract_params=&accum_params->extracted_lweparams;
+    
     	const int n = in_out_params->n;
     	const int kslength = 15;
     	const int basebit = 2;
@@ -92,6 +95,16 @@ inline void fake_tfhe_createLweBootstrappingKey(
 	fake_tGswSymEncryptInt(&bk->bk[i], kin[i], alpha, rgsw_key);
     }
 }
+
+
+#define USE_FAKE_tfhe_createLweBootstrappingKey \
+    inline void tfhe_createLweBootstrappingKey(LweBootstrappingKey* bk, const LweKey* key_in, const TGswKey* rgsw_key) { \
+        fake_tfhe_createLweBootstrappingKey(bk,key_in,rgsw_key); \
+    }
+
+
+
+
 
 /**
  * multiply the accumulator by X^sum(bara_i.s_i)

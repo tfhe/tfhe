@@ -26,6 +26,15 @@ namespace {
     const TGswParams* bk_params = new_TGswParams(l_bk, Bgbit_bk, accum_params);
     const LweParams* extract_params = &accum_params->extracted_lweparams;
 
+
+
+    LweSample* real_new_LweSample(const LweParams* params){
+        return new_LweSample(params);
+    }
+    void real_delete_LweSample(LweSample* sample){
+        delete_LweSample(sample);
+    }
+
 /*
     LweKey* key = new_LweKey(params_in);
     lweKeyGen(key);
@@ -121,12 +130,15 @@ namespace {
     class TfheBlindRotateAndExtractTest: public ::testing::Test {
 	public:
 
-        USE_FAKE_new_TGswSample;
+        USE_FAKE_new_LweSample;
+        USE_FAKE_delete_LweSample;
+        //USE_FAKE_new_TGswSample;
         USE_FAKE_new_TLweSample;
         USE_FAKE_delete_TLweSample;
-        USE_FAKE_delete_TGswSample;
+        //USE_FAKE_delete_TGswSample;
         USE_FAKE_new_TGswSample_array;
         USE_FAKE_delete_TGswSample_array;
+        USE_FAKE_tLweNoiselessTrivial;
         USE_FAKE_tGswSymEncryptInt;
 	    USE_FAKE_tfhe_blindRotate;
         USE_FAKE_tLweExtractLweSample;
@@ -160,7 +172,8 @@ namespace {
 	//create v
 	TorusPolynomial* v = new_TorusPolynomial(N);
 	//create result
-	LweSample* result = new_LweSample(&accum_params->extracted_lweparams);
+	LweSample* result = fake_new_LweSample(&accum_params->extracted_lweparams);
+    FakeLwe* fres = fake(result);
 
 	for (int trial=0; trial<NB_TRIALS; trial++) {
 	    for (int i=0; i<n; i++) bara[i]=rand()%(2*N);
@@ -174,11 +187,11 @@ namespace {
 	    //verify
 	    int offset = barb;
 	    for (int i=0; i<n; i++) offset = (offset + 2*N - key->key[i]*bara[i])%(2*N);
-	    ASSERT_EQ(result->b,(offset<N)?(v->coefsT[offset]):(-v->coefsT[offset-N]));
+	    ASSERT_EQ(fres->message,(offset<N)?(v->coefsT[offset]):(-v->coefsT[offset-N]));
 	    //TODO variance
 	}
 	//clean up
-	delete_LweSample(result);
+	fake_delete_LweSample(result);
 	delete_TorusPolynomial(v);
 	delete[] bara;
 	fake_delete_TGswSample_array(n,bk);
@@ -190,7 +203,15 @@ namespace {
     class TfheBootstrapTest: public ::testing::Test {
 	public:
 
-	    USE_FAKE_tfhe_blindRotateAndExtract;
+	    USE_FAKE_new_LweSample;
+        USE_FAKE_delete_LweSample;
+        USE_FAKE_new_TGswSample_array;
+        USE_FAKE_delete_TGswSample_array;
+        USE_FAKE_new_LweKeySwitchKey;
+        USE_FAKE_delete_LweKeySwitchKey;
+        USE_FAKE_tfhe_createLweBootstrappingKey;
+        USE_FAKE_tfhe_blindRotateAndExtract;
+        USE_FAKE_lweKeySwitch;
 
 #define INCLUDE_TFHE_BOOTSTRAP
 #include "../libtfhe/lwe-bootstrapping-functions.cpp"
@@ -220,10 +241,11 @@ namespace {
 	fake_tfhe_createLweBootstrappingKey(bk, key, key_bk);
 
 	//alloc the output lwe sample
-	LweSample* result = new_LweSample(in_params);
+	LweSample* result = fake_new_LweSample(in_params);
+    FakeLwe* fres = fake(result);
 
 	//create a random input sample
-	LweSample* insample = new_LweSample(extract_params);
+	LweSample* insample = real_new_LweSample(extract_params);
 	for (int trial=0; trial<NB_TRIALS; trial++) {
 	    lweSymEncrypt(insample,uniformTorus32_distrib(generator),0.001,key);
 
@@ -241,12 +263,12 @@ namespace {
 
 	    //printf("trial=%d,hash=%d,phase=%d,result=%d\n",trial,hash,phase,result->b);
 	    //verify the result
-	    ASSERT_EQ(result->b,phase<N?TEST_MU:-TEST_MU);
+	    ASSERT_EQ(fres->message,phase<N?TEST_MU:-TEST_MU);
 	}
 
 	//cleanup
-	delete_LweSample(insample);
-	delete_LweSample(result);
+	real_delete_LweSample(insample);
+	fake_delete_LweSample(result);
 	fake_delete_LweBootstrappingKey(bk);
 	delete_TGswKey(key_bk);
 	delete_LweKey(key);

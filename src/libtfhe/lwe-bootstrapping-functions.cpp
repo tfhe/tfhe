@@ -47,11 +47,7 @@ EXPORT void tfhe_blindRotate(TLweSample* accum, const TGswSample* bk, const int*
     
     tfhe_MuxRotate(temp2, temp3, bk+i, barai, bk_params);
     swap(temp2, temp3);
-    /*
-	tGswMulByXaiMinusOne(temp, barai, bk+i, bk_params);
-	tGswAddH(temp, bk_params);
-	tGswExternMulToTLwe(accum, temp, bk_params);
-    */
+    
     }
     if (temp3 != accum) {
         tLweCopy(accum, temp3, bk_params->tlwe_params);

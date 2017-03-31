@@ -60,15 +60,15 @@ inline const FakeLwe* fake(const LweSample* sample) {
 
 
 
-inline LweSample* fake_new_LweSample() {
+inline LweSample* fake_new_LweSample(const LweParams* params) {
     FakeLwe* reps = (FakeLwe*) malloc(sizeof(FakeLwe));
     new(reps) FakeLwe();
     return (LweSample*) reps;
 }
 
 #define USE_FAKE_new_LweSample \
-inline LweSample* new_LweSample() { \
-    return fake_new_LweSample(); \
+inline LweSample* new_LweSample(const LweParams* params) { \
+    return fake_new_LweSample(params); \
 }
 
 inline void fake_delete_LweSample(LweSample* sample) {
