@@ -47,11 +47,7 @@ EXPORT void tfhe_blindRotate(TLweSample* accum, const TGswSample* bk, const int*
     
     tfhe_MuxRotate(temp2, temp3, bk+i, barai, bk_params);
     swap(temp2, temp3);
-    /*
-	tGswMulByXaiMinusOne(temp, barai, bk+i, bk_params);
-	tGswAddH(temp, bk_params);
-	tGswExternMulToTLwe(accum, temp, bk_params);
-    */
+    
     }
     if (temp3 != accum) {
         tLweCopy(accum, temp3, bk_params->tlwe_params);
@@ -61,6 +57,9 @@ EXPORT void tfhe_blindRotate(TLweSample* accum, const TGswSample* bk, const int*
     //delete_TGswSample(temp);
 }
 #endif 
+
+
+
 
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_BLIND_ROTATE_AND_EXTRACT
 #undef INCLUDE_TFHE_BLIND_ROTATE_AND_EXTRACT
@@ -80,6 +79,7 @@ EXPORT void tfhe_blindRotateAndExtract(LweSample* result,
 	const int* bara,
 	const int n,
 	const TGswParams* bk_params) {
+
     const TLweParams* accum_params = bk_params->tlwe_params;
     const LweParams* extract_params = &accum_params->extracted_lweparams;
     const int N = accum_params->N;
@@ -112,6 +112,7 @@ EXPORT void tfhe_blindRotateAndExtract(LweSample* result,
 EXPORT void tfhe_bootstrap(LweSample* result, 
 	const LweBootstrappingKey* bk, 
 	Torus32 mu, const LweSample* x){
+    
     const TGswParams* bk_params = bk->bk_params;
     const TLweParams* accum_params = bk->accum_params;
     const LweParams* extract_params = &accum_params->extracted_lweparams;

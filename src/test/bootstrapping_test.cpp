@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 //#include <gmock/gmock.h>
 #include "tfhe.h"
+#include "fakes/tlwe.h"
 #include "fakes/tgsw.h"
 #include "fakes/lwe-bootstrapping.h"
 #define TFHE_TEST_ENVIRONMENT 1
@@ -24,6 +25,26 @@ namespace {
     const TLweParams* accum_params = new_TLweParams(N, k, alpha_bk, 1./16.);
     const TGswParams* bk_params = new_TGswParams(l_bk, Bgbit_bk, accum_params);
     const LweParams* extract_params = &accum_params->extracted_lweparams;
+
+
+
+    LweSample* real_new_LweSample(const LweParams* params){
+        return new_LweSample(params);
+    }
+    void real_delete_LweSample(LweSample* sample){
+        delete_LweSample(sample);
+    }
+
+
+    vector<bool> random_binary_key(const int n){
+        vector<bool> rand_vect(n);
+        for (int i = 0; i < n; ++i) {
+            rand_vect[i] = rand()%2;
+        }
+        return rand_vect;
+    }
+
+
 
 /*
     LweKey* key = new_LweKey(params_in);
@@ -66,57 +87,67 @@ namespace {
     //	    const int n,
     //	    const TGswParams* bk_params) {
     TEST_F(TfheBlindRotateTest,tfheBlindRotateTest) {
-	LweKey* key = new_LweKey(in_params);
-	lweKeyGen(key);
-	TGswKey* key_bk = new_TGswKey(bk_params);
-	tGswKeyGen(key_bk);
-	TGswSample* bk = fake_new_TGswSample_array(n, bk_params);
-	//create bara
-	int* bara = new int[n];
-	for (int i=0; i<n; i++) bara[i]=rand()%(2*N);
-	//create bk
-	for (int i=0; i<n; i++) fake_tGswSymEncryptInt(bk+i,key->key[i],alpha_bk,key_bk);
-	//create accum
-	TorusPolynomial* initAccumMessage = new_TorusPolynomial(N);
-	torusPolynomialUniform(initAccumMessage);
-	const double initAlphaAccum=0.2;
-	int expectedOffset=0;
-	TorusPolynomial* expectedAccumMessage = new_TorusPolynomial(N);
-	torusPolynomialCopy(expectedAccumMessage,initAccumMessage);
-	//double expectedAccumVariance=initAlphaAccum*initAlphaAccum;
-	TLweSample* accum = fake_new_TLweSample(accum_params);
-	FakeTLwe* faccum = fake(accum);
-	torusPolynomialCopy(faccum->message, initAccumMessage);
-	faccum->current_variance = initAlphaAccum*initAlphaAccum;
-	//call bootstraprotate: one iteration at a time
-	for (int i=0; i<n; i++) {
-	    tfhe_blindRotate(accum,bk+i,bara+i,1,bk_params);
-	    if (key->key[i]==1 && bara[i]!=0) {
-		expectedOffset=(expectedOffset+bara[i])%(2*N);
-		torusPolynomialMulByXai(expectedAccumMessage,expectedOffset,initAccumMessage);
-	    }
-	    //printf("i=%d,si=%d,barai=%d,offset=%d\n",i,key->key[i],bara[i],expectedOffset);
-	    for (int j=0; j<N; j++) ASSERT_EQ(expectedAccumMessage->coefsT[j],accum->b->coefsT[j]);
-	}
-	//Now, bootstraprotate: all iterations at once (same offset)
-	torusPolynomialCopy(faccum->message, initAccumMessage);
-	faccum->current_variance=initAlphaAccum*initAlphaAccum;
-	tfhe_blindRotate(accum,bk,bara,n,bk_params);
-	for (int j=0; j<N; j++) ASSERT_EQ(expectedAccumMessage->coefsT[j],accum->b->coefsT[j]);
-	//cleanup everything
-	fake_delete_TLweSample(accum);
-	delete_TorusPolynomial(expectedAccumMessage);
-	delete_TorusPolynomial(initAccumMessage);
-	delete[] bara;
-	fake_delete_TGswSample_array(n,bk);
-	delete_TGswKey(key_bk);
-	delete_LweKey(key);
+        
+        vector<bool> key = random_binary_key(n);
+        TGswSample* bk = fake_new_TGswSample_array(n, bk_params);
+        FakeTGsw* fbk = fake(bk);
+        for (int i=0; i<n; i++) fbk[i].setMessageVariance(key[i],alpha_bk*alpha_bk);
+
+    	//create bara
+    	int* bara = new int[n];
+    	for (int i=0; i<n; i++) bara[i]=rand()%(2*N);
+    	//create accum
+    	TorusPolynomial* initAccumMessage = new_TorusPolynomial(N);
+    	torusPolynomialUniform(initAccumMessage);
+    	const double initAlphaAccum=0.2;
+    	int expectedOffset=0;
+    	TorusPolynomial* expectedAccumMessage = new_TorusPolynomial(N);
+    	torusPolynomialCopy(expectedAccumMessage,initAccumMessage);
+    	//double expectedAccumVariance=initAlphaAccum*initAlphaAccum;
+    	TLweSample* accum = fake_new_TLweSample(accum_params);
+    	FakeTLwe* faccum = fake(accum);
+    	torusPolynomialCopy(faccum->message, initAccumMessage);
+    	faccum->current_variance = initAlphaAccum*initAlphaAccum;
+    	
+        //call bootstraprotate: one iteration at a time
+    	for (int i=0; i<n; i++) {
+    	    tfhe_blindRotate(accum,bk+i,bara+i,1,bk_params);
+    	    if (key[i]==1 && bara[i]!=0) {
+        		expectedOffset=(expectedOffset+bara[i])%(2*N);
+        		torusPolynomialMulByXai(expectedAccumMessage,expectedOffset,initAccumMessage);
+    	    }
+    	    //printf("i=%d,si=%d,barai=%d,offset=%d\n",i,key->key[i],bara[i],expectedOffset);
+    	    for (int j=0; j<N; j++) ASSERT_EQ(expectedAccumMessage->coefsT[j],accum->b->coefsT[j]);
+    	}
+    	//Now, bootstraprotate: all iterations at once (same offset)
+    	torusPolynomialCopy(faccum->message, initAccumMessage);
+    	faccum->current_variance=initAlphaAccum*initAlphaAccum;
+    	tfhe_blindRotate(accum,bk,bara,n,bk_params);
+    	for (int j=0; j<N; j++) ASSERT_EQ(expectedAccumMessage->coefsT[j],accum->b->coefsT[j]);
+    	
+        //cleanup everything
+    	fake_delete_TLweSample(accum);
+    	delete_TorusPolynomial(expectedAccumMessage);
+    	delete_TorusPolynomial(initAccumMessage);
+    	delete[] bara;
+    	fake_delete_TGswSample_array(n,bk);
     }
 
     class TfheBlindRotateAndExtractTest: public ::testing::Test {
 	public:
 
+        USE_FAKE_new_LweSample;
+        USE_FAKE_delete_LweSample;
+        //USE_FAKE_new_TGswSample;
+        USE_FAKE_new_TLweSample;
+        USE_FAKE_delete_TLweSample;
+        //USE_FAKE_delete_TGswSample;
+        USE_FAKE_new_TGswSample_array;
+        USE_FAKE_delete_TGswSample_array;
+        USE_FAKE_tLweNoiselessTrivial;
+        USE_FAKE_tGswSymEncryptInt;
 	    USE_FAKE_tfhe_blindRotate;
+        USE_FAKE_tLweExtractLweSample;
 
 #define INCLUDE_TFHE_BLIND_ROTATE_AND_EXTRACT
 #include "../libtfhe/lwe-bootstrapping-functions.cpp"
@@ -135,19 +166,18 @@ namespace {
     TEST_F(TfheBlindRotateAndExtractTest,tfheBlindRotateAndExtractTest) {
 	const int NB_TRIALS=30;
 
-	LweKey* key = new_LweKey(in_params);
-	lweKeyGen(key);
-	TGswKey* key_bk = new_TGswKey(bk_params);
-	tGswKeyGen(key_bk);
-	TGswSample* bk = fake_new_TGswSample_array(n, bk_params);
+	vector<bool> key = random_binary_key(n);
+    TGswSample* bk = fake_new_TGswSample_array(n, bk_params);
+    FakeTGsw* fbk = fake(bk);
+    for (int i=0; i<n; i++) fbk[i].setMessageVariance(key[i],alpha_bk*alpha_bk);
+
 	//create bara and b
 	int* bara = new int[n];
-	//create bk
-	for (int i=0; i<n; i++) fake_tGswSymEncryptInt(bk+i,key->key[i],alpha_bk,key_bk);
 	//create v
 	TorusPolynomial* v = new_TorusPolynomial(N);
 	//create result
-	LweSample* result = new_LweSample(&accum_params->extracted_lweparams);
+	LweSample* result = fake_new_LweSample(&accum_params->extracted_lweparams);
+    FakeLwe* fres = fake(result);
 
 	for (int trial=0; trial<NB_TRIALS; trial++) {
 	    for (int i=0; i<n; i++) bara[i]=rand()%(2*N);
@@ -160,24 +190,30 @@ namespace {
 
 	    //verify
 	    int offset = barb;
-	    for (int i=0; i<n; i++) offset = (offset + 2*N - key->key[i]*bara[i])%(2*N);
-	    ASSERT_EQ(result->b,(offset<N)?(v->coefsT[offset]):(-v->coefsT[offset-N]));
+	    for (int i=0; i<n; i++) offset = (offset + 2*N - key[i]*bara[i])%(2*N);
+	    ASSERT_EQ(fres->message,(offset<N)?(v->coefsT[offset]):(-v->coefsT[offset-N]));
 	    //TODO variance
 	}
 	//clean up
-	delete_LweSample(result);
+	fake_delete_LweSample(result);
 	delete_TorusPolynomial(v);
 	delete[] bara;
 	fake_delete_TGswSample_array(n,bk);
-	delete_TGswKey(key_bk);
-	delete_LweKey(key);
     }
 
 
     class TfheBootstrapTest: public ::testing::Test {
 	public:
 
-	    USE_FAKE_tfhe_blindRotateAndExtract;
+	    USE_FAKE_new_LweSample;
+        USE_FAKE_delete_LweSample;
+        USE_FAKE_new_TGswSample_array;
+        USE_FAKE_delete_TGswSample_array;
+        USE_FAKE_new_LweKeySwitchKey;
+        USE_FAKE_delete_LweKeySwitchKey;
+        USE_FAKE_tfhe_createLweBootstrappingKey;
+        USE_FAKE_tfhe_blindRotateAndExtract;
+        USE_FAKE_lweKeySwitch;
 
 #define INCLUDE_TFHE_BOOTSTRAP
 #include "../libtfhe/lwe-bootstrapping-functions.cpp"
@@ -207,10 +243,11 @@ namespace {
 	fake_tfhe_createLweBootstrappingKey(bk, key, key_bk);
 
 	//alloc the output lwe sample
-	LweSample* result = new_LweSample(in_params);
+	LweSample* result = fake_new_LweSample(in_params);
+    FakeLwe* fres = fake(result);
 
 	//create a random input sample
-	LweSample* insample = new_LweSample(extract_params);
+	LweSample* insample = real_new_LweSample(extract_params);
 	for (int trial=0; trial<NB_TRIALS; trial++) {
 	    lweSymEncrypt(insample,uniformTorus32_distrib(generator),0.001,key);
 
@@ -228,12 +265,12 @@ namespace {
 
 	    //printf("trial=%d,hash=%d,phase=%d,result=%d\n",trial,hash,phase,result->b);
 	    //verify the result
-	    ASSERT_EQ(result->b,phase<N?TEST_MU:-TEST_MU);
+	    ASSERT_EQ(fres->message,phase<N?TEST_MU:-TEST_MU);
 	}
 
 	//cleanup
-	delete_LweSample(insample);
-	delete_LweSample(result);
+	real_delete_LweSample(insample);
+	fake_delete_LweSample(result);
 	fake_delete_LweBootstrappingKey(bk);
 	delete_TGswKey(key_bk);
 	delete_LweKey(key);

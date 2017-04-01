@@ -1,9 +1,12 @@
 #ifndef FAKES_TGSW_FFT_H
 #define FAKES_TGSW_FFT_H
 
+#include "./tlwe-fft.h"
+
+
 namespace {
 
-    // Fake TLWE structure 
+    // Fake TGSW FFT structure 
     struct FakeTGswFFT {
 	static const int FAKE_TYPE_UID = 574569852; // precaution: distinguish fakes from trues
 	const int fake_uid;
@@ -14,18 +17,18 @@ namespace {
 	char unused_padding[sizeof(TGswSampleFFT)-sizeof(long)-sizeof(IntPolynomial*)-sizeof(double)];
 
 	// construct
-	FakeTGSW(int N):fake_uid(FAKE_TYPE_UID) {
+	FakeTGswFFT(int N):fake_uid(FAKE_TYPE_UID) {
 	    message = new_IntPolynomial(N);
 	    current_variance = 0.;
 	}
 
 	// delete
-	~FakeTGsw() {
+	~FakeTGswFFT() {
 	    if (fake_uid!=FAKE_TYPE_UID) abort();
 	    delete_IntPolynomial(message);
 	}
-	FakeTGsw(const FakeTGsw&)=delete;
-	void operator=(const FakeTGsw&)=delete;
+	FakeTGswFFT(const FakeTGswFFT&)=delete;
+	void operator=(const FakeTGswFFT&)=delete;
     };
 
 
@@ -51,9 +54,9 @@ namespace {
     //-----------------------------------------
 
     inline TGswSampleFFT* fake_new_TGswSampleFFT_array(int nbelts, const TGswParams* params) {
-        int N = params->N;
+        int N = params->tlwe_params->N;
         FakeTGswFFT* reps = (FakeTGswFFT*) malloc(nbelts*sizeof(FakeTGswFFT));
-        for (int i=0; i<nbelts; i++) new(reps+i) FakeTGswFFT(params);
+        for (int i=0; i<nbelts; i++) new(reps+i) FakeTGswFFT(N);
         return (TGswSampleFFT*) reps;
     }
 
@@ -77,9 +80,9 @@ namespace {
 
 
     inline TGswSampleFFT* fake_new_TGswSampleFFT(const TGswParams* params) {
-        int N = params->N;
+        int N = params->tlwe_params->N;
         FakeTGswFFT* reps = (FakeTGswFFT*) malloc(sizeof(FakeTGswFFT));
-        new(reps) FakeTGswFFT(params);
+        new(reps) FakeTGswFFT(N);
         return (TGswSampleFFT*) reps;
     }
 
@@ -112,7 +115,7 @@ namespace {
 	const FakeTGsw* fs = fake(source);
 	FakeTGswFFT* fres = fake(result);
 
-	IntPolynomial_copy(fres->message, fs->message);
+	intPolynomialCopy(fres->message, fs->message);
 	fres->current_variance=fs->current_variance;
     }
 
@@ -124,10 +127,10 @@ namespace {
 
     // Computes the FFT of the coefficients of the TLWEfft sample
     inline void fake_tGswFromFFTConvert(TGswSample* result, const TGswSampleFFT* source, const TGswParams* params){
-	FakeTGswFFT* fs = fake(source);
+	const FakeTGswFFT* fs = fake(source);
 	FakeTGsw* fres = fake(result);
 
-	IntPolynomial_copy(fres->message, fs->message);
+	intPolynomialCopy(fres->message, fs->message);
 	fres->current_variance=fs->current_variance;
     }
 
@@ -142,7 +145,7 @@ namespace {
     inline void fake_tGswFFTClear(TGswSampleFFT* result, const TGswParams* params){
 	FakeTGswFFT* fres = fake(result);
 
-	IntPolynomial_clear(fres->message);
+	intPolynomialClear(fres->message);
 	fres->current_variance=0;
     }
 
@@ -158,7 +161,7 @@ namespace {
     // result = result + H
     inline void fake_tGswFFTAddH(TGswSampleFFT* result, const TGswParams* params) {
 	FakeTGswFFT* fres = fake(result);
-	result->message->coefs[0]++;
+	fres->message->coefs[0]++;
 	//variance is preserved
     }
 
@@ -170,8 +173,8 @@ namespace {
     // result = list of TLWE (0,0)
     inline void tGswFFTClear(TGswSampleFFT* result, const TGswParams* params) {
 	FakeTGswFFT* fres = fake(result);
-	intPolynomialClear(result->message);
-	result->current_variance=0;
+	intPolynomialClear(fres->message);
+	fres->current_variance=0;
     }    
 
 #define USE_FAKE_tGswFFTClear \
@@ -180,18 +183,18 @@ namespace {
     }
 
     // External product (*): accum = gsw (*) accum 
-    inline void fake_tGswFFTExternMulToTLwe(TLweSample* accum, TGswSampleFFT* gsw, const TGswParams* params) {
+    inline void fake_tGswFFTExternMulToTLwe(TLweSample* accum, const TGswSampleFFT* gsw, const TGswParams* params) {
 	const int N = params->tlwe_params->N;
 	const FakeTGswFFT* fgsw = fake(gsw);
 	const FakeTLwe* faccum = fake(accum);
 	TorusPolynomial* tmp = new_TorusPolynomial(N);
 	torusPolynomialMultKaratsuba(tmp,fgsw->message,faccum->message);
-	TorusPolynomial_copy(faccum->message, tmp);
+	torusPolynomialCopy(faccum->message, tmp);
 	delete_TorusPolynomial(tmp);
     }
 
 #define USE_FAKE_tGswFFTExternMulToTLwe \
-    inline void tGswFFTExternMulToTLwe(TLweSample* accum, TGswSampleFFT* gsw, const TGswParams* params) { \
+    inline void tGswFFTExternMulToTLwe(TLweSample* accum, const TGswSampleFFT* gsw, const TGswParams* params) { \
 	fake_tGswFFTExternMulToTLwe(accum, gsw, params); \
     }
 

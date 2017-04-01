@@ -1,8 +1,58 @@
 #ifndef FAKE_LWE_KEYSWITCH_H
 #define FAKE_LWE_KEYSWITCH_H
 
-#include <tfhe.h>
+#include "tfhe.h"
 #include "./lwe.h"
+
+
+
+
+struct FakeLweKeySwitchKey {
+    static const long FAKE_LWEKEYSWITCH_UID = 956475132024584l; // precaution: distinguish fakes from trues
+    const long fake_uid;
+    const int n;
+    const int t;
+    const int basebit;
+    const int base;
+    double variance_overhead;
+
+    //this padding is here to make sure that FakeLweKeySwitchKey and LweKeySwitchKey have the same size
+    char unused_padding[sizeof(LweKeySwitchKey)-sizeof(long)-4*sizeof(int)-sizeof(double)];
+
+    // construct
+    FakeLweKeySwitchKey(int n, int t, int basebit): fake_uid(FAKE_LWEKEYSWITCH_UID), 
+    n(n), t(t), 
+    basebit(basebit), 
+    base(1<<basebit) {
+        variance_overhead = 0.; // ILA: attention!
+    }
+
+    // delete
+    ~FakeLweKeySwitchKey() {
+        if (fake_uid!=FAKE_LWEKEYSWITCH_UID) abort();
+    }
+    FakeLweKeySwitchKey(const FakeLweKeySwitchKey&)=delete;
+    void operator=(const FakeLweKeySwitchKey&)=delete;
+};
+
+// At compile time, we verify that the two structures have exactly the same size
+static_assert (sizeof(FakeLweKeySwitchKey) == sizeof(LweKeySwitchKey), "Error: Size is not correct");
+
+
+
+inline FakeLweKeySwitchKey* fake(LweKeySwitchKey* key) {
+    FakeLweKeySwitchKey* reps = (FakeLweKeySwitchKey*) key;
+    if (reps->fake_uid!=FakeLweKeySwitchKey::FAKE_LWEKEYSWITCH_UID) abort();
+    return reps;
+}
+
+inline const FakeLweKeySwitchKey* fake(const LweKeySwitchKey* key) {
+    const FakeLweKeySwitchKey* reps = (const FakeLweKeySwitchKey*) key;
+    if (reps->fake_uid!=FakeLweKeySwitchKey::FAKE_LWEKEYSWITCH_UID) abort();
+    return reps;
+}
+
+
 
 /**
  * fills the KeySwitching key array
@@ -25,11 +75,20 @@ inline void fake_lweCreateKeySwitchKey_fromArray(LweSample*** result,
 	    for(int k=0;k<base;k++){
 		Torus32 x=(in_key[i]*k)*(1<<(32-(j+1)*basebit));
 		fake_lweSymEncrypt(&result[i][j][k],x,out_alpha,out_key);
-		//printf("i,j,k,ki,x,phase=%d,%d,%d,%d,%d,%d\n",i,j,k,in_key->key[i],x,lwePhase(&result->ks[i][j][k],out_key));
 	    }
 	}
     }
 }
+
+#define USE_FAKE_lweCreateKeySwitchKey_fromArray \
+    inline void lweCreateKeySwitchKey_fromArray(LweSample*** result, \
+	    const LweKey* out_key, const double out_alpha, \
+	    const int* in_key, const int n, const int t, const int basebit){ \
+	fake_lweCreateKeySwitchKey_fromArray(result, \
+		out_key, out_alpha, \
+		in_key, n, t, basebit); \
+    }
+
 
 
 /**
@@ -56,37 +115,84 @@ void fake_lweKeySwitchTranslate_fromArray(LweSample* result,
 	const uint32_t aibar=ai[i]+prec_offset;
 	for (int j=0;j<t;j++){
 	    const uint32_t aij=(aibar>>(32-(j+1)*basebit)) & mask;
-	    lweSubTo(result,&ks[i][j][aij],params);
+	    fake_lweSubTo(result,&ks[i][j][aij],params);
 	}
     }
 }
 
+#define USE_FAKE_lweKeySwitchTranslate_fromArray \
+    inline void lweKeySwitchTranslate_fromArray(LweSample* result, \
+	    const LweSample*** ks, const LweParams* params, \
+	    const Torus32* ai, \
+	    const int n, const int t, const int basebit){ \
+        fake_lweKeySwitchTranslate_fromArray(result, ks, params, ai, n, t, basebit); \
+    }
 
 
 inline void fake_lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key){
+    const double variance = out_key->params->alpha_min*out_key->params->alpha_min;
     const int n=result->n;
     const int basebit=result->basebit;
     const int t=result->t;
+    const double epsilon2 = pow(0.5,2*(basebit*t+1));
 
-    //TODO check the parameters
+    const double variance_overhead = n*t*variance+n*epsilon2;
 
-
-    fake_lweCreateKeySwitchKey_fromArray(result->ks,
-	    out_key, out_key->params->alpha_min,
-	    in_key->key, n, t, basebit);
+    FakeLweKeySwitchKey* fres = fake(result);
+    fres->variance_overhead = variance_overhead;
 }
+
+#define USE_FAKE_lweCreateKeySwitchKey \
+    inline void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key) { \
+	fake_lweCreateKeySwitchKey(result, in_key, out_key); \
+    }
+
+
 
 //sample=(a',b')
 inline void fake_lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, const LweSample* sample){
-    const LweParams* params=ks->out_params;
-    const int n=ks->n;
-    const int basebit=ks->basebit;
-    const int t=ks->t;
+    FakeLwe* fres = fake(result);
+    const FakeLweKeySwitchKey* fks = fake(ks);
+    const FakeLwe* fsample = fake(sample);
 
-    lweNoiselessTrivial(result,sample->b,params);
-    fake_lweKeySwitchTranslate_fromArray(result,
-	    (const LweSample***) ks->ks, params,
-	    sample->a, n, t, basebit);
+    fres->message = fsample->message;
+    fres->current_variance = fsample->current_variance+fks->variance_overhead;
 }
+
+#define USE_FAKE_lweKeySwitch \
+    inline void lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, const LweSample* sample) { \
+	fake_lweKeySwitch(result, ks, sample); \
+    } 
+
+
+
+
+
+
+
+
+
+inline LweKeySwitchKey* fake_new_LweKeySwitchKey(int n, int t, int basebit) {
+    FakeLweKeySwitchKey* ks = new FakeLweKeySwitchKey(n,t,basebit);
+    return (LweKeySwitchKey*) ks;
+}
+
+#define USE_FAKE_new_LweKeySwitchKey \
+inline LweKeySwitchKey* new_LweKeySwitchKey(int n, int t, int basebit) { \
+    return fake_new_LweKeySwitchKey(n,t,basebit); \
+}
+
+
+inline void fake_delete_LweKeySwitchKey(LweKeySwitchKey* ks) {
+    FakeLweKeySwitchKey* fks = fake(ks);
+    delete fks;
+}
+
+#define USE_FAKE_delete_LweKeySwitchKey \
+inline void delete_LweKeySwitchKey(LweKeySwitchKey* ks) { \
+    fake_delete_LweKeySwitchKey(ks); \
+}
+
+
 
 #endif // FAKE_LWE_KEYSWITCH_H

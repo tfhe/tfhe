@@ -8,11 +8,118 @@ Fakes for LWE
 
 #include "tfhe.h"
 
-// Fake symetric encryption of a Torus message
-inline void fake_lweSymEncrypt(LweSample* result, Torus32 message, double alpha, const LweKey* key) {
-    lweNoiselessTrivial(result,message,key->params);
-    result->current_variance=alpha*alpha;
+// Fake LWE structure 
+struct FakeLwe {
+    static const int FAKE_LWE_UID=45287951; // precaution: do not confuse fakes with trues
+    const int fake_uid;
+    Torus32 message;
+    double current_variance;
+
+    //this padding is here to make sure that FakeLwe and LweSample have the same size
+    char unused_padding[sizeof(LweSample)-sizeof(int)-sizeof(Torus32)-sizeof(double)];
+
+    // construct
+    FakeLwe():fake_uid(FAKE_LWE_UID) {
+        current_variance = 0.;
+    }
+
+    // delete
+    ~FakeLwe() {
+        if (fake_uid!=FAKE_LWE_UID) abort();
+    }
+    FakeLwe(const FakeLwe&)=delete;
+    void operator=(const FakeLwe&)=delete;
+};
+
+
+
+// At compile time, we verify that the two structures have exactly the same size
+static_assert (sizeof(FakeLwe) == sizeof(LweSample), "Error: Size is not correct");
+
+
+
+
+
+
+
+inline FakeLwe* fake(LweSample* sample) {
+    FakeLwe* reps = (FakeLwe*) sample;
+    if (reps->fake_uid!=FakeLwe::FAKE_LWE_UID) abort();
+    return reps; 
 }
+inline const FakeLwe* fake(const LweSample* sample) {
+    const FakeLwe* reps = (const FakeLwe*) sample;
+    if (reps->fake_uid!=FakeLwe::FAKE_LWE_UID) abort();
+    return reps; 
+}
+
+
+
+
+
+
+
+
+inline LweSample* fake_new_LweSample(const LweParams* params) {
+    FakeLwe* reps = (FakeLwe*) malloc(sizeof(FakeLwe));
+    new(reps) FakeLwe();
+    return (LweSample*) reps;
+}
+
+#define USE_FAKE_new_LweSample \
+inline LweSample* new_LweSample(const LweParams* params) { \
+    return fake_new_LweSample(params); \
+}
+
+inline void fake_delete_LweSample(LweSample* sample) {
+    FakeLwe* ptr = fake(sample);
+    (ptr)->~FakeLwe();
+    free(ptr);
+}
+
+#define USE_FAKE_delete_LweSample \
+inline void delete_LweSample(LweSample* sample) { \
+    fake_delete_LweSample(sample); \
+}
+
+
+
+
+
+
+
+
+inline LweSample* fake_new_LweSample_array(int nbelts) {
+    FakeLwe* arr = (FakeLwe*) malloc(nbelts*sizeof(FakeLwe));
+    for (int i=0; i<nbelts; i++) new(arr+i) FakeLwe();
+    return (LweSample*) arr;
+}
+
+#define USE_FAKE_new_LweSample_array \
+inline LweSample* new_LweSample_array(int nbelts) { \
+    return fake_new_LweSample_array(nbelts); \
+}
+
+inline void fake_delete_LweSample_array(int nbelts, LweSample* sample) {
+    FakeLwe* arr = fake(sample);
+    for (int i=0; i<nbelts; i++) (arr+i)->~FakeLwe();
+    free(arr);
+}
+
+#define USE_FAKE_delete_LweSample_array \
+inline void delete_LweSample_array(int nbelts, LweSample* samples) { \
+    fake_delete_LweSample_array(nbelts,samples); \
+}
+
+
+
+
+
+
+
+
+
+
 
 // The message is just the b part, as the samples are noiseless trivial 
 inline Torus32 fake_lweMessage(const LweSample* sample) {
@@ -23,5 +130,53 @@ inline Torus32 fake_lweMessage(const LweSample* sample) {
 inline Torus32 fake_lweVariance(const LweSample* sample) {
     return sample->current_variance;
 }
+
+
+
+
+
+
+// Fake symetric encryption of a Torus message
+inline void fake_lweSymEncrypt(LweSample* result, Torus32 message, double alpha, const LweKey* key) {
+    FakeLwe* fres = fake(result);
+    fres->message = message;
+    fres->current_variance = alpha*alpha; 
+}
+
+#define USE_FAKE_lweSymEncrypt \
+    inline void lweSymEncrypt(LweSample* result, Torus32 message, double alpha, const LweKey* key) { \
+    return fake_lweSymEncrypt(result,message,alpha,key); \
+}
+
+
+
+// Noiseless trivial of a Torus message
+inline void fake_lweNoiselessTrivial(LweSample* result, Torus32 message, const LweKey* key) {
+    FakeLwe* fres = fake(result);
+    fres->message = message;
+    fres->current_variance = 0; 
+}
+
+#define USE_FAKE_lweNoiselessTrivial \
+    inline void lweNoiselessTrivial(LweSample* result, Torus32 message, const LweKey* key) { \
+    return fake_lweNoiselessTrivial(result,message,key); \
+}
+
+
+
+
+/** result = result - sample */
+inline void fake_lweSubTo(LweSample* result, const LweSample* sample, const LweParams* params) {
+    FakeLwe* fres = fake(result);
+    const FakeLwe* fsample = fake(sample);
+    fres->message -= fsample->message;
+    fres->current_variance += fsample->current_variance;
+}
+
+#define USE_FAKE_lweSubTo \
+    inline void lweSubTo(LweSample* result, const LweSample* sample, const LweParams* params) { \
+    return fake_lweSubTo(result,sample,params); \
+}
+
 
 #endif //FAKES_LWE_H
