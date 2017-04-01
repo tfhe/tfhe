@@ -12,7 +12,8 @@
 #define EXPORT extern "C"
 #include "tfhe_generic_templates.h"
 #else
-#define EXPORT 
+#define EXPORT
+typedef int bool;
 #endif
 
 // Idea:
