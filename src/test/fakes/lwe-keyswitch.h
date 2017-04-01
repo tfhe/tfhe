@@ -5,7 +5,7 @@
 #include "./lwe.h"
 
 
-
+namespace {
 
 struct FakeLweKeySwitchKey {
     static const long FAKE_LWEKEYSWITCH_UID = 956475132024584l; // precaution: distinguish fakes from trues
@@ -24,7 +24,7 @@ struct FakeLweKeySwitchKey {
     n(n), t(t), 
     basebit(basebit), 
     base(1<<basebit) {
-        variance_overhead = 0.; // ILA: attention!
+        variance_overhead = 0.; 
     }
 
     // delete
@@ -103,7 +103,7 @@ inline void fake_lweCreateKeySwitchKey_fromArray(LweSample*** result,
  * @param t The precision of the keyswitch (technically, 1/2.base^t)
  * @param basebit Log_2 of base
  */
-void fake_lweKeySwitchTranslate_fromArray(LweSample* result, 
+inline void fake_lweKeySwitchTranslate_fromArray(LweSample* result, 
 	const LweSample*** ks, const LweParams* params, 
 	const Torus32* ai, 
 	const int n, const int t, const int basebit){
@@ -172,14 +172,14 @@ inline void fake_lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, cons
 
 
 
-inline LweKeySwitchKey* fake_new_LweKeySwitchKey(int n, int t, int basebit) {
+inline LweKeySwitchKey* fake_new_LweKeySwitchKey(int n, int t, int basebit, const LweParams* params) {
     FakeLweKeySwitchKey* ks = new FakeLweKeySwitchKey(n,t,basebit);
     return (LweKeySwitchKey*) ks;
 }
 
 #define USE_FAKE_new_LweKeySwitchKey \
-inline LweKeySwitchKey* new_LweKeySwitchKey(int n, int t, int basebit) { \
-    return fake_new_LweKeySwitchKey(n,t,basebit); \
+inline LweKeySwitchKey* new_LweKeySwitchKey(int n, int t, int basebit, const LweParams* params) { \
+    return fake_new_LweKeySwitchKey(n,t,basebit,params); \
 }
 
 
@@ -194,5 +194,6 @@ inline void delete_LweKeySwitchKey(LweKeySwitchKey* ks) { \
 }
 
 
+} // namespace
 
 #endif // FAKE_LWE_KEYSWITCH_H

@@ -89,15 +89,15 @@ inline void delete_LweSample(LweSample* sample) { \
 
 
 
-inline LweSample* fake_new_LweSample_array(int nbelts) {
+inline LweSample* fake_new_LweSample_array(int nbelts, const LweParams* params) {
     FakeLwe* arr = (FakeLwe*) malloc(nbelts*sizeof(FakeLwe));
     for (int i=0; i<nbelts; i++) new(arr+i) FakeLwe();
     return (LweSample*) arr;
 }
 
 #define USE_FAKE_new_LweSample_array \
-inline LweSample* new_LweSample_array(int nbelts) { \
-    return fake_new_LweSample_array(nbelts); \
+inline LweSample* new_LweSample_array(int nbelts, const LweParams* params) { \
+    return fake_new_LweSample_array(nbelts, params); \
 }
 
 inline void fake_delete_LweSample_array(int nbelts, LweSample* sample) {
@@ -132,6 +132,23 @@ inline Torus32 fake_lweVariance(const LweSample* sample) {
 }
 
 
+
+
+
+
+
+// Fake symetric encryption of a Torus message
+inline void fake_lweCopy(LweSample* result, const LweSample* sample, const LweParams* params) {
+    FakeLwe* fres = fake(result);
+    const FakeLwe* fsample = fake(sample);
+    fres->message = fsample->message;
+    fres->current_variance = fsample->current_variance; 
+}
+
+#define USE_FAKE_lweCopy \
+    inline void lweCopy(LweSample* result, const LweSample* sample, const LweParams* params) { \
+    return fake_lweCopy(result, sample, params); \
+}
 
 
 

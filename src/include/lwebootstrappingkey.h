@@ -17,7 +17,12 @@ struct LweBootstrappingKey{
 
 
 #ifdef __cplusplus
-   LweBootstrappingKey(const LweParams* in_out_params, const TGswParams* bk_params);
+   LweBootstrappingKey(const LweParams* in_out_params, 
+    const TGswParams* bk_params,
+    const TLweParams* accum_params,
+    const LweParams* extract_params,
+    TGswSample* bk,
+    LweKeySwitchKey* ks);
     ~LweBootstrappingKey();
     LweBootstrappingKey(const LweBootstrappingKey&) = delete;
     void operator=(const LweBootstrappingKey&) = delete;
@@ -33,12 +38,17 @@ struct LweBootstrappingKeyFFT {
     const TGswParams* bk_params; ///< params of the Gsw elems in bk. key: s"
     const TLweParams* accum_params; ///< params of the accum variable key: s"
     const LweParams* extract_params; ///< params after extraction: key: s' 
-    TGswSampleFFT* bkFFT; ///< the bootstrapping key (s->s")
-    LweKeySwitchKey* ks; ///< the keyswitch key (s'->s)
+    const TGswSampleFFT* bkFFT; ///< the bootstrapping key (s->s")
+    const LweKeySwitchKey* ks; ///< the keyswitch key (s'->s)
 
 
 #ifdef __cplusplus
-   LweBootstrappingKeyFFT(const LweBootstrappingKey* bk);
+   LweBootstrappingKeyFFT(const LweParams* in_out_params, 
+    const TGswParams* bk_params,
+    const TLweParams* accum_params,
+    const LweParams* extract_params, 
+    const TGswSampleFFT* bkFFT,
+    const LweKeySwitchKey* ks);
     ~LweBootstrappingKeyFFT();
     LweBootstrappingKeyFFT(const LweBootstrappingKeyFFT&) = delete;
     void operator=(const LweBootstrappingKeyFFT&) = delete;
