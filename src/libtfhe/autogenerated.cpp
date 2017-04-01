@@ -64,130 +64,13 @@ EXPORT void delete_IntPolynomial_array(int nbelts, IntPolynomial* obj) {
     destroy_IntPolynomial_array(nbelts,obj);
     free_IntPolynomial_array(nbelts,obj);
 }
-#include "lwebootstrappingkey.h" 
-//allocate memory space for a LweBootstrappingKey
 
-EXPORT LweBootstrappingKey* alloc_LweBootstrappingKey() {
-    return (LweBootstrappingKey*) malloc(sizeof(LweBootstrappingKey));
-}
-EXPORT LweBootstrappingKey* alloc_LweBootstrappingKey_array(int nbelts) {
-    return (LweBootstrappingKey*) malloc(nbelts*sizeof(LweBootstrappingKey));
-}
-
-//free memory space for a LweKey
-EXPORT void free_LweBootstrappingKey(LweBootstrappingKey* ptr) {
-    free(ptr);
-}
-EXPORT void free_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey* ptr) {
-    free(ptr);
-}
-
-//initialize the key structure
-//(equivalent of the C++ constructor)
-EXPORT void init_LweBootstrappingKey(LweBootstrappingKey* obj, const LweParams* in_out_params, const TGswParams* bk_params) {
-    new(obj) LweBootstrappingKey(in_out_params,bk_params);
-}
-EXPORT void init_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey* obj, const LweParams* in_out_params, const TGswParams* bk_params) {
-    for (int i=0; i<nbelts; i++) {
-	new(obj+i) LweBootstrappingKey(in_out_params,bk_params);
-    }
-}
-
-//destroys the LweBootstrappingKey structure
-//(equivalent of the C++ destructor)
-EXPORT void destroy_LweBootstrappingKey(LweBootstrappingKey* obj) {
-    obj->~LweBootstrappingKey();
-}
-EXPORT void destroy_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey* obj) {
-    for (int i=0; i<nbelts; i++) {
-	(obj+i)->~LweBootstrappingKey();
-    }
-}
- 
-//allocates and initialize the LweBootstrappingKey structure
-//(equivalent of the C++ new)
-EXPORT LweBootstrappingKey* new_LweBootstrappingKey(const LweParams* in_out_params, const TGswParams* bk_params) {
-    return new LweBootstrappingKey(in_out_params,bk_params);
-}
-EXPORT LweBootstrappingKey* new_LweBootstrappingKey_array(int nbelts, const LweParams* in_out_params, const TGswParams* bk_params) {
-    LweBootstrappingKey* obj = alloc_LweBootstrappingKey_array(nbelts);
-    init_LweBootstrappingKey_array(nbelts,obj,in_out_params,bk_params);
-    return obj;
-}
-
-//destroys and frees the LweBootstrappingKey structure
-//(equivalent of the C++ delete)
-EXPORT void delete_LweBootstrappingKey(LweBootstrappingKey* obj) {
-    delete obj;
-}
-EXPORT void delete_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey* obj) {
-    destroy_LweBootstrappingKey_array(nbelts,obj);
-    free_LweBootstrappingKey_array(nbelts,obj);
-}
 #include "lwebootstrappingkey.h" 
 
 
 
 
-//allocate memory space for a LweBootstrappingKeyFFT
 
-EXPORT LweBootstrappingKeyFFT* alloc_LweBootstrappingKeyFFT() {
-    return (LweBootstrappingKeyFFT*) malloc(sizeof(LweBootstrappingKeyFFT));
-}
-EXPORT LweBootstrappingKeyFFT* alloc_LweBootstrappingKeyFFT_array(int nbelts) {
-    return (LweBootstrappingKeyFFT*) malloc(nbelts*sizeof(LweBootstrappingKeyFFT));
-}
-
-//free memory space for a LweKey
-EXPORT void free_LweBootstrappingKeyFFT(LweBootstrappingKeyFFT* ptr) {
-    free(ptr);
-}
-EXPORT void free_LweBootstrappingKeyFFT_array(int nbelts, LweBootstrappingKeyFFT* ptr) {
-    free(ptr);
-}
-
-//initialize the key structure
-//(equivalent of the C++ constructor)
-EXPORT void init_LweBootstrappingKeyFFT(LweBootstrappingKeyFFT* obj, const LweBootstrappingKey* bk) {
-    new(obj) LweBootstrappingKeyFFT(bk);
-}
-EXPORT void init_LweBootstrappingKeyFFT_array(int nbelts, LweBootstrappingKeyFFT* obj, const LweBootstrappingKey* bk) {
-    for (int i=0; i<nbelts; i++) {
-	new(obj+i) LweBootstrappingKeyFFT(bk);
-    }
-}
-
-//destroys the LweBootstrappingKeyFFT structure
-//(equivalent of the C++ destructor)
-EXPORT void destroy_LweBootstrappingKeyFFT(LweBootstrappingKeyFFT* obj) {
-    obj->~LweBootstrappingKeyFFT();
-}
-EXPORT void destroy_LweBootstrappingKeyFFT_array(int nbelts, LweBootstrappingKeyFFT* obj) {
-    for (int i=0; i<nbelts; i++) {
-	(obj+i)->~LweBootstrappingKeyFFT();
-    }
-}
- 
-//allocates and initialize the LweBootstrappingKeyFFT structure
-//(equivalent of the C++ new)
-EXPORT LweBootstrappingKeyFFT* new_LweBootstrappingKeyFFT(const LweBootstrappingKey* bk) {
-    return new LweBootstrappingKeyFFT(bk);
-}
-EXPORT LweBootstrappingKeyFFT* new_LweBootstrappingKeyFFT_array(int nbelts, const LweBootstrappingKey* bk) {
-    LweBootstrappingKeyFFT* obj = alloc_LweBootstrappingKeyFFT_array(nbelts);
-    init_LweBootstrappingKeyFFT_array(nbelts,obj,bk);
-    return obj;
-}
-
-//destroys and frees the LweBootstrappingKeyFFT structure
-//(equivalent of the C++ delete)
-EXPORT void delete_LweBootstrappingKeyFFT(LweBootstrappingKeyFFT* obj) {
-    delete obj;
-}
-EXPORT void delete_LweBootstrappingKeyFFT_array(int nbelts, LweBootstrappingKeyFFT* obj) {
-    destroy_LweBootstrappingKeyFFT_array(nbelts,obj);
-    free_LweBootstrappingKeyFFT_array(nbelts,obj);
-}
 #include "lweparams.h" 
 //allocate memory space for a LweParams
 

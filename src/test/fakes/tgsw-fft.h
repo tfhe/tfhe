@@ -15,7 +15,13 @@ namespace {
 
 	//this padding is here to make sure that FakeTLwe and TLweSample have the same size
 	char unused_padding[sizeof(TGswSampleFFT)-sizeof(long)-sizeof(IntPolynomial*)-sizeof(double)];
-
+    
+    void setMessageVariance(bool mess, double variance){
+        intPolynomialClear(message);
+        message->coefs[0] = mess;
+        current_variance = variance;
+    }
+    
 	// construct
 	FakeTGswFFT(int N):fake_uid(FAKE_TYPE_UID) {
 	    message = new_IntPolynomial(N);

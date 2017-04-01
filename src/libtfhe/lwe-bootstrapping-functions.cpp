@@ -9,6 +9,27 @@ using namespace std;
 #define EXPORT
 #endif
 
+const int basebit = 1;
+const int kslength = 15;
+
+
+EXPORT void init_LweBootstrappingKey(LweBootstrappingKey* obj, const LweParams* in_out_params, const TGswParams* bk_params) {
+    const TLweParams* accum_params = bk_params->tlwe_params;
+    const LweParams* extract_params = &accum_params->extracted_lweparams;
+    const int n = in_out_params->n;
+    const int N = extract_params->n;
+    
+    TGswSample* bk=new_TGswSample_array(n,bk_params);
+    LweKeySwitchKey* ks=new_LweKeySwitchKey(N, kslength, basebit, in_out_params);
+
+    new(obj) LweBootstrappingKey(in_out_params, bk_params, accum_params, extract_params, bk, ks);
+}
+EXPORT void destroy_LweBootstrappingKey(LweBootstrappingKey* obj) {
+    delete_LweKeySwitchKey(obj->ks);
+    delete_TGswSample_array(obj->in_out_params->n,obj->bk);
+    obj->~LweBootstrappingKey();
+}
+
 
 
 void tfhe_MuxRotate(TLweSample* result, const TLweSample* accum, const TGswSample* bki, const int barai, const TGswParams* bk_params) {
@@ -178,6 +199,74 @@ EXPORT void tfhe_createLweBootstrappingKey(
     }
 }
 #endif
+
+
+
+
+
+
+
+#include "lwebootstrappingkey.h" 
+//allocate memory space for a LweBootstrappingKey
+
+EXPORT LweBootstrappingKey* alloc_LweBootstrappingKey() {
+    return (LweBootstrappingKey*) malloc(sizeof(LweBootstrappingKey));
+}
+EXPORT LweBootstrappingKey* alloc_LweBootstrappingKey_array(int nbelts) {
+    return (LweBootstrappingKey*) malloc(nbelts*sizeof(LweBootstrappingKey));
+}
+
+//free memory space for a LweKey
+EXPORT void free_LweBootstrappingKey(LweBootstrappingKey* ptr) {
+    free(ptr);
+}
+EXPORT void free_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey* ptr) {
+    free(ptr);
+}
+
+//initialize the key structure
+//(equivalent of the C++ constructor)
+
+EXPORT void init_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey* obj, const LweParams* in_out_params, const TGswParams* bk_params) {
+    for (int i=0; i<nbelts; i++) {
+        init_LweBootstrappingKey(obj+i, in_out_params, bk_params);
+    }
+}
+
+//destroys the LweBootstrappingKey structure
+//(equivalent of the C++ destructor)
+
+EXPORT void destroy_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey* obj) {
+    for (int i=0; i<nbelts; i++) {
+        destroy_LweBootstrappingKey(obj+i);
+    }
+}
+ 
+//allocates and initialize the LweBootstrappingKey structure
+//(equivalent of the C++ new)
+EXPORT LweBootstrappingKey* new_LweBootstrappingKey(const LweParams* in_out_params, const TGswParams* bk_params) {
+    LweBootstrappingKey* obj = alloc_LweBootstrappingKey();
+    init_LweBootstrappingKey(obj,in_out_params,bk_params);
+    return obj;
+}
+EXPORT LweBootstrappingKey* new_LweBootstrappingKey_array(int nbelts, const LweParams* in_out_params, const TGswParams* bk_params) {
+    LweBootstrappingKey* obj = alloc_LweBootstrappingKey_array(nbelts);
+    init_LweBootstrappingKey_array(nbelts,obj,in_out_params,bk_params);
+    return obj;
+}
+
+//destroys and frees the LweBootstrappingKey structure
+//(equivalent of the C++ delete)
+EXPORT void delete_LweBootstrappingKey(LweBootstrappingKey* obj) {
+    destroy_LweBootstrappingKey(obj);
+    free_LweBootstrappingKey(obj);
+}
+EXPORT void delete_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey* obj) {
+    destroy_LweBootstrappingKey_array(nbelts,obj);
+    free_LweBootstrappingKey_array(nbelts,obj);
+}
+
+
 
 
 #undef INCLUDE_ALL

@@ -5,6 +5,8 @@
 #include "./lwe-keyswitch.h"
 
 
+namespace {
+
 struct FakeLweBootstrappingKey{
     const LweParams* in_out_params; ///< paramètre de l'input et de l'output. key: s
     const TGswParams* bk_params; ///< params of the Gsw elems in bk. key: s"
@@ -24,7 +26,7 @@ struct FakeLweBootstrappingKey{
     	const int basebit = 2;
 
     	this->bk = fake_new_TGswSample_array(n,this->bk_params);
-        this->ks= fake_new_LweKeySwitchKey(n, kslength, basebit);
+        this->ks= fake_new_LweKeySwitchKey(n, kslength, basebit,in_out_params);
     }
     ~FakeLweBootstrappingKey() {
     	fake_delete_LweKeySwitchKey(ks);
@@ -236,5 +238,6 @@ inline void tfhe_bootstrap(LweSample* result, const LweBootstrappingKey* bk, Tor
 }
 
 
+} //namespace
 
 #endif // FAKE_LWE_BOOTSTRAPPING_H

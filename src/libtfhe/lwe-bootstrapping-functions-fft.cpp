@@ -16,6 +16,54 @@ using namespace std;
 
 
 
+#if defined INCLUDE_ALL || defined INCLUDE_TFHE_INIT_LWEBOOTSTRAPPINGKEY_FFT
+#undef INCLUDE_TFHE_INIT_LWEBOOTSTRAPPINGKEY_FFT
+//(equivalent of the C++ constructor)
+EXPORT void init_LweBootstrappingKeyFFT(LweBootstrappingKeyFFT* obj, const LweBootstrappingKey* bk) {
+    
+    const LweParams* in_out_params = bk->in_out_params;
+    const TGswParams* bk_params = bk->bk_params;
+    const TLweParams* accum_params = bk_params->tlwe_params;
+    const LweParams* extract_params = &accum_params->extracted_lweparams;
+    const int n = in_out_params->n;
+    const int t = bk->ks->t;
+    const int basebit = bk->ks->basebit;
+    const int base = bk->ks->base;
+    const int N = extract_params->n;
+
+    LweKeySwitchKey* ks = new_LweKeySwitchKey(N, t, basebit, in_out_params);
+    // Copy the KeySwitching key
+    for(int i=0; i<N; i++) {
+        for(int j=0; j<t; j++){
+            for(int p=0; p<base; p++) {
+                lweCopy(&ks->ks[i][j][p], &bk->ks->ks[i][j][p], in_out_params);
+            }
+        }
+    }
+
+    // Bootstrapping Key FFT 
+    TGswSampleFFT* bkFFT = new_TGswSampleFFT_array(n,bk_params);
+    for (int i=0; i<n; ++i) {
+        tGswToFFTConvert(&bkFFT[i], &bk->bk[i], bk_params);
+    }
+
+    new(obj) LweBootstrappingKeyFFT(in_out_params, bk_params, accum_params, extract_params, bkFFT, ks);
+}
+#endif
+
+
+
+//destroys the LweBootstrappingKeyFFT structure
+//(equivalent of the C++ destructor)
+EXPORT void destroy_LweBootstrappingKeyFFT(LweBootstrappingKeyFFT* obj) {
+    delete_LweKeySwitchKey((LweKeySwitchKey*) obj->ks);
+    delete_TGswSampleFFT_array(obj->in_out_params->n,(TGswSampleFFT*) obj->bkFFT);
+
+    obj->~LweBootstrappingKeyFFT();
+}
+
+
+
 void tfhe_MuxRotate_FFT(TLweSample* result, const TLweSample* accum, const TGswSampleFFT* bki, const int barai, const TGswParams* bk_params) {
     // ACC = BKi*[(X^barai-1)*ACC]+ACC
     // temp = (X^barai-1)*ACC
@@ -54,11 +102,6 @@ EXPORT void tfhe_blindRotate_FFT(TLweSample* accum,
         
         tfhe_MuxRotate_FFT(temp2, temp3, bkFFT+i, barai, bk_params);
         swap(temp2,temp3);
-        /*
-        tGswFFTMulByXaiMinusOne(temp, barai, bk+i, bk_params);
-        tGswFFTAddH(temp, bk_params);
-        tGswFFTExternMulToTLwe(accum, temp, bk_params);
-        */
     }
     if (temp3 != accum) {
         tLweCopy(accum, temp3, bk_params->tlwe_params);
@@ -175,6 +218,74 @@ EXPORT void tfhe_bootstrap_FFT(LweSample* result,
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+//allocate memory space for a LweBootstrappingKeyFFT
+
+EXPORT LweBootstrappingKeyFFT* alloc_LweBootstrappingKeyFFT() {
+    return (LweBootstrappingKeyFFT*) malloc(sizeof(LweBootstrappingKeyFFT));
+}
+EXPORT LweBootstrappingKeyFFT* alloc_LweBootstrappingKeyFFT_array(int nbelts) {
+    return (LweBootstrappingKeyFFT*) malloc(nbelts*sizeof(LweBootstrappingKeyFFT));
+}
+
+//free memory space for a LweKey
+EXPORT void free_LweBootstrappingKeyFFT(LweBootstrappingKeyFFT* ptr) {
+    free(ptr);
+}
+EXPORT void free_LweBootstrappingKeyFFT_array(int nbelts, LweBootstrappingKeyFFT* ptr) {
+    free(ptr);
+}
+
+//initialize the key structure
+
+EXPORT void init_LweBootstrappingKeyFFT_array(int nbelts, LweBootstrappingKeyFFT* obj, const LweBootstrappingKey* bk) {
+    for (int i=0; i<nbelts; i++) {
+    init_LweBootstrappingKeyFFT(obj+i,bk);
+    }
+}
+
+
+EXPORT void destroy_LweBootstrappingKeyFFT_array(int nbelts, LweBootstrappingKeyFFT* obj) {
+    for (int i=0; i<nbelts; i++) {
+        destroy_LweBootstrappingKeyFFT(obj+i);
+    }
+}
+ 
+//allocates and initialize the LweBootstrappingKeyFFT structure
+//(equivalent of the C++ new)
+EXPORT LweBootstrappingKeyFFT* new_LweBootstrappingKeyFFT(const LweBootstrappingKey* bk) {
+    LweBootstrappingKeyFFT* obj = alloc_LweBootstrappingKeyFFT();
+    init_LweBootstrappingKeyFFT(obj,bk);
+    return obj;
+}
+EXPORT LweBootstrappingKeyFFT* new_LweBootstrappingKeyFFT_array(int nbelts, const LweBootstrappingKey* bk) {
+    LweBootstrappingKeyFFT* obj = alloc_LweBootstrappingKeyFFT_array(nbelts);
+    init_LweBootstrappingKeyFFT_array(nbelts,obj,bk);
+    return obj;
+}
+
+//destroys and frees the LweBootstrappingKeyFFT structure
+//(equivalent of the C++ delete)
+EXPORT void delete_LweBootstrappingKeyFFT(LweBootstrappingKeyFFT* obj) {
+    destroy_LweBootstrappingKeyFFT(obj);
+    free_LweBootstrappingKeyFFT(obj);
+}
+EXPORT void delete_LweBootstrappingKeyFFT_array(int nbelts, LweBootstrappingKeyFFT* obj) {
+    destroy_LweBootstrappingKeyFFT_array(nbelts,obj);
+    free_LweBootstrappingKeyFFT_array(nbelts,obj);
+}
 
 
 
