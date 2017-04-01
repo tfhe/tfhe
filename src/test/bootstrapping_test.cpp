@@ -35,6 +35,17 @@ namespace {
         delete_LweSample(sample);
     }
 
+
+    vector<bool> random_binary_key(const int n){
+        vector<bool> rand_vect(n);
+        for (int i = 0; i < n; ++i) {
+            rand_vect[i] = rand()%2;
+        }
+        return rand_vect;
+    }
+
+
+
 /*
     LweKey* key = new_LweKey(params_in);
     lweKeyGen(key);
@@ -76,18 +87,15 @@ namespace {
     //	    const int n,
     //	    const TGswParams* bk_params) {
     TEST_F(TfheBlindRotateTest,tfheBlindRotateTest) {
-
-    	LweKey* key = new_LweKey(in_params);
-    	lweKeyGen(key);
-    	TGswKey* key_bk = new_TGswKey(bk_params);
-    	tGswKeyGen(key_bk);
-    	TGswSample* bk = fake_new_TGswSample_array(n, bk_params);
+        
+        vector<bool> key = random_binary_key(n);
+        TGswSample* bk = fake_new_TGswSample_array(n, bk_params);
+        FakeTGsw* fbk = fake(bk);
+        for (int i=0; i<n; i++) fbk[i].setMessageVariance(key[i],alpha_bk*alpha_bk);
 
     	//create bara
     	int* bara = new int[n];
     	for (int i=0; i<n; i++) bara[i]=rand()%(2*N);
-    	//create bk
-    	for (int i=0; i<n; i++) fake_tGswSymEncryptInt(bk+i,key->key[i],alpha_bk,key_bk);
     	//create accum
     	TorusPolynomial* initAccumMessage = new_TorusPolynomial(N);
     	torusPolynomialUniform(initAccumMessage);
@@ -104,7 +112,7 @@ namespace {
         //call bootstraprotate: one iteration at a time
     	for (int i=0; i<n; i++) {
     	    tfhe_blindRotate(accum,bk+i,bara+i,1,bk_params);
-    	    if (key->key[i]==1 && bara[i]!=0) {
+    	    if (key[i]==1 && bara[i]!=0) {
         		expectedOffset=(expectedOffset+bara[i])%(2*N);
         		torusPolynomialMulByXai(expectedAccumMessage,expectedOffset,initAccumMessage);
     	    }
@@ -123,8 +131,6 @@ namespace {
     	delete_TorusPolynomial(initAccumMessage);
     	delete[] bara;
     	fake_delete_TGswSample_array(n,bk);
-    	delete_TGswKey(key_bk);
-    	delete_LweKey(key);
     }
 
     class TfheBlindRotateAndExtractTest: public ::testing::Test {
@@ -160,15 +166,13 @@ namespace {
     TEST_F(TfheBlindRotateAndExtractTest,tfheBlindRotateAndExtractTest) {
 	const int NB_TRIALS=30;
 
-	LweKey* key = new_LweKey(in_params);
-	lweKeyGen(key);
-	TGswKey* key_bk = new_TGswKey(bk_params);
-	tGswKeyGen(key_bk);
-	TGswSample* bk = fake_new_TGswSample_array(n, bk_params);
+	vector<bool> key = random_binary_key(n);
+    TGswSample* bk = fake_new_TGswSample_array(n, bk_params);
+    FakeTGsw* fbk = fake(bk);
+    for (int i=0; i<n; i++) fbk[i].setMessageVariance(key[i],alpha_bk*alpha_bk);
+
 	//create bara and b
 	int* bara = new int[n];
-	//create bk
-	for (int i=0; i<n; i++) fake_tGswSymEncryptInt(bk+i,key->key[i],alpha_bk,key_bk);
 	//create v
 	TorusPolynomial* v = new_TorusPolynomial(N);
 	//create result
@@ -186,7 +190,7 @@ namespace {
 
 	    //verify
 	    int offset = barb;
-	    for (int i=0; i<n; i++) offset = (offset + 2*N - key->key[i]*bara[i])%(2*N);
+	    for (int i=0; i<n; i++) offset = (offset + 2*N - key[i]*bara[i])%(2*N);
 	    ASSERT_EQ(fres->message,(offset<N)?(v->coefsT[offset]):(-v->coefsT[offset-N]));
 	    //TODO variance
 	}
@@ -195,8 +199,6 @@ namespace {
 	delete_TorusPolynomial(v);
 	delete[] bara;
 	fake_delete_TGswSample_array(n,bk);
-	delete_TGswKey(key_bk);
-	delete_LweKey(key);
     }
 
 
