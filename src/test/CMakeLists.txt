@@ -42,6 +42,7 @@ add_executable(test-decomp-tgsw-${FFT_PROCESSOR} test-decomp-tgsw.cpp ${TFHE_HEA
 add_executable(test-lwe-${FFT_PROCESSOR} test-lwe.cpp ${TFHE_HEADERS})
 add_executable(test-multiplication-${FFT_PROCESSOR} test-multiplication.cpp ${TFHE_HEADERS})
 add_executable(test-tlwe-${FFT_PROCESSOR} test-tlwe.cpp ${TFHE_HEADERS})
+add_executable(test-gate-bootstrapping-${FFT_PROCESSOR} test-gate-bootstrapping.cpp ${TFHE_HEADERS})
 
 target_link_libraries(unittests-${FFT_PROCESSOR} ${RUNTIME_LIBS} ${GTEST_BOTH_LIBRARIES} -lgmock -lpthread)
 target_link_libraries(test-c-binding-${FFT_PROCESSOR} ${RUNTIME_LIBS})
@@ -50,6 +51,7 @@ target_link_libraries(test-decomp-tgsw-${FFT_PROCESSOR} ${RUNTIME_LIBS})
 target_link_libraries(test-lwe-${FFT_PROCESSOR} ${RUNTIME_LIBS})
 target_link_libraries(test-multiplication-${FFT_PROCESSOR} ${RUNTIME_LIBS})
 target_link_libraries(test-tlwe-${FFT_PROCESSOR} ${RUNTIME_LIBS})
+target_link_libraries(test-gate-bootstrapping-${FFT_PROCESSOR} ${RUNTIME_LIBS})
 
 add_test(unittests-${FFT_PROCESSOR} unittests-${FFT_PROCESSOR})
 

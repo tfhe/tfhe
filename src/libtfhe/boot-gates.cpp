@@ -31,13 +31,13 @@ using namespace std;
  * Outputs a LWE bootstrapped sample (with message space [0,1/4]*vs[?,?], noise<1/16)
 */
 EXPORT void bootsNAND(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) {
-	static const Torus32 MU = dtot32(1./8);
+	static const Torus32 MU = modSwitchToTorus32(1,8);
 	const LweParams* in_out_params = bk->params->in_out_params;
 
 	LweSample* temp_result = new_LweSample(in_out_params); 
 
 	//compute: (0,1/8) - ca - cb
-	static const Torus32 NandConst=dtot32(1./8);
+	static const Torus32 NandConst=modSwitchToTorus32(1,8);
 	lweNoiselessTrivial(temp_result, NandConst, in_out_params); 
 	lweSubTo(temp_result, ca, in_out_params);
 	lweSubTo(temp_result, cb, in_out_params);
