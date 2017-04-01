@@ -21,30 +21,25 @@ using namespace std;
 
 
 /*
- * Homomorphic NAND gate
- * Takes in input 2 LWE samples (with message space [0,1/4]*vs[-1/8,1/8], noise<1/16)
- * Outputs a LWE sample (with message space [0,1/2]*vs[?,?], noise<1/4)
-*/
-void homNAND(LweSample* result, const LweSample* c1, const LweSample* c2, const LweParams* params) {
-	static const Torus32 NandConst=dtot32(5./8);
-	lweNoiselessTrivial(result, NandConst, params); 
-	lweSubTo(result, c1, params);
-	lweSubTo(result, c2, params);
-}
-
-
-/*
  * Homomorphic bootstrapped NAND gate
  * Takes in input 2 LWE samples (with message space [0,1/4]*vs[-1/8,1/8], noise<1/16)
  * Outputs a LWE bootstrapped sample (with message space [0,1/4]*vs[?,?], noise<1/16)
 */
-EXPORT void bootsNAND(LweSample* result, const LweSample* c1, const LweSample* c2, const LweBootstrappingKey* BK) {
-	static const Torus32 mu0=dtot32(0.);
-	static const Torus32 mu1=dtot32(1./4);
+EXPORT void bootsNAND(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) {
+	static const Torus32 MU = dtot32(1./8);
+	const LweParams* in_out_params = bk->params->in_out_params;
 
-	LweSample* temp_result = new_LweSample(BK->in_out_params); 
-	homNAND(temp_result, c1, c2, BK->in_out_params);
-	lweToLweBootstrap(result, BK, mu1, mu0, temp_result);
+	LweSample* temp_result = new_LweSample(in_out_params); 
+
+	//compute: (0,1/8) - ca - cb
+	static const Torus32 NandConst=dtot32(1./8);
+	lweNoiselessTrivial(result, NandConst, in_out_params); 
+	lweSubTo(result, ca, in_out_params);
+	lweSubTo(result, cb, in_out_params);
+
+	//if the phase is positive, the result is 1/8
+	//if the phase is positive, else the result is -1/8
+	tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
 
 	delete_LweSample(temp_result);
 }
@@ -52,10 +47,7 @@ EXPORT void bootsNAND(LweSample* result, const LweSample* c1, const LweSample* c
 
 
 
-
-
-
-
+#if 0
 
 
 /*
@@ -180,3 +172,4 @@ EXPORT void homNOT(LweSample* result, const LweSample* c1, const LweParams* para
 	lweNoiselessTrivial(result, NotConst, params); 
 	lweSubTo(result, c1, params);
 }
+#endif
