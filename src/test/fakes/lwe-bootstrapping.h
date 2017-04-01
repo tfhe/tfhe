@@ -3,6 +3,7 @@
 
 #include <tfhe.h>
 #include "./lwe-keyswitch.h"
+#include "./tgsw.h"
 
 
 namespace {

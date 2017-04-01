@@ -1,3 +1,4 @@
+#ifndef TFHE_TEST_ENVIRONMENT 
 #include <cstdlib>
 #include <iostream>
 #include <random>
@@ -13,6 +14,10 @@
 #include "tfhe.h"
 
 using namespace std;
+#else
+#undef EXPORT
+#define EXPORT
+#endif
 
 
 //*//*****************************************
