@@ -144,39 +144,6 @@ USE_DEFAULT_CONSTRUCTOR_DESTRUCTOR_IMPLEMENTATIONS1(TGswSampleFFT, TGswParams);
 
 
 
-#ifndef TFHE_TEST_ENVIRONMENT
-// bk contains the bootstrapping key bk and the keyswitching key ks
-//  - bk: key_in (LWE) --> rgsw_key (GSW)
-//  - "keyextract": rgsw_key (GSW) --> extracted_key
-//  - ks: extracted_key --> key_in (LWE)
-EXPORT void tfhe_createLweBootstrappingKeyFFT(LweBootstrappingKeyFFT* bk, const LweKey* key_in, const TGswKey* rgsw_key) {
-    assert(bk->bk_params==rgsw_key->params);
-    assert(bk->in_out_params==key_in->params);
-
-    const LweParams* in_out_params = bk->in_out_params; 
-    const TGswParams* bk_params = bk->bk_params;
-    const TLweParams* accum_params = bk_params->tlwe_params;
-    const LweParams* extract_params = &accum_params->extracted_lweparams;
-    
-    //LweKeySwitchKey* ks; ///< the keyswitch key (s'->s)
-    const TLweKey* accum_key = &rgsw_key->tlwe_key;
-    LweKey* extracted_key = new_LweKey(extract_params);
-    tLweExtractKey(extracted_key, accum_key);
-    lweCreateKeySwitchKey(bk->ks, extracted_key, key_in);
-    delete_LweKey(extracted_key);
-    
-    //TGswSample* bk; ///< the bootstrapping key (s->s")
-    TGswSample* tmpsample = new_TGswSample(bk_params);
-    int* kin = key_in->key;
-    const double alpha = accum_params->alpha_min;
-    const int n = in_out_params->n;
-    for (int i=0; i<n; i++) {
-    tGswSymEncryptInt(tmpsample, kin[i], alpha, rgsw_key);
-    tGswToFFTConvert(&bk->bkFFT[i], tmpsample, bk_params);
-    }
-    delete_TGswSample(tmpsample);
-}
-#endif
 
 
 
