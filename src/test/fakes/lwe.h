@@ -168,15 +168,15 @@ inline void fake_lweSymEncrypt(LweSample* result, Torus32 message, double alpha,
 
 
 // Noiseless trivial of a Torus message
-inline void fake_lweNoiselessTrivial(LweSample* result, Torus32 message, const LweKey* key) {
+inline void fake_lweNoiselessTrivial(LweSample* result, Torus32 message, const LweParams* params) {
     FakeLwe* fres = fake(result);
     fres->message = message;
     fres->current_variance = 0; 
 }
 
 #define USE_FAKE_lweNoiselessTrivial \
-    inline void lweNoiselessTrivial(LweSample* result, Torus32 message, const LweKey* key) { \
-    return fake_lweNoiselessTrivial(result,message,key); \
+    inline void lweNoiselessTrivial(LweSample* result, Torus32 message, const LweParams* params) { \
+    return fake_lweNoiselessTrivial(result,message,params); \
 }
 
 

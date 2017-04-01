@@ -1,3 +1,4 @@
+#ifndef TFHE_TEST_ENVIRONMENT 
 #include <cstdlib>
 #include <iostream>
 #include <random>
@@ -13,6 +14,10 @@
 #include "tfhe.h"
 
 using namespace std;
+#else
+#undef EXPORT
+#define EXPORT
+#endif
 
 
 //*//*****************************************
@@ -33,9 +38,9 @@ EXPORT void bootsNAND(LweSample* result, const LweSample* ca, const LweSample* c
 
 	//compute: (0,1/8) - ca - cb
 	static const Torus32 NandConst=dtot32(1./8);
-	lweNoiselessTrivial(result, NandConst, in_out_params); 
-	lweSubTo(result, ca, in_out_params);
-	lweSubTo(result, cb, in_out_params);
+	lweNoiselessTrivial(temp_result, NandConst, in_out_params); 
+	lweSubTo(temp_result, ca, in_out_params);
+	lweSubTo(temp_result, cb, in_out_params);
 
 	//if the phase is positive, the result is 1/8
 	//if the phase is positive, else the result is -1/8

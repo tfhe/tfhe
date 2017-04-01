@@ -4,6 +4,8 @@
 #include <tfhe.h>
 #include "./lwe-keyswitch.h"
 #include "./lwe-bootstrapping.h"
+#include "./tgsw.h"
+#include "./tgsw-fft.h"
 
 
 namespace {
