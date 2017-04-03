@@ -830,22 +830,76 @@ EXPORT LweKeySwitchKey* new_lweKeySwitchKey_fromStream(std::istream& F) {  retur
 
 
 /**
+ * This function prints the bootstrapping the coefficients (tgsw array section only)
+ */
+void write_LweBootstrappingKey_content(const Ostream& F, const LweBootstrappingKey* bk) {
+    const int n = bk->in_out_params->n;
+    const int kpl = bk->bk_params->kpl;
+    const int k = bk->bk_params->tlwe_params->k;
+    const int N = bk->bk_params->tlwe_params->N;
+    double max_variance = -1;
+    for (int i=0; i<n; i++)
+	for (int j=0; j<kpl; j++) {
+	    TLweSample& sample = bk->bk[i].all_sample[j];
+	    if (sample.current_variance > max_variance)
+	       max_variance = sample.current_variance;
+	}
+    F.fwrite(&LWE_BOOTSTRAPPING_KEY_TYPE_UID, sizeof(int32_t));
+    //print the variance once
+    F.fwrite(&max_variance, sizeof(double));
+    //then print all the coefficients
+    for (int i=0; i<n; i++)
+	for (int j=0; j<kpl; j++) {
+	    TLweSample& sample = bk->bk[i].all_sample[j];
+	    for (int l=0; l<=k; l++) {
+		F.fwrite(sample.a[l].coefsT, N*sizeof(Torus32));
+	    }
+	}
+}
+
+/**
+ * This function reads the bootstrapping the coefficients (tgsw array section only)
+ */
+void read_LweBootstrappingKey_content(const Istream& F, LweBootstrappingKey* bk) {
+    const int n = bk->in_out_params->n;
+    const int kpl = bk->bk_params->kpl;
+    const int k = bk->bk_params->tlwe_params->k;
+    const int N = bk->bk_params->tlwe_params->N;
+    double max_variance = -1;
+    int32_t type_uid = -1;
+    F.fread(&type_uid, sizeof(int32_t));
+    if (type_uid!=LWE_BOOTSTRAPPING_KEY_TYPE_UID)
+	die_dramatically("Trying to read something that is not a BK content");
+    F.fread(&max_variance, sizeof(double));
+    for (int i=0; i<n; i++)
+	for (int j=0; j<kpl; j++) {
+	    TLweSample& sample = bk->bk[i].all_sample[j];
+	    for (int l=0; l<=k; l++) {
+		F.fread(sample.a[l].coefsT, N*sizeof(Torus32));
+	    }
+	    sample.current_variance=max_variance;
+	}
+}
+
+
+
+/**
  * This function prints the bootstrapping parameters to a generic stream
  * It only prints the parameters section, not the coefficients
  */
-void write_LweBootstrappingKey(const Ostream& F, const LweBootstrappingKey* bk, bool write_inout_params, bool write_bk_params) {
+void write_lweBootstrappingKey(const Ostream& F, const LweBootstrappingKey* bk, bool write_inout_params=true, bool write_bk_params=true) {
     if (write_inout_params) write_lweParams(F, bk->in_out_params);
     if (write_bk_params) write_tGswParams(F, bk->bk_params);
     write_LweKeySwitchParameters_section(F, bk->ks);
     write_LweKeySwitchKey_content(F, bk->ks);
-    //write_LweBootstrappingKey_content(F, bk);
+    write_LweBootstrappingKey_content(F, bk);
 }
 
 /**
  * This constructor function reads and creates a TGswParams from a generic stream, and an TlweParams object. 
  * The result must be deleted with delete_TGswParams();
  */
-void read_new_lweBootstrappingKey(const Istream& F, const LweParams* in_out_params, const TGswParams* bk_params) {
+LweBootstrappingKey* read_new_lweBootstrappingKey(const Istream& F, const LweParams* in_out_params=0, const TGswParams* bk_params=0) {
     if (in_out_params==0) {
        LweParams* tmp = read_new_lweParams(F);
        in_out_params = tmp;
@@ -858,8 +912,11 @@ void read_new_lweBootstrappingKey(const Istream& F, const LweParams* in_out_para
     }
     LweKeySwitchParameters ksparams;
     read_lweKeySwitchParameters_section(F, &ksparams);
-    LweKeySwitchKey* reps = new_LweKeySwitchKey(ksparams.n,ksparams.t,ksparams.basebit, in_out_params);
-    read_lweKeySwitchKey_content(F, reps);
+    if (ksparams.n != bk_params->tlwe_params->N) die_dramatically("Wrong dimension in bootstrapping key");
+    LweBootstrappingKey* reps = new_LweBootstrappingKey(ksparams.t,ksparams.basebit, in_out_params, bk_params);
+    read_lweKeySwitchKey_content(F, reps->ks);
+    read_LweBootstrappingKey_content(F, reps);
+    return reps;
 }
 
 
@@ -867,26 +924,26 @@ void read_new_lweBootstrappingKey(const Istream& F, const LweParams* in_out_para
 /**
  * This function exports a lwe bootstrapping key (in binary) to a file
  */
-EXPORT void export_lweBootstrappingKey_toFile(FILE* F, const LweBootstrappingKey* bk);
+EXPORT void export_lweBootstrappingKey_toFile(FILE* F, const LweBootstrappingKey* bk) { write_lweBootstrappingKey(to_Ostream(F), bk); }
 
 /**
  * This constructor function reads and creates a LweBootstrappingKey from a File. The result
  * must be deleted with delete_LweBootstrappingKey();
  */
-EXPORT LweBootstrappingKey* new_lweBootstrappingKey_fromFile(FILE* F);
+EXPORT LweBootstrappingKey* new_lweBootstrappingKey_fromFile(FILE* F) { return read_new_lweBootstrappingKey(to_Istream(F)); }
 
 #ifdef __cplusplus
 
 /**
  * This function exports a lwe bootstrapping key (in binary) to a file
  */
-EXPORT void export_lweBootstrappingKey_toStream(std::ostream& F, const LweBootstrappingKey* bk);
+EXPORT void export_lweBootstrappingKey_toStream(std::ostream& F, const LweBootstrappingKey* bk) { write_lweBootstrappingKey(to_Ostream(F), bk); }
 
 /**
  * This constructor function reads and creates a LweBootstrappingKey from a File. The result
  * must be deleted with delete_LweBootstrappingKey();
  */
-EXPORT LweBootstrappingKey* new_lweBootstrappingKey_fromStream(std::istream& F);
+EXPORT LweBootstrappingKey* new_lweBootstrappingKey_fromStream(std::istream& F) { return read_new_lweBootstrappingKey(to_Istream(F)); }
 
 #endif
 

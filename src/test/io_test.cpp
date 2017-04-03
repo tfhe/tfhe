@@ -48,12 +48,13 @@ namespace {
 
     
     //generate a random ks
-    LweKeySwitchKey* new_random_ks_key(int N, int t, int basebit, const LweParams* out_params) {
-	const int n = out_params->n;
-        const int base = 1<<basebit;
+    void random_ks_key(LweKeySwitchKey* key) {
+        const int N = key->n;
+        const int t = key->t;
+        const int base = key->base;
+	const int n = key->out_params->n;
 	const int length = N*t*base;
-	LweKeySwitchKey* key = new_LweKeySwitchKey(N,t,basebit,out_params);
-        double variance = rand()/double(RAND_MAX);
+	double variance = rand()/double(RAND_MAX);
         LweSample* begin = key->ks0_raw;
 	LweSample* end = begin+length;
 	for (LweSample* it=begin; it!=end; ++it) {
@@ -61,7 +62,36 @@ namespace {
             it->b=rand();
             it->current_variance=variance;
         }
+    }
+
+    //generate a random ks
+    LweKeySwitchKey* new_random_ks_key(int N, int t, int basebit, const LweParams* out_params) {
+	LweKeySwitchKey* key = new_LweKeySwitchKey(N,t,basebit,out_params);
+        random_ks_key(key);
 	return key;
+    }
+
+    
+    //generate a random ks
+    LweBootstrappingKey* new_random_bk_key(int ks_t, int ks_basebit, const LweParams* in_out_params, const TGswParams* bk_params) {
+	const int n = in_out_params->n;
+        const int kpl = bk_params->kpl;
+        const int k = bk_params->tlwe_params->k;
+        const int N = bk_params->tlwe_params->N;
+        LweBootstrappingKey* bk = new_LweBootstrappingKey(ks_t, ks_basebit, in_out_params, bk_params);
+        random_ks_key(bk->ks);
+        double variance = rand()/double(RAND_MAX);
+        for (int i=0; i<n; i++) {
+            for (int p=0; p<kpl; p++) {
+                TLweSample& sample = bk->bk[i].all_sample[p];
+                for (int j=0; j<=k; j++) {
+                    for (int x=0; x<N; x++)
+                        sample.a[j].coefsT[x]=rand();
+                }
+                sample.current_variance=variance;
+            }
+        }
+        return bk;
     }
 
     const LweKey* lwekey500 = new_random_lwe_key(lweparams500);
@@ -75,6 +105,10 @@ namespace {
     
     const LweKeySwitchKey* ks503 = new_random_ks_key(503,7,2,lweparams500);
     const set<const LweKeySwitchKey*> allks = { ks503 };
+
+    const LweBootstrappingKey* bk0 = new_random_bk_key(11,1,lweparams500, tgswparams1024_1);
+    const set<const LweBootstrappingKey*> allbk = { bk0 };
+
 
     //equality test for parameters
     void assert_equals(const LweParams* a, const LweParams* b) {
@@ -170,7 +204,8 @@ namespace {
 	    assert_equals(a->all_sample+i,b->all_sample+i,tlwe_params);
     }
 
-    //equality test for keyswitch key
+    //equality test for keyswitch key (for the variance, only the max is
+    //compared)
     void assert_equals(const LweKeySwitchKey* a, const LweKeySwitchKey* b) {
 	ASSERT_EQ(a->n,b->n);
 	ASSERT_EQ(a->t,b->t);
@@ -190,6 +225,37 @@ namespace {
 	    if (sb.current_variance>max_varb) max_varb=sb.current_variance;
 	}
 	ASSERT_EQ(max_vara,max_varb);
+    }
+
+    //equality test for bootstrapping key
+    void assert_equals(const LweBootstrappingKey* a, const LweBootstrappingKey* b) {
+        const int n = a->in_out_params->n;
+        const int kpl = a->bk_params->kpl;
+        //const int N = a->bk_params->tlwe_params->N;
+        const int k = a->bk_params->tlwe_params->k;
+        //compare ks
+        assert_equals(a->ks, b->ks);
+        //compute the max variance
+        double max_vara = -1;
+        double max_varb = -1;
+        for (int i=0; i<n; i++)
+            for (int j=0; j<kpl; j++) {
+                TLweSample& samplea = a->bk[i].all_sample[j];
+                TLweSample& sampleb = b->bk[i].all_sample[j];
+                if (samplea.current_variance > max_vara)
+                    max_vara = samplea.current_variance;
+                if (sampleb.current_variance > max_varb)
+                    max_varb = sampleb.current_variance;
+            }
+        ASSERT_EQ(max_vara,max_varb);
+        //compare the coefficients
+        for (int i=0; i<n; i++)
+            for (int j=0; j<kpl; j++) {
+                TLweSample& samplea = a->bk[i].all_sample[j];
+                TLweSample& sampleb = b->bk[i].all_sample[j];
+                for (int l=0; l<=k; l++)
+                    ASSERT_EQ(torusPolynomialNormInftyDist(samplea.a+l,sampleb.a+l),0);
+            }
     }
 
 
@@ -351,7 +417,6 @@ namespace {
         }	
     }
 
-/*
     TEST(IOTest, LweBootstrappingKeyIO) {
         for (const LweBootstrappingKey* bk: allbk) {
             {
@@ -365,6 +430,5 @@ namespace {
             }
         }	
     }
-*/
 
 }
