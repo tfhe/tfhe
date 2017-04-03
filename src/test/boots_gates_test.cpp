@@ -37,7 +37,9 @@ namespace {
 	    USE_FAKE_new_LweSample;
 	    USE_FAKE_delete_LweSample;
 	    USE_FAKE_lweSubTo;
-	    //USE_FAKE_lweAddTo;
+	    USE_FAKE_lweAddTo;
+        USE_FAKE_lweAddMulTo;
+        USE_FAKE_lweSubMulTo;
 	    USE_FAKE_lweNoiselessTrivial;
 	    //USE_FAKE_tfhe_bootstrap_FFT;
 

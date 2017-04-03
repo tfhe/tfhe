@@ -199,7 +199,7 @@ inline void fake_lweSubTo(LweSample* result, const LweSample* sample, const LweP
 inline void fake_lweAddTo(LweSample* result, const LweSample* sample, const LweParams* params) {
     FakeLwe* fres = fake(result);
     const FakeLwe* fsample = fake(sample);
-    fres->message -= fsample->message;
+    fres->message += fsample->message;
     fres->current_variance += fsample->current_variance;
 }
 
@@ -207,6 +207,35 @@ inline void fake_lweAddTo(LweSample* result, const LweSample* sample, const LweP
     static inline void lweAddTo(LweSample* result, const LweSample* sample, const LweParams* params) { \
     return fake_lweAddTo(result,sample,params); \
 }
+
+
+/** result = result + p*sample */
+inline void fake_lweAddMulTo(LweSample* result, const int p, const LweSample* sample, const LweParams* params) {
+    FakeLwe* fres = fake(result);
+    const FakeLwe* fsample = fake(sample);
+    fres->message += p*fsample->message;
+    fres->current_variance += p*fsample->current_variance;
+}
+
+#define USE_FAKE_lweAddMulTo \
+    static inline void lweAddMulTo(LweSample* result, const int p, const LweSample* sample, const LweParams* params) { \
+    return fake_lweAddMulTo(result,p,sample,params); \
+}
+
+
+/** result = result - p*sample */
+inline void fake_lweSubMulTo(LweSample* result, const int p, const LweSample* sample, const LweParams* params) {
+    FakeLwe* fres = fake(result);
+    const FakeLwe* fsample = fake(sample);
+    fres->message -= p*fsample->message;
+    fres->current_variance += p*fsample->current_variance;
+}
+
+#define USE_FAKE_lweSubMulTo \
+    static inline void lweSubMulTo(LweSample* result, const int p, const LweSample* sample, const LweParams* params) { \
+    return fake_lweSubMulTo(result,p,sample,params); \
+}
+
 
 
 #endif //FAKES_LWE_H
