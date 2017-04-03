@@ -16,7 +16,7 @@
 using namespace std;
 #else
 #undef EXPORT
-#define EXPORT
+#define EXPORT static
 #endif
 
 
@@ -50,6 +50,31 @@ EXPORT void bootsNAND(LweSample* result, const LweSample* ca, const LweSample* c
 }
 
 
+/** bootstrapped Or Gate:  */ 
+EXPORT void bootsOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) { die_dramatically("Not implemented"); }
+/** bootstrapped And Gate: result = a and b */ 
+EXPORT void bootsAND(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) { die_dramatically("Not implemented"); }
+/** bootstrapped Xor Gate: result = a xor b */ 
+EXPORT void bootsXOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) { die_dramatically("Not implemented"); }
+/** bootstrapped Xnor Gate: result = (a==b) */ 
+EXPORT void bootsXNOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) { die_dramatically("Not implemented"); }
+/** bootstrapped Not Gate: result = not(a) */ 
+EXPORT void bootsNOT(LweSample* result, const LweSample* ca, const TFheGateBootstrappingCloudKeySet* bk) { die_dramatically("Not implemented"); }
+/** bootstrapped Copy Gate: result = a */ 
+EXPORT void bootsCOPY(LweSample* result, const LweSample* ca, const TFheGateBootstrappingCloudKeySet* bk) { die_dramatically("Not implemented"); }
+/** bootstrapped Nor Gate: result = not(a or b) */ 
+EXPORT void bootsNOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) { die_dramatically("Not implemented"); }
+/** bootstrapped AndNY Gate: not(a) and b */ 
+EXPORT void bootsANDNY(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) { die_dramatically("Not implemented"); }
+/** bootstrapped AndYN Gate: a and not(b) */ 
+EXPORT void bootsANDYN(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) { die_dramatically("Not implemented"); }
+/** bootstrapped OrNY Gate: not(a) or b */ 
+EXPORT void bootsORNY(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) { die_dramatically("Not implemented"); }
+/** bootstrapped OrYN Gate: a or not(b) */ 
+EXPORT void bootsORYN(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) { die_dramatically("Not implemented"); }
+
+/** bootstrapped Mux(a,b,c) = a?b:c */ 
+EXPORT void bootsMUX(LweSample* result, const LweSample* a, const LweSample* b, const LweSample* c, const TFheGateBootstrappingCloudKeySet* bk) { die_dramatically("Not implemented"); }
 
 
 #if 0

@@ -9,6 +9,7 @@
 #include "lwesamples.h"
 #include "tlwe.h"
 #include "tgsw.h"
+#include "tfhe.h" //TODO proprify dependencies
 
 #ifdef __cplusplus
 #include <cstdio>
@@ -310,6 +311,156 @@ EXPORT void export_tgswKey_toStream(std::ostream& F, const TGswKey* tgswkey);
  * must be deleted with delete_tgswKey();
  */
 EXPORT TGswKey* new_tgswKey_fromStream(std::istream& F);
+
+#endif
+
+/* ****************************
+ * Lwe Keyswitch key
+**************************** */
+
+/**
+ * This function exports a lwe keyswitch key (in binary) to a file
+ */
+EXPORT void export_lweKeySwitchKey_toFile(FILE* F, const LweKeySwitchKey* ks);
+
+/**
+ * This constructor function reads and creates a LweKeySwitchKey from a File. The result
+ * must be deleted with delete_LweKeySwitchKey();
+ */
+EXPORT LweKeySwitchKey* new_lweKeySwitchKey_fromFile(FILE* F);
+
+#ifdef __cplusplus
+
+/**
+ * This function exports a lwe keyswitch key (in binary) to a file
+ */
+EXPORT void export_lweKeySwitchKey_toStream(std::ostream& F, const LweKeySwitchKey* ks);
+
+/**
+ * This constructor function reads and creates a LweKeySwitchKey from a File. The result
+ * must be deleted with delete_LweKeySwitchKey();
+ */
+EXPORT LweKeySwitchKey* new_lweKeySwitchKey_fromStream(std::istream& F);
+
+#endif
+
+/* ****************************
+ * Lwe Bootstrapping key
+**************************** */
+
+/**
+ * This function exports a lwe bootstrapping key (in binary) to a file
+ */
+EXPORT void export_lweBootstrappingKey_toFile(FILE* F, const LweBootstrappingKey* bk);
+
+/**
+ * This constructor function reads and creates a LweBootstrappingKey from a File. The result
+ * must be deleted with delete_LweBootstrappingKey();
+ */
+EXPORT LweBootstrappingKey* new_lweBootstrappingKey_fromFile(FILE* F);
+
+#ifdef __cplusplus
+
+/**
+ * This function exports a lwe bootstrapping key (in binary) to a file
+ */
+EXPORT void export_lweBootstrappingKey_toStream(std::ostream& F, const LweBootstrappingKey* bk);
+
+/**
+ * This constructor function reads and creates a LweBootstrappingKey from a File. The result
+ * must be deleted with delete_LweBootstrappingKey();
+ */
+EXPORT LweBootstrappingKey* new_lweBootstrappingKey_fromStream(std::istream& F);
+
+#endif
+
+/* ****************************
+ * TFheGateBootstrappingParameterSet key
+**************************** */
+
+/**
+ * This function prints the tfhe gate bootstrapping parameter set to a file
+ */
+EXPORT void export_tfheGateBootstrappingParameterSet_toFile(FILE* F, const TFheGateBootstrappingParameterSet* params);
+
+/**
+ * This constructor function reads and creates a tfhe gate bootstrapping parameter set from a File. The result
+ * must be deleted with delete_tfheGateBootstrappingParameterSet();
+ */
+EXPORT TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_fromFile(FILE* F);
+
+#ifdef __cplusplus
+
+/**
+ * This function prints the tfhe gate bootstrapping parameter set to a file
+ */
+EXPORT void export_tfheGateBootstrappingParameterSet_toStream(std::ostream& F, const TFheGateBootstrappingParameterSet* params);
+
+/**
+ * This constructor function reads and creates a tfhe gate bootstrapping parameter set from a File. The result
+ * must be deleted with delete_tfheGateBootstrappingParameterSet();
+ */
+EXPORT TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_fromStream(std::istream& F);
+
+#endif
+
+/* ****************************
+ * TFheGateBootstrappingCloudKeySet
+**************************** */
+
+/**
+ * This function prints the tfhe gate bootstrapping cloud key to a file
+ */
+EXPORT void export_tfheGateBootstrappingCloudKeySet_toFile(FILE* F, const TFheGateBootstrappingCloudKeySet* params);
+
+/**
+ * This constructor function reads and creates a tfhe gate bootstrapping cloud key from a File. The result
+ * must be deleted with delete_tfheGateBootstrappingCloudKeySet();
+ */
+EXPORT TFheGateBootstrappingCloudKeySet* new_tfheGateBootstrappingCloudKeySet_fromFile(FILE* F);
+
+#ifdef __cplusplus
+
+/**
+ * This function prints the tfhe gate bootstrapping cloud key to a file
+ */
+EXPORT void export_tfheGateBootstrappingCloudKeySet_toStream(std::ostream& F, const TFheGateBootstrappingCloudKeySet* params);
+
+/**
+ * This constructor function reads and creates a tfhe gate bootstrapping cloud key from a File. The result
+ * must be deleted with delete_tfheGateBootstrappingCloudKeySet();
+ */
+EXPORT TFheGateBootstrappingCloudKeySet* new_tfheGateBootstrappingCloudKeySet_fromStream(std::istream& F);
+
+#endif
+
+/* ****************************
+ * TFheGateBootstrappingSecretKeySet
+**************************** */
+
+/**
+ * This function prints the tfhe gate bootstrapping secret key to a file
+ */
+EXPORT void export_tfheGateBootstrappingSecretKeySet_toFile(FILE* F, const TFheGateBootstrappingSecretKeySet* params);
+
+/**
+ * This constructor function reads and creates a tfhe gate bootstrapping secret key from a File. The result
+ * must be deleted with delete_tfheGateBootstrappingSecretKeySet();
+ */
+EXPORT TFheGateBootstrappingSecretKeySet* new_tfheGateBootstrappingSecretKeySet_fromFile(FILE* F);
+
+#ifdef __cplusplus
+
+/**
+ * This function prints the tfhe gate bootstrapping secret key to a file
+ */
+EXPORT void export_tfheGateBootstrappingSecretKeySet_toStream(std::ostream& F, const TFheGateBootstrappingSecretKeySet* params);
+
+/**
+ * This constructor function reads and creates a TGSWKey from a stream. The result
+ * must be deleted with delete_tfheGateBootstrappingSecretKeySet();
+ */
+EXPORT TFheGateBootstrappingSecretKeySet* new_tfheGateBootstrappingSecretKeySet_fromStream(std::istream& F);
 
 #endif
 

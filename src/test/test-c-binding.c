@@ -33,7 +33,8 @@ int main(int argc, char** argv) {
     const int n = 500;
     const int l_bk = 3;
     const int Bgbit_bk = 10;
-    //const int ks_basebit = 4;
+    const int ks_t = 15;
+    const int ks_basebit = 1;
     const double alpha_in = 5e-4;
     const double alpha_bk = 9e-9;
     //const int alpha_ks = 1e-6;
@@ -48,7 +49,7 @@ int main(int argc, char** argv) {
     TGswKey* key_bk = new_TGswKey(params_bk);
     tGswKeyGen(key_bk);
 
-    LweBootstrappingKey* bk = new_LweBootstrappingKey(params_in, params_bk);
+    LweBootstrappingKey* bk = new_LweBootstrappingKey(ks_t, ks_basebit, params_in, params_bk);
     tfhe_createLweBootstrappingKey(bk, key, key_bk);
 
     LweSample* test = new_LweSample(params_in);

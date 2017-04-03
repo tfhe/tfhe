@@ -9,18 +9,15 @@ using namespace std;
 #define EXPORT
 #endif
 
-const int basebit = 1;
-const int kslength = 15;
 
-
-EXPORT void init_LweBootstrappingKey(LweBootstrappingKey* obj, const LweParams* in_out_params, const TGswParams* bk_params) {
+EXPORT void init_LweBootstrappingKey(LweBootstrappingKey* obj, int ks_t, int ks_basebit, const LweParams* in_out_params, const TGswParams* bk_params) {
     const TLweParams* accum_params = bk_params->tlwe_params;
     const LweParams* extract_params = &accum_params->extracted_lweparams;
     const int n = in_out_params->n;
     const int N = extract_params->n;
     
     TGswSample* bk=new_TGswSample_array(n,bk_params);
-    LweKeySwitchKey* ks=new_LweKeySwitchKey(N, kslength, basebit, in_out_params);
+    LweKeySwitchKey* ks=new_LweKeySwitchKey(N, ks_t, ks_basebit, in_out_params);
 
     new(obj) LweBootstrappingKey(in_out_params, bk_params, accum_params, extract_params, bk, ks);
 }
@@ -227,9 +224,9 @@ EXPORT void free_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey* ptr)
 //initialize the key structure
 //(equivalent of the C++ constructor)
 
-EXPORT void init_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey* obj, const LweParams* in_out_params, const TGswParams* bk_params) {
+EXPORT void init_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey* obj, int ks_t, int ks_basebit, const LweParams* in_out_params, const TGswParams* bk_params) {
     for (int i=0; i<nbelts; i++) {
-        init_LweBootstrappingKey(obj+i, in_out_params, bk_params);
+        init_LweBootstrappingKey(obj+i, ks_t, ks_basebit, in_out_params, bk_params);
     }
 }
 
@@ -244,14 +241,14 @@ EXPORT void destroy_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey* o
  
 //allocates and initialize the LweBootstrappingKey structure
 //(equivalent of the C++ new)
-EXPORT LweBootstrappingKey* new_LweBootstrappingKey(const LweParams* in_out_params, const TGswParams* bk_params) {
+EXPORT LweBootstrappingKey* new_LweBootstrappingKey(const int ks_t, const int ks_basebit, const LweParams* in_out_params, const TGswParams* bk_params) {
     LweBootstrappingKey* obj = alloc_LweBootstrappingKey();
-    init_LweBootstrappingKey(obj,in_out_params,bk_params);
+    init_LweBootstrappingKey(obj,ks_t,ks_basebit,in_out_params,bk_params);
     return obj;
 }
-EXPORT LweBootstrappingKey* new_LweBootstrappingKey_array(int nbelts, const LweParams* in_out_params, const TGswParams* bk_params) {
+EXPORT LweBootstrappingKey* new_LweBootstrappingKey_array(int nbelts, const int ks_t, const int ks_basebit, const LweParams* in_out_params, const TGswParams* bk_params) {
     LweBootstrappingKey* obj = alloc_LweBootstrappingKey_array(nbelts);
-    init_LweBootstrappingKey_array(nbelts,obj,in_out_params,bk_params);
+    init_LweBootstrappingKey_array(nbelts,obj,ks_t,ks_basebit,in_out_params,bk_params);
     return obj;
 }
 

@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
     TFheGateBootstrappingParameterSet* params = new_default_gate_bootstrapping_parameters(minimum_lambda);
     const LweParams* in_out_params = params->in_out_params;
     // generate the secret keyset
-    TFheGateBootstrappingSecretKeySet* keyset = new_gate_bootstrapping_secret_keyset(params);
+    TFheGateBootstrappingSecretKeySet* keyset = new_random_gate_bootstrapping_secret_keyset(params);
 
     // generate input samples
     LweSample* test_in = new_LweSample_array(nb_samples, in_out_params);
@@ -79,7 +79,7 @@ int main(int argc, char** argv) {
     delete_LweSample_array(nb_samples,test_out);
     delete_LweSample_array(nb_samples,test_in);
     delete_gate_bootstrapping_secret_keyset(keyset);
-    delete_default_gate_bootstrapping_parameters(params);
+    delete_gate_bootstrapping_parameters(params);
 
     return 0;
 }
