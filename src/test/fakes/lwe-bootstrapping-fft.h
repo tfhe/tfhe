@@ -190,7 +190,7 @@ inline void fake_tfhe_blindRotateAndExtract_FFT(LweSample* result,
  * @param mu The output message (if phase(x)>0)
  * @param x The input sample
  */
-inline void old_fake_tfhe_bootstrap_woKS_FFT(LweSample* result, 
+inline void fake_tfhe_bootstrap_woKS_FFT(LweSample* result, 
     const LweBootstrappingKeyFFT* bkFFT, 
     Torus32 mu, const LweSample* x){
 
@@ -224,9 +224,9 @@ inline void old_fake_tfhe_bootstrap_woKS_FFT(LweSample* result,
     delete_TorusPolynomial(testvect);
 }
 
-#define USE_OLD_FAKE_tfhe_bootstrap_woKS_FFT \
-static inline void old_tfhe_bootstrap_woKS_FFT(LweSample* result, const LweBootstrappingKeyFFT* bkFFT, Torus32 mu, const LweSample* x) { \
-    old_fake_tfhe_bootstrap_woKS_FFT(result,bkFFT,mu,x); \
+#define USE_FAKE_tfhe_bootstrap_woKS_FFT \
+static inline void tfhe_bootstrap_woKS_FFT(LweSample* result, const LweBootstrappingKeyFFT* bkFFT, Torus32 mu, const LweSample* x) { \
+    fake_tfhe_bootstrap_woKS_FFT(result,bkFFT,mu,x); \
 }
 
 

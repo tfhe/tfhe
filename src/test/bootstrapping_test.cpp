@@ -295,6 +295,7 @@ namespace {
         USE_FAKE_delete_LweKeySwitchKey;
         USE_FAKE_tfhe_createLweBootstrappingKey;
         USE_FAKE_tfhe_blindRotateAndExtract;
+        USE_FAKE_tfhe_bootstrap_woKS;
         USE_FAKE_lweKeySwitch;
 
 #define INCLUDE_TFHE_BOOTSTRAP

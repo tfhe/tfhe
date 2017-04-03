@@ -321,6 +321,7 @@ namespace {
         USE_FAKE_tGswToFFTConvert;
         USE_FAKE_lweKeySwitch;
         USE_FAKE_tfhe_blindRotateAndExtract_FFT;
+        USE_FAKE_tfhe_bootstrap_woKS_FFT;
 
 #define INCLUDE_TFHE_BOOTSTRAP_FFT
 #include "../libtfhe/lwe-bootstrapping-functions-fft.cpp"
