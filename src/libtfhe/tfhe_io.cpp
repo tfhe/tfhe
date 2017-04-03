@@ -719,27 +719,27 @@ void write_LweKeySwitchKey_content(const Ostream& F, const LweKeySwitchKey* ks) 
     const int base = ks->base;
     const int n = out_params->n;
     double current_variance=-1;
-    
+
     //computes the maximum variance
     for (int i=0; i<N; i++)
-	for (int j=0; j<t; j++)
-	    for (int k=0; k<base; k++) {
-		const LweSample& sample = ks->ks[i][j][k];
-		if (sample.current_variance>current_variance) 
-		    current_variance=sample.current_variance;
-	    }
+        for (int j=0; j<t; j++)
+            for (int k=0; k<base; k++) {
+                const LweSample& sample = ks->ks[i][j][k];
+                if (sample.current_variance>current_variance) 
+                    current_variance=sample.current_variance;
+            }
     F.fwrite(&LWE_KEYSWITCH_KEY_TYPE_UID, sizeof(int32_t));
     //write the variance once
     F.fwrite(&current_variance,sizeof(double));    
     //and dump the coefficients
     for (int i=0; i<N; i++)
-	for (int j=0; j<t; j++)
-	    for (int k=0; k<base; k++) {
-		const LweSample& sample = ks->ks[i][j][k];
-		//bin output the sample coefs
-		F.fwrite(sample.a,n*sizeof(Torus32));
-		F.fwrite(&sample.b,1*sizeof(Torus32));
-	    }
+        for (int j=0; j<t; j++)
+            for (int k=0; k<base; k++) {
+                const LweSample& sample = ks->ks[i][j][k];
+                //bin output the sample coefs
+                F.fwrite(sample.a,n*sizeof(Torus32));
+                F.fwrite(&sample.b,1*sizeof(Torus32));
+            }
 }
 
 /**
@@ -752,23 +752,23 @@ void read_lweKeySwitchKey_content(const Istream& F, LweKeySwitchKey* ks) {
     const int base = ks->base;
     const int n = out_params->n;
     double current_variance=-1;
-    
+
     int32_t type_uid=-1;
     F.fread(&type_uid,sizeof(int32_t));
     if (type_uid!=LWE_KEYSWITCH_KEY_TYPE_UID) 
-	die_dramatically("Trying to read something that is not a LWE Keyswitch!");
+        die_dramatically("Trying to read something that is not a LWE Keyswitch!");
     //reads the variance only once in the end
     F.fread(&current_variance,sizeof(double));    
     //and read the coefficients
     for (int i=0; i<N; i++)
-	for (int j=0; j<t; j++)
-	    for (int k=0; k<base; k++) {
-		LweSample& sample = ks->ks[i][j][k];
-		//bin output the sample coefs
-		F.fread(sample.a,n*sizeof(Torus32));
-		F.fread(&sample.b,1*sizeof(Torus32));
-		sample.current_variance=current_variance;
-	    }
+        for (int j=0; j<t; j++)
+            for (int k=0; k<base; k++) {
+                LweSample& sample = ks->ks[i][j][k];
+                //bin output the sample coefs
+                F.fread(sample.a,n*sizeof(Torus32));
+                F.fread(&sample.b,1*sizeof(Torus32));
+                sample.current_variance=current_variance;
+            }
 }
 
 /**
@@ -776,7 +776,7 @@ void read_lweKeySwitchKey_content(const Istream& F, LweKeySwitchKey* ks) {
  */
 void write_lweKeySwitchKey(const Ostream& F, const LweKeySwitchKey* ks, bool output_LweParams=true) {
     if (output_LweParams)
-	write_lweParams(F, ks->out_params);
+        write_lweParams(F, ks->out_params);
     write_LweKeySwitchParameters_section(F, ks);
     write_LweKeySwitchKey_content(F, ks);
 }
@@ -786,9 +786,9 @@ void write_lweKeySwitchKey(const Ostream& F, const LweKeySwitchKey* ks, bool out
  */
 LweKeySwitchKey* read_new_lweKeySwitchKey(const Istream& F, const LweParams* out_params=0) {
     if (out_params==0) {
-	LweParams* tmp = read_new_lweParams(F);
-	out_params = tmp;
-	TfheGarbageCollector::register_param(tmp);
+        LweParams* tmp = read_new_lweParams(F);
+        out_params = tmp;
+        TfheGarbageCollector::register_param(tmp);
     }
     LweKeySwitchParameters ksparams;
     read_lweKeySwitchParameters_section(F, &ksparams);
@@ -839,22 +839,22 @@ void write_LweBootstrappingKey_content(const Ostream& F, const LweBootstrappingK
     const int N = bk->bk_params->tlwe_params->N;
     double max_variance = -1;
     for (int i=0; i<n; i++)
-	for (int j=0; j<kpl; j++) {
-	    TLweSample& sample = bk->bk[i].all_sample[j];
-	    if (sample.current_variance > max_variance)
-	       max_variance = sample.current_variance;
-	}
+        for (int j=0; j<kpl; j++) {
+            TLweSample& sample = bk->bk[i].all_sample[j];
+            if (sample.current_variance > max_variance)
+                max_variance = sample.current_variance;
+        }
     F.fwrite(&LWE_BOOTSTRAPPING_KEY_TYPE_UID, sizeof(int32_t));
     //print the variance once
     F.fwrite(&max_variance, sizeof(double));
     //then print all the coefficients
     for (int i=0; i<n; i++)
-	for (int j=0; j<kpl; j++) {
-	    TLweSample& sample = bk->bk[i].all_sample[j];
-	    for (int l=0; l<=k; l++) {
-		F.fwrite(sample.a[l].coefsT, N*sizeof(Torus32));
-	    }
-	}
+        for (int j=0; j<kpl; j++) {
+            TLweSample& sample = bk->bk[i].all_sample[j];
+            for (int l=0; l<=k; l++) {
+                F.fwrite(sample.a[l].coefsT, N*sizeof(Torus32));
+            }
+        }
 }
 
 /**
@@ -869,16 +869,16 @@ void read_LweBootstrappingKey_content(const Istream& F, LweBootstrappingKey* bk)
     int32_t type_uid = -1;
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid!=LWE_BOOTSTRAPPING_KEY_TYPE_UID)
-	die_dramatically("Trying to read something that is not a BK content");
+        die_dramatically("Trying to read something that is not a BK content");
     F.fread(&max_variance, sizeof(double));
     for (int i=0; i<n; i++)
-	for (int j=0; j<kpl; j++) {
-	    TLweSample& sample = bk->bk[i].all_sample[j];
-	    for (int l=0; l<=k; l++) {
-		F.fread(sample.a[l].coefsT, N*sizeof(Torus32));
-	    }
-	    sample.current_variance=max_variance;
-	}
+        for (int j=0; j<kpl; j++) {
+            TLweSample& sample = bk->bk[i].all_sample[j];
+            for (int l=0; l<=k; l++) {
+                F.fread(sample.a[l].coefsT, N*sizeof(Torus32));
+            }
+            sample.current_variance=max_variance;
+        }
 }
 
 
@@ -901,14 +901,14 @@ void write_lweBootstrappingKey(const Ostream& F, const LweBootstrappingKey* bk, 
  */
 LweBootstrappingKey* read_new_lweBootstrappingKey(const Istream& F, const LweParams* in_out_params=0, const TGswParams* bk_params=0) {
     if (in_out_params==0) {
-       LweParams* tmp = read_new_lweParams(F);
-       in_out_params = tmp;
-       TfheGarbageCollector::register_param(tmp);
+        LweParams* tmp = read_new_lweParams(F);
+        in_out_params = tmp;
+        TfheGarbageCollector::register_param(tmp);
     }
     if (bk_params==0) {
-       TGswParams* tmp = read_new_tGswParams(F);
-       bk_params = tmp;
-       TfheGarbageCollector::register_param(tmp);
+        TGswParams* tmp = read_new_tGswParams(F);
+        bk_params = tmp;
+        TfheGarbageCollector::register_param(tmp);
     }
     LweKeySwitchParameters ksparams;
     read_lweKeySwitchParameters_section(F, &ksparams);
@@ -951,29 +951,63 @@ EXPORT LweBootstrappingKey* new_lweBootstrappingKey_fromStream(std::istream& F) 
  * TFheGateBootstrappingParameterSet key
  **************************** */
 
+
+void write_tfheGateBootstrappingProperParameters_section(const Ostream& F, const TFheGateBootstrappingParameterSet* params) {
+    TextModeProperties* props = new_TextModeProperties_blank();
+    props->setTypeTitle("GATEBOOTSPARAMS");
+    props->setProperty_long("ks_t", params->ks_t);
+    props->setProperty_long("ks_basebit", params->ks_basebit);
+    print_TextModeProperties_toOStream(F, props);
+    delete_TextModeProperties(props);
+}
+
+void read_tfheGateBootstrappingProperParameters_section(const Istream& F, int& ks_t, int& ks_basebit) {
+    TextModeProperties* props = new_TextModeProperties_fromIstream(F);
+    if (props->getTypeTitle() != string("GATEBOOTSPARAMS")) abort();
+    ks_t = props->getProperty_long("ks_t");
+    ks_basebit = props->getProperty_double("ks_basebit");
+    delete_TextModeProperties(props);
+}
+
+void write_tfheGateBootstrappingProperParameters(const Ostream& F, const TFheGateBootstrappingParameterSet* params) {
+    write_tfheGateBootstrappingProperParameters_section(F,params);
+    write_lweParams(F, params->in_out_params);
+    write_tGswParams(F, params->tgsw_params);
+}
+
+TFheGateBootstrappingParameterSet* read_new_tfheGateBootstrappingProperParameters(const Istream& F) {
+    int ks_t,ks_basebit;
+    read_tfheGateBootstrappingProperParameters_section(F,ks_t,ks_basebit);
+    LweParams* in_out_params = read_new_lweParams(F);
+    TGswParams* bk_params = read_new_tGswParams(F);
+    TfheGarbageCollector::register_param(in_out_params);
+    TfheGarbageCollector::register_param(bk_params);
+    return new TFheGateBootstrappingParameterSet(ks_t,ks_basebit,in_out_params,bk_params);
+}
+
 /**
  * This function prints the tfhe gate bootstrapping parameter set to a file
  */
-EXPORT void export_tfheGateBootstrappingParameterSet_toFile(FILE* F, const TFheGateBootstrappingParameterSet* params);
+EXPORT void export_tfheGateBootstrappingParameterSet_toFile(FILE* F, const TFheGateBootstrappingParameterSet* params) { write_tfheGateBootstrappingProperParameters(to_Ostream(F), params); }
 
 /**
  * This constructor function reads and creates a tfhe gate bootstrapping parameter set from a File. The result
  * must be deleted with delete_tfheGateBootstrappingParameterSet();
  */
-EXPORT TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_fromFile(FILE* F);
+EXPORT TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_fromFile(FILE* F) { return read_new_tfheGateBootstrappingProperParameters(to_Istream(F)); }
 
 #ifdef __cplusplus
 
 /**
  * This function prints the tfhe gate bootstrapping parameter set to a file
  */
-EXPORT void export_tfheGateBootstrappingParameterSet_toStream(std::ostream& F, const TFheGateBootstrappingParameterSet* params);
+EXPORT void export_tfheGateBootstrappingParameterSet_toStream(std::ostream& F, const TFheGateBootstrappingParameterSet* params)  { write_tfheGateBootstrappingProperParameters(to_Ostream(F), params); }
 
 /**
  * This constructor function reads and creates a tfhe gate bootstrapping parameter set from a File. The result
  * must be deleted with delete_tfheGateBootstrappingParameterSet();
  */
-EXPORT TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_fromStream(std::istream& F);
+EXPORT TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_fromStream(std::istream& F) { return read_new_tfheGateBootstrappingProperParameters(to_Istream(F)); }
 
 #endif
 

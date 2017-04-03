@@ -8,13 +8,18 @@ using namespace std;
 namespace {
 
     const LweParams* lweparams500 = new_LweParams(500,0.1,0.3);
-    const set<const LweParams*> allparams = { lweparams500 };
+    const LweParams* lweparams120 = new_LweParams(120,0.1,0.3);
+    const set<const LweParams*> allparams = { lweparams120, lweparams500 };
 
     const TLweParams* tlweparams1024_1 = new_TLweParams(1024,1,0.1,0.3);
-    const set<const TLweParams*> allparams_tlwe = { tlweparams1024_1 };
+    const TLweParams* tlweparams153_2 = new_TLweParams(153,2,0.1,0.3);
+    const set<const TLweParams*> allparams_tlwe = { tlweparams153_2, tlweparams1024_1 };
 
     const TGswParams* tgswparams1024_1 = new_TGswParams(3,15,tlweparams1024_1);
     const set<const TGswParams*> allparams_tgsw = { tgswparams1024_1 };
+
+    const TFheGateBootstrappingParameterSet* gbp1 = new TFheGateBootstrappingParameterSet(6,2,lweparams120,tgswparams1024_1);
+    const set<const TFheGateBootstrappingParameterSet*> allgbp = { gbp1 };
 
     //generate a random lwekey
     LweKey* new_random_lwe_key(const LweParams* params) {
@@ -258,6 +263,13 @@ namespace {
             }
     }
 
+    //equality test for gb parameters
+    void assert_equals(const TFheGateBootstrappingParameterSet* a, const TFheGateBootstrappingParameterSet* b) {
+        ASSERT_EQ(a->ks_t,b->ks_t);
+        ASSERT_EQ(a->ks_basebit,b->ks_basebit);
+        assert_equals(a->in_out_params, b->in_out_params);
+        assert_equals(a->tgsw_params, b->tgsw_params);
+    }
 
     TEST(IOTest, LweParamsIO) {
 	for (const LweParams* params: allparams) {
@@ -427,6 +439,21 @@ namespace {
                 LweBootstrappingKey* bk1 = new_lweBootstrappingKey_fromStream(iss);
                 assert_equals(bk,bk1);
                 delete_LweBootstrappingKey(bk1);
+            }
+        }	
+    }
+
+    TEST(IOTest, TFheGateBootstrappingParameterSetIO) {
+        for (const TFheGateBootstrappingParameterSet* gbp: allgbp) {
+            {
+                ostringstream oss;
+                export_tfheGateBootstrappingParameterSet_toStream(oss, gbp);
+                export_tfheGateBootstrappingParameterSet_toFile(stdout, gbp);
+                string result = oss.str();
+                istringstream iss(result);
+                TFheGateBootstrappingParameterSet* gbp1 = new_tfheGateBootstrappingParameterSet_fromStream(iss);
+                assert_equals(gbp,gbp1);
+                delete_default_gate_bootstrapping_parameters(gbp1);
             }
         }	
     }
