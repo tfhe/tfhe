@@ -67,7 +67,7 @@ inline LweSample* fake_new_LweSample(const LweParams* params) {
 }
 
 #define USE_FAKE_new_LweSample \
-inline LweSample* new_LweSample(const LweParams* params) { \
+static inline LweSample* new_LweSample(const LweParams* params) { \
     return fake_new_LweSample(params); \
 }
 
@@ -78,7 +78,7 @@ inline void fake_delete_LweSample(LweSample* sample) {
 }
 
 #define USE_FAKE_delete_LweSample \
-inline void delete_LweSample(LweSample* sample) { \
+static inline void delete_LweSample(LweSample* sample) { \
     fake_delete_LweSample(sample); \
 }
 
@@ -175,7 +175,7 @@ inline void fake_lweNoiselessTrivial(LweSample* result, Torus32 message, const L
 }
 
 #define USE_FAKE_lweNoiselessTrivial \
-    inline void lweNoiselessTrivial(LweSample* result, Torus32 message, const LweParams* params) { \
+    static inline void lweNoiselessTrivial(LweSample* result, Torus32 message, const LweParams* params) { \
     return fake_lweNoiselessTrivial(result,message,params); \
 }
 
@@ -191,8 +191,21 @@ inline void fake_lweSubTo(LweSample* result, const LweSample* sample, const LweP
 }
 
 #define USE_FAKE_lweSubTo \
-    inline void lweSubTo(LweSample* result, const LweSample* sample, const LweParams* params) { \
+    static inline void lweSubTo(LweSample* result, const LweSample* sample, const LweParams* params) { \
     return fake_lweSubTo(result,sample,params); \
+}
+
+/** result = result + sample */
+inline void fake_lweAddTo(LweSample* result, const LweSample* sample, const LweParams* params) {
+    FakeLwe* fres = fake(result);
+    const FakeLwe* fsample = fake(sample);
+    fres->message -= fsample->message;
+    fres->current_variance += fsample->current_variance;
+}
+
+#define USE_FAKE_lweAddTo \
+    static inline void lweAddTo(LweSample* result, const LweSample* sample, const LweParams* params) { \
+    return fake_lweAddTo(result,sample,params); \
 }
 
 

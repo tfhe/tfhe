@@ -16,6 +16,9 @@
 typedef int bool;
 #endif
 
+EXPORT void die_dramatically(const char* message);
+
+
 // Idea:
 // we may want to represent an element x of the real torus by 
 // the integer rint(2^32.x) modulo 2^32
