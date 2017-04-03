@@ -8,7 +8,7 @@
 #error This file should only be included in a C++ file, for internal use only
 #endif
 #include <vector>
-#include "lweparams.h"
+#include "tfhe.h"
 
 /**
  * this class implements a simple garbage collector for simple parameter pointers
@@ -17,10 +17,12 @@ class TfheGarbageCollector {
     std::vector<LweParams*> lwe_params;
     std::vector<TLweParams*> tlwe_params;
     std::vector<TGswParams*> tgsw_params;
+    std::vector<TFheGateBootstrappingParameterSet*> gb_params;
 
     void m_register_param(LweParams* param); 
     void m_register_param(TLweParams* param);
     void m_register_param(TGswParams* param);
+    void m_register_param(TFheGateBootstrappingParameterSet* param);
 
     static TfheGarbageCollector* global_tfheGarbageCollector;
     public:
@@ -33,6 +35,8 @@ class TfheGarbageCollector {
     static void register_param(TLweParams* param);
     /** adds a parameter to the list of managed parameters */
     static void register_param(TGswParams* param);
+    /** adds a parameter to the list of managed parameters */
+    static void register_param(TFheGateBootstrappingParameterSet* param);
 
     /** destroy all managed parameters */
     static void finalize();    

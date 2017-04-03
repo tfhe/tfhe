@@ -156,9 +156,12 @@ void write_lweKey_content(const Ostream& F, const LweKey* key) {
  * @param F the input stream
  * @Return the key
  */
-LweKey* read_new_lweKey(const Istream& F) {
-    LweParams* params = read_new_lweParams(F);
-    TfheGarbageCollector::register_param(params);
+LweKey* read_new_lweKey(const Istream& F, const LweParams* params=0x0) {
+    if (params==0) {
+        LweParams* tmp = read_new_lweParams(F);
+        params=tmp;
+        TfheGarbageCollector::register_param(tmp);
+    }
     LweKey* key = new_LweKey(params);
     read_lweKey_content(F,key);
     return key;
@@ -170,8 +173,8 @@ LweKey* read_new_lweKey(const Istream& F) {
  * @param F the output stream
  * @Return the key
  */
-void write_lweKey(const Ostream& F, const LweKey* key) {
-    write_lweParams(F,key->params);
+void write_lweKey(const Ostream& F, const LweKey* key, bool output_params=true) {
+    if (output_params) write_lweParams(F,key->params);
     write_lweKey_content(F,key);
 }
 
@@ -631,9 +634,12 @@ void write_tGswKey_content(const Ostream& F, const TGswKey* key) {
 /**
  * reads a tgsw key coefficients in a previously defined structure
  */ 
-TGswKey* read_new_tGswKey(const Istream& F) {
-    TGswParams* params = read_new_tGswParams(F);
-    TfheGarbageCollector::register_param(params);
+TGswKey* read_new_tGswKey(const Istream& F, const TGswParams* params=0) {
+    if (params==0) {
+        TGswParams* tmp = read_new_tGswParams(F);
+        TfheGarbageCollector::register_param(tmp);
+        params=tmp;
+    }
     TGswKey* key = new_TGswKey(params);
     read_tGswKey_content(F, key);
     return key;
@@ -642,8 +648,8 @@ TGswKey* read_new_tGswKey(const Istream& F) {
 /**
  * writes the tgsw key coefficients
  */ 
-void write_tGswKey(const Ostream& F, const TGswKey* key) {
-    write_tGswParams(F,key->params);
+void write_tGswKey(const Ostream& F, const TGswKey* key, bool output_params=true) {
+    if (output_params) write_tGswParams(F,key->params);
     write_tGswKey_content(F,key);
 }
 
@@ -969,13 +975,13 @@ void read_tfheGateBootstrappingProperParameters_section(const Istream& F, int& k
     delete_TextModeProperties(props);
 }
 
-void write_tfheGateBootstrappingProperParameters(const Ostream& F, const TFheGateBootstrappingParameterSet* params) {
+void write_tfheGateBootstrappingParameters(const Ostream& F, const TFheGateBootstrappingParameterSet* params) {
     write_tfheGateBootstrappingProperParameters_section(F,params);
     write_lweParams(F, params->in_out_params);
     write_tGswParams(F, params->tgsw_params);
 }
 
-TFheGateBootstrappingParameterSet* read_new_tfheGateBootstrappingProperParameters(const Istream& F) {
+TFheGateBootstrappingParameterSet* read_new_tfheGateBootstrappingParameters(const Istream& F) {
     int ks_t,ks_basebit;
     read_tfheGateBootstrappingProperParameters_section(F,ks_t,ks_basebit);
     LweParams* in_out_params = read_new_lweParams(F);
@@ -988,26 +994,26 @@ TFheGateBootstrappingParameterSet* read_new_tfheGateBootstrappingProperParameter
 /**
  * This function prints the tfhe gate bootstrapping parameter set to a file
  */
-EXPORT void export_tfheGateBootstrappingParameterSet_toFile(FILE* F, const TFheGateBootstrappingParameterSet* params) { write_tfheGateBootstrappingProperParameters(to_Ostream(F), params); }
+EXPORT void export_tfheGateBootstrappingParameterSet_toFile(FILE* F, const TFheGateBootstrappingParameterSet* params) { write_tfheGateBootstrappingParameters(to_Ostream(F), params); }
 
 /**
  * This constructor function reads and creates a tfhe gate bootstrapping parameter set from a File. The result
  * must be deleted with delete_tfheGateBootstrappingParameterSet();
  */
-EXPORT TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_fromFile(FILE* F) { return read_new_tfheGateBootstrappingProperParameters(to_Istream(F)); }
+EXPORT TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_fromFile(FILE* F) { return read_new_tfheGateBootstrappingParameters(to_Istream(F)); }
 
 #ifdef __cplusplus
 
 /**
  * This function prints the tfhe gate bootstrapping parameter set to a file
  */
-EXPORT void export_tfheGateBootstrappingParameterSet_toStream(std::ostream& F, const TFheGateBootstrappingParameterSet* params)  { write_tfheGateBootstrappingProperParameters(to_Ostream(F), params); }
+EXPORT void export_tfheGateBootstrappingParameterSet_toStream(std::ostream& F, const TFheGateBootstrappingParameterSet* params)  { write_tfheGateBootstrappingParameters(to_Ostream(F), params); }
 
 /**
  * This constructor function reads and creates a tfhe gate bootstrapping parameter set from a File. The result
  * must be deleted with delete_tfheGateBootstrappingParameterSet();
  */
-EXPORT TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_fromStream(std::istream& F) { return read_new_tfheGateBootstrappingProperParameters(to_Istream(F)); }
+EXPORT TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_fromStream(std::istream& F) { return read_new_tfheGateBootstrappingParameters(to_Istream(F)); }
 
 #endif
 
@@ -1015,29 +1021,47 @@ EXPORT TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_
  * TFheGateBootstrappingCloudKeySet
  **************************** */
 
+
+TFheGateBootstrappingCloudKeySet* read_new_tfheGateBootstrappingCloudKeySet(const Istream& F, const TFheGateBootstrappingParameterSet* params=0) {
+    if (params==0) {
+        TFheGateBootstrappingParameterSet* tmp = read_new_tfheGateBootstrappingParameters(F);
+        TfheGarbageCollector::register_param(tmp);
+        params=tmp;
+    }
+    LweBootstrappingKey* bk = read_new_lweBootstrappingKey(F,params->in_out_params, params->tgsw_params);
+    LweBootstrappingKeyFFT* bkFFT = new_LweBootstrappingKeyFFT(bk);
+    return new TFheGateBootstrappingCloudKeySet(params, bk, bkFFT);
+}
+
+void write_tfheGateBootstrappingCloudKeySet(const Ostream& F, const TFheGateBootstrappingCloudKeySet* key, bool output_gbparams=true) {
+    if (output_gbparams) write_tfheGateBootstrappingParameters(F, key->params);
+    write_lweBootstrappingKey(F, key->bk, false, false);
+}
+
+
 /**
  * This function prints the tfhe gate bootstrapping cloud key to a file
  */
-EXPORT void export_tfheGateBootstrappingCloudKeySet_toFile(FILE* F, const TFheGateBootstrappingCloudKeySet* params);
+EXPORT void export_tfheGateBootstrappingCloudKeySet_toFile(FILE* F, const TFheGateBootstrappingCloudKeySet* keyset) { write_tfheGateBootstrappingCloudKeySet(to_Ostream(F),keyset); }
 
 /**
  * This constructor function reads and creates a tfhe gate bootstrapping cloud key from a File. The result
  * must be deleted with delete_tfheGateBootstrappingCloudKeySet();
  */
-EXPORT TFheGateBootstrappingCloudKeySet* new_tfheGateBootstrappingCloudKeySet_fromFile(FILE* F);
+EXPORT TFheGateBootstrappingCloudKeySet* new_tfheGateBootstrappingCloudKeySet_fromFile(FILE* F) { return read_new_tfheGateBootstrappingCloudKeySet(to_Istream(F)); }
 
 #ifdef __cplusplus
 
 /**
  * This function prints the tfhe gate bootstrapping cloud key to a file
  */
-EXPORT void export_tfheGateBootstrappingCloudKeySet_toStream(std::ostream& F, const TFheGateBootstrappingCloudKeySet* params);
+EXPORT void export_tfheGateBootstrappingCloudKeySet_toStream(std::ostream& F, const TFheGateBootstrappingCloudKeySet* keyset) { write_tfheGateBootstrappingCloudKeySet(to_Ostream(F),keyset); }
 
 /**
  * This constructor function reads and creates a tfhe gate bootstrapping cloud key from a File. The result
  * must be deleted with delete_tfheGateBootstrappingCloudKeySet();
  */
-EXPORT TFheGateBootstrappingCloudKeySet* new_tfheGateBootstrappingCloudKeySet_fromStream(std::istream& F);
+EXPORT TFheGateBootstrappingCloudKeySet* new_tfheGateBootstrappingCloudKeySet_fromStream(std::istream& F) { return read_new_tfheGateBootstrappingCloudKeySet(to_Istream(F)); }
 
 #endif
 
@@ -1045,29 +1069,52 @@ EXPORT TFheGateBootstrappingCloudKeySet* new_tfheGateBootstrappingCloudKeySet_fr
  * TFheGateBootstrappingSecretKeySet
  **************************** */
 
+
+TFheGateBootstrappingSecretKeySet* read_new_tfheGateBootstrappingSecretKeySet(const Istream& F, const TFheGateBootstrappingParameterSet* params=0) {
+    if (params==0) {
+        TFheGateBootstrappingParameterSet* tmp = read_new_tfheGateBootstrappingParameters(F);
+        TfheGarbageCollector::register_param(tmp);
+        params=tmp;
+    }
+    LweBootstrappingKey* bk = read_new_lweBootstrappingKey(F,params->in_out_params, params->tgsw_params);
+    LweKey* lwe_key = read_new_lweKey(F,params->in_out_params);
+    TGswKey* tgsw_key = read_new_tGswKey(F,params->tgsw_params);
+    LweBootstrappingKeyFFT* bkFFT = new_LweBootstrappingKeyFFT(bk);
+    return new TFheGateBootstrappingSecretKeySet(params, bk, bkFFT, lwe_key, tgsw_key);
+}
+
+void write_tfheGateBootstrappingSecretKeySet(const Ostream& F, const TFheGateBootstrappingSecretKeySet* key, bool output_gbparams=true) {
+    if (output_gbparams) write_tfheGateBootstrappingParameters(F, key->params);
+    write_lweBootstrappingKey(F, key->cloud.bk, false, false);
+    write_lweKey(F, key->lwe_key, false);
+    write_tGswKey(F, key->tgsw_key, false);
+}
+
+
+
 /**
  * This function prints the tfhe gate bootstrapping secret key to a file
  */
-EXPORT void export_tfheGateBootstrappingSecretKeySet_toFile(FILE* F, const TFheGateBootstrappingSecretKeySet* params);
+EXPORT void export_tfheGateBootstrappingSecretKeySet_toFile(FILE* F, const TFheGateBootstrappingSecretKeySet* keyset) { write_tfheGateBootstrappingSecretKeySet(to_Ostream(F),keyset); }
 
 /**
  * This constructor function reads and creates a tfhe gate bootstrapping secret key from a File. The result
  * must be deleted with delete_tfheGateBootstrappingSecretKeySet();
  */
-EXPORT TFheGateBootstrappingSecretKeySet* new_tfheGateBootstrappingSecretKeySet_fromFile(FILE* F);
+EXPORT TFheGateBootstrappingSecretKeySet* new_tfheGateBootstrappingSecretKeySet_fromFile(FILE* F) { return read_new_tfheGateBootstrappingSecretKeySet(to_Istream(F)); }
 
 #ifdef __cplusplus
 
 /**
  * This function prints the tfhe gate bootstrapping secret key to a file
  */
-EXPORT void export_tfheGateBootstrappingSecretKeySet_toStream(std::ostream& F, const TFheGateBootstrappingSecretKeySet* params);
+EXPORT void export_tfheGateBootstrappingSecretKeySet_toStream(std::ostream& F, const TFheGateBootstrappingSecretKeySet* keyset) { write_tfheGateBootstrappingSecretKeySet(to_Ostream(F),keyset); }
 
 /**
  * This constructor function reads and creates a TGSWKey from a stream. The result
  * must be deleted with delete_tfheGateBootstrappingSecretKeySet();
  */
-EXPORT TFheGateBootstrappingSecretKeySet* new_tfheGateBootstrappingSecretKeySet_fromStream(std::istream& F);
+EXPORT TFheGateBootstrappingSecretKeySet* new_tfheGateBootstrappingSecretKeySet_fromStream(std::istream& F) { return read_new_tfheGateBootstrappingSecretKeySet(to_Istream(F)); }
 
 #endif
 

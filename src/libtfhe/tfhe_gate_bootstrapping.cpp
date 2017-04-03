@@ -73,6 +73,15 @@ EXPORT void delete_gate_bootstrapping_secret_keyset(TFheGateBootstrappingSecretK
     delete keyset;
 }
 
+/** deletes a gate bootstrapping cloud key */
+EXPORT void delete_gate_bootstrapping_cloud_keyset(TFheGateBootstrappingCloudKeySet* keyset) {
+    LweBootstrappingKey* bk = (LweBootstrappingKey*) keyset->bk;
+    LweBootstrappingKeyFFT* bkFFT = (LweBootstrappingKeyFFT*) keyset->bkFFT;
+    delete_LweBootstrappingKeyFFT(bkFFT);    
+    delete_LweBootstrappingKey(bk);    
+    delete keyset;
+}
+
 /** generate a new unititialized ciphertext */
 EXPORT LweSample* new_gate_bootstrapping_ciphertext(const TFheGateBootstrappingParameterSet* params) {
     return new_LweSample(params->in_out_params);
