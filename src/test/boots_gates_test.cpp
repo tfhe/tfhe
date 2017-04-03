@@ -40,6 +40,8 @@ namespace {
 	    USE_FAKE_lweAddTo;
         USE_FAKE_lweAddMulTo;
         USE_FAKE_lweSubMulTo;
+        USE_FAKE_lweCopy;
+        USE_FAKE_lweNegate;
 	    USE_FAKE_lweNoiselessTrivial;
 	    //USE_FAKE_tfhe_bootstrap_FFT;
 

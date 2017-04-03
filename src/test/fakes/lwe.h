@@ -137,7 +137,7 @@ inline Torus32 fake_lweVariance(const LweSample* sample) {
 
 
 
-// Fake symetric encryption of a Torus message
+// Fake Copy
 inline void fake_lweCopy(LweSample* result, const LweSample* sample, const LweParams* params) {
     FakeLwe* fres = fake(result);
     const FakeLwe* fsample = fake(sample);
@@ -148,6 +148,21 @@ inline void fake_lweCopy(LweSample* result, const LweSample* sample, const LwePa
 #define USE_FAKE_lweCopy \
     inline void lweCopy(LweSample* result, const LweSample* sample, const LweParams* params) { \
     return fake_lweCopy(result, sample, params); \
+}
+
+
+
+// Fake Negate
+inline void fake_lweNegate(LweSample* result, const LweSample* sample, const LweParams* params) {
+    FakeLwe* fres = fake(result);
+    const FakeLwe* fsample = fake(sample);
+    fres->message = -fsample->message;
+    fres->current_variance = fsample->current_variance; 
+}
+
+#define USE_FAKE_lweNegate \
+    inline void lweNegate(LweSample* result, const LweSample* sample, const LweParams* params) { \
+    return fake_lweNegate(result, sample, params); \
 }
 
 
