@@ -308,38 +308,39 @@ EXPORT void bootsMUX(LweSample* result, const LweSample* a, const LweSample* b, 
 	static const Torus32 MU = modSwitchToTorus32(1,8);
 	const LweParams* in_out_params = bk->params->in_out_params;
 
-	LweSample* temp_result1 = new_LweSample(in_out_params); 
-	LweSample* temp_result2 = new_LweSample(in_out_params); 
+	LweSample* temp_result = new_LweSample(in_out_params); 
 	LweSample* u1 = new_LweSample(in_out_params); 
 	LweSample* u2 = new_LweSample(in_out_params); 
 
 
 	//compute "AND(a,b)": (0,-1/8) + a + b
 	static const Torus32 AndConst=modSwitchToTorus32(-1,8);
-	lweNoiselessTrivial(temp_result1, AndConst, in_out_params); 
-	lweAddTo(temp_result1, a, in_out_params);
-	lweAddTo(temp_result1, b, in_out_params);
+	lweNoiselessTrivial(temp_result, AndConst, in_out_params); 
+	lweAddTo(temp_result, a, in_out_params);
+	lweAddTo(temp_result, b, in_out_params);
 	// Bootstrap without KeySwitch
-	tfhe_bootstrap_woKS_FFT(u1, bk->bkFFT, MU, temp_result1);
+	tfhe_bootstrap_woKS_FFT(u1, bk->bkFFT, MU, temp_result);
     
 
 	//compute "AND(not(a),c)": (0,-1/8) - a + c
-	lweNoiselessTrivial(temp_result2, AndConst, in_out_params); 
-	lweSubTo(temp_result2, a, in_out_params);
-	lweAddTo(temp_result2, c, in_out_params);
+	lweNoiselessTrivial(temp_result, AndConst, in_out_params); 
+	lweSubTo(temp_result, a, in_out_params);
+	lweAddTo(temp_result, c, in_out_params);
 	// Bootstrap without KeySwitch
-	tfhe_bootstrap_woKS_FFT(u2, bk->bkFFT, MU, temp_result2);
+	tfhe_bootstrap_woKS_FFT(u2, bk->bkFFT, MU, temp_result);
 
 	// Add u1=u1+u2
-	lweAddTo(u1, u2, in_out_params);
+	static const Torus32 MuxConst=modSwitchToTorus32(1,8);
+	lweNoiselessTrivial(temp_result, MuxConst, in_out_params);
+	lweAddTo(temp_result, u1, in_out_params);
+	lweAddTo(temp_result, u2, in_out_params);
 	// Key switching
-    lweKeySwitch(result, bk->bkFFT->ks, u1);
+    lweKeySwitch(result, bk->bkFFT->ks, temp_result);
 
 
     delete_LweSample(u2);
     delete_LweSample(u1);
-    delete_LweSample(temp_result2);
-	delete_LweSample(temp_result1);
+    delete_LweSample(temp_result);
 }
 
 
