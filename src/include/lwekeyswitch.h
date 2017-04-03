@@ -44,7 +44,7 @@ EXPORT void init_LweKeySwitchKey_array(int nbelts, LweKeySwitchKey* obj, int n, 
 //(equivalent of the C++ destructor)
 EXPORT void destroy_LweKeySwitchKey(LweKeySwitchKey* obj);
 EXPORT void destroy_LweKeySwitchKey_array(int nbelts, LweKeySwitchKey* obj);
- 
+
 //allocates and initialize the LweKeySwitchKey structure
 //(equivalent of the C++ new)
 EXPORT LweKeySwitchKey* new_LweKeySwitchKey(int n, int t, int basebit, const LweParams* out_params);
