@@ -38,9 +38,9 @@ EXPORT TFheGateBootstrappingParameterSet* new_default_gate_bootstrapping_paramet
     TLweParams* params_accum = new_TLweParams(N, k, bk_stdev, max_stdev);
     TGswParams* params_bk = new_TGswParams(bk_l, bk_Bgbit, params_accum);
 
-    global_tfheGarbageCollector.register_param(params_in);
-    global_tfheGarbageCollector.register_param(params_accum);
-    global_tfheGarbageCollector.register_param(params_bk);
+    TfheGarbageCollector::register_param(params_in);
+    TfheGarbageCollector::register_param(params_accum);
+    TfheGarbageCollector::register_param(params_bk);
 
     return new TFheGateBootstrappingParameterSet(params_in, params_bk);
 }

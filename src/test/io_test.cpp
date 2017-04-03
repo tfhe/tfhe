@@ -46,6 +46,24 @@ namespace {
 	return key;
     }
 
+    
+    //generate a random ks
+    LweKeySwitchKey* new_random_ks_key(int N, int t, int basebit, const LweParams* out_params) {
+	const int n = out_params->n;
+        const int base = 1<<basebit;
+	const int length = N*t*base;
+	LweKeySwitchKey* key = new_LweKeySwitchKey(N,t,basebit,out_params);
+        double variance = rand()/double(RAND_MAX);
+        LweSample* begin = key->ks0_raw;
+	LweSample* end = begin+length;
+	for (LweSample* it=begin; it!=end; ++it) {
+	    for (int j=0; j<n; j++) it->a[j]=rand();
+            it->b=rand();
+            it->current_variance=variance;
+        }
+	return key;
+    }
+
     const LweKey* lwekey500 = new_random_lwe_key(lweparams500);
     const set<const LweKey*> allkey = { lwekey500 };
 
@@ -54,6 +72,9 @@ namespace {
 
     const TGswKey* tgswkey1024_1 = new_random_tgsw_key(tgswparams1024_1);
     const set<const TGswKey*> allkey_tgsw = { tgswkey1024_1 };
+    
+    const LweKeySwitchKey* ks503 = new_random_ks_key(503,7,2,lweparams500);
+    const set<const LweKeySwitchKey*> allks = { ks503 };
 
     //equality test for parameters
     void assert_equals(const LweParams* a, const LweParams* b) {
@@ -147,6 +168,28 @@ namespace {
 	const TLweParams* tlwe_params = params->tlwe_params;
 	for (int i=0; i<kpl; i++) 
 	    assert_equals(a->all_sample+i,b->all_sample+i,tlwe_params);
+    }
+
+    //equality test for keyswitch key
+    void assert_equals(const LweKeySwitchKey* a, const LweKeySwitchKey* b) {
+	ASSERT_EQ(a->n,b->n);
+	ASSERT_EQ(a->t,b->t);
+	ASSERT_EQ(a->basebit,b->basebit);
+	ASSERT_EQ(a->base,b->base);
+	assert_equals(a->out_params, b->out_params);
+	const int length = a->n * a->t * a->base;
+	const int outn = a->out_params->n;
+	double max_vara=-1;
+	double max_varb=-1;
+	for (int i=0; i<length; i++) {
+	    const LweSample& sa = a->ks0_raw[i];
+	    const LweSample& sb = b->ks0_raw[i];
+	    for (int j=0; j<outn; j++) ASSERT_EQ(sa.a[j],sb.a[j]);
+	    ASSERT_EQ(sa.b,sb.b);
+	    if (sa.current_variance>max_vara) max_vara=sa.current_variance;
+	    if (sb.current_variance>max_varb) max_varb=sb.current_variance;
+	}
+	ASSERT_EQ(max_vara,max_varb);
     }
 
 
@@ -275,24 +318,53 @@ namespace {
 	}	
     }
 
-
     TEST(IOTest, TGswSampleIO) {
-	for (const TGswParams* params: allparams_tgsw) {
-	    TGswSample* sample = new_TGswSample(params);
-	    TGswSample* blah = new_TGswSample(params);
-	    tgswSampleUniform(sample, params);
-	    tgswSampleUniform(blah, params);
-	    ostringstream oss;
-	    //export_gswSample_toFile(stdout, sample);
-	    export_tgswSample_toStream(oss, sample, params);
-	    string result = oss.str();
-	    istringstream iss(result);
-	    import_tgswSample_fromStream(iss, blah, params);
-	    assert_equals(sample, blah, params);
-	    delete_TGswSample(blah);
-	    delete_TGswSample(sample);
-	}	
+        for (const TGswParams* params: allparams_tgsw) {
+            TGswSample* sample = new_TGswSample(params);
+            TGswSample* blah = new_TGswSample(params);
+            tgswSampleUniform(sample, params);
+            tgswSampleUniform(blah, params);
+            ostringstream oss;
+            //export_gswSample_toFile(stdout, sample);
+            export_tgswSample_toStream(oss, sample, params);
+            string result = oss.str();
+            istringstream iss(result);
+            import_tgswSample_fromStream(iss, blah, params);
+            assert_equals(sample, blah, params);
+            delete_TGswSample(blah);
+            delete_TGswSample(sample);
+        }
     }
 
+
+    TEST(IOTest, LweKeySwitchKeyIO) {
+        for (const LweKeySwitchKey* ks: allks) {
+            {
+                ostringstream oss;
+                export_lweKeySwitchKey_toStream(oss, ks);
+                string result = oss.str();
+                istringstream iss(result);
+                LweKeySwitchKey* ks1 = new_lweKeySwitchKey_fromStream(iss);
+                assert_equals(ks,ks1);
+                delete_LweKeySwitchKey(ks1);
+            }
+        }	
+    }
+
+/*
+    TEST(IOTest, LweBootstrappingKeyIO) {
+        for (const LweBootstrappingKey* bk: allbk) {
+            {
+                ostringstream oss;
+                export_lweBootstrappingKey_toStream(oss, bk);
+                string result = oss.str();
+                istringstream iss(result);
+                LweBootstrappingKey* bk1 = new_lweBootstrappingKey_fromStream(iss);
+                assert_equals(bk,bk1);
+                delete_LweBootstrappingKey(bk1);
+            }
+        }	
+    }
+*/
 
 }

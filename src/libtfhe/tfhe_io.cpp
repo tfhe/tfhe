@@ -158,7 +158,7 @@ void write_lweKey_content(const Ostream& F, const LweKey* key) {
  */
 LweKey* read_new_lweKey(const Istream& F) {
     LweParams* params = read_new_lweParams(F);
-    global_tfheGarbageCollector.register_param(params);
+    TfheGarbageCollector::register_param(params);
     LweKey* key = new_LweKey(params);
     read_lweKey_content(F,key);
     return key;
@@ -388,7 +388,7 @@ void write_tLweKey_content(const Ostream& F, const TLweKey* key) {
  */ 
 TLweKey* read_new_tLweKey(const Istream& F) {
     TLweParams* params = read_new_tLweParams(F);
-    global_tfheGarbageCollector.register_param(params);
+    TfheGarbageCollector::register_param(params);
     TLweKey* key = new_TLweKey(params);
     read_tLweKey_content(F,key);
     return key;
@@ -482,7 +482,7 @@ TGswParams* read_new_tGswParams_section(const Istream& F, const TLweParams* tlwe
  */
 TGswParams* read_new_tGswParams(const Istream& F) {
     TLweParams* tlwe_params = read_new_tLweParams(F);
-    global_tfheGarbageCollector.register_param(tlwe_params);
+    TfheGarbageCollector::register_param(tlwe_params);
     return read_new_tGswParams_section(F, tlwe_params);
 }
 
@@ -633,7 +633,7 @@ void write_tGswKey_content(const Ostream& F, const TGswKey* key) {
  */ 
 TGswKey* read_new_tGswKey(const Istream& F) {
     TGswParams* params = read_new_tGswParams(F);
-    global_tfheGarbageCollector.register_param(params);
+    TfheGarbageCollector::register_param(params);
     TGswKey* key = new_TGswKey(params);
     read_tGswKey_content(F, key);
     return key;
@@ -720,7 +720,7 @@ void write_LweKeySwitchKey_content(const Ostream& F, const LweKeySwitchKey* ks) 
     const int n = out_params->n;
     double current_variance=-1;
     
-    //print the variance only once in the end
+    //computes the maximum variance
     for (int i=0; i<N; i++)
 	for (int j=0; j<t; j++)
 	    for (int k=0; k<base; k++) {
@@ -728,6 +728,8 @@ void write_LweKeySwitchKey_content(const Ostream& F, const LweKeySwitchKey* ks) 
 		if (sample.current_variance>current_variance) 
 		    current_variance=sample.current_variance;
 	    }
+    F.fwrite(&LWE_KEYSWITCH_KEY_TYPE_UID, sizeof(int32_t));
+    //write the variance once
     F.fwrite(&current_variance,sizeof(double));    
     //and dump the coefficients
     for (int i=0; i<N; i++)
@@ -751,6 +753,10 @@ void read_lweKeySwitchKey_content(const Istream& F, LweKeySwitchKey* ks) {
     const int n = out_params->n;
     double current_variance=-1;
     
+    int32_t type_uid=-1;
+    F.fread(&type_uid,sizeof(int32_t));
+    if (type_uid!=LWE_KEYSWITCH_KEY_TYPE_UID) 
+	die_dramatically("Trying to read something that is not a LWE Keyswitch!");
     //reads the variance only once in the end
     F.fread(&current_variance,sizeof(double));    
     //and read the coefficients
@@ -765,30 +771,56 @@ void read_lweKeySwitchKey_content(const Istream& F, LweKeySwitchKey* ks) {
 	    }
 }
 
+/**
+ * This function prints the keyswitch coefficients
+ */
+void write_lweKeySwitchKey(const Ostream& F, const LweKeySwitchKey* ks, bool output_LweParams=true) {
+    if (output_LweParams)
+	write_lweParams(F, ks->out_params);
+    write_LweKeySwitchParameters_section(F, ks);
+    write_LweKeySwitchKey_content(F, ks);
+}
+
+/**
+ * This function reads the keyswitch coefficients
+ */
+LweKeySwitchKey* read_new_lweKeySwitchKey(const Istream& F, const LweParams* out_params=0) {
+    if (out_params==0) {
+	LweParams* tmp = read_new_lweParams(F);
+	out_params = tmp;
+	TfheGarbageCollector::register_param(tmp);
+    }
+    LweKeySwitchParameters ksparams;
+    read_lweKeySwitchParameters_section(F, &ksparams);
+    LweKeySwitchKey* reps = new_LweKeySwitchKey(ksparams.n,ksparams.t,ksparams.basebit, out_params);
+    read_lweKeySwitchKey_content(F, reps);
+    return reps;
+}
+
 
 /**
  * This function exports a lwe keyswitch key (in binary) to a file
  */
-EXPORT void export_lweKeySwitchKey_toFile(FILE* F, const LweKeySwitchKey* ks);
+EXPORT void export_lweKeySwitchKey_toFile(FILE* F, const LweKeySwitchKey* ks) { write_lweKeySwitchKey(to_Ostream(F), ks); }
 
 /**
  * This constructor function reads and creates a LweKeySwitchKey from a File. The result
  * must be deleted with delete_LweKeySwitchKey();
  */
-EXPORT LweKeySwitchKey* new_lweKeySwitchKey_fromFile(FILE* F);
+EXPORT LweKeySwitchKey* new_lweKeySwitchKey_fromFile(FILE* F) { return read_new_lweKeySwitchKey(to_Istream(F)); }
 
 #ifdef __cplusplus
 
 /**
  * This function exports a lwe keyswitch key (in binary) to a file
  */
-EXPORT void export_lweKeySwitchKey_toStream(std::ostream& F, const LweKeySwitchKey* ks);
+EXPORT void export_lweKeySwitchKey_toStream(std::ostream& F, const LweKeySwitchKey* ks) { write_lweKeySwitchKey(to_Ostream(F), ks); }
 
 /**
  * This constructor function reads and creates a LweKeySwitchKey from a File. The result
  * must be deleted with delete_LweKeySwitchKey();
  */
-EXPORT LweKeySwitchKey* new_lweKeySwitchKey_fromStream(std::istream& F);
+EXPORT LweKeySwitchKey* new_lweKeySwitchKey_fromStream(std::istream& F) {  return read_new_lweKeySwitchKey(to_Istream(F)); }
 
 #endif
 

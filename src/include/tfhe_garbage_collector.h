@@ -17,18 +17,34 @@ class TfheGarbageCollector {
     std::vector<LweParams*> lwe_params;
     std::vector<TLweParams*> tlwe_params;
     std::vector<TGswParams*> tgsw_params;
+
+    void m_register_param(LweParams* param); 
+    void m_register_param(TLweParams* param);
+    void m_register_param(TGswParams* param);
+
+    static TfheGarbageCollector* global_tfheGarbageCollector;
     public:
-    void register_param(LweParams* param); 
-    void register_param(TLweParams* param);
-    void register_param(TGswParams* param);
+    /** initialize the garbage collector (this will automatically be
+     * called by register_param */
+    static void init();
+    /** adds a parameter to the list of managed parameters */
+    static void register_param(LweParams* param); 
+    /** adds a parameter to the list of managed parameters */
+    static void register_param(TLweParams* param);
+    /** adds a parameter to the list of managed parameters */
+    static void register_param(TGswParams* param);
+
+    /** destroy all managed parameters */
+    static void finalize();    
 
     TfheGarbageCollector();
     TfheGarbageCollector(const TfheGarbageCollector&)=delete;
     void operator=(const TfheGarbageCollector&)=delete;
     ~TfheGarbageCollector();
+
 };
 
-extern TfheGarbageCollector global_tfheGarbageCollector;
+
 
 #endif //TFHE_GARBAGE_COLLECTOR_H
 
