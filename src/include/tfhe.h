@@ -26,10 +26,14 @@
 //////////////////////////////////////////
 
 typedef struct TFheGateBootstrappingParameterSet {
+    const int ks_t;
+    const int ks_basebit;
     const LweParams* const in_out_params;
     const TGswParams* const tgsw_params;
 #ifdef __cplusplus
-    TFheGateBootstrappingParameterSet(const LweParams* const in_out_params, const TGswParams* const tgsw_params):
+    TFheGateBootstrappingParameterSet(const int ks_t, const int ks_basebit, const LweParams* const in_out_params, const TGswParams* const tgsw_params):
+	ks_t(ks_t),
+	ks_basebit(ks_basebit),
 	in_out_params(in_out_params),
 	tgsw_params(tgsw_params) {}
 #endif

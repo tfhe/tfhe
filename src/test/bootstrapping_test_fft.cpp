@@ -16,7 +16,8 @@ namespace {
     const int n = 500;
     const int l_bk = 3; //ell
     const int Bgbit_bk = 10;
-    //const int ks_basebit = 4;
+    const int ks_t = 15;
+    const int ks_basebit = 1;
     const double alpha_in = 5e-4;
     const double alpha_bk = 9e-9;
     //const int alpha_ks = 1e-6;
@@ -251,7 +252,7 @@ namespace {
     lweKeyGen(key);
     TGswKey* key_bk = new_TGswKey(bk_params);
     tGswKeyGen(key_bk);
-    LweBootstrappingKey* bk = fake_new_LweBootstrappingKey(in_params, bk_params);
+    LweBootstrappingKey* bk = fake_new_LweBootstrappingKey(ks_t, ks_basebit, in_params, bk_params);
     fake_tfhe_createLweBootstrappingKey(bk, key, key_bk);
     
     LweBootstrappingKeyFFT* bkFFT = fake_new_LweBootstrappingKeyFFT(bk);
@@ -342,7 +343,7 @@ class TfheInitLweBootstrappingKeyFFTTest: public ::testing::Test {
         lweKeyGen(key);
         TGswKey* key_bk = new_TGswKey(bk_params);
         tGswKeyGen(key_bk);
-        LweBootstrappingKey* bk = new_LweBootstrappingKey(in_params, bk_params);
+        LweBootstrappingKey* bk = new_LweBootstrappingKey(ks_t, ks_basebit, in_params, bk_params);
         tfhe_createLweBootstrappingKey(bk, key, key_bk);
 
         // create (allocate and initialize) the BK FFT

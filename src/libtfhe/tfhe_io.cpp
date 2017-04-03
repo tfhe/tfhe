@@ -828,6 +828,42 @@ EXPORT LweKeySwitchKey* new_lweKeySwitchKey_fromStream(std::istream& F) {  retur
  * Lwe Bootstrapping key
  **************************** */
 
+
+/**
+ * This function prints the bootstrapping parameters to a generic stream
+ * It only prints the parameters section, not the coefficients
+ */
+void write_LweBootstrappingKey(const Ostream& F, const LweBootstrappingKey* bk, bool write_inout_params, bool write_bk_params) {
+    if (write_inout_params) write_lweParams(F, bk->in_out_params);
+    if (write_bk_params) write_tGswParams(F, bk->bk_params);
+    write_LweKeySwitchParameters_section(F, bk->ks);
+    write_LweKeySwitchKey_content(F, bk->ks);
+    //write_LweBootstrappingKey_content(F, bk);
+}
+
+/**
+ * This constructor function reads and creates a TGswParams from a generic stream, and an TlweParams object. 
+ * The result must be deleted with delete_TGswParams();
+ */
+void read_new_lweBootstrappingKey(const Istream& F, const LweParams* in_out_params, const TGswParams* bk_params) {
+    if (in_out_params==0) {
+       LweParams* tmp = read_new_lweParams(F);
+       in_out_params = tmp;
+       TfheGarbageCollector::register_param(tmp);
+    }
+    if (bk_params==0) {
+       TGswParams* tmp = read_new_tGswParams(F);
+       bk_params = tmp;
+       TfheGarbageCollector::register_param(tmp);
+    }
+    LweKeySwitchParameters ksparams;
+    read_lweKeySwitchParameters_section(F, &ksparams);
+    LweKeySwitchKey* reps = new_LweKeySwitchKey(ksparams.n,ksparams.t,ksparams.basebit, in_out_params);
+    read_lweKeySwitchKey_content(F, reps);
+}
+
+
+
 /**
  * This function exports a lwe bootstrapping key (in binary) to a file
  */
