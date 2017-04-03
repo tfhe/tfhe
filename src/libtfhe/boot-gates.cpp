@@ -157,7 +157,7 @@ EXPORT void bootsXNOR(LweSample* result, const LweSample* ca, const LweSample* c
 */
 EXPORT void bootsNOT(LweSample* result, const LweSample* ca, const TFheGateBootstrappingCloudKeySet* bk) { 
 	const LweParams* in_out_params = bk->params->in_out_params;
-	lweNegate(result,ca,in_out_params);
+	lweNegate(result, ca, in_out_params);
 }
 
 
@@ -168,7 +168,7 @@ EXPORT void bootsNOT(LweSample* result, const LweSample* ca, const TFheGateBoots
 */
 EXPORT void bootsCOPY(LweSample* result, const LweSample* ca, const TFheGateBootstrappingCloudKeySet* bk) { 
 	const LweParams* in_out_params = bk->params->in_out_params;
-	lweCopy(result,ca,in_out_params);
+	lweCopy(result, ca, in_out_params);
 }
 
 

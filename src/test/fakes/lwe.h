@@ -146,7 +146,7 @@ inline void fake_lweCopy(LweSample* result, const LweSample* sample, const LwePa
 }
 
 #define USE_FAKE_lweCopy \
-    inline void lweCopy(LweSample* result, const LweSample* sample, const LweParams* params) { \
+    static inline void lweCopy(LweSample* result, const LweSample* sample, const LweParams* params) { \
     return fake_lweCopy(result, sample, params); \
 }
 
@@ -161,7 +161,7 @@ inline void fake_lweNegate(LweSample* result, const LweSample* sample, const Lwe
 }
 
 #define USE_FAKE_lweNegate \
-    inline void lweNegate(LweSample* result, const LweSample* sample, const LweParams* params) { \
+    static inline void lweNegate(LweSample* result, const LweSample* sample, const LweParams* params) { \
     return fake_lweNegate(result, sample, params); \
 }
 
