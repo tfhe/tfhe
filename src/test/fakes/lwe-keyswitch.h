@@ -160,7 +160,7 @@ inline void fake_lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, cons
 }
 
 #define USE_FAKE_lweKeySwitch \
-    inline void lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, const LweSample* sample) { \
+    static inline void lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, const LweSample* sample) { \
 	fake_lweKeySwitch(result, ks, sample); \
     } 
 

@@ -16,7 +16,9 @@ namespace {
 	TGswKey* tgsw_key = 0x0; //new_TGswKey(params->tgsw_params);
 	LweBootstrappingKey* bk = 0x0; //new_LweBootstrappingKey(params->in_out_params, params->tgsw_params);
 	//tfhe_createLweBootstrappingKey(bk, lwe_key, tgsw_key);
-	LweBootstrappingKeyFFT* bkFFT = 0x0; // new_LweBootstrappingKeyFFT(bk);
+	//LweBootstrappingKeyFFT* bkFFT = 0x0; // new_LweBootstrappingKeyFFT(bk);
+    LweKeySwitchKey* ks = (LweKeySwitchKey*) new FakeLweKeySwitchKey(1024,15,1);
+    LweBootstrappingKeyFFT* bkFFT = new LweBootstrappingKeyFFT(0,0,0,0,0,ks);
 	return new TFheGateBootstrappingSecretKeySet(params, bk, bkFFT, lwe_key, tgsw_key);
     }
 
@@ -43,6 +45,7 @@ namespace {
         USE_FAKE_lweCopy;
         USE_FAKE_lweNegate;
 	    USE_FAKE_lweNoiselessTrivial;
+        USE_FAKE_lweKeySwitch;
         //USE_FAKE_tfhe_bootstrap_woKS_FFT;
 	    //USE_FAKE_tfhe_bootstrap_FFT;
 
