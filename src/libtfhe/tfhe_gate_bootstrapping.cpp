@@ -7,9 +7,9 @@ using namespace std;
 
 struct Exception42 {};
 
-inline void die_dramatically(const char* message) {
+EXPORT void die_dramatically(const char* message) {
     cerr << message << endl;
-    throw Exception42();
+    abort(); throw Exception42();
 }
 
 /** 
@@ -66,8 +66,8 @@ EXPORT void delete_gate_bootstrapping_secret_keyset(TFheGateBootstrappingSecretK
     TGswKey* tgsw_key = (TGswKey*) keyset->tgsw_key;
     LweBootstrappingKey* bk = (LweBootstrappingKey*) keyset->cloud.bk;
     LweBootstrappingKeyFFT* bkFFT = (LweBootstrappingKeyFFT*) keyset->cloud.bkFFT;
-    delete_LweBootstrappingKeyFFT(bkFFT);    
-    delete_LweBootstrappingKey(bk);    
+    if (bkFFT) delete_LweBootstrappingKeyFFT(bkFFT);    
+    if (bk) delete_LweBootstrappingKey(bk);    
     delete_TGswKey(tgsw_key);
     delete_LweKey(lwe_key); 
     delete keyset;
@@ -77,8 +77,8 @@ EXPORT void delete_gate_bootstrapping_secret_keyset(TFheGateBootstrappingSecretK
 EXPORT void delete_gate_bootstrapping_cloud_keyset(TFheGateBootstrappingCloudKeySet* keyset) {
     LweBootstrappingKey* bk = (LweBootstrappingKey*) keyset->bk;
     LweBootstrappingKeyFFT* bkFFT = (LweBootstrappingKeyFFT*) keyset->bkFFT;
-    delete_LweBootstrappingKeyFFT(bkFFT);    
-    delete_LweBootstrappingKey(bk);    
+    if (bkFFT) delete_LweBootstrappingKeyFFT(bkFFT);    
+    if (bk) delete_LweBootstrappingKey(bk);    
     delete keyset;
 }
 

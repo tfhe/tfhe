@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <tfhe_io.h>
 #include <set>
+#include <tfhe_generic_streams.h>
+#include <tfhe_garbage_collector.h>
 #include "polynomials_arithmetic.h"
 
 using namespace std;
@@ -12,13 +14,14 @@ namespace {
     const set<const LweParams*> allparams = { lweparams120, lweparams500 };
 
     const TLweParams* tlweparams1024_1 = new_TLweParams(1024,1,0.1,0.3);
-    const TLweParams* tlweparams153_2 = new_TLweParams(153,2,0.1,0.3);
-    const set<const TLweParams*> allparams_tlwe = { tlweparams153_2, tlweparams1024_1 };
+    const TLweParams* tlweparams128_2 = new_TLweParams(128,2,0.1,0.3);
+    const set<const TLweParams*> allparams_tlwe = { tlweparams128_2, tlweparams1024_1 };
 
     const TGswParams* tgswparams1024_1 = new_TGswParams(3,15,tlweparams1024_1);
-    const set<const TGswParams*> allparams_tgsw = { tgswparams1024_1 };
+    const TGswParams* tgswparams128_2 = new_TGswParams(7,4,tlweparams128_2);
+    const set<const TGswParams*> allparams_tgsw = { tgswparams1024_1, tgswparams128_2};
 
-    const TFheGateBootstrappingParameterSet* gbp1 = new TFheGateBootstrappingParameterSet(6,2,lweparams120,tgswparams1024_1);
+    const TFheGateBootstrappingParameterSet* gbp1 = new TFheGateBootstrappingParameterSet(6,2,lweparams120,tgswparams128_2);
     const set<const TFheGateBootstrappingParameterSet*> allgbp = { gbp1 };
 
     //generate a random lwekey
@@ -100,19 +103,26 @@ namespace {
     }
 
     const LweKey* lwekey500 = new_random_lwe_key(lweparams500);
-    const set<const LweKey*> allkey = { lwekey500 };
+    const LweKey* lwekey120 = new_random_lwe_key(lweparams120);
+    const set<const LweKey*> allkey = { lwekey500, lwekey120 };
 
     const TLweKey* tlwekey1024_1 = new_random_tlwe_key(tlweparams1024_1);
     const set<const TLweKey*> allkey_tlwe = { tlwekey1024_1 };
 
     const TGswKey* tgswkey1024_1 = new_random_tgsw_key(tgswparams1024_1);
-    const set<const TGswKey*> allkey_tgsw = { tgswkey1024_1 };
+    const TGswKey* tgswkey128_2 = new_random_tgsw_key(tgswparams128_2);
+    const set<const TGswKey*> allkey_tgsw = { tgswkey1024_1, tgswkey128_2 };
     
-    const LweKeySwitchKey* ks503 = new_random_ks_key(503,7,2,lweparams500);
-    const set<const LweKeySwitchKey*> allks = { ks503 };
+    const LweKeySwitchKey* ks128 = new_random_ks_key(256,6,2,lweparams120);
+    const set<const LweKeySwitchKey*> allks = { ks128 };
 
-    const LweBootstrappingKey* bk0 = new_random_bk_key(11,1,lweparams500, tgswparams1024_1);
-    const set<const LweBootstrappingKey*> allbk = { bk0 };
+    const LweBootstrappingKey* bk1 = new_random_bk_key(11,1,lweparams120, tgswparams128_2);
+    const set<const LweBootstrappingKey*> allbk = { bk1 };
+
+    const TFheGateBootstrappingSecretKeySet* gbsk1 = new TFheGateBootstrappingSecretKeySet(gbp1, bk1, 0, lwekey120, tgswkey128_2 );
+    const set<const TFheGateBootstrappingSecretKeySet*> allgbsk = { gbsk1 };
+
+    const set<const TFheGateBootstrappingCloudKeySet*> allgbck = { &gbsk1->cloud };
 
 
     //equality test for parameters
@@ -269,6 +279,20 @@ namespace {
         ASSERT_EQ(a->ks_basebit,b->ks_basebit);
         assert_equals(a->in_out_params, b->in_out_params);
         assert_equals(a->tgsw_params, b->tgsw_params);
+    }
+
+    //equality test for gb cloud key
+    void assert_equals(const TFheGateBootstrappingCloudKeySet* a, const TFheGateBootstrappingCloudKeySet* b) {
+        assert_equals(a->params,b->params);
+        assert_equals(a->bk,b->bk);
+    }
+
+    //equality test for gb secret key
+    void assert_equals(const TFheGateBootstrappingSecretKeySet* a, const TFheGateBootstrappingSecretKeySet* b) {
+        assert_equals(a->params,b->params);
+        assert_equals(&a->cloud,&b->cloud);
+        assert_equals(a->lwe_key,b->lwe_key);
+        assert_equals(a->tgsw_key,b->tgsw_key);
     }
 
     TEST(IOTest, LweParamsIO) {
@@ -458,4 +482,43 @@ namespace {
         }	
     }
 
-}
+
+    class IOTest2 : public ::testing::Test {
+        public:
+           //we don't do anything with the FFT section
+           LweBootstrappingKeyFFT* new_LweBootstrappingKeyFFT(const LweBootstrappingKey*) { return 0x0; }
+           void delete_LweBootstrappingKeyFFT(LweBootstrappingKeyFFT*) {}
+
+#define TFHE_TESTING_ENVIRONMENT
+#include "../libtfhe/tfhe_io.cpp"
+    };
+
+    TEST_F(IOTest2, TFheGateBootstrappingCloudKeySetIO) {
+        for (const TFheGateBootstrappingCloudKeySet* gbck: allgbck) {
+            {
+                ostringstream oss;
+                export_tfheGateBootstrappingCloudKeySet_toStream(oss, gbck);
+                string result = oss.str();
+                istringstream iss(result);
+                TFheGateBootstrappingCloudKeySet* gbck1 = new_tfheGateBootstrappingCloudKeySet_fromStream(iss);
+                assert_equals(gbck,gbck1);
+                delete_gate_bootstrapping_cloud_keyset(gbck1);
+            }
+        }	
+    }
+
+    TEST_F(IOTest2, TFheGateBootstrappingSecretKeySetIO) {
+        for (const TFheGateBootstrappingSecretKeySet* gbsk: allgbsk) {
+            {
+                ostringstream oss;
+                export_tfheGateBootstrappingSecretKeySet_toStream(oss, gbsk);
+                string result = oss.str();
+                istringstream iss(result);
+                TFheGateBootstrappingSecretKeySet* gbsk1 = new_tfheGateBootstrappingSecretKeySet_fromStream(iss);
+                assert_equals(gbsk,gbsk1);
+                delete_gate_bootstrapping_secret_keyset(gbsk1);
+            }
+        }	
+    }
+
+} //namespace

@@ -1,3 +1,4 @@
+#ifndef TFHE_TESTING_ENVIRONMENT
 #include <tfhe_io.h>
 #include <map>
 #include <string>
@@ -5,6 +6,10 @@
 #include <tfhe_garbage_collector.h>
 
 using namespace std;
+#else
+#undef EXPORT
+#define EXPORT
+#endif
 
 
 
@@ -918,7 +923,8 @@ LweBootstrappingKey* read_new_lweBootstrappingKey(const Istream& F, const LwePar
     }
     LweKeySwitchParameters ksparams;
     read_lweKeySwitchParameters_section(F, &ksparams);
-    if (ksparams.n != bk_params->tlwe_params->N) die_dramatically("Wrong dimension in bootstrapping key");
+    if (ksparams.n != bk_params->tlwe_params->N*bk_params->tlwe_params->k) 
+        die_dramatically("Wrong dimension in bootstrapping key");
     LweBootstrappingKey* reps = new_LweBootstrappingKey(ksparams.t,ksparams.basebit, in_out_params, bk_params);
     read_lweKeySwitchKey_content(F, reps->ks);
     read_LweBootstrappingKey_content(F, reps);
