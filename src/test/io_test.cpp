@@ -453,7 +453,7 @@ namespace {
                 istringstream iss(result);
                 TFheGateBootstrappingParameterSet* gbp1 = new_tfheGateBootstrappingParameterSet_fromStream(iss);
                 assert_equals(gbp,gbp1);
-                delete_default_gate_bootstrapping_parameters(gbp1);
+                delete_gate_bootstrapping_parameters(gbp1);
             }
         }	
     }

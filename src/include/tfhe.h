@@ -74,14 +74,17 @@ typedef struct TFheGateBootstrappingSecretKeySet {
 /** generate default gate bootstrapping parameters */
 EXPORT TFheGateBootstrappingParameterSet* new_default_gate_bootstrapping_parameters(int minimum_lambda);
 
-/** generate a gate bootstrapping secret key */
-EXPORT TFheGateBootstrappingSecretKeySet* new_gate_bootstrapping_secret_keyset(const TFheGateBootstrappingParameterSet* params);
+/** generate a random gate bootstrapping secret key */
+EXPORT TFheGateBootstrappingSecretKeySet* new_random_gate_bootstrapping_secret_keyset(const TFheGateBootstrappingParameterSet* params);
 
 /** deletes gate bootstrapping parameters */
-EXPORT void delete_default_gate_bootstrapping_parameters(TFheGateBootstrappingParameterSet* params);
+EXPORT void delete_gate_bootstrapping_parameters(TFheGateBootstrappingParameterSet* params);
 
 /** deletes a gate bootstrapping secret key */
 EXPORT void delete_gate_bootstrapping_secret_keyset(TFheGateBootstrappingSecretKeySet* keyset);
+
+/** deletes a gate bootstrapping secret key */
+EXPORT void delete_gate_bootstrapping_cloud_keyset(TFheGateBootstrappingCloudKeySet* keyset);
 
 /** generate a new unititialized ciphertext */
 EXPORT LweSample* new_gate_bootstrapping_ciphertext(const TFheGateBootstrappingParameterSet* params);
