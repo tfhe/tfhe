@@ -26,6 +26,8 @@ const int32_t TGSW_SAMPLE_FFT_TYPE_UID = 167;
 const int32_t LWE_KEY_TYPE_UID = 43;
 const int32_t TLWE_KEY_TYPE_UID = 85;
 const int32_t TGSW_KEY_TYPE_UID = 169;
+const int32_t LWE_KEYSWITCH_KEY_TYPE_UID = 200;
+const int32_t LWE_BOOTSTRAPPING_KEY_TYPE_UID = 201;
 
 /**
  * This is a generic Istream wrapper: supports getLine() and feof()

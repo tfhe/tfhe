@@ -16,18 +16,16 @@ struct FakeLweBootstrappingKey{
     TGswSample* bk; ///< the bootstrapping key (s->s")
     LweKeySwitchKey* ks; ///< the keyswitch key (s'->s)
 
-    FakeLweBootstrappingKey(const LweParams* in_out_params, const TGswParams* bk_params) {
+    FakeLweBootstrappingKey(int ks_t, int ks_basebit, const LweParams* in_out_params, const TGswParams* bk_params) {
     	this->in_out_params = in_out_params;
     	this->bk_params= bk_params;
         this->accum_params = bk_params->tlwe_params; 
         this->extract_params=&accum_params->extracted_lweparams;
     
     	const int n = in_out_params->n;
-    	const int kslength = 15;
-    	const int basebit = 2;
 
     	this->bk = fake_new_TGswSample_array(n,this->bk_params);
-        this->ks= fake_new_LweKeySwitchKey(n, kslength, basebit,in_out_params);
+        this->ks= fake_new_LweKeySwitchKey(extract_params->n, ks_t, ks_basebit,in_out_params);
     }
     ~FakeLweBootstrappingKey() {
     	fake_delete_LweKeySwitchKey(ks);
@@ -55,8 +53,8 @@ const FakeLweBootstrappingKey* fake(const LweBootstrappingKey* key) {
 
 
 
-inline LweBootstrappingKey* fake_new_LweBootstrappingKey(const LweParams* in_out_params, const TGswParams* bk_params) {
-    return (LweBootstrappingKey*) new FakeLweBootstrappingKey(in_out_params, bk_params);
+inline LweBootstrappingKey* fake_new_LweBootstrappingKey(int ks_t, int ks_basebit, const LweParams* in_out_params, const TGswParams* bk_params) {
+    return (LweBootstrappingKey*) new FakeLweBootstrappingKey(ks_t, ks_basebit, in_out_params, bk_params);
 }
 
 inline void fake_delete_LweBootstrappingKey(LweBootstrappingKey* bk) {

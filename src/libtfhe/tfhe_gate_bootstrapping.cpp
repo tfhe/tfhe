@@ -7,9 +7,9 @@ using namespace std;
 
 struct Exception42 {};
 
-inline void die_dramatically(const char* message) {
+EXPORT void die_dramatically(const char* message) {
     cerr << message << endl;
-    throw Exception42();
+    abort(); throw Exception42();
 }
 
 /** 
@@ -28,8 +28,8 @@ EXPORT TFheGateBootstrappingParameterSet* new_default_gate_bootstrapping_paramet
     static const int n = 500;
     static const int bk_l = 3;
     static const int bk_Bgbit = 10;
-    //static const int ks_basebit = 2;
-    //static const int ks_length = 15;
+    static const int ks_basebit = 1;
+    static const int ks_length = 15;
     static const double ks_stdev = mulBySqrtTwoOverPi(pow(2.,-15));   //standard deviation
     static const double bk_stdev = mulBySqrtTwoOverPi(9.e-9);          //standard deviation
     static const double max_stdev = mulBySqrtTwoOverPi(pow(2.,-4)/4.); //max standard deviation for a 1/4 msg space
@@ -38,23 +38,23 @@ EXPORT TFheGateBootstrappingParameterSet* new_default_gate_bootstrapping_paramet
     TLweParams* params_accum = new_TLweParams(N, k, bk_stdev, max_stdev);
     TGswParams* params_bk = new_TGswParams(bk_l, bk_Bgbit, params_accum);
 
-    global_tfheGarbageCollector.register_param(params_in);
-    global_tfheGarbageCollector.register_param(params_accum);
-    global_tfheGarbageCollector.register_param(params_bk);
+    TfheGarbageCollector::register_param(params_in);
+    TfheGarbageCollector::register_param(params_accum);
+    TfheGarbageCollector::register_param(params_bk);
 
-    return new TFheGateBootstrappingParameterSet(params_in, params_bk);
+    return new TFheGateBootstrappingParameterSet(ks_length, ks_basebit, params_in, params_bk);
 }
 
 /** deletes gate bootstrapping parameters */
-EXPORT void delete_default_gate_bootstrapping_parameters(TFheGateBootstrappingParameterSet* params) {
+EXPORT void delete_gate_bootstrapping_parameters(TFheGateBootstrappingParameterSet* params) {
     delete params;
 }
 
 /** generate a gate bootstrapping secret key */
-EXPORT TFheGateBootstrappingSecretKeySet* new_gate_bootstrapping_secret_keyset(const TFheGateBootstrappingParameterSet* params) {
+EXPORT TFheGateBootstrappingSecretKeySet* new_random_gate_bootstrapping_secret_keyset(const TFheGateBootstrappingParameterSet* params) {
     LweKey* lwe_key = new_LweKey(params->in_out_params);
     TGswKey* tgsw_key = new_TGswKey(params->tgsw_params);
-    LweBootstrappingKey* bk = new_LweBootstrappingKey(params->in_out_params, params->tgsw_params);
+    LweBootstrappingKey* bk = new_LweBootstrappingKey(params->ks_t, params->ks_basebit, params->in_out_params, params->tgsw_params);
     tfhe_createLweBootstrappingKey(bk, lwe_key, tgsw_key);
     LweBootstrappingKeyFFT* bkFFT = new_LweBootstrappingKeyFFT(bk);
     return new TFheGateBootstrappingSecretKeySet(params, bk, bkFFT, lwe_key, tgsw_key);
@@ -66,10 +66,19 @@ EXPORT void delete_gate_bootstrapping_secret_keyset(TFheGateBootstrappingSecretK
     TGswKey* tgsw_key = (TGswKey*) keyset->tgsw_key;
     LweBootstrappingKey* bk = (LweBootstrappingKey*) keyset->cloud.bk;
     LweBootstrappingKeyFFT* bkFFT = (LweBootstrappingKeyFFT*) keyset->cloud.bkFFT;
-    delete_LweBootstrappingKeyFFT(bkFFT);    
-    delete_LweBootstrappingKey(bk);    
+    if (bkFFT) delete_LweBootstrappingKeyFFT(bkFFT);    
+    if (bk) delete_LweBootstrappingKey(bk);    
     delete_TGswKey(tgsw_key);
     delete_LweKey(lwe_key); 
+    delete keyset;
+}
+
+/** deletes a gate bootstrapping cloud key */
+EXPORT void delete_gate_bootstrapping_cloud_keyset(TFheGateBootstrappingCloudKeySet* keyset) {
+    LweBootstrappingKey* bk = (LweBootstrappingKey*) keyset->bk;
+    LweBootstrappingKeyFFT* bkFFT = (LweBootstrappingKeyFFT*) keyset->bkFFT;
+    if (bkFFT) delete_LweBootstrappingKeyFFT(bkFFT);    
+    if (bk) delete_LweBootstrappingKey(bk);    
     delete keyset;
 }
 
