@@ -188,6 +188,10 @@ inline void fake_tfhe_blindRotateAndExtract(LweSample* result,
     }
 
 
+
+
+
+
 /**
  * result = LWE(mu) iff phase(x)>0, LWE(-mu) iff phase(x)<0
  * @param result The resulting LweSample
@@ -195,7 +199,60 @@ inline void fake_tfhe_blindRotateAndExtract(LweSample* result,
  * @param mu The output message (if phase(x)>0)
  * @param x The input sample
  */
-inline void fake_tfhe_bootstrap(LweSample* result, 
+inline void fake_tfhe_bootstrap_woKS(LweSample* result, 
+    const LweBootstrappingKey* bk, 
+    Torus32 mu, const LweSample* x){
+
+    //FakeLwe* fres = fake(result); // the fake will be created in the fake_tfhe_blindRotateAndExtract
+    const FakeLweBootstrappingKey* fbk = fake(bk);
+
+    const TGswParams* bk_params = fbk->bk_params;
+    const TLweParams* accum_params = fbk->accum_params;
+    const LweParams* in_params = fbk->in_out_params;
+    const int N=accum_params->N;
+    const int Nx2= 2*N;
+    const int n = in_params->n;
+
+    TorusPolynomial* testvect=new_TorusPolynomial(N);
+    int* bara = new int[N];
+    //LweSample* u = new_LweSample(extract_params);
+
+    int barb=modSwitchFromTorus32(x->b,Nx2);
+    for (int i=0; i<n; i++) {
+    bara[i]=modSwitchFromTorus32(x->a[i],Nx2);
+    }
+
+    //the initial testvec = [mu,mu,mu,...,mu]
+    for (int i=0;i<N;i++) testvect->coefsT[i]=mu;
+
+    //fake_tfhe_blindRotateAndExtract(u, testvect, bk->bk, barb, bara, n, bk_params);
+    fake_tfhe_blindRotateAndExtract(result, testvect, bk->bk, barb, bara, n, bk_params);
+
+    //delete_LweSample(u);
+    delete[] bara;
+    delete_TorusPolynomial(testvect);
+}
+
+#define USE_FAKE_tfhe_bootstrap_woKS \
+static inline void tfhe_bootstrap_woKS(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu, const LweSample* x) { \
+    fake_tfhe_bootstrap_woKS(result,bk,mu,x); \
+}
+
+
+
+
+
+
+
+
+/**
+ * result = LWE(mu) iff phase(x)>0, LWE(-mu) iff phase(x)<0
+ * @param result The resulting LweSample
+ * @param bk The bootstrapping + keyswitch key
+ * @param mu The output message (if phase(x)>0)
+ * @param x The input sample
+ */
+inline void old_fake_tfhe_bootstrap(LweSample* result, 
 	const LweBootstrappingKey* bk, 
 	Torus32 mu, const LweSample* x){
 
@@ -231,9 +288,9 @@ inline void fake_tfhe_bootstrap(LweSample* result,
     delete_TorusPolynomial(testvect);
 }
 
-#define USE_FAKE_tfhe_bootstrap \
-inline void tfhe_bootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu, const LweSample* x) { \
-    fake_tfhe_bootstrap(result,bk,mu,x); \
+#define USE_OLD_FAKE_tfhe_bootstrap \
+inline void old_tfhe_bootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu, const LweSample* x) { \
+    old_fake_tfhe_bootstrap(result,bk,mu,x); \
 }
 
 

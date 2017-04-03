@@ -180,6 +180,62 @@ inline void fake_tfhe_blindRotateAndExtract_FFT(LweSample* result,
     }
 
 
+
+
+
+/**
+ * result = LWE(mu) iff phase(x)>0, LWE(-mu) iff phase(x)<0
+ * @param result The resulting LweSample
+ * @param bk The bootstrapping + keyswitch key
+ * @param mu The output message (if phase(x)>0)
+ * @param x The input sample
+ */
+inline void old_fake_tfhe_bootstrap_woKS_FFT(LweSample* result, 
+    const LweBootstrappingKeyFFT* bkFFT, 
+    Torus32 mu, const LweSample* x){
+
+    // FakeLwe* fres = fake(result); // The fake will be created in fake_tfhe_blindRotateAndExtract_FFT
+    const FakeLweBootstrappingKeyFFT* fbkFFT = fake(bkFFT);
+
+    const TGswParams* bk_params = fbkFFT->bk_params;
+    const TLweParams* accum_params = fbkFFT->accum_params;
+    const LweParams* in_params = fbkFFT->in_out_params;
+    const int N=accum_params->N;
+    const int Nx2= 2*N;
+    const int n = in_params->n;
+
+    TorusPolynomial* testvect=new_TorusPolynomial(N);
+    int* bara = new int[N];
+    //LweSample* u = new_LweSample(extract_params);
+
+    int barb=modSwitchFromTorus32(x->b,Nx2);
+    for (int i=0; i<n; i++) {
+    bara[i]=modSwitchFromTorus32(x->a[i],Nx2);
+    }
+
+    //the initial testvec = [mu,mu,mu,...,mu]
+    for (int i=0;i<N;i++) testvect->coefsT[i]=mu;
+
+    //fake_tfhe_blindRotateAndExtract_FFT(u, testvect, bkFFT->bkFFT, barb, bara, n, bk_params);
+    fake_tfhe_blindRotateAndExtract_FFT(result, testvect, bkFFT->bkFFT, barb, bara, n, bk_params);
+
+    //delete_LweSample(u);
+    delete[] bara;
+    delete_TorusPolynomial(testvect);
+}
+
+#define USE_OLD_FAKE_tfhe_bootstrap_woKS_FFT \
+static inline void old_tfhe_bootstrap_woKS_FFT(LweSample* result, const LweBootstrappingKeyFFT* bkFFT, Torus32 mu, const LweSample* x) { \
+    old_fake_tfhe_bootstrap_woKS_FFT(result,bkFFT,mu,x); \
+}
+
+
+
+
+
+
+
+
 /**
  * result = LWE(mu) iff phase(x)>0, LWE(-mu) iff phase(x)<0
  * @param result The resulting LweSample

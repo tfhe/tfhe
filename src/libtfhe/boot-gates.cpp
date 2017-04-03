@@ -305,19 +305,13 @@ EXPORT void bootsORYN(LweSample* result, const LweSample* ca, const LweSample* c
  * Outputs a LWE bootstrapped sample (with message space [-1/8,1/8], noise<1/16)
 */ 
 EXPORT void bootsMUX(LweSample* result, const LweSample* a, const LweSample* b, const LweSample* c, const TFheGateBootstrappingCloudKeySet* bk) { 
-	const TGswParams* bk_params = bk->bkFFT->bk_params;
-    const TLweParams* accum_params = bk->bkFFT->accum_params;
-    const LweParams* extract_params = &accum_params->extracted_lweparams;
-    const LweParams* in_params = bk->bkFFT->in_out_params;
-    const int N=accum_params->N;
-    const int Nx2= 2*N;
-    const int n = in_params->n;
-
 	static const Torus32 MU = modSwitchToTorus32(1,8);
 	const LweParams* in_out_params = bk->params->in_out_params;
 
 	LweSample* temp_result1 = new_LweSample(in_out_params); 
 	LweSample* temp_result2 = new_LweSample(in_out_params); 
+	LweSample* u1 = new_LweSample(in_out_params); 
+	LweSample* u2 = new_LweSample(in_out_params); 
 
 
 	//compute "AND(a,b)": (0,-1/8) + a + b
@@ -325,39 +319,16 @@ EXPORT void bootsMUX(LweSample* result, const LweSample* a, const LweSample* b, 
 	lweNoiselessTrivial(temp_result1, AndConst, in_out_params); 
 	lweAddTo(temp_result1, a, in_out_params);
 	lweAddTo(temp_result1, b, in_out_params);
-
-	TorusPolynomial* testvect1 = new_TorusPolynomial(N);
-    int* bara1 = new int[N];
-    LweSample* u1 = new_LweSample(extract_params);
-	// Modulus switching
-    int barb1 = modSwitchFromTorus32(temp_result1->b,Nx2);
-    for (int i=0; i<n; i++) {
-        bara1[i]=modSwitchFromTorus32(temp_result1->a[i],Nx2);
-    }
-    // the initial testvec = [mu,mu,mu,...,mu]
-    for (int i=0;i<N;i++) testvect1->coefsT[i]=MU;
-    // Bootstrapping rotation and extraction
-    tfhe_blindRotateAndExtract_FFT(u1, testvect1, bk->bkFFT->bkFFT, barb1, bara1, n, bk_params);
+	// Bootstrap without KeySwitch
+	tfhe_bootstrap_woKS_FFT(u1, bk->bkFFT, MU, temp_result1);
     
 
 	//compute "AND(not(a),c)": (0,-1/8) - a + c
 	lweNoiselessTrivial(temp_result2, AndConst, in_out_params); 
 	lweSubTo(temp_result2, a, in_out_params);
 	lweAddTo(temp_result2, c, in_out_params);
-
-	TorusPolynomial* testvect2 = new_TorusPolynomial(N);
-    int* bara2 = new int[N];
-    LweSample* u2 = new_LweSample(extract_params);
-	// Modulus switching
-    int barb2 = modSwitchFromTorus32(temp_result2->b,Nx2);
-    for (int i=0; i<n; i++) {
-        bara2[i]=modSwitchFromTorus32(temp_result2->a[i],Nx2);
-    }
-    // the initial testvec = [mu,mu,mu,...,mu]
-    for (int i=0;i<N;i++) testvect2->coefsT[i]=MU;
-    // Bootstrapping rotation and extraction
-    tfhe_blindRotateAndExtract_FFT(u2, testvect2, bk->bkFFT->bkFFT, barb2, bara2, n, bk_params);
-
+	// Bootstrap without KeySwitch
+	tfhe_bootstrap_woKS_FFT(u2, bk->bkFFT, MU, temp_result2);
 
 	// Add u1=u1+u2
 	lweAddTo(u1, u2, in_out_params);
@@ -366,12 +337,8 @@ EXPORT void bootsMUX(LweSample* result, const LweSample* a, const LweSample* b, 
 
 
     delete_LweSample(u2);
-    delete[] bara2;
-    delete_TorusPolynomial(testvect2);
     delete_LweSample(u1);
-    delete[] bara1;
-    delete_TorusPolynomial(testvect1);
-	delete_LweSample(temp_result2);
+    delete_LweSample(temp_result2);
 	delete_LweSample(temp_result1);
 }
 

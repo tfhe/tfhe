@@ -43,7 +43,17 @@ namespace {
         USE_FAKE_lweCopy;
         USE_FAKE_lweNegate;
 	    USE_FAKE_lweNoiselessTrivial;
+        //USE_FAKE_tfhe_bootstrap_woKS_FFT;
 	    //USE_FAKE_tfhe_bootstrap_FFT;
+
+        static inline void tfhe_bootstrap_woKS_FFT(LweSample* result,  const LweBootstrappingKeyFFT* bkFFT,  Torus32 mu, const LweSample* x){
+        FakeLwe* fres = fake(result);
+        const FakeLwe* fx = fake(x);
+        if (fx->message>=0)
+            fres->message=mu;
+        else
+            fres->message=-mu;
+        }
 
 	    static inline void tfhe_bootstrap_FFT(LweSample* result,  const LweBootstrappingKeyFFT* bkFFT,  Torus32 mu, const LweSample* x){
 		FakeLwe* fres = fake(result);
