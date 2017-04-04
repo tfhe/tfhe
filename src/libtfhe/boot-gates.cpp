@@ -333,9 +333,9 @@ EXPORT void bootsMUX(LweSample* result, const LweSample* a, const LweSample* b, 
 
 	// Add u1=u1+u2
 	static const Torus32 MuxConst=modSwitchToTorus32(1,8);
-	lweNoiselessTrivial(temp_result1, MuxConst, in_out_params);
-	lweAddTo(temp_result1, u1, in_out_params);
-	lweAddTo(temp_result1, u2, in_out_params);
+	lweNoiselessTrivial(temp_result1, MuxConst, extracted_params);
+	lweAddTo(temp_result1, u1, extracted_params);
+	lweAddTo(temp_result1, u2, extracted_params);
 	// Key switching
     lweKeySwitch(result, bk->bkFFT->ks, temp_result1);
 

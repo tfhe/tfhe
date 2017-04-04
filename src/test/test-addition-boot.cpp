@@ -149,7 +149,10 @@ int main(int argc, char** argv) {
             bool messSum = bootsSymDecrypt(sum+i, keyset);
             
             if (messSum != (((messX+messY)%2)+messCarry)%2){
-                cout << "ERROR!!! " << trial << "," << i << endl; 
+                cout << "ERROR!!! " << trial << "," << i << " - "; 
+                cout << t32tod(lwePhase(x+i, keyset->lwe_key)) << " - ";
+                cout << t32tod(lwePhase(y+i, keyset->lwe_key)) << " - ";
+                cout << t32tod(lwePhase(sum+i, keyset->lwe_key)) << endl; 
             }
 
             messCarry = messCarry?(messX || messY):(messX && messY);            
