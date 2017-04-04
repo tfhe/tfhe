@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
 
-project(libtfhe)
-
 # include the fft processors in the build process
 add_subdirectory(fft_processors)
 
