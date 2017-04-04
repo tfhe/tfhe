@@ -188,6 +188,43 @@ inline void fake_tfhe_blindRotateAndExtract(LweSample* result,
     }
 
 
+
+
+
+
+/**
+ * result = LWE(mu) iff phase(x)>0, LWE(-mu) iff phase(x)<0
+ * @param result The resulting LweSample
+ * @param bk The bootstrapping + keyswitch key
+ * @param mu The output message (if phase(x)>0)
+ * @param x The input sample
+ */
+inline void fake_tfhe_bootstrap_woKS(LweSample* result, 
+    const LweBootstrappingKey* bk, 
+    Torus32 mu, const LweSample* x){
+
+    FakeLwe* fres = fake(result);
+    const FakeLwe* fx = fake(x);
+    if (fx->message>=0)
+        fres->message=mu;
+    else
+        fres->message=-mu;
+}
+
+#define USE_FAKE_tfhe_bootstrap_woKS \
+static inline void tfhe_bootstrap_woKS(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu, const LweSample* x) { \
+    fake_tfhe_bootstrap_woKS(result,bk,mu,x); \
+}
+
+
+
+
+
+
+
+
+
+
 /**
  * result = LWE(mu) iff phase(x)>0, LWE(-mu) iff phase(x)<0
  * @param result The resulting LweSample
@@ -196,6 +233,41 @@ inline void fake_tfhe_blindRotateAndExtract(LweSample* result,
  * @param x The input sample
  */
 inline void fake_tfhe_bootstrap(LweSample* result, 
+    const LweBootstrappingKey* bk, 
+    Torus32 mu, const LweSample* x){
+
+    FakeLwe* fres = fake(result);
+    const FakeLwe* fx = fake(x);
+    if (fx->message>=0)
+        fres->message=mu;
+    else
+        fres->message=-mu;
+}
+
+#define USE_FAKE_tfhe_bootstrap \
+static inline void tfhe_bootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu, const LweSample* x) { \
+    fake_tfhe_bootstrap(result,bk,mu,x); \
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * result = LWE(mu) iff phase(x)>0, LWE(-mu) iff phase(x)<0
+ * @param result The resulting LweSample
+ * @param bk The bootstrapping + keyswitch key
+ * @param mu The output message (if phase(x)>0)
+ * @param x The input sample
+ */
+inline void old_fake_tfhe_bootstrap(LweSample* result, 
 	const LweBootstrappingKey* bk, 
 	Torus32 mu, const LweSample* x){
 
@@ -231,9 +303,9 @@ inline void fake_tfhe_bootstrap(LweSample* result,
     delete_TorusPolynomial(testvect);
 }
 
-#define USE_FAKE_tfhe_bootstrap \
-inline void tfhe_bootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu, const LweSample* x) { \
-    fake_tfhe_bootstrap(result,bk,mu,x); \
+#define USE_OLD_FAKE_tfhe_bootstrap \
+inline void old_tfhe_bootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu, const LweSample* x) { \
+    old_fake_tfhe_bootstrap(result,bk,mu,x); \
 }
 
 

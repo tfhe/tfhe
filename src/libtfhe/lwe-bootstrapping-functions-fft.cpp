@@ -164,6 +164,51 @@ EXPORT void tfhe_blindRotateAndExtract_FFT(LweSample* result,
 
 
 
+#if defined INCLUDE_ALL || defined INCLUDE_TFHE_BOOTSTRAP_WO_KS_FFT
+#undef INCLUDE_TFHE_BOOTSTRAP_WO_KS_FFT
+/**
+ * result = LWE(mu) iff phase(x)>0, LWE(-mu) iff phase(x)<0
+ * @param result The resulting LweSample
+ * @param bk The bootstrapping + keyswitch key
+ * @param mu The output message (if phase(x)>0)
+ * @param x The input sample
+ */
+EXPORT void tfhe_bootstrap_woKS_FFT(LweSample* result, 
+    const LweBootstrappingKeyFFT* bk, 
+    Torus32 mu, 
+    const LweSample* x){
+
+    const TGswParams* bk_params = bk->bk_params;
+    const TLweParams* accum_params = bk->accum_params;
+    const LweParams* in_params = bk->in_out_params;
+    const int N=accum_params->N;
+    const int Nx2= 2*N;
+    const int n = in_params->n;
+
+    TorusPolynomial* testvect = new_TorusPolynomial(N);
+    int* bara = new int[N];
+    
+
+    // Modulus switching
+    int barb = modSwitchFromTorus32(x->b,Nx2);
+    for (int i=0; i<n; i++) {
+        bara[i]=modSwitchFromTorus32(x->a[i],Nx2);
+    }
+
+    // the initial testvec = [mu,mu,mu,...,mu]
+    for (int i=0;i<N;i++) testvect->coefsT[i]=mu;
+
+    // Bootstrapping rotation and extraction
+    tfhe_blindRotateAndExtract_FFT(result, testvect, bk->bkFFT, barb, bara, n, bk_params);
+
+    
+    delete[] bara;
+    delete_TorusPolynomial(testvect);
+}
+#endif
+
+
+
 
 
    
@@ -182,37 +227,13 @@ EXPORT void tfhe_bootstrap_FFT(LweSample* result,
     Torus32 mu, 
     const LweSample* x){
 
-    const TGswParams* bk_params = bk->bk_params;
-    const TLweParams* accum_params = bk->accum_params;
-    const LweParams* extract_params = &accum_params->extracted_lweparams;
-    const LweParams* in_params = bk->in_out_params;
-    const int N=accum_params->N;
-    const int Nx2= 2*N;
-    const int n = in_params->n;
+    LweSample* u = new_LweSample(&bk->accum_params->extracted_lweparams);
 
-    TorusPolynomial* testvect = new_TorusPolynomial(N);
-    int* bara = new int[N];
-    LweSample* u = new_LweSample(extract_params);
-
-
-    // Modulus switching
-    int barb = modSwitchFromTorus32(x->b,Nx2);
-    for (int i=0; i<n; i++) {
-        bara[i]=modSwitchFromTorus32(x->a[i],Nx2);
-    }
-
-    // the initial testvec = [mu,mu,mu,...,mu]
-    for (int i=0;i<N;i++) testvect->coefsT[i]=mu;
-
-    // Bootstrapping rotation and extraction
-    tfhe_blindRotateAndExtract_FFT(u, testvect, bk->bkFFT, barb, bara, n, bk_params);
+    tfhe_bootstrap_woKS_FFT(u, bk, mu, x);
     // Key switching
     lweKeySwitch(result, bk->ks, u);
 
-    
     delete_LweSample(u);
-    delete[] bara;
-    delete_TorusPolynomial(testvect);
 }
 #endif
 

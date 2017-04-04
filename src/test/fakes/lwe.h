@@ -137,7 +137,7 @@ inline Torus32 fake_lweVariance(const LweSample* sample) {
 
 
 
-// Fake symetric encryption of a Torus message
+// Fake Copy
 inline void fake_lweCopy(LweSample* result, const LweSample* sample, const LweParams* params) {
     FakeLwe* fres = fake(result);
     const FakeLwe* fsample = fake(sample);
@@ -146,8 +146,23 @@ inline void fake_lweCopy(LweSample* result, const LweSample* sample, const LwePa
 }
 
 #define USE_FAKE_lweCopy \
-    inline void lweCopy(LweSample* result, const LweSample* sample, const LweParams* params) { \
+    static inline void lweCopy(LweSample* result, const LweSample* sample, const LweParams* params) { \
     return fake_lweCopy(result, sample, params); \
+}
+
+
+
+// Fake Negate
+inline void fake_lweNegate(LweSample* result, const LweSample* sample, const LweParams* params) {
+    FakeLwe* fres = fake(result);
+    const FakeLwe* fsample = fake(sample);
+    fres->message = -fsample->message;
+    fres->current_variance = fsample->current_variance; 
+}
+
+#define USE_FAKE_lweNegate \
+    static inline void lweNegate(LweSample* result, const LweSample* sample, const LweParams* params) { \
+    return fake_lweNegate(result, sample, params); \
 }
 
 
@@ -199,7 +214,7 @@ inline void fake_lweSubTo(LweSample* result, const LweSample* sample, const LweP
 inline void fake_lweAddTo(LweSample* result, const LweSample* sample, const LweParams* params) {
     FakeLwe* fres = fake(result);
     const FakeLwe* fsample = fake(sample);
-    fres->message -= fsample->message;
+    fres->message += fsample->message;
     fres->current_variance += fsample->current_variance;
 }
 
@@ -207,6 +222,35 @@ inline void fake_lweAddTo(LweSample* result, const LweSample* sample, const LweP
     static inline void lweAddTo(LweSample* result, const LweSample* sample, const LweParams* params) { \
     return fake_lweAddTo(result,sample,params); \
 }
+
+
+/** result = result + p*sample */
+inline void fake_lweAddMulTo(LweSample* result, const int p, const LweSample* sample, const LweParams* params) {
+    FakeLwe* fres = fake(result);
+    const FakeLwe* fsample = fake(sample);
+    fres->message += p*fsample->message;
+    fres->current_variance += p*fsample->current_variance;
+}
+
+#define USE_FAKE_lweAddMulTo \
+    static inline void lweAddMulTo(LweSample* result, const int p, const LweSample* sample, const LweParams* params) { \
+    return fake_lweAddMulTo(result,p,sample,params); \
+}
+
+
+/** result = result - p*sample */
+inline void fake_lweSubMulTo(LweSample* result, const int p, const LweSample* sample, const LweParams* params) {
+    FakeLwe* fres = fake(result);
+    const FakeLwe* fsample = fake(sample);
+    fres->message -= p*fsample->message;
+    fres->current_variance += p*fsample->current_variance;
+}
+
+#define USE_FAKE_lweSubMulTo \
+    static inline void lweSubMulTo(LweSample* result, const int p, const LweSample* sample, const LweParams* params) { \
+    return fake_lweSubMulTo(result,p,sample,params); \
+}
+
 
 
 #endif //FAKES_LWE_H

@@ -45,6 +45,9 @@ EXPORT void lweClear(LweSample* result, const LweParams* params);
 /** result = sample */
 EXPORT void lweCopy(LweSample* result, const LweSample* sample, const LweParams* params);
 
+/** result = -sample */
+EXPORT void lweNegate(LweSample* result, const LweSample* sample, const LweParams* params);
+
 /** result = (0,mu) */
 EXPORT void lweNoiselessTrivial(LweSample* result, Torus32 mu, const LweParams* params);
 

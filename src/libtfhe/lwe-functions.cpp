@@ -98,6 +98,16 @@ EXPORT void lweCopy(LweSample* result, const LweSample* sample, const LweParams*
 }
 
 
+/** result = -sample */
+EXPORT void lweNegate(LweSample* result, const LweSample* sample, const LweParams* params){
+    const int n = params->n;
+
+    for (int i = 0; i < n; ++i) result->a[i] = -sample->a[i];
+    result->b = -sample->b;
+    result->current_variance = sample->current_variance;
+}
+
+
 /** result = (0,mu) */
 EXPORT void lweNoiselessTrivial(LweSample* result, Torus32 mu, const LweParams* params){
     const int n = params->n;

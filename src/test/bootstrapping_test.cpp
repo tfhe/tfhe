@@ -3,6 +3,7 @@
 #include "tfhe.h"
 #include "fakes/tlwe.h"
 #include "fakes/tgsw.h"
+#include "fakes/lwe-keyswitch.h"
 #include "fakes/lwe-bootstrapping.h"
 #define TFHE_TEST_ENVIRONMENT 1
 using namespace std;
@@ -202,10 +203,13 @@ namespace {
     }
 
 
-    class TfheBootstrapTest: public ::testing::Test {
-	public:
 
-	    USE_FAKE_new_LweSample;
+
+
+    class TfheBootstrapWoKSTest: public ::testing::Test {
+    public:
+
+        USE_FAKE_new_LweSample;
         USE_FAKE_delete_LweSample;
         USE_FAKE_new_TGswSample_array;
         USE_FAKE_delete_TGswSample_array;
@@ -213,6 +217,87 @@ namespace {
         USE_FAKE_delete_LweKeySwitchKey;
         USE_FAKE_tfhe_createLweBootstrappingKey;
         USE_FAKE_tfhe_blindRotateAndExtract;
+
+#define INCLUDE_TFHE_BOOTSTRAP_WO_KS
+#include "../libtfhe/lwe-bootstrapping-functions.cpp"
+
+    };
+    /**
+     * result = LWE(mu) iff phase(x)>0, LWE(-mu) iff phase(x)<0
+     * @param result The resulting LweSample
+     * @param bk The bootstrapping + keyswitch key
+     * @param mu The output message (if phase(x)>0)
+     * @param x The input sample
+     */
+    //EXPORT void tfhe_bootstrap(LweSample* result, 
+    //  const LweBootstrappingKey* bk, 
+    //  Torus32 mu, const LweSample* x)
+    TEST_F(TfheBootstrapWoKSTest,tfheBootstrapWoKSTest) {
+    const Torus32 TEST_MU=123456789;
+    const int NB_TRIALS=30;
+    const int Nx2= 2*N;
+    const int n = in_params->n;
+    //create a fake bootstrapping key
+    LweKey* key = new_LweKey(in_params);
+    lweKeyGen(key);
+    TGswKey* key_bk = new_TGswKey(bk_params);
+    tGswKeyGen(key_bk);
+    LweBootstrappingKey* bk = fake_new_LweBootstrappingKey(ks_t, ks_basebit, in_params, bk_params);
+    fake_tfhe_createLweBootstrappingKey(bk, key, key_bk);
+
+    //alloc the output lwe sample
+    LweSample* result = fake_new_LweSample(in_params);
+    FakeLwe* fres = fake(result);
+
+    //create a random input sample
+    LweSample* insample = real_new_LweSample(extract_params);
+    for (int trial=0; trial<NB_TRIALS; trial++) {
+        lweSymEncrypt(insample,uniformTorus32_distrib(generator),0.001,key);
+
+        //compute the approx. phase mod 2N
+        int barb=modSwitchFromTorus32(insample->b,Nx2);
+        int phase=barb;
+        for (int i=0; i<n; i++) {
+        int barai=modSwitchFromTorus32(insample->a[i],Nx2);
+        phase-=key->key[i]*barai;
+        }
+        phase = (Nx2+(phase%Nx2))%Nx2; //positive modulo
+
+        //call the function
+        tfhe_bootstrap_woKS(result,bk,TEST_MU,insample);
+
+        //printf("trial=%d,hash=%d,phase=%d,result=%d\n",trial,hash,phase,result->b);
+        //verify the result
+        ASSERT_EQ(fres->message,phase<N?TEST_MU:-TEST_MU);
+    }
+
+    //cleanup
+    real_delete_LweSample(insample);
+    fake_delete_LweSample(result);
+    fake_delete_LweBootstrappingKey(bk);
+    delete_TGswKey(key_bk);
+    delete_LweKey(key);
+
+    }
+
+
+
+
+
+
+    class TfheBootstrapTest: public ::testing::Test {
+	public:
+
+	    USE_FAKE_new_LweSample;
+        USE_FAKE_delete_LweSample;
+        USE_FAKE_lweSymEncrypt;
+        USE_FAKE_new_TGswSample_array;
+        USE_FAKE_delete_TGswSample_array;
+        USE_FAKE_new_LweKeySwitchKey;
+        USE_FAKE_delete_LweKeySwitchKey;
+        USE_FAKE_tfhe_createLweBootstrappingKey;
+        USE_FAKE_tfhe_blindRotateAndExtract;
+        USE_FAKE_tfhe_bootstrap_woKS;
         USE_FAKE_lweKeySwitch;
 
 #define INCLUDE_TFHE_BOOTSTRAP
@@ -232,49 +317,34 @@ namespace {
     TEST_F(TfheBootstrapTest,tfheBootstrapTest) {
 	const Torus32 TEST_MU=123456789;
 	const int NB_TRIALS=30;
-	const int Nx2= 2*N;
-	const int n = in_params->n;
-	//create a fake bootstrapping key
-	LweKey* key = new_LweKey(in_params);
-	lweKeyGen(key);
-	TGswKey* key_bk = new_TGswKey(bk_params);
-	tGswKeyGen(key_bk);
-	LweBootstrappingKey* bk = fake_new_LweBootstrappingKey(ks_t, ks_basebit, in_params, bk_params);
-	fake_tfhe_createLweBootstrappingKey(bk, key, key_bk);
-
-	//alloc the output lwe sample
+	
+    //fake keys
+    LweKey* key = 0x0; 
+    FakeLweKeySwitchKey* ks = new FakeLweKeySwitchKey(1024,15,1);
+    LweBootstrappingKey* bk = new LweBootstrappingKey((LweParams*) 0, (TGswParams*) 0, (TLweParams*) 0, (LweParams*) 0, (TGswSample*) 0, (LweKeySwitchKey*) ks);
+	
+    //alloc the output lwe sample
 	LweSample* result = fake_new_LweSample(in_params);
     FakeLwe* fres = fake(result);
 
 	//create a random input sample
-	LweSample* insample = real_new_LweSample(extract_params);
+	LweSample* insample = fake_new_LweSample(extract_params);
+    FakeLwe* fin = fake(insample);
 	for (int trial=0; trial<NB_TRIALS; trial++) {
 	    lweSymEncrypt(insample,uniformTorus32_distrib(generator),0.001,key);
-
-	    //compute the approx. phase mod 2N
-	    int barb=modSwitchFromTorus32(insample->b,Nx2);
-	    int phase=barb;
-	    for (int i=0; i<n; i++) {
-		int barai=modSwitchFromTorus32(insample->a[i],Nx2);
-		phase-=key->key[i]*barai;
-	    }
-	    phase = (Nx2+(phase%Nx2))%Nx2; //positive modulo
 
 	    //call the function
 	    tfhe_bootstrap(result,bk,TEST_MU,insample);
 
-	    //printf("trial=%d,hash=%d,phase=%d,result=%d\n",trial,hash,phase,result->b);
 	    //verify the result
-	    ASSERT_EQ(fres->message,phase<N?TEST_MU:-TEST_MU);
+	    ASSERT_EQ(fres->message,fin->message>=0?TEST_MU:-TEST_MU);
 	}
 
 	//cleanup
-	real_delete_LweSample(insample);
+    delete ((FakeLweKeySwitchKey*) ks);
+    delete bk; 
+    fake_delete_LweSample(insample);
 	fake_delete_LweSample(result);
-	fake_delete_LweBootstrappingKey(bk);
-	delete_TGswKey(key_bk);
-	delete_LweKey(key);
-
     }
 
     class TfheCreateBootstrapKeyTest: public ::testing::Test {

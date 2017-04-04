@@ -16,7 +16,9 @@ namespace {
 	TGswKey* tgsw_key = 0x0; //new_TGswKey(params->tgsw_params);
 	LweBootstrappingKey* bk = 0x0; //new_LweBootstrappingKey(params->in_out_params, params->tgsw_params);
 	//tfhe_createLweBootstrappingKey(bk, lwe_key, tgsw_key);
-	LweBootstrappingKeyFFT* bkFFT = 0x0; // new_LweBootstrappingKeyFFT(bk);
+	//LweBootstrappingKeyFFT* bkFFT = 0x0; // new_LweBootstrappingKeyFFT(bk);
+    LweKeySwitchKey* ks = (LweKeySwitchKey*) new FakeLweKeySwitchKey(1024,15,1);
+    LweBootstrappingKeyFFT* bkFFT = new LweBootstrappingKeyFFT(0,0,0,0,0,ks);
 	return new TFheGateBootstrappingSecretKeySet(params, bk, bkFFT, lwe_key, tgsw_key);
     }
 
@@ -37,19 +39,15 @@ namespace {
 	    USE_FAKE_new_LweSample;
 	    USE_FAKE_delete_LweSample;
 	    USE_FAKE_lweSubTo;
-	    //USE_FAKE_lweAddTo;
+	    USE_FAKE_lweAddTo;
+        USE_FAKE_lweAddMulTo;
+        USE_FAKE_lweSubMulTo;
+        USE_FAKE_lweCopy;
+        USE_FAKE_lweNegate;
 	    USE_FAKE_lweNoiselessTrivial;
-	    //USE_FAKE_tfhe_bootstrap_FFT;
-
-	    static inline void tfhe_bootstrap_FFT(LweSample* result,  const LweBootstrappingKeyFFT* bkFFT,  Torus32 mu, const LweSample* x){
-		FakeLwe* fres = fake(result);
-		const FakeLwe* fx = fake(x);
-		if (fx->message>=0)
-		    fres->message=mu;
-		else
-		    fres->message=-mu;
-	    }
-
+        USE_FAKE_lweKeySwitch;
+        USE_FAKE_tfhe_bootstrap_woKS_FFT;
+	    USE_FAKE_tfhe_bootstrap_FFT;
 
 #include "../libtfhe/boot-gates.cpp"
 

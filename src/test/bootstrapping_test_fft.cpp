@@ -208,7 +208,11 @@ namespace {
 
 
 
-    class TfheBootstrapFFTTest: public ::testing::Test {
+
+
+
+
+    class TfheBootstrapWoKSFFTTest: public ::testing::Test {
     public:
 
         USE_FAKE_new_LweSample;
@@ -222,10 +226,9 @@ namespace {
         USE_FAKE_lweCreateKeySwitchKey;
         USE_FAKE_tfhe_createLweBootstrappingKey;
         USE_FAKE_tGswToFFTConvert;
-        USE_FAKE_lweKeySwitch;
         USE_FAKE_tfhe_blindRotateAndExtract_FFT;
 
-#define INCLUDE_TFHE_BOOTSTRAP_FFT
+#define INCLUDE_TFHE_BOOTSTRAP_WO_KS_FFT
 #include "../libtfhe/lwe-bootstrapping-functions-fft.cpp"
 
     }; 
@@ -241,7 +244,7 @@ namespace {
     //  const LweBootstrappingKey* bk, 
     //  Torus32 mu, const LweSample* x)
 
-    TEST_F(TfheBootstrapFFTTest,tfheBootstrapFFTTest) {
+    TEST_F(TfheBootstrapWoKSFFTTest,tfheBootstrapWoKSFFTTest) {
     const Torus32 TEST_MU=123456789;
     const int NB_TRIALS=30;
     const int Nx2= 2*N;
@@ -276,7 +279,7 @@ namespace {
         phase = (Nx2+(phase%Nx2))%Nx2; //positive modulo
 
         //call the function
-        tfhe_bootstrap_FFT(result,bkFFT,TEST_MU,insample);
+        tfhe_bootstrap_woKS_FFT(result,bkFFT,TEST_MU,insample);
 
         //printf("trial=%d,hash=%d,phase=%d,result=%d\n",trial,hash,phase,result->b);
         //verify the result
@@ -290,6 +293,84 @@ namespace {
     fake_delete_LweBootstrappingKey(bk);
     delete_TGswKey(key_bk);
     delete_LweKey(key);
+}
+
+
+
+
+
+
+
+
+
+
+
+    class TfheBootstrapFFTTest: public ::testing::Test {
+    public:
+
+        USE_FAKE_new_LweSample;
+        USE_FAKE_delete_LweSample;
+        USE_FAKE_lweSymEncrypt;
+        //USE_FAKE_new_LweSample_array;
+        //USE_FAKE_delete_LweSample_array;
+        USE_FAKE_new_TGswSampleFFT_array;
+        USE_FAKE_delete_TGswSampleFFT_array;
+        USE_FAKE_new_LweKeySwitchKey;
+        USE_FAKE_delete_LweKeySwitchKey;
+        USE_FAKE_lweCreateKeySwitchKey;
+        USE_FAKE_tfhe_createLweBootstrappingKey;
+        USE_FAKE_tGswToFFTConvert;
+        USE_FAKE_lweKeySwitch;
+        USE_FAKE_tfhe_blindRotateAndExtract_FFT;
+        USE_FAKE_tfhe_bootstrap_woKS_FFT;
+
+#define INCLUDE_TFHE_BOOTSTRAP_FFT
+#include "../libtfhe/lwe-bootstrapping-functions-fft.cpp"
+
+    }; 
+  
+    /**
+     * result = LWE(mu) iff phase(x)>0, LWE(-mu) iff phase(x)<0
+     * @param result The resulting LweSample
+     * @param bk The bootstrapping + keyswitch key
+     * @param mu The output message (if phase(x)>0)
+     * @param x The input sample
+     */
+    //EXPORT void tfhe_bootstrap(LweSample* result, 
+    //  const LweBootstrappingKey* bk, 
+    //  Torus32 mu, const LweSample* x)
+
+    TEST_F(TfheBootstrapFFTTest,tfheBootstrapFFTTest) {
+    const Torus32 TEST_MU=123456789;
+    const int NB_TRIALS=30;
+    
+    //fake keys
+    LweKey* key = 0x0; 
+    FakeLweKeySwitchKey* ks = new FakeLweKeySwitchKey(1024,15,1);
+    LweBootstrappingKeyFFT* bkFFT = new LweBootstrappingKeyFFT((LweParams*) 0, (TGswParams*) 0, (TLweParams*) 0, (LweParams*) 0, (TGswSampleFFT*) 0, (LweKeySwitchKey*) ks);
+    
+    //alloc the output lwe sample
+    LweSample* result = fake_new_LweSample(in_params);
+    FakeLwe* fres = fake(result);
+
+    //create a random input sample
+    LweSample* insample = fake_new_LweSample(extract_params);
+    FakeLwe* fin = fake(insample);
+    for (int trial=0; trial<NB_TRIALS; trial++) {
+        lweSymEncrypt(insample,uniformTorus32_distrib(generator),0.001,key);
+
+        //call the function
+        tfhe_bootstrap_FFT(result,bkFFT,TEST_MU,insample);
+
+        //verify the result
+        ASSERT_EQ(fres->message,fin->message>=0?TEST_MU:-TEST_MU);
+    }
+
+    //cleanup
+    delete ((FakeLweKeySwitchKey*) ks);
+    delete bkFFT; 
+    fake_delete_LweSample(insample);
+    fake_delete_LweSample(result);    
 }
 
 
