@@ -149,6 +149,7 @@ EXPORT void tfhe_blindRotateAndExtract_FFT(LweSample* result,
 
     // testvector = X^{2N-barb}*v
     if (barb!=0) torusPolynomialMulByXai(testvectbis, _2N-barb, v);
+    else torusPolynomialCopy(testvectbis, v);
     tLweNoiselessTrivial(acc, testvectbis, accum_params);
     // Blind rotation
     tfhe_blindRotate_FFT(acc, bk, bara, n, bk_params);

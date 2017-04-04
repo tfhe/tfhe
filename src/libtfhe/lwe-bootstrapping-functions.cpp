@@ -106,8 +106,8 @@ EXPORT void tfhe_blindRotateAndExtract(LweSample* result,
     TorusPolynomial* testvectbis=new_TorusPolynomial(N);
     TLweSample* acc = new_TLweSample(accum_params);
 
-    if (barb!=0)
-	torusPolynomialMulByXai(testvectbis, _2N-barb, v);
+    if (barb!=0) torusPolynomialMulByXai(testvectbis, _2N-barb, v);
+    else torusPolynomialCopy(testvectbis, v);
     tLweNoiselessTrivial(acc, testvectbis, accum_params);
     tfhe_blindRotate(acc, bk, bara, n, bk_params);
     tLweExtractLweSample(result, acc, extract_params, accum_params);
