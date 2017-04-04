@@ -53,7 +53,9 @@ EXPORT void delete_gate_bootstrapping_parameters(TFheGateBootstrappingParameterS
 /** generate a gate bootstrapping secret key */
 EXPORT TFheGateBootstrappingSecretKeySet* new_random_gate_bootstrapping_secret_keyset(const TFheGateBootstrappingParameterSet* params) {
     LweKey* lwe_key = new_LweKey(params->in_out_params);
+    lweKeyGen(lwe_key);
     TGswKey* tgsw_key = new_TGswKey(params->tgsw_params);
+    tGswKeyGen(tgsw_key);
     LweBootstrappingKey* bk = new_LweBootstrappingKey(params->ks_t, params->ks_basebit, params->in_out_params, params->tgsw_params);
     tfhe_createLweBootstrappingKey(bk, lwe_key, tgsw_key);
     LweBootstrappingKeyFFT* bkFFT = new_LweBootstrappingKeyFFT(bk);

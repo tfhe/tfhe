@@ -307,10 +307,12 @@ EXPORT void bootsORYN(LweSample* result, const LweSample* ca, const LweSample* c
 EXPORT void bootsMUX(LweSample* result, const LweSample* a, const LweSample* b, const LweSample* c, const TFheGateBootstrappingCloudKeySet* bk) { 
 	static const Torus32 MU = modSwitchToTorus32(1,8);
 	const LweParams* in_out_params = bk->params->in_out_params;
+	const LweParams* extracted_params = &bk->params->tgsw_params->tlwe_params->extracted_lweparams;
 
 	LweSample* temp_result = new_LweSample(in_out_params); 
-	LweSample* u1 = new_LweSample(in_out_params); 
-	LweSample* u2 = new_LweSample(in_out_params); 
+	LweSample* temp_result1 = new_LweSample(extracted_params); 
+	LweSample* u1 = new_LweSample(extracted_params); 
+	LweSample* u2 = new_LweSample(extracted_params); 
 
 
 	//compute "AND(a,b)": (0,-1/8) + a + b
@@ -331,15 +333,16 @@ EXPORT void bootsMUX(LweSample* result, const LweSample* a, const LweSample* b, 
 
 	// Add u1=u1+u2
 	static const Torus32 MuxConst=modSwitchToTorus32(1,8);
-	lweNoiselessTrivial(temp_result, MuxConst, in_out_params);
-	lweAddTo(temp_result, u1, in_out_params);
-	lweAddTo(temp_result, u2, in_out_params);
+	lweNoiselessTrivial(temp_result1, MuxConst, extracted_params);
+	lweAddTo(temp_result1, u1, extracted_params);
+	lweAddTo(temp_result1, u2, extracted_params);
 	// Key switching
-    lweKeySwitch(result, bk->bkFFT->ks, temp_result);
+    lweKeySwitch(result, bk->bkFFT->ks, temp_result1);
 
 
     delete_LweSample(u2);
     delete_LweSample(u1);
+    delete_LweSample(temp_result1);
     delete_LweSample(temp_result);
 }
 
