@@ -25,6 +25,7 @@ set(CPP_ITESTS
     test-multiplication
     test-tlwe
     test-gate-bootstrapping
+    test-addition-boot
     )
 
 set(C_ITESTS
