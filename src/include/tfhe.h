@@ -99,13 +99,13 @@ EXPORT void delete_gate_bootstrapping_ciphertext(LweSample* sample);
 EXPORT void delete_gate_bootstrapping_ciphertext_array(int nbelems, LweSample* samples);
 
 /** encrypts a boolean */
-EXPORT void bootsSymEncrypt(LweSample* result, bool message, const TFheGateBootstrappingSecretKeySet* params);
+EXPORT void bootsSymEncrypt(LweSample* result, int message, const TFheGateBootstrappingSecretKeySet* params);
 
 /** decrypts a boolean */
-EXPORT bool bootsSymDecrypt(const LweSample* sample, const TFheGateBootstrappingSecretKeySet* params);
+EXPORT int bootsSymDecrypt(const LweSample* sample, const TFheGateBootstrappingSecretKeySet* params);
 
 /** bootstrapped Constant (true or false) trivial Gate */ 
-EXPORT void bootsCONSTANT(LweSample* result, bool value, const TFheGateBootstrappingCloudKeySet* bk);
+EXPORT void bootsCONSTANT(LweSample* result, int value, const TFheGateBootstrappingCloudKeySet* bk);
 
 /** bootstrapped Nand Gate */ 
 EXPORT void bootsNAND(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);

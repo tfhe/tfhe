@@ -176,7 +176,7 @@ EXPORT void bootsCOPY(LweSample* result, const LweSample* ca, const TFheGateBoot
  * Takes a boolean value)
  * Outputs a LWE sample (with message space [-1/8,1/8], noise<1/16)
 */
-EXPORT void bootsCONSTANT(LweSample* result, bool value, const TFheGateBootstrappingCloudKeySet* bk) { 
+EXPORT void bootsCONSTANT(LweSample* result, int value, const TFheGateBootstrappingCloudKeySet* bk) { 
 	const LweParams* in_out_params = bk->params->in_out_params;
 	static const Torus32 MU=modSwitchToTorus32(1,8);
 	lweNoiselessTrivial(result, value?MU:-MU, in_out_params);

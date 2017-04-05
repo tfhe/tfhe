@@ -60,10 +60,8 @@ endif(ENABLE_SPQLIOS_FMA)
 include_directories("include")
 file(GLOB TFHE_HEADERS include/*.h)
 
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/include
+install(FILES ${TFHE_HEADERS}
     DESTINATION include/tfhe
-    FILES_MATCHING
-    PATTERN "*.h"
     PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
 
 # include the lib and the tests
