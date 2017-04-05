@@ -1,6 +1,3 @@
-#include <complex.h>
-#define complex _Complex
-#include <fftw3.h>
 #include <cassert>
 #include <cmath>
 #include "tfhe_core.h"

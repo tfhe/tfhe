@@ -5,7 +5,6 @@
 #include <cmath>
 #include <complex.h>
 typedef double _Complex cplx;
-#include <fftw3.h>
 #include "tfhe.h"
 #include "polynomials.h"
 
