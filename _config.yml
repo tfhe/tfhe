@@ -24,7 +24,7 @@ github_username:  tfhe
 
 # Build settings
 markdown: kramdown
-theme: jekyll-theme-dinky
+theme: jekyll-theme-merlot
 gems:
   - jekyll-feed
 exclude:
