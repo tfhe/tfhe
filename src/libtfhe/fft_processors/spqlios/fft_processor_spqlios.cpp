@@ -26,7 +26,7 @@ FFT_Processor_Spqlios::FFT_Processor_Spqlios(const int N): _2N(2*N),N(N),Ns2(N/2
     sinomegaxminus1 = cosomegaxminus1+_2N;
     int rev1 = rev(1,_2N);
     int rev3 = rev(3,_2N);
-    printf("rev-interval: %d, %d\n",rev1,rev3);
+    //printf("rev-interval: %d, %d\n",rev1,rev3);
     for (int revi=rev1; revi<rev3; revi++) 
 	reva[revi-rev1]=rev(revi,_2N);
     for (int j=0; j<_2N; j++) {

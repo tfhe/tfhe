@@ -99,10 +99,13 @@ EXPORT void delete_gate_bootstrapping_ciphertext(LweSample* sample);
 EXPORT void delete_gate_bootstrapping_ciphertext_array(int nbelems, LweSample* samples);
 
 /** encrypts a boolean */
-EXPORT void bootsSymEncrypt(LweSample* result, bool message, const TFheGateBootstrappingSecretKeySet* params);
+EXPORT void bootsSymEncrypt(LweSample* result, int message, const TFheGateBootstrappingSecretKeySet* params);
 
 /** decrypts a boolean */
-EXPORT bool bootsSymDecrypt(const LweSample* sample, const TFheGateBootstrappingSecretKeySet* params);
+EXPORT int bootsSymDecrypt(const LweSample* sample, const TFheGateBootstrappingSecretKeySet* params);
+
+/** bootstrapped Constant (true or false) trivial Gate */ 
+EXPORT void bootsCONSTANT(LweSample* result, int value, const TFheGateBootstrappingCloudKeySet* bk);
 
 /** bootstrapped Nand Gate */ 
 EXPORT void bootsNAND(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);
@@ -136,6 +139,9 @@ EXPORT void bootsMUX(LweSample* result, const LweSample* a, const LweSample* b, 
 //  TFHE bootstrapping internal functions
 //////////////////////////////////////////////////
 
+
+/** sets the seed of the random number generator to the given values */
+EXPORT void tfhe_random_generator_setSeed(uint32_t* values, int size);
 
 EXPORT void tfhe_blindRotate(TLweSample* accum, const TGswSample* bk, const int* bara, const int n, const TGswParams* bk_params);
 EXPORT void tfhe_blindRotateAndExtract(LweSample* result, const TorusPolynomial* v, const TGswSample* bk, const int barb, const int* bara, const int n, const TGswParams* bk_params);

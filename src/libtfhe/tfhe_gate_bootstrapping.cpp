@@ -105,7 +105,7 @@ EXPORT void delete_gate_bootstrapping_ciphertext_array(int nbelems, LweSample* s
 }
 
 /** encrypts a boolean */
-EXPORT void bootsSymEncrypt(LweSample* result, bool message, const TFheGateBootstrappingSecretKeySet* key) {
+EXPORT void bootsSymEncrypt(LweSample* result, int message, const TFheGateBootstrappingSecretKeySet* key) {
     Torus32 _1s8 = modSwitchToTorus32(1,8);
     Torus32 mu = message?_1s8:-_1s8;
     double alpha = key->params->in_out_params->alpha_min; //TODO: specify noise
@@ -113,7 +113,7 @@ EXPORT void bootsSymEncrypt(LweSample* result, bool message, const TFheGateBoots
 }
 
 /** decrypts a boolean */
-EXPORT bool bootsSymDecrypt(const LweSample* sample, const TFheGateBootstrappingSecretKeySet* key) {
+EXPORT int bootsSymDecrypt(const LweSample* sample, const TFheGateBootstrappingSecretKeySet* key) {
     Torus32 mu = lwePhase(sample, key->lwe_key);
-    return (mu>0);
+    return (mu>0?1:0); //we have to do that because of the C binding
 }

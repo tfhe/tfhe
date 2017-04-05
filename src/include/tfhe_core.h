@@ -13,7 +13,6 @@
 #include "tfhe_generic_templates.h"
 #else
 #define EXPORT
-typedef int bool;
 #endif
 
 EXPORT void die_dramatically(const char* message);
