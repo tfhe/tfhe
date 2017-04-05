@@ -402,5 +402,3 @@ attribute-based. In Crypto 2013, pages 75-92
 
 [CGGI16](https://eprint.iacr.org/2016/870){:target="_blank"}: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. Faster fully homomorphic encryption: Bootstrapping in less than 0.1 seconds. Asiacrypt 2016. Cryptology ePrint Archive, report 2016/870.
 
-[HElib](https://github.com/shaih/HElib){:target="_blank"}: An Implementation of homomorphic encryption
-[https://github.com/shaih/HElib](https://github.com/shaih/HElib){:target="_blank"}
