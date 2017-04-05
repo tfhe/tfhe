@@ -38,6 +38,11 @@ add_library(tfhe-core OBJECT ${SRCS} ${TFHE_HEADERS})
 foreach (FFT_PROCESSOR IN LISTS FFT_PROCESSORS) 
     add_library(tfhe-${FFT_PROCESSOR} 
 	$<TARGET_OBJECTS:tfhe-core>
-	$<TARGET_OBJECTS:tfhe-fft-${FFT_PROCESSOR}>)
+        $<TARGET_OBJECTS:tfhe-fft-${FFT_PROCESSOR}>)
+
+    install(TARGETS tfhe-${FFT_PROCESSOR}
+        RUNTIME DESTINATION bin
+        LIBRARY DESTINATION lib
+        ARCHIVE DESTINATION lib)
 endforeach (FFT_PROCESSOR IN LISTS FFT_PROCESSORS) 
 
