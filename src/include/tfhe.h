@@ -104,6 +104,9 @@ EXPORT void bootsSymEncrypt(LweSample* result, bool message, const TFheGateBoots
 /** decrypts a boolean */
 EXPORT bool bootsSymDecrypt(const LweSample* sample, const TFheGateBootstrappingSecretKeySet* params);
 
+/** bootstrapped Constant (true or false) trivial Gate */ 
+EXPORT void bootsCONSTANT(LweSample* result, bool value, const TFheGateBootstrappingCloudKeySet* bk);
+
 /** bootstrapped Nand Gate */ 
 EXPORT void bootsNAND(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);
 /** bootstrapped Or Gate:  */ 
