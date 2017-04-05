@@ -1,3 +1,7 @@
+---
+title: TFHE Fast Fully Homomorphic Encryption over the Torus
+---
+
 # TFHE: Fast Fully Homomorphic Encryption over the Torus
 
 **version 1.0-rc1** -- *first release candidate date: 2017.04.05*
@@ -9,7 +13,6 @@ The underlying scheme is described in best paper of the IACR
 conference Asiacrypt 2016: "Faster fully homomorphic encryption: 
 Bootstrapping in less than 0.1 seconds", presented by 
 Ilaria Chillotti, Nicolas Gama, Mariya Georgieva and Malika Izabachène.
-
 
 ### Description 
 
@@ -51,7 +54,7 @@ cryptosystem and makes many optimizations described in [DM15] and
 [CGGI16]. 
 
 It also implements a dedicated Fast Fourier
-Transformation for the anticyclic ring R[X]/(X^N+1), and uses AVX
+Transformation for the anticyclic ring \\(\mathbb{R}[X]/(X^N+1)\\), and uses AVX
 assembly vectorization instructions. 
 The default parameter set achieves a 120-bit cryptographic security,
 based on ideal lattice assumptions.
@@ -79,10 +82,11 @@ At least one FFT processor is needed to run the project:
   the other using the AVX assembly instructions.
   This component is licensed under the MIT license, and we added the code
   of the reverse FFT (both in C and in assembly). Original source:
-  https://www.nayuki.io/page/fast-fourier-transform-in-x86-assembly
+  [https://www.nayuki.io/page/fast-fourier-transform-in-x86-assembly](https://www.nayuki.io/page/fast-fourier-transform-in-x86-assembly){:target="_blank"}
 * we provide another processor, named the spqlios processor, which is
   written in AVX and FMA assembly in the style of the nayuki processor,
-  and which is dedicated to the ring R[X]/(X^N+1) for N a power of 2.
+  and which is dedicated to the ring \\(\mathbb{R}[X]/(X^N+1)\\) for \\(N\\) a power of 2.
+
 <!--
 * We also provide a connector for the FFTW3 library: http://www.fftw.org.
   With this library, the performance of the FFT is between 2 and 3 times
@@ -92,6 +96,7 @@ At least one FFT processor is needed to run the project:
   be released under GPL License as well (other commercial licenses are
   available on their web site)
 -->
+
 * We plan to add other connectors in the future (for instance the Intel’s
   IPP Fourier Transform, which should be 1.5× faster than FFTW for 1D
   real data)
@@ -102,8 +107,7 @@ At least one FFT processor is needed to run the project:
 To build the library with the default options, run ```make``` from the
 top level directory of the TFHE project.
 This assumes that the standard tool cmake is already installed on the
-system, and an
-up-to-date c++ compiler (i.e. g++ >=5.2) as well.
+system, and an up-to-date c++ compiler (i.e. g++ >=5.2) as well.
 It will compile the library in optimized mode in the build/libtfhe
 folder.
 Currently, only static libraries are generated. There is no make install
@@ -112,7 +116,8 @@ in an early state.
 
 If you want to choose additional compile options (i.e. debug mode, tests,
 fftw), you need to run cmake manually and pass the desired options:
-```
+
+```sh
 mkdir build
 cd build
 cmake ../src -DENABLE_TESTS=on -DENABLE_FFTW=on -DCMAKE_BUILD_TYPE=debug
@@ -120,26 +125,60 @@ make
 ```
 The available options are the following:
 
-| Variable Name          | values           | 
-|------------------------|-------|
-| CMAKE_BUILD_TYPE       | <ul><li>*optim* enables compiler's optimization flags, including native architecture specific optimizations</li><li>*debug* disables any optimization and include all debugging info (-g3 -O0)</li> | 
-| ENABLE_TESTS           | *on/off* compiles the library's unit tests and sample applications in the test/ folder. This assumes that googletest>1.8 is installed on the system. (use ```ctest``` to run all tests) | 
-| ENABLE_FFTW            | *on/off* compiles libtfhe-fftw.a, using FFTW3 (GPL licence) for fast FFT computations |
-| ENABLE_NAYUKI_PORTABLE | *on/off* compiles libtfhe-nayuki-portable.a, using the fast C version of nayuki for FFT computations |
-| ENABLE_NAYUKI_AVX      | *on/off* compiles libtfhe-nayuki-avx.a, using the avx assembly version of nayuki for FFT computations |
-| ENABLE_SPQLIOS_AVX     | *on/off* compiles libtfhe-spqlios-avx.a, using tfhe's dedicated avx assembly version for FFT computations |
-| ENABLE_SPQLIOS_FMA     | *on/off* compiles libtfhe-spqlios-fma.a, using tfhe's dedicated fma assembly version for FFT computations |
+<table>
+  <thead>
+    <tr>
+      <th>Variable Name</th>
+      <th>values</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>CMAKE_BUILD_TYPE</td>
+      <td>
+        <em>optim</em> enables compiler's optimization flags, including native 
+             architecture specific optimizations<br>
+        <em>debug</em> disables any optimization and include all debugging 
+             info (-g3 -O0)
+      </td>
+    </tr>
+    <tr>
+      <td>ENABLE_TESTS</td>
+      <td><em>on/off</em> compiles the library’s unit tests and sample applications in the test/ folder. This assumes that googletest&gt;1.8 is installed on the system. (use <code class="highlighter-rouge">ctest</code> to run all tests)</td>
+    </tr>
+    <tr>
+      <td>ENABLE_FFTW</td>
+      <td><em>on/off</em> compiles libtfhe-fftw.a, using FFTW3 (GPL licence) for fast FFT computations</td>
+    </tr>
+    <tr>
+      <td>ENABLE_NAYUKI_PORTABLE</td>
+      <td><em>on/off</em> compiles libtfhe-nayuki-portable.a, using the fast C version of nayuki for FFT computations</td>
+    </tr>
+    <tr>
+      <td>ENABLE_NAYUKI_AVX</td>
+      <td><em>on/off</em> compiles libtfhe-nayuki-avx.a, using the avx assembly version of nayuki for FFT computations</td>
+    </tr>
+    <tr>
+      <td>ENABLE_SPQLIOS_AVX</td>
+      <td><em>on/off</em> compiles libtfhe-spqlios-avx.a, using tfhe’s dedicated avx assembly version for FFT computations</td>
+    </tr>
+    <tr>
+      <td>ENABLE_SPQLIOS_FMA</td>
+      <td><em>on/off</em> compiles libtfhe-spqlios-fma.a, using tfhe’s dedicated fma assembly version for FFT computations</td>
+    </tr>
+  </tbody>
+</table>
 
 ### References
 
-[DM15](): L. Ducas and D. Micciancio.  FHEW: Bootstrapping homomorphic
+[DM15](#): L. Ducas and D. Micciancio.  FHEW: Bootstrapping homomorphic
 encryption in less than a second.  In Eurocrypt 2015, pages 617-640.
 
-[GSW13]():  C. Gentry, A. Sahai, and B. Waters. Homomorphic encryption from
+[GSW13](#):  C. Gentry, A. Sahai, and B. Waters. Homomorphic encryption from
 learning with errors:  Conceptually-simpler,  asymptotically-faster,
 attribute-based. In Crypto 2013, pages 75-92
 
-[CGGI16](): I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. Faster fully homomorphic encryption: Bootstrapping in less than 0.1 seconds. Asiacrypt, To appear, 2016. Cryptology ePrint Archive, report 2016/870.
+[CGGI16](https://eprint.iacr.org/2016/870){:target="_blank"}: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. Faster fully homomorphic encryption: Bootstrapping in less than 0.1 seconds. Asiacrypt 2016. Cryptology ePrint Archive, report 2016/870.
 
-[HElib]: An Implementation of homomorphic encryption
-https://github.com/shaih/HElib
+[HElib](https://github.com/shaih/HElib){:target="_blank"}: An Implementation of homomorphic encryption
+[https://github.com/shaih/HElib](https://github.com/shaih/HElib){:target="_blank"}
