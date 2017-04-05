@@ -137,6 +137,9 @@ EXPORT void bootsMUX(LweSample* result, const LweSample* a, const LweSample* b, 
 //////////////////////////////////////////////////
 
 
+/** sets the seed of the random number generator to the given values */
+EXPORT void tfhe_random_generator_setSeed(uint32_t* values, int size);
+
 EXPORT void tfhe_blindRotate(TLweSample* accum, const TGswSample* bk, const int* bara, const int n, const TGswParams* bk_params);
 EXPORT void tfhe_blindRotateAndExtract(LweSample* result, const TorusPolynomial* v, const TGswSample* bk, const int barb, const int* bara, const int n, const TGswParams* bk_params);
 EXPORT void tfhe_bootstrap_woKS(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu, const LweSample* x);

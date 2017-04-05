@@ -12,6 +12,12 @@ default_random_engine generator;
 uniform_int_distribution<Torus32> uniformTorus32_distrib(INT32_MIN, INT32_MAX);
 uniform_int_distribution<int> uniformInt_distrib(INT_MIN, INT_MAX);
 
+/** sets the seed of the random number generator to the given values */
+EXPORT void tfhe_random_generator_setSeed(uint32_t* values, int size) {
+    seed_seq seeds(values, values+size);
+    generator.seed(seeds);
+}
+
 // Gaussian sample centered in message, with standard deviation sigma
 EXPORT Torus32 gaussian32(Torus32 message, double sigma){
     //Attention: all the implementation will use the stdev instead of the gaussian fourier param
