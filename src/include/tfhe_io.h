@@ -464,6 +464,38 @@ EXPORT TFheGateBootstrappingSecretKeySet* new_tfheGateBootstrappingSecretKeySet_
 
 #endif
 
+/* ****************************
+ * TFheGateBootstrappingCiphertext
+**************************** */
+
+/**
+ * This function prints a gate bootstrapping ciphertext to a file
+ * (wrapper to export LweSample)
+ */
+EXPORT void export_gate_bootstrapping_ciphertext_toFile(FILE* F, const LweSample* sample, const TFheGateBootstrappingParameterSet* params);
+
+/**
+ * This function reads a tfhe gate bootstrapping ciphertext from a File.
+ * wrapper to import LweSample
+ */
+EXPORT void import_gate_bootstrapping_ciphertext_fromFile(FILE* F, LweSample* sample, const TFheGateBootstrappingParameterSet* params);
+
+#ifdef __cplusplus
+
+/**
+ * This function prints a gate bootstrapping ciphertext to a file
+ * (wrapper to export LweSample)
+ */
+EXPORT void export_gate_bootstrapping_ciphertext_toStream(std::ostream& F, const LweSample* sample, const TFheGateBootstrappingParameterSet* params);
+
+/**
+ * This function reads a tfhe gate bootstrapping ciphertext from a File.
+ * wrapper to import LweSample
+ */
+EXPORT void import_gate_bootstrapping_ciphertext_fromStream(std::istream& F, LweSample* sample, const TFheGateBootstrappingParameterSet* params);
+
+#endif
+
 
 
 #endif // TFHE_IO_H
