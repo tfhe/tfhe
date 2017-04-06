@@ -3,6 +3,10 @@ layout: page
 title: TFHE Fast Fully Homomorphic Encryption over the Torus
 ---
 
+[back: installation](installation.html) - 
+[home](index.html) -
+[next: the full API](gate-bootstrapping-api.html) 
+
 # Using the library
 
 ## Generating and saving parameters and keys
