@@ -130,9 +130,13 @@ a {
 }
 
 .project-tagline {
-  //margin-bottom: 2rem;
+  margin-top: 5px;
+  margin-bottom: 5px;
   font-weight: normal;
   opacity: 0.7;
+  font-family: 'Indie Flower', cursive;
+  //font-family: 'Gloria Hallelujah', cursive;
+  //font-family: 'Dancing Script', cursive;
 
   @include large {
     font-size: 1.25rem;
@@ -155,7 +159,7 @@ a {
   }
 
   @include large {
-    max-width: 76rem;
+    max-width: 72rem;
     padding: 2rem 6rem;
     margin: 0 auto;
     font-size: 1.1rem;

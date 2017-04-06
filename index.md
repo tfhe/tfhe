@@ -1,4 +1,5 @@
 ---
+layout: default
 title: TFHE Fast Fully Homomorphic Encryption over the Torus
 ---
 
@@ -16,22 +17,22 @@ Ilaria Chillotti, Nicolas Gama, Mariya Georgieva and Malika Izabachène.
 
 ### Description 
 
-TFHE is a C/C++ library which implements a very fast gate-by-gate 
-bootstrapping, based on [CGGI16]. The library allows to evaluate an  
-arbitrary boolean circuit composed of binary gates, over encrypted 
-data, without revealing any information on the data.
+TFHE is a C/C++ library which implements a very fast gate-by-gate
+bootstrapping, based on [CGGI16]. The library allows to evaluate an
+arbitrary boolean circuit composed of binary gates, over encrypted data,
+without revealing any information on the data.
 
 The library supports the homomorphic evaluation of the 10 binary gates (And, Or, Xor, 
 Nand, Nor, etc...), as well as the negation and the Mux gate. Each binary gate takes 
 about 20 milliseconds single-core time to evaluate, which improves [DM15] by a factor 30, 
 and the mux gate takes about 40 CPU-ms.
 
-Unlike other libraries, the gate-bootstrapping mode of TFHE has no restriction on the 
-number of gates or on their composition. This allows to perform any
-computation over encrypted data, even if the actual function that will be applied is 
-not yet known when the data is encrypted. The library is easy to use with either
-manually crafted circuits, or with the output of automated circuit
-generation tools. 
+Unlike other libraries, the gate-bootstrapping mode of TFHE has no
+restriction on the number of gates or on their composition. This allows
+to perform any computation over encrypted data, even if the actual
+function that will be applied is not yet known when the data is
+encrypted. The library is easy to use with either manually crafted
+circuits, or with the output of automated circuit generation tools. 
 
 From the user point of view, the library can:
 * generate a secret-keyset and a cloud-keyset. The secret keyset is

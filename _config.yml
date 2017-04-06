@@ -17,14 +17,17 @@ title: TFHE
 email: nicolas.gama@gmail.com
 description: > # this means to ignore newlines until "baseurl:"
   A fast open-source library for fully homomorphic encryption. 
+description2: > # this means to ignore newlines until "baseurl:"
+    TFHE: A fast open-source library for fully homomorphic encryption. 
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 #twitter_username: 
 github_username:  tfhe
+show_downloads: true
 
 # Build settings
 markdown: kramdown
-theme: jekyll-theme-cayman
+#theme: jekyll-theme-cayman
 gems:
   - jekyll-feed
 exclude:

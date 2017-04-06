@@ -14,10 +14,11 @@
   </head>
   <body>
     <section class="page-header">
-      <img src="{{ '/assets/images/logo-tfhe.png' |  relative_url }}" style="width: 300px; ">
+      <img src="{{ '/assets/images/logo-tfhe.png' |  relative_url }}"
+      style="width: 145px; float: left">
       <!-- <h1 class="project-name">{{ site.title | default:
           site.github.repository_name }}</h1> -->
-      <h2 class="project-tagline">{{ site.description | default: site.github.project_tagline }}</h2>
+      <h2 class="project-tagline">{{ site.description2 | default: site.github.project_tagline }}</h2>
       {% if site.github.is_project_page %}
         <a href="{{ site.github.repository_url }}" class="btn">View on GitHub</a>
       {% endif %}
@@ -25,6 +26,7 @@
         <a href="{{ site.github.repository_url }}/zipball/master" class="btn">Download .zip</a>
         <a href="{{ site.github.repository_url }}/tarball/master" class="btn">Download .tar.gz</a>
       {% endif %}
+      <div style="clear: both; heigth:0.1px; margin: 0px; padding: 0px;"></div>
     </section>
 
     <section class="main-content">
