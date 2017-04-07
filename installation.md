@@ -3,7 +3,7 @@ layout: page
 title: TFHE Fast Fully Homomorphic Encryption over the Torus
 ---
 [back: homepage](index.html) -
-[next: installation](coding.html) 
+[next: using the library](usage.html) 
 
 # Installing the library
 
@@ -47,22 +47,25 @@ cd build
 ccmake ../src
 ~~~
 
-If you have a recent Core i7 processor, enabling the SPQLIOS_FMA version in
-optimized mode is very likely to be the fastest results. If you have an older
-CPU that do not support the latest FMA opcodes, you can revert to other fft
+From the configuration tool, you can choose your installation folder
+(```CMAKE_INSTALL_PREFIX```). The default is ```/usr/local```. 
+After compilation, all libraries will be installed to 
+```CMAKE_INSTALL_PREFIX/lib```, and headers will be installed to  
+```CMAKE_INSTALL_PREFIX/include```.
+
+You may then configure which fft processor to use. If you have a recent Core i7 
+processor, enabling the SPQLIOS_FMA version in optimized mode whil likely 
+give you the fastest running times. If you have an older
+CPU that does not support the latest FMA opcodes, you can revert to other fft
 processors. The nayuki-portable processor is slower, but will run on any
 hardware.
 
-Currently, only static libraries are generated. The default installation prefix
-(```CMAKE_INSTALL_PREFIX```) is ```/usr/local```. After compilation, all static libraries 
-will be installed to ```CMAKE_INSTALL_PREFIX/lib```, and headers will be installed to  
-```CMAKE_INSTALL_PREFIX/include```
+You may choose different or additional compile options (i.e. debug mode, 
+tests, fftw), which are described in the advanced section at the bottom
+of this page.
 
-If you want to choose different or additional compile options (i.e. debug mode, 
-tests, fftw), you need to run cmake manually and pass the desired options, which 
-are described in the advanced section below.
-
-Once you exit the configuration tool, you can build and install the library.
+Once you exit the configuration tool (by choosing congigure and generate of course),
+you can build and install the library.
 
 ~~~sh
 #build the library
@@ -72,40 +75,10 @@ make
 make install #(with sudo if the install prefix requires root) 
 ~~~
 
-## Using the library
+Once the installation is finished, you can start [using the library](usage.html).
 
-To use the library, you need to tell your compiler how to find the recently installed library and headers. 
-If you are using gcc/g++, you can do it on the current shell by setting these environment variables.
 
-~~~sh
-#configure environment variables
-TFHE_PREFIX=/usr/local #the prefix where you installed tfhe
-export LIBRARY_PATH=$LIBRARY_PATH:$TFHE_PREFIX/lib
-export C_INCLUDE_PATH=$C_INCLUDE_PATH:$TFHE_PREFIX/include
-export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$TFHE_PREFIX/include
-~~~
-
-To make these changes persistent, you may define these variables in your
-```.bashrc``` or ```.profile``` file.
-
-To compile a C++ file on the terminal that knows these environment variables,
-you can do
-
-~~~sh
-# compile a c++ source code
-g++ your-program.cpp -o your-program -ltfhe-spqlios-fma 
-~~~
-
-Finally, since tfhe uses c++ functions, even if you write C code that you separately compile with gcc, 
-you will need to link the final executable with g++. For instance,
-
-~~~sh
-# compile a c source code
-gcc -c your-program.c -o your-program.o
-g++ your-program.o -o your-program -ltfhe-spqlios-fma 
-~~~
-
-## advanced options
+## Advanced options (for expert users)
 
 The available build options are the following:
 
