@@ -22,7 +22,7 @@ Each of these three steps will be coded as a separate binary, and data that
 should be transmitted between programs will be saved and loaded in files.
 
 For a quick introduction, you may download the three ready to compile
-programs [here](asset/data/samples.tar.gz) and follow the explanations on
+programs [here](assets/data/samples.tar.gz) and follow the explanations on
 the next pages.
 
 [Step 1: alice.c](tuto-alice.html) - 
