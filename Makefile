@@ -7,6 +7,9 @@ CMAKE_OTESTS_OPTS=-DCMAKE_BUILD_TYPE=optim ${CMAKE_TESTS_OPTS}
 all: build
 	make -C build
 
+install: build
+	make -C build install
+
 clean: build
 	make -C build clean
 

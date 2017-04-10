@@ -2,6 +2,7 @@
 Fast Fully Homomorphic Encryption Library over the Torus
 
 **version 1.0-rc1** -- *first pre-release date: 2017.04.05*
+
 **version 0.1** -- *Proof of concept release date: 2016.08.18*
 
 TFHE is open-source software distributed under the terms of the Apache 2.0 license. 
