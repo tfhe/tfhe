@@ -1,6 +1,6 @@
 ---
 layout: page
-title: TFHE: Gate Bootstrapping API
+title: TFHE - Gate Bootstrapping API
 ---
 
 [back: tutorial](coding.html) - 

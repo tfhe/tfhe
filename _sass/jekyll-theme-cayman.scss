@@ -151,6 +151,29 @@ a {
   }
 }
 
+section.logos {
+    position: relative;
+    top: 50px;
+    height: 0px;
+
+  @include large {
+    max-width: 6rem;
+  }
+  @include medium {
+    max-width: 4rem;
+  }
+  @include small {
+    max-width: 1rem;
+  }
+}
+section.logos img {
+    display: block;
+    max-width: 100%; 
+    max-height: 50px;
+    margin-bottom: 10px;
+}
+
+
 .main-content {
   word-wrap: break-word;
 
