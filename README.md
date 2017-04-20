@@ -20,7 +20,7 @@ cryptosystem and makes many optimizations described in [DM15] and [CGGI16].
 
 It also implements a dedicated Fast Fourier
 Transformation for the anticyclic ring R[X]/(X^N+1), and uses AVX assembly vectorization instructions. 
-The default parameter set achieves a 130-bit cryptographic security, based on ideal lattice assumptions.
+The default parameter set achieves at least 110-bit of cryptographic security, based on ideal lattice assumptions.
 
 From the user point of view, the library can evaluate a net-list of binary gates homomorphically at a rate of about 50 gates per second per core, without decrypting its input. It suffices to provide the sequence of gates, as well as ciphertexts of the input bits. And the
 library computes ciphertexts of the output bits.
@@ -64,7 +64,7 @@ The available options are the following:
 
 | Variable Name          | values           | 
 |------------------------|-------|
-| CMAKE_INSTALL_PREFIX   | */usr/local* installation folder (libs go in lib/ and headers in include/ | 
+| CMAKE_INSTALL_PREFIX   | */usr/local* installation folder (libs go in lib/ and headers in include/) | 
 | CMAKE_BUILD_TYPE       | <ul><li>*optim* enables compiler's optimization flags, including native architecture specific optimizations</li><li>*debug* disables any optimization and include all debugging info (-g3 -O0)</li> | 
 | ENABLE_TESTS           | *on/off* compiles the library's unit tests and sample applications in the test/ folder. This assumes that googletest>1.8 is installed on the system. (use ```ctest``` to run all tests) | 
 | ENABLE_FFTW            | *on/off* compiles libtfhe-fftw.a, using FFTW3 (GPL licence) for fast FFT computations |
