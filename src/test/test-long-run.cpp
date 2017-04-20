@@ -18,6 +18,7 @@ using namespace std;
 
 
 int main(int argc, char** argv) {
+if (argc==2) srand(atoi(argv[1]));
 #ifndef NDEBUG
 cout << "DEBUG MODE!" << endl;
 #endif
