@@ -22,10 +22,6 @@
 
 @import url('https://fonts.googleapis.com/css?family=Dancing+Script|Gloria+Hallelujah|Indie+Flower');
 
-* {
-  box-sizing: border-box;
-}
-
 body {
   padding: 0;
   margin: 0;
@@ -155,15 +151,16 @@ section.logos {
     position: relative;
     top: 50px;
     height: 0px;
+    width: 10%;
 
   @include large {
-    max-width: 6rem;
+    max-width: 150px;
   }
   @include medium {
-    max-width: 4rem;
+    max-width: 150px;
   }
   @include small {
-    max-width: 1rem;
+    display: none;
   }
 }
 section.logos img {
@@ -182,20 +179,23 @@ section.logos img {
   }
 
   @include large {
-    max-width: 72rem;
-    padding: 2rem 6rem;
+    /* width: 73.3%; */
+    max-width: 1200px;
+    padding: 2rem 13.3% 2rem 13.3%;
     margin: 0 auto;
     font-size: 1.1rem;
   }
 
   @include medium {
-    padding: 2rem 4rem;
-    font-size: 1.1rem;
+    /* width: 84.6%; */
+    padding: 2rem 1rem 2rem 15.3%;
+    font-size: 1rem;
+    margin: 0 auto;
   }
 
   @include small {
-    padding: 2rem 1rem;
-    font-size: 1rem;
+    padding: 1rem 1rem;
+    font-size: 0.8rem;
   }
 
   img {
