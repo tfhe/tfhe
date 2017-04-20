@@ -49,247 +49,131 @@ cout << "DEBUG MODE!" << endl;
         int gate = rand()%11; // randomly chose a gate between the 10 binary gates and the MUX
         int in1, in2, in3, out; // indexes
         bool mess1, mess2, mess3, mess; // messages in clear
+        
+
+        // randomply chose 2 inputs and the output between the samples
+        in1 = rand()%nb_samples; 
+        in2 = rand()%nb_samples; 
+        in3 = rand()%nb_samples; 
+        out = rand()%nb_samples; 
+        // randomly apply a not to the inputs 
+        if (rand()%2 == 1){ bootsNOT(test+in1, test+in1, &keyset->cloud); }
+        if (rand()%2 == 1){ bootsNOT(test+in2, test+in2, &keyset->cloud); }
+        if (rand()%2 == 1){ bootsNOT(test+in3, test+in3, &keyset->cloud); }
+        // messages in input
+        mess1 = bootsSymDecrypt(test+in1, keyset);
+        mess2 = bootsSymDecrypt(test+in2, keyset);
+        mess3 = bootsSymDecrypt(test+in3, keyset);
+                
 
         switch(gate)
         {
             /** bootstrapped Nand Gate */ 
             // bootsNAND(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);
             case (0):
-                // randomply chose 2 inputs and the output between the samples
-                in1 = rand()%nb_samples; 
-                in2 = rand()%nb_samples; 
-                out = rand()%nb_samples; 
-                // messages in input
-                mess1 = bootsSymDecrypt(test+in1, keyset);
-                mess2 = bootsSymDecrypt(test+in2, keyset);
                 // test the gate 
                 bootsNAND(test+out, test+in1, test+in2, &keyset->cloud);
-                mess = bootsSymDecrypt(test+out, keyset);
-
-                // verification 
-                if (mess != 1 - (mess1 && mess2)){
-                    cout << "ERROR NAND!!! " << i << "," << t32tod(lwePhase(test+out, keyset->lwe_key)) << endl; 
-                }
+                mess = 1 - (mess1 && mess2);
                 break;
             
 
             /** bootstrapped Or Gate:  */ 
             // bootsOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);
             case (1):
-                // randomply chose 2 inputs and the output between the samples
-                in1 = rand()%nb_samples; 
-                in2 = rand()%nb_samples; 
-                out = rand()%nb_samples; 
-                // messages in input
-                mess1 = bootsSymDecrypt(test+in1, keyset);
-                mess2 = bootsSymDecrypt(test+in2, keyset);
                 // test the gate 
                 bootsOR(test+out, test+in1, test+in2, &keyset->cloud);
-                mess = bootsSymDecrypt(test+out, keyset);
-
-                // verification 
-                if (mess != mess1 || mess2){
-                    cout << "ERROR OR!!! " << i << "," << t32tod(lwePhase(test+out, keyset->lwe_key)) << endl; 
-                }
+                mess = (mess1 || mess2);
                 break;
 
 
             /** bootstrapped And Gate: result = a and b */ 
             // bootsAND(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);
             case (2):
-                // randomply chose 2 inputs and the output between the samples
-                in1 = rand()%nb_samples; 
-                in2 = rand()%nb_samples; 
-                out = rand()%nb_samples; 
-                // messages in input
-                mess1 = bootsSymDecrypt(test+in1, keyset);
-                mess2 = bootsSymDecrypt(test+in2, keyset);
                 // test the gate 
                 bootsAND(test+out, test+in1, test+in2, &keyset->cloud);
-                mess = bootsSymDecrypt(test+out, keyset);
-
-                // verification 
-                if (mess != mess1 && mess2){
-                    cout << "ERROR AND!!! " << i << "," << t32tod(lwePhase(test+out, keyset->lwe_key)) << endl; 
-                }
+                mess = (mess1 && mess2);
                 break;
 
 
             /** bootstrapped Xor Gate: result = a xor b */ 
             // bootsXOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);
             case (3):
-                // randomply chose 2 inputs and the output between the samples
-                in1 = rand()%nb_samples; 
-                in2 = rand()%nb_samples; 
-                out = rand()%nb_samples; 
-                // messages in input
-                mess1 = bootsSymDecrypt(test+in1, keyset);
-                mess2 = bootsSymDecrypt(test+in2, keyset);
                 // test the gate 
                 bootsXOR(test+out, test+in1, test+in2, &keyset->cloud);
-                mess = bootsSymDecrypt(test+out, keyset);
-
-                // verification 
-                if (mess != (mess1 ^ mess2)){
-                    cout << "ERROR XOR!!! " << i << "," << t32tod(lwePhase(test+out, keyset->lwe_key)) << endl; 
-                }
+                mess = (mess1 ^ mess2);
                 break;
 
 
             /** bootstrapped Xnor Gate: result = (a==b) */ 
             // bootsXNOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);
             case (4):
-                // randomply chose 2 inputs and the output between the samples
-                in1 = rand()%nb_samples; 
-                in2 = rand()%nb_samples; 
-                out = rand()%nb_samples; 
-                // messages in input
-                mess1 = bootsSymDecrypt(test+in1, keyset);
-                mess2 = bootsSymDecrypt(test+in2, keyset);
                 // test the gate 
                 bootsXNOR(test+out, test+in1, test+in2, &keyset->cloud);
-                mess = bootsSymDecrypt(test+out, keyset);
-
-                // verification 
-                if (mess != (mess1==mess2)){
-                    cout << "ERROR XNOR!!! " << i << "," << t32tod(lwePhase(test+out, keyset->lwe_key)) << endl; 
-                }
+                mess = (mess1==mess2);
                 break;
 
 
             /** bootstrapped Nor Gate: result = not(a or b) */ 
             // bootsNOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);
             case (5):
-                // randomply chose 2 inputs and the output between the samples
-                in1 = rand()%nb_samples; 
-                in2 = rand()%nb_samples; 
-                out = rand()%nb_samples; 
-                // messages in input
-                mess1 = bootsSymDecrypt(test+in1, keyset);
-                mess2 = bootsSymDecrypt(test+in2, keyset);
-                // test the gate 
+                 // test the gate 
                 bootsNOR(test+out, test+in1, test+in2, &keyset->cloud);
-                mess = bootsSymDecrypt(test+out, keyset);
-
-                // verification 
-                if (mess != 1 - (mess1 || mess2)){
-                    cout << "ERROR NOR!!! " << i << "," << t32tod(lwePhase(test+out, keyset->lwe_key)) << endl; 
-                }
+                mess = 1 - (mess1 || mess2);
                 break;
 
 
             /** bootstrapped AndNY Gate: not(a) and b */ 
             // bootsANDNY(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);
             case (6):
-                // randomply chose 2 inputs and the output between the samples
-                in1 = rand()%nb_samples; 
-                in2 = rand()%nb_samples; 
-                out = rand()%nb_samples; 
-                // messages in input
-                mess1 = bootsSymDecrypt(test+in1, keyset);
-                mess2 = bootsSymDecrypt(test+in2, keyset);
                 // test the gate 
                 bootsANDNY(test+out, test+in1, test+in2, &keyset->cloud);
-                mess = bootsSymDecrypt(test+out, keyset);
-
-                // verification 
-                if (mess != (1 - mess1) && mess2){
-                    cout << "ERROR ANDNY!!! " << i << "," << t32tod(lwePhase(test+out, keyset->lwe_key)) << endl; 
-                }
+                mess = ((1 - mess1) && mess2);
                 break;
 
 
             /** bootstrapped AndYN Gate: a and not(b) */ 
             // bootsANDYN(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);
             case (7):
-                // randomply chose 2 inputs and the output between the samples
-                in1 = rand()%nb_samples; 
-                in2 = rand()%nb_samples; 
-                out = rand()%nb_samples; 
-                // messages in input
-                mess1 = bootsSymDecrypt(test+in1, keyset);
-                mess2 = bootsSymDecrypt(test+in2, keyset);
                 // test the gate 
                 bootsANDYN(test+out, test+in1, test+in2, &keyset->cloud);
-                mess = bootsSymDecrypt(test+out, keyset);
-
-                // verification 
-                if (mess != mess1 && (1 - mess2)){
-                    cout << "ERROR ANDYN!!! " << i << "," << t32tod(lwePhase(test+out, keyset->lwe_key)) << endl; 
-                }
+                mess = (mess1 && (1 - mess2));
                 break;
 
 
             /** bootstrapped OrNY Gate: not(a) or b */ 
             // bootsORNY(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);
             case (8):
-                // randomply chose 2 inputs and the output between the samples
-                in1 = rand()%nb_samples; 
-                in2 = rand()%nb_samples; 
-                out = rand()%nb_samples; 
-                // messages in input
-                mess1 = bootsSymDecrypt(test+in1, keyset);
-                mess2 = bootsSymDecrypt(test+in2, keyset);
                 // test the gate 
                 bootsORNY(test+out, test+in1, test+in2, &keyset->cloud);
-                mess = bootsSymDecrypt(test+out, keyset);
-
-                // verification 
-                if (mess != (1 - mess1) || mess2){
-                    cout << "ERROR ORNY!!! " << i << "," << t32tod(lwePhase(test+out, keyset->lwe_key)) << endl; 
-                }
+                mess = ((1 - mess1) || mess2);
                 break;
 
 
             /** bootstrapped OrYN Gate: a or not(b) */ 
             // bootsORYN(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk);
             case (9):
-                // randomply chose 2 inputs and the output between the samples
-                in1 = rand()%nb_samples; 
-                in2 = rand()%nb_samples; 
-                out = rand()%nb_samples; 
-                // messages in input
-                mess1 = bootsSymDecrypt(test+in1, keyset);
-                mess2 = bootsSymDecrypt(test+in2, keyset);
                 // test the gate 
                 bootsORYN(test+out, test+in1, test+in2, &keyset->cloud);
-                mess = bootsSymDecrypt(test+out, keyset);
-
-                // verification 
-                if (mess != (mess1 || (1 - mess2))){
-                    cout << "ERROR ORYN!!! " << i << "," << t32tod(lwePhase(test+out, keyset->lwe_key)) << endl; 
-                }
+                mess = (mess1 || (1 - mess2));
                 break;
 
             
             /** bootstrapped Mux(a,b,c) = a?b:c */ 
             // bootsMUX(LweSample* result, const LweSample* a, const LweSample* b, const LweSample* c, const TFheGateBootstrappingCloudKeySet* bk);
             default:    
-                // randomply chose 2 inputs and the output between the samples
-                in1 = rand()%nb_samples; 
-                in2 = rand()%nb_samples; 
-                in3 = rand()%nb_samples; 
-                out = rand()%nb_samples; 
-                // messages in input
-                mess1 = bootsSymDecrypt(test+in1, keyset);
-                mess2 = bootsSymDecrypt(test+in2, keyset);
-                mess3 = bootsSymDecrypt(test+in3, keyset);
                 // test the gate 
                 bootsMUX(test+out, test+in1, test+in2, test+in3, &keyset->cloud);
-                mess = bootsSymDecrypt(test+out, keyset);
-
-                // verification 
-                if (mess != mess1?mess2:mess3){
-                    cout << "ERROR MUX!!! " << i << "," << t32tod(lwePhase(test+out, keyset->lwe_key)) << endl; 
-                }
+                mess = (mess1?mess2:mess3);   
         }
 
+        // verification 
+        if (bootsSymDecrypt(test+out, keyset) != mess){
+            cout << "ERROR!!! testing gate : " << gate << " at trial " << i << " - phase " << t32tod(lwePhase(test+out, keyset->lwe_key)) << endl; 
+        }
+        cout << "testing gate " << gate << " at trial " << i << " - phase " << t32tod(lwePhase(test+out, keyset->lwe_key)) << endl;
 
 
 
-
-        /** bootstrapped Not Gate: result = not(a) */ 
-        // EXPORT void bootsNOT(LweSample* result, const LweSample* ca, const TFheGateBootstrappingCloudKeySet* bk);
 
     }
 
