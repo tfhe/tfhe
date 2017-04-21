@@ -17,11 +17,15 @@ using namespace std;
 // **********************************************************************************
 
 
+
 int main(int argc, char** argv) {
-if (argc==2) srand(atoi(argv[1]));
-#ifndef NDEBUG
-cout << "DEBUG MODE!" << endl;
-#endif
+
+if (argc==2) {
+    uint32_t seed = atoi(argv[1]);
+    srand(seed);
+    tfhe_random_generator_setSeed(&seed, 1);
+} 
+
 
     static const int NAND_GATE = 0;
     static const int OR_GATE = 1;
