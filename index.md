@@ -9,14 +9,15 @@ title: TFHE Fast Fully Homomorphic Encryption over the Torus
 
 # TFHE: Fast Fully Homomorphic Encryption over the Torus
 
+**version 1.0-rc2** -- *second release candidate date: 2017.04.21*<br>
 **version 1.0-rc1** -- *first release candidate date: 2017.04.05*
 
 TFHE is an open-source library for fully homomorphic encryption, 
 distributed under the terms of the Apache 2.0 license. 
 
 The underlying scheme is described in best paper of the IACR
-conference Asiacrypt 2016: "Faster fully homomorphic encryption: 
-Bootstrapping in less than 0.1 seconds", presented by 
+conference Asiacrypt 2016: "*Faster fully homomorphic encryption: 
+Bootstrapping in less than 0.1 seconds*", presented by 
 Ilaria Chillotti, Nicolas Gama, Mariya Georgieva and Malika Izabachène.
 
 ### Description 
@@ -108,12 +109,13 @@ At least one FFT processor is needed to run the project:
 
 ### References
 
-[DM15](#): L. Ducas and D. Micciancio.  FHEW: Bootstrapping homomorphic
-encryption in less than a second.  In Eurocrypt 2015, pages 617-640.
+[[CGGI16]](https://eprint.iacr.org/2016/870){:target="_blank"}: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. *Faster fully homomorphic encryption: Bootstrapping in less than 0.1 seconds*. Asiacrypt 2016. Cryptology ePrint Archive, report 2016/870.
 
-[GSW13](#):  C. Gentry, A. Sahai, and B. Waters. Homomorphic encryption from
+[[DM15]](https://eprint.iacr.org/2014/816){:target="_blank"}: L. Ducas and D. Micciancio.  *FHEW: Bootstrapping homomorphic
+encryption in less than a second*.  In Eurocrypt 2015, pages 617-640.
+
+[[GSW13]](https://eprint.iacr.org/2013/340){:target="_blank"}:  C. Gentry, A. Sahai, and B. Waters. *Homomorphic encryption from
 learning with errors:  Conceptually-simpler,  asymptotically-faster,
-attribute-based. In Crypto 2013, pages 75-92
+attribute-based.* In Crypto 2013, pages 75-92
 
-[CGGI16](https://eprint.iacr.org/2016/870){:target="_blank"}: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. Faster fully homomorphic encryption: Bootstrapping in less than 0.1 seconds. Asiacrypt 2016. Cryptology ePrint Archive, report 2016/870.
 
