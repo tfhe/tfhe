@@ -170,6 +170,54 @@ section.logos img {
     margin-bottom: 10px;
 }
 
+section.navigation {
+    nav {
+        display: block;
+        @include large {
+            /* width: 73.3%; */
+            max-width: 1200px;
+            padding: 0px 13.3% 0px 13.3%;
+            margin: 0 auto;
+            font-size: 1.1rem;
+        }
+
+        @include medium {
+            /* width: 84.6%; */
+            padding: 0px 1rem 0px 15.3%;
+            font-size: 1rem;
+            margin: 0 auto;
+        }
+
+        @include small {
+            padding: 0px 1rem;
+            font-size: 0.8rem;
+        }
+    }
+    nav>ul {
+        display: block;
+        margin: 0px;
+        padding: 0px;
+        height: 1.5em;
+    }
+    nav>ul>li {
+        display: inline-block;
+        vertical-align: top;
+        position: relative;
+    }
+    nav>ul>li:not(:first-child):before {
+        content: " - ";
+    }
+    nav>ul>li>ul {
+        display: none;
+    }
+    nav>ul>li:hover>ul {
+        display: block;
+        position: absolute;
+        background-color: $body-background-color;
+        border: thin black outset;
+        width: 20rem;
+    }
+}
 
 .main-content {
   word-wrap: break-word;
