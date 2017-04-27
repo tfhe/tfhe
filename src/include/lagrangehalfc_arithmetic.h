@@ -30,8 +30,10 @@ EXPORT void LagrangeHalfCPolynomialClear(LagrangeHalfCPolynomial* result);
 EXPORT void LagrangeHalfCPolynomialSetTorusConstant(LagrangeHalfCPolynomial* result, const Torus32 mu);
 EXPORT void LagrangeHalfCPolynomialAddTorusConstant(LagrangeHalfCPolynomial* result, const Torus32 cst);
 
-/** sets to X^ai-1 */
-EXPORT void LagrangeHalfCPolynomialSetXaiMinusOne(LagrangeHalfCPolynomial* result, const int ai);
+// /* sets to X^ai-1 */
+//This function is commented, because it is not used 
+//in the current version. However, it may be included in future releases
+//EXPORT void LagrangeHalfCPolynomialSetXaiMinusOne(LagrangeHalfCPolynomial* result, const int ai);
 
 
 /** multiplication via direct FFT */
