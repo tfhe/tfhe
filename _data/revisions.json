@@ -1,0 +1,17 @@
+[
+    {
+        "name": "v1.0-rc2",
+        "title": "Second release candidate",
+        "date": "2017.04.21"
+    },
+    {
+        "name": "v1.0-rc1",
+        "title": "First release candidate",
+        "date": "2017.04.05"
+    },
+    {
+        "name": "v0.1",
+        "title": "Proof of Concept",
+        "date": "2016.08.10"
+    }
+]

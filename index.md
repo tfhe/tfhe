@@ -9,8 +9,11 @@ title: TFHE Fast Fully Homomorphic Encryption over the Torus
 
 # TFHE: Fast Fully Homomorphic Encryption over the Torus
 
-**version 1.0-rc2** -- *second release candidate date: 2017.04.21*<br>
-**version 1.0-rc1** -- *first release candidate date: 2017.04.05*
+<div>
+{% for release in site.data.revisions %}
+<strong>{{ release.name }}</strong> -- <em>{{ release.title }}</em>, date: {{ release.date }}<br>
+{% endfor %}
+</div>
 
 TFHE is an open-source library for fully homomorphic encryption, 
 distributed under the terms of the Apache 2.0 license. 
@@ -91,8 +94,6 @@ At least one FFT processor is needed to run the project:
 * we provide another processor, named the spqlios processor, which is
   written in AVX and FMA assembly in the style of the nayuki processor,
   and which is dedicated to the ring \\(\mathbb{R}[X]/(X^N+1)\\) for \\(N\\) a power of 2.
-
-<!--
 * We also provide a connector for the FFTW3 library: http://www.fftw.org.
   With this library, the performance of the FFT is between 2 and 3 times
   faster than the default Nayuki implementation. However, you should keep
@@ -100,8 +101,6 @@ At least one FFT processor is needed to run the project:
   choose to use this library in a final product, this product may have to
   be released under GPL License as well (other commercial licenses are
   available on their web site)
--->
-
 * We plan to add other connectors in the future (for instance the Intel’s
   IPP Fourier Transform, which should be 1.5× faster than FFTW for 1D
   real data)
