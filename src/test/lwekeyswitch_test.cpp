@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-//#include <gmock/gmock.h>
 #include "lwe-functions.h"
 #include "lwekeyswitch.h"
 #include "numeric_functions.h"
