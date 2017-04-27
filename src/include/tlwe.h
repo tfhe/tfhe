@@ -5,7 +5,6 @@
 ///@brief This file contains the declaration of tlwe structures
 
 #include "tfhe_core.h"
-#include "polynomials.h"
 #include "lweparams.h"
 
 struct TLweParams {

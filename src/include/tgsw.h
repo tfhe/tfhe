@@ -6,7 +6,6 @@
 
 #include "tfhe_core.h"
 #include "tlwe.h"
-#include "polynomials.h"
 
 struct TGswParams {
     const int l; ///< decomp length

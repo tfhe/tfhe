@@ -8,7 +8,7 @@
 #error This file should only be included in a C++ file, for internal use only
 #endif
 #include <vector>
-#include "tfhe.h"
+#include "tfhe_core.h"
 
 /**
  * this class implements a simple garbage collector for simple parameter pointers
