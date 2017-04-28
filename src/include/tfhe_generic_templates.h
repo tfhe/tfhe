@@ -1,6 +1,9 @@
 #ifndef TFHE_GENERIC_TEMPLATES
 #define TFHE_GENERIC_TEMPLATES
 
+///@file
+///@brief macros for generic constructors/destructors
+
 #ifdef __cplusplus
 
 namespace tfhe {

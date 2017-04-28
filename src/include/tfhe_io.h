@@ -4,16 +4,10 @@
 ///@brief This file declares the Input/Output functions
 
 #include "tfhe_core.h"
-#include "lwekey.h"
-#include "lweparams.h"
-#include "lwesamples.h"
-#include "tlwe.h"
-#include "tgsw.h"
-#include "tfhe.h" //TODO proprify dependencies
 
 #ifdef __cplusplus
 #include <cstdio>
-#include <iostream>
+#include <iosfwd>
 #else
 #include <stdio.h>
 #endif
