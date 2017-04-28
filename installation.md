@@ -1,9 +1,9 @@
 ---
 layout: page
 title: TFHE Fast Fully Homomorphic Encryption over the Torus
+previousPage: index.html
+nextPage: usage.html
 ---
-[back: homepage](index.html) -
-[next: using the library](usage.html) 
 
 # Installing the library
 

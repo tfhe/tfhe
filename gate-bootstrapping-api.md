@@ -1,10 +1,8 @@
 ---
 layout: page
 title: TFHE - Gate Bootstrapping API
+previousPage: usage.html
 ---
-
-[back: tutorial](coding.html) - 
-[home](index.html) -
 
 # The Gate Bootstrapping API
 

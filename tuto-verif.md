@@ -1,15 +1,9 @@
 ---
 layout: page
 title: TFHE Fast Fully Homomorphic Encryption over the Torus
+previousPage: tuto-cloud.html
+nextPage: gate-bootstrapping-api.html
 ---
-
-[back: using the library](usage.html) - 
-[home](index.html) -
-[tutorial intro](coding.html) - 
-[Step 1: alice.c](tuto-alice.html) - 
-[Step 2: cloud.c](tuto-cloud.html) - 
-[Step 3: verif.c](tuto-verif.html) - 
-[the full API](gate-bootstrapping-api.html) 
 
 ## reading and decrypting the final result
 

@@ -3,10 +3,6 @@ layout: default
 title: TFHE Fast Fully Homomorphic Encryption over the Torus
 ---
 
-[Installation](installation.html) - 
-[Tutorial](coding.html) - 
-[API](gate-bootstrapping-api.html)
-
 # TFHE: Fast Fully Homomorphic Encryption over the Torus
 
 <div>

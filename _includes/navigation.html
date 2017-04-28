@@ -1,0 +1,24 @@
+<section class="navigation">
+    <nav>
+        <ul>
+            {% for topic in site.data.navigation %}
+            <li><a href="{{ topic.url }}">{{ topic.topic }}</a>
+                {% if topic.subtopics %}
+                <ul>
+                    {% for subtopic in topic.subtopics %}
+                    <li><a href="{{ subtopic.url }}">{{ subtopic.topic }}</a></li>
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </li>
+            {% endfor %}
+            {% if page.previousPage %}
+            <li><a href="{{ page.previousPage }}">Prev</a></li>
+            {% endif %}
+            {% if page.nextPage %}
+            <li><a href="{{ page.nextPage }}">Next</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+</section>
+
