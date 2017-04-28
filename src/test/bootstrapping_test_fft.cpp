@@ -1,5 +1,4 @@
 #include <gtest/gtest.h>
-//#include <gmock/gmock.h>
 #include "tfhe.h"
 #include "fakes/tgsw.h"
 #include "fakes/tgsw-fft.h"

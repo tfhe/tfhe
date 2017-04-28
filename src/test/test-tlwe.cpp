@@ -21,7 +21,7 @@ double approxEquals(Torus32 a, Torus32 b) { return abs(a-b)<10; }
 int main(int argc, char** argv) {
     for (int i=0; i<20000; i++) uniformTorus32_distrib(generator); // Ila ?????
     
-    const int N = 512;
+    const int N = 1024;
     const int k = 2;
     const int alpha_min = 0.01;
     const int alpha_max = 0.071;
