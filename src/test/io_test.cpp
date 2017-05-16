@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include <tfhe_io.h>
+#include <tfhe.h>
 #include <set>
 #include <tfhe_generic_streams.h>
 #include <tfhe_garbage_collector.h>

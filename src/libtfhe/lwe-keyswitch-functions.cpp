@@ -61,7 +61,7 @@ void lweKeySwitchTranslate_fromArray(LweSample* result,
 	const uint32_t aibar=ai[i]+prec_offset;
 	for (int j=0;j<t;j++){
 	    const uint32_t aij=(aibar>>(32-(j+1)*basebit)) & mask;
-	    lweSubTo(result,&ks[i][j][aij],params);
+	    if(aij != 0) {lweSubTo(result,&ks[i][j][aij],params);}
 	}
     }
 }

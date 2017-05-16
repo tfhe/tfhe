@@ -40,17 +40,14 @@ struct TGswParams;
 struct TGswKey;
 struct TGswSample;
 struct TGswSampleFFT;
-// *** ()
 struct LweBootstrappingKey;
 struct LweBootstrappingKeyFFT;
-// * ()
 struct IntPolynomial;
 struct TorusPolynomial;
 struct LagrangeHalfCPolynomial;
-// **** Ilaria (Platinum)
-struct SemiTGswParams;
-struct SemiTGswKey;
-struct SemiTGswSample;
+struct TFheGateBootstrappingParameterSet;
+struct TFheGateBootstrappingCloudKeySet;
+struct TFheGateBootstrappingSecretKeySet;
 
 //this is for compatibility with C code, to be able to use
 //"LweParams" as a type and not "struct LweParams"
@@ -71,8 +68,8 @@ typedef struct LweBootstrappingKeyFFT LweBootstrappingKeyFFT;
 typedef struct IntPolynomial	   IntPolynomial;
 typedef struct TorusPolynomial	   TorusPolynomial;
 typedef struct LagrangeHalfCPolynomial	   LagrangeHalfCPolynomial;
-typedef struct SemiTGswParams   SemiTGswParams;
-typedef struct SemiTGswKey      SemiTGswKey;
-typedef struct SemiTGswSample   SemiTGswSample;
+typedef struct TFheGateBootstrappingParameterSet TFheGateBootstrappingParameterSet;
+typedef struct TFheGateBootstrappingCloudKeySet TFheGateBootstrappingCloudKeySet;
+typedef struct TFheGateBootstrappingSecretKeySet TFheGateBootstrappingSecretKeySet;
 
 #endif //TFHE_CORE_H

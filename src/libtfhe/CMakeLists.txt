@@ -30,6 +30,7 @@ set(SRCS
     tfhe_generic_streams.cpp
     tfhe_garbage_collector.cpp
     tfhe_gate_bootstrapping.cpp
+    tfhe_gate_bootstrapping_structures.cpp
     )
 
 

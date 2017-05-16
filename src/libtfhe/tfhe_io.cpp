@@ -2,8 +2,14 @@
 #include <tfhe_io.h>
 #include <map>
 #include <string>
-#include <tfhe_generic_streams.h>
-#include <tfhe_garbage_collector.h>
+#include "tfhe_generic_streams.h"
+#include "tfhe_garbage_collector.h"
+#include "lwe-functions.h"
+#include "lwekeyswitch.h"
+#include "tlwe_functions.h"
+#include "tgsw_functions.h"
+#include "polynomials_arithmetic.h"
+#include "tfhe_gate_bootstrapping_structures.h"
 
 using namespace std;
 #else
