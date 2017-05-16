@@ -26,7 +26,7 @@ EXPORT TFheGateBootstrappingParameterSet* new_default_gate_bootstrapping_paramet
     static const int N = 1024;
     static const int k = 1;
     static const int n = 500;
-    static const int bk_l = 3;
+    static const int bk_l = 2;
     static const int bk_Bgbit = 10;
     static const int ks_basebit = 1;
     static const int ks_length = 15;
