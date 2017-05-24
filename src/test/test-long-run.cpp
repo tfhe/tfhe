@@ -178,7 +178,7 @@ if (argc==2) {
 
         // verification 
         if (bootsSymDecrypt(test+out, keyset) != mess){
-            cerr << i << " " << gate << " " << t32tod(lwePhase(test+out, keyset->lwe_key) - (mess?MU:(-MU))) << endl; 
+            cerr << "ERROR!!!" << i << " " << gate << " " << t32tod(lwePhase(test+out, keyset->lwe_key) - (mess?MU:(-MU))) << endl; 
         }
         cout << i << " " << gate << " " << t32tod(lwePhase(test+out, keyset->lwe_key) - (mess?MU:(-MU))) << endl;
 

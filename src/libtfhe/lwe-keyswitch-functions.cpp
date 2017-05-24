@@ -2,12 +2,80 @@
 #include <iostream>
 #include "lwe-functions.h"
 #include "lwekeyswitch.h"
+#include "numeric_functions.h"
+
 
 using namespace std;
 #else
 #undef EXPORT
 #define EXPORT
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void renormalizeKSkey(LweKeySwitchKey* ks, const LweKey* out_key, const int* in_key){
+    const int n = ks->n;
+    const int basebit = ks->basebit;
+    const int t = ks->t;
+    const int base = 1<<basebit; 
+
+    Torus32 phase;
+    Torus32 temp_err; 
+    Torus32 error = 0;
+    // double err_norm = 0; 
+
+    // compute the average error
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < t; ++j) {
+            for (int h = 1; h < base; ++h) { // pas le terme en 0
+                // compute the phase 
+                phase = lwePhase(&ks->ks[i][j][h], out_key);
+                // compute the error 
+                Torus32 x = (in_key[i]*h)*(1<<(32-(j+1)*basebit));
+                temp_err = phase - x;
+                // sum all errors 
+                error += temp_err;
+            }
+        }
+    }
+    int nb = n*t*(base-1); 
+    error = dtot32(t32tod(error)/nb);
+
+    // relinearize
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < t; ++j) {
+            for (int h = 1; h < base; ++h) { // pas le terme en 0
+                ks->ks[i][j][h].b -= error;                
+            }
+        }
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * fills the KeySwitching key array
@@ -79,6 +147,9 @@ EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key,
     lweCreateKeySwitchKey_fromArray(result->ks,
 	    out_key, out_key->params->alpha_min,
 	    in_key->key, n, t, basebit);
+
+    // renormalize
+    renormalizeKSkey(result, out_key, in_key->key); // ILA: reverifier 
 }
 
 //sample=(a',b')
@@ -174,5 +245,7 @@ EXPORT void delete_LweKeySwitchKey_array(int nbelts, LweKeySwitchKey* obj) {
     destroy_LweKeySwitchKey_array(nbelts,obj);
     free_LweKeySwitchKey_array(nbelts,obj);
 }
+
+
 
 

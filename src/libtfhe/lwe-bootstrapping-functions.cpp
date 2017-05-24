@@ -180,6 +180,10 @@ EXPORT void tfhe_bootstrap(LweSample* result,
 }
 #endif
 
+
+
+
+
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_CREATEBOOTSTRAPPINGKEY
 #undef INCLUDE_TFHE_CREATEBOOTSTRAPPINGKEY
 EXPORT void tfhe_createLweBootstrappingKey(
@@ -213,6 +217,7 @@ EXPORT void tfhe_createLweBootstrappingKey(
     for (int i=0; i<n; i++) {
 	tGswSymEncryptInt(&bk->bk[i], kin[i], alpha, rgsw_key);
     }
+
 }
 #endif
 
