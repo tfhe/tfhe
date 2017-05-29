@@ -130,7 +130,7 @@ void lweKeySwitchTranslate_fromArray(LweSample* result,
 
 
 
-EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key){
+EXPORT void lweCreateKeySwitchKey_old(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key){
     const int n=result->n;
     const int basebit=result->basebit;
     const int t=result->t;
@@ -160,7 +160,7 @@ Create the key switching key: normalize the error in the beginning
  * recenter the noises 
  * generate the ks by creating noiseless encryprions and then add the noise
 */
-EXPORT void lweCreateKeySwitchKey_new(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key){
+EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key){
     const int n = result->n;
     const int t = result->t;
     const int basebit = result->basebit;
