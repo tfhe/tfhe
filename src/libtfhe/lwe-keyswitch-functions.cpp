@@ -166,7 +166,7 @@ EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key,
     const int basebit = result->basebit;
     const int base = 1<<basebit;
     const double alpha = out_key->params->alpha_min;
-    const int sizeks = n*t*base;
+    const int sizeks = n*t*(base-1);
     const int n_out = out_key->params->n;
 
     double err = 0;
@@ -187,6 +187,11 @@ EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key,
     int index = 0; 
     for (int i = 0; i < n; ++i) {
         for (int j = 0; j < t; ++j) {
+
+            // term h=0 as trivial encryption of 0 (it will not be used in the KeySwitching)
+            lweNoiselessTrivial(&result->ks[i][j][0], 0, out_key->params);
+            //lweSymEncrypt(&result->ks[i][j][0],0,alpha,out_key);
+
             for (int h = 1; h < base; ++h) { // pas le terme en 0
                 // noiseless encryption
                 result->ks[i][j][h].b = (in_key->key[i]*h)*(1<<(32-(j+1)*basebit));
@@ -201,7 +206,8 @@ EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key,
         }
     }
 
-    delete noise; 
+
+    delete[] noise; 
 }
 
 
