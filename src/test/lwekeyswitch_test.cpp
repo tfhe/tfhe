@@ -132,13 +132,13 @@ namespace {
 		dec += rec;
 	    }
 	    ASSERT_EQ(dec,aibar[i]);
-	    ASSERT_NEAR(alpha*alpha*(i+1)*t,res->current_variance,1e-10);
+	    ASSERT_LE(res->current_variance,alpha*alpha*(i+1)*t+1e-10);
 	    ASSERT_EQ(barphi,res->b);
 	}
 	//now, test it all at once
 	lweNoiselessTrivial(res,b,params500_1em5);
 	lweKeySwitchTranslate_fromArray(res, (const LweSample***) test->ks,params500_1em5,ai,N,t,basebit);
-	ASSERT_NEAR(alpha*alpha*N*t,res->current_variance,1e-10);
+	ASSERT_LE(res->current_variance,alpha*alpha*N*t+1e-10);
 	ASSERT_EQ(barphi,res->b);
 	delete[] in_key;
 	delete[] ai;
