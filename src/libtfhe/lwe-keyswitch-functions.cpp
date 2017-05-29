@@ -3,6 +3,7 @@
 #include "lwe-functions.h"
 #include "lwekeyswitch.h"
 #include "numeric_functions.h"
+#include <random>
 
 
 using namespace std;
@@ -15,17 +16,10 @@ using namespace std;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+/*
+Renormalization of KS
+ * compute the error of the KS that has been generated and translate the ks to recenter the gaussian in 0
+*/
 void renormalizeKSkey(LweKeySwitchKey* ks, const LweKey* out_key, const int* in_key){
     const int n = ks->n;
     const int basebit = ks->basebit;
@@ -151,6 +145,74 @@ EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key,
     // renormalize
     renormalizeKSkey(result, out_key, in_key->key); // ILA: reverifier 
 }
+
+
+
+
+
+
+
+
+
+/*
+Create the key switching key: normalize the error in the beginning
+ * chose a random vector of gaussian noises (same size as ks) 
+ * recenter the noises 
+ * generate the ks by creating noiseless encryprions and then add the noise
+*/
+EXPORT void lweCreateKeySwitchKey_new(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key){
+    const int n = result->n;
+    const int t = result->t;
+    const int basebit = result->basebit;
+    const int base = 1<<basebit;
+    const double alpha = out_key->params->alpha_min;
+    const int sizeks = n*t*base;
+    const int n_out = out_key->params->n;
+
+    double err = 0;
+
+    // chose a random vector of gaussian noises
+    double* noise = new double[sizeks];
+    for (int i = 0; i < sizeks; ++i){
+        normal_distribution<double> distribution(0.,alpha); 
+        noise[i] = distribution(generator);
+        err += noise[i];
+    }
+    // recenter the noises
+    err = err/sizeks;
+    for (int i = 0; i < sizeks; ++i) noise[i] -= err;
+
+
+    // generate the ks
+    int index = 0; 
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < t; ++j) {
+            for (int h = 1; h < base; ++h) { // pas le terme en 0
+                // noiseless encryption
+                result->ks[i][j][h].b = (in_key->key[i]*h)*(1<<(32-(j+1)*basebit));
+                for (int p = 0; p < n_out; ++p) {
+                    result->ks[i][j][h].a[p] = uniformTorus32_distrib(generator);
+                    result->ks[i][j][h].b += result->ks[i][j][h].a[p] * out_key->key[p];
+                }
+                // add the noise 
+                result->ks[i][j][h].b += dtot32(noise[index]);
+                index += 1;
+            }
+        }
+    }
+
+    delete noise; 
+}
+
+
+
+
+
+
+
+
+
+
 
 //sample=(a',b')
 EXPORT void lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, const LweSample* sample){

@@ -67,7 +67,7 @@ EXPORT void lweSubMulTo(LweSample* result, int p, const LweSample* sample, const
  * creates a Key Switching Key between the two keys
  */
 EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key);
-
+EXPORT void lweCreateKeySwitchKey_new(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key);
 
 /**
  * applies keySwitching

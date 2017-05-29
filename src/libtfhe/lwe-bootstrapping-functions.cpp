@@ -202,7 +202,7 @@ EXPORT void tfhe_createLweBootstrappingKey(
     const TLweKey* accum_key = &rgsw_key->tlwe_key;
     LweKey* extracted_key = new_LweKey(extract_params);
     tLweExtractKey(extracted_key, accum_key);
-    lweCreateKeySwitchKey(bk->ks, extracted_key, key_in);
+    lweCreateKeySwitchKey_new(bk->ks, extracted_key, key_in);
     delete_LweKey(extracted_key);
 
     //TGswSample* bk; ///< the bootstrapping key (s->s")
