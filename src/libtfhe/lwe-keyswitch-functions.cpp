@@ -167,7 +167,7 @@ EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key,
     const int base = 1<<basebit;
     const double alpha = out_key->params->alpha_min;
     const int sizeks = n*t*(base-1);
-    const int n_out = out_key->params->n;
+    //const int n_out = out_key->params->n;
 
     double err = 0;
 
@@ -193,6 +193,7 @@ EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key,
             //lweSymEncrypt(&result->ks[i][j][0],0,alpha,out_key);
 
             for (int h = 1; h < base; ++h) { // pas le terme en 0
+                /*
                 // noiseless encryption
                 result->ks[i][j][h].b = (in_key->key[i]*h)*(1<<(32-(j+1)*basebit));
                 for (int p = 0; p < n_out; ++p) {
@@ -201,6 +202,9 @@ EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key,
                 }
                 // add the noise 
                 result->ks[i][j][h].b += dtot32(noise[index]);
+                */
+                Torus32 mess = (in_key->key[i]*h)*(1<<(32-(j+1)*basebit));
+                lweSymEncryptWithExternalNoise(&result->ks[i][j][h], mess, noise[index], alpha, out_key);
                 index += 1;
             }
         }

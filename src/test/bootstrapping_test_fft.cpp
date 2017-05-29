@@ -397,6 +397,10 @@ class TfheInitLweBootstrappingKeyFFTTest: public ::testing::Test {
         USE_FAKE_tGswToFFTConvert;
         USE_FAKE_lweSymEncrypt;
         USE_FAKE_tGswSymEncryptInt;
+        // because of new create KS key
+        USE_FAKE_lweSymEncryptWithExternalNoise;
+        USE_FAKE_lweNoiselessTrivial;
+        USE_FAKE_lwePhase;
 
     #define INCLUDE_TFHE_INIT_LWEBOOTSTRAPPINGKEY_FFT
     #define INCLUDE_TFHE_CREATEBOOTSTRAPPINGKEY

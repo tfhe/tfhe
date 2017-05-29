@@ -182,6 +182,20 @@ inline void fake_lweSymEncrypt(LweSample* result, Torus32 message, double alpha,
 
 
 
+// Fake symetric encryption with external noise of a Torus message
+inline void fake_lweSymEncryptWithExternalNoise(LweSample* result, Torus32 message, double noise, double alpha, const LweKey* key) {
+    FakeLwe* fres = fake(result);
+    fres->message = message;
+    fres->current_variance = alpha*alpha; 
+}
+
+#define USE_FAKE_lweSymEncryptWithExternalNoise \
+    inline void lweSymEncryptWithExternalNoise(LweSample* result, Torus32 message, double noise, double alpha, const LweKey* key) { \
+    return fake_lweSymEncryptWithExternalNoise(result,message,noise,alpha,key); \
+}
+
+
+
 // Noiseless trivial of a Torus message
 inline void fake_lweNoiselessTrivial(LweSample* result, Torus32 message, const LweParams* params) {
     FakeLwe* fres = fake(result);
@@ -193,6 +207,21 @@ inline void fake_lweNoiselessTrivial(LweSample* result, Torus32 message, const L
     static inline void lweNoiselessTrivial(LweSample* result, Torus32 message, const LweParams* params) { \
     return fake_lweNoiselessTrivial(result,message,params); \
 }
+
+
+
+
+
+// phase 
+inline Torus32 fake_lwePhase(const LweSample* sample, const LweKey* key) {
+    return sample->b; 
+}
+
+#define USE_FAKE_lwePhase \
+    static inline Torus32 lwePhase(const LweSample* sample, const LweKey* key) { \
+    return fake_lwePhase(sample,key); \
+}
+
 
 
 
