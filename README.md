@@ -1,6 +1,8 @@
 # tfhe
 Fast Fully Homomorphic Encryption Library over the Torus
 
+**version 1.0** -- *first release date: 2017.05.02*
+
 **version 1.0-rc1** -- *first pre-release date: 2017.04.05*
 
 **version 0.1** -- *Proof of concept release date: 2016.08.18*
@@ -12,8 +14,8 @@ The scheme is described in the paper "Faster fully homomorphic encryption: Boots
 ### Description 
 
 The TFHE library implements a very fast gate-by-gate bootstrapping, based on [CGGI16]. Namely, any binary 
-gate is evaluated homomorphically in about 20 milliseconds on a single
-core which improves [DM15] by a factor 30, and the mux gate takes about 40 CPU-ms (or 20ms on 2 cores). 
+gate is evaluated homomorphically in about 13 milliseconds on a single
+core which improves [DM15] by a factor 50, and the mux gate takes about 26 CPU-ms (or 13ms on 2 cores). 
 
 The library implements a Ring-variant of the GSW [GSW13]
 cryptosystem and makes many optimizations described in [DM15] and [CGGI16]. 
