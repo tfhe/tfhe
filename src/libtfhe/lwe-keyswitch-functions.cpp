@@ -2,12 +2,74 @@
 #include <iostream>
 #include "lwe-functions.h"
 #include "lwekeyswitch.h"
+#include "numeric_functions.h"
+#include <random>
+
 
 using namespace std;
 #else
 #undef EXPORT
 #define EXPORT
 #endif
+
+
+
+
+
+/*
+Renormalization of KS
+ * compute the error of the KS that has been generated and translate the ks to recenter the gaussian in 0
+*/
+void renormalizeKSkey(LweKeySwitchKey* ks, const LweKey* out_key, const int* in_key){
+    const int n = ks->n;
+    const int basebit = ks->basebit;
+    const int t = ks->t;
+    const int base = 1<<basebit; 
+
+    Torus32 phase;
+    Torus32 temp_err; 
+    Torus32 error = 0;
+    // double err_norm = 0; 
+
+    // compute the average error
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < t; ++j) {
+            for (int h = 1; h < base; ++h) { // pas le terme en 0
+                // compute the phase 
+                phase = lwePhase(&ks->ks[i][j][h], out_key);
+                // compute the error 
+                Torus32 x = (in_key[i]*h)*(1<<(32-(j+1)*basebit));
+                temp_err = phase - x;
+                // sum all errors 
+                error += temp_err;
+            }
+        }
+    }
+    int nb = n*t*(base-1); 
+    error = dtot32(t32tod(error)/nb);
+
+    // relinearize
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < t; ++j) {
+            for (int h = 1; h < base; ++h) { // pas le terme en 0
+                ks->ks[i][j][h].b -= error;                
+            }
+        }
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * fills the KeySwitching key array
@@ -61,14 +123,14 @@ void lweKeySwitchTranslate_fromArray(LweSample* result,
 	const uint32_t aibar=ai[i]+prec_offset;
 	for (int j=0;j<t;j++){
 	    const uint32_t aij=(aibar>>(32-(j+1)*basebit)) & mask;
-	    lweSubTo(result,&ks[i][j][aij],params);
+	    if(aij != 0) {lweSubTo(result,&ks[i][j][aij],params);}
 	}
     }
 }
 
 
 
-EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key){
+EXPORT void lweCreateKeySwitchKey_old(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key){
     const int n=result->n;
     const int basebit=result->basebit;
     const int t=result->t;
@@ -79,7 +141,88 @@ EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key,
     lweCreateKeySwitchKey_fromArray(result->ks,
 	    out_key, out_key->params->alpha_min,
 	    in_key->key, n, t, basebit);
+
+    // renormalize
+    renormalizeKSkey(result, out_key, in_key->key); // ILA: reverifier 
 }
+
+
+
+
+
+
+
+
+
+/*
+Create the key switching key: normalize the error in the beginning
+ * chose a random vector of gaussian noises (same size as ks) 
+ * recenter the noises 
+ * generate the ks by creating noiseless encryprions and then add the noise
+*/
+EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key){
+    const int n = result->n;
+    const int t = result->t;
+    const int basebit = result->basebit;
+    const int base = 1<<basebit;
+    const double alpha = out_key->params->alpha_min;
+    const int sizeks = n*t*(base-1);
+    //const int n_out = out_key->params->n;
+
+    double err = 0;
+
+    // chose a random vector of gaussian noises
+    double* noise = new double[sizeks];
+    for (int i = 0; i < sizeks; ++i){
+        normal_distribution<double> distribution(0.,alpha); 
+        noise[i] = distribution(generator);
+        err += noise[i];
+    }
+    // recenter the noises
+    err = err/sizeks;
+    for (int i = 0; i < sizeks; ++i) noise[i] -= err;
+
+
+    // generate the ks
+    int index = 0; 
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < t; ++j) {
+
+            // term h=0 as trivial encryption of 0 (it will not be used in the KeySwitching)
+            lweNoiselessTrivial(&result->ks[i][j][0], 0, out_key->params);
+            //lweSymEncrypt(&result->ks[i][j][0],0,alpha,out_key);
+
+            for (int h = 1; h < base; ++h) { // pas le terme en 0
+                /*
+                // noiseless encryption
+                result->ks[i][j][h].b = (in_key->key[i]*h)*(1<<(32-(j+1)*basebit));
+                for (int p = 0; p < n_out; ++p) {
+                    result->ks[i][j][h].a[p] = uniformTorus32_distrib(generator);
+                    result->ks[i][j][h].b += result->ks[i][j][h].a[p] * out_key->key[p];
+                }
+                // add the noise 
+                result->ks[i][j][h].b += dtot32(noise[index]);
+                */
+                Torus32 mess = (in_key->key[i]*h)*(1<<(32-(j+1)*basebit));
+                lweSymEncryptWithExternalNoise(&result->ks[i][j][h], mess, noise[index], alpha, out_key);
+                index += 1;
+            }
+        }
+    }
+
+
+    delete[] noise; 
+}
+
+
+
+
+
+
+
+
+
+
 
 //sample=(a',b')
 EXPORT void lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, const LweSample* sample){
@@ -174,5 +317,7 @@ EXPORT void delete_LweKeySwitchKey_array(int nbelts, LweKeySwitchKey* obj) {
     destroy_LweKeySwitchKey_array(nbelts,obj);
     free_LweKeySwitchKey_array(nbelts,obj);
 }
+
+
 
 

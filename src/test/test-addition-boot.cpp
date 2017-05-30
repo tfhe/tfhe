@@ -144,7 +144,7 @@ int main(int argc, char** argv) {
 #ifndef NDEBUG
     cout << "DEBUG MODE!" << endl;
 #endif
-    const int nb_bits = 64; 
+    const int nb_bits = 16; 
     const int nb_trials = 10;
     
     // generate params 
@@ -170,11 +170,11 @@ int main(int argc, char** argv) {
 
 
         // evaluate the addition circuit 
-        cout << "starting bootstrapping addition circuit (FA in MUX version)...trial " << trial << endl;
+        cout << "starting bootstrapping " << nb_bits << "-bits addition circuit (FA in MUX version)...trial " << trial << endl;
         clock_t begin1 = clock();
         full_adder_MUX(sum, x, y, nb_bits, keyset);
         clock_t end1 = clock();
-        cout << "finished bootstrappings addition circuit (FA in MUX version)" << endl;
+        cout << "finished bootstrappings " << nb_bits << "-bits addition circuit (FA in MUX version)" << endl;
         cout << "total time (microsecs)... " << (end1-begin1) << endl;
 
 
@@ -204,11 +204,11 @@ int main(int argc, char** argv) {
 
 
         // evaluate the addition circuit 
-        cout << "starting bootstrapping addition circuit (FA)...trial " << trial << endl;
+        cout << "starting bootstrapping " << nb_bits << "-bits addition circuit (FA)...trial " << trial << endl;
         clock_t begin2 = clock();
         full_adder(sum, x, y, nb_bits, keyset);
         clock_t end2 = clock();
-        cout << "finished bootstrappings addition circuit (FA)" << endl;
+        cout << "finished bootstrappings " << nb_bits << "-bits addition circuit (FA)" << endl;
         cout << "total time (microsecs)... " << (end2-begin2) << endl;
 
 
@@ -237,11 +237,11 @@ int main(int argc, char** argv) {
 
         LweSample* comp = new_LweSample(in_out_params);
         // evaluate the addition circuit 
-        cout << "starting bootstrapping comparison...trial " << trial << endl;
+        cout << "starting bootstrapping " << nb_bits << "-bits comparison...trial " << trial << endl;
         clock_t begin3 = clock();
         comparison_MUX(comp, x, y, nb_bits, keyset);
         clock_t end3 = clock();
-        cout << "finished bootstrappings comparison" << endl;
+        cout << "finished bootstrappings " << nb_bits << "-bits comparison" << endl;
         cout << "total time (microsecs)... " << (end3-begin3) << endl;
 
         // verification

@@ -47,6 +47,24 @@ EXPORT void lweSymEncrypt(LweSample* result, Torus32 message, double alpha, cons
 }
 
 
+/* 
+ * This function encrypts a message by using key and a given noise value
+*/
+EXPORT void lweSymEncryptWithExternalNoise(LweSample* result, Torus32 message, double noise, double alpha, const LweKey* key){
+    const int n = key->params->n;
+
+    result->b = message + dtot32(noise); 
+    for (int i = 0; i < n; ++i)
+    {
+        result->a[i] = uniformTorus32_distrib(generator);
+        result->b += result->a[i]*key->key[i];
+    }
+
+    result->current_variance = alpha*alpha;
+}
+
+
+
 
 /**
  * This function computes the phase of sample by using key : phi = b - a.s

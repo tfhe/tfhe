@@ -26,10 +26,10 @@ EXPORT TFheGateBootstrappingParameterSet* new_default_gate_bootstrapping_paramet
     static const int N = 1024;
     static const int k = 1;
     static const int n = 500;
-    static const int bk_l = 3;
+    static const int bk_l = 2;
     static const int bk_Bgbit = 10;
-    static const int ks_basebit = 1;
-    static const int ks_length = 15;
+    static const int ks_basebit = 2;
+    static const int ks_length = 8;
     static const double ks_stdev = mulBySqrtTwoOverPi(pow(2.,-15));   //standard deviation
     static const double bk_stdev = mulBySqrtTwoOverPi(9.e-9);          //standard deviation
     static const double max_stdev = mulBySqrtTwoOverPi(pow(2.,-4)/4.); //max standard deviation for a 1/4 msg space

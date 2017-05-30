@@ -23,6 +23,10 @@ EXPORT void lweKeyGen(LweKey* result);
  * (this means that the parameters are already in the result)
  */
 EXPORT void lweSymEncrypt(LweSample* result, Torus32 message, double alpha, const LweKey* key);
+/* 
+ * This function encrypts a message by using key and a given noise value
+*/
+EXPORT void lweSymEncryptWithExternalNoise(LweSample* result, Torus32 message, double noise, double alpha, const LweKey* key);
 
 
 /**
@@ -66,8 +70,8 @@ EXPORT void lweSubMulTo(LweSample* result, int p, const LweSample* sample, const
 /** 
  * creates a Key Switching Key between the two keys
  */
+EXPORT void lweCreateKeySwitchKey_old(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key);
 EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key);
-
 
 /**
  * applies keySwitching

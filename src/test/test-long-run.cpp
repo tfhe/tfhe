@@ -39,8 +39,8 @@ if (argc==2) {
     static const int ORYN_GATE = 9;
     // static const int MUX_GATE = 10;
     
-    static const int nb_test_gates = 1000000; // number of gates to be tested 
-    static const int nb_samples = 10; // number of samples to be tested 
+    static const int nb_test_gates = 10000000; // number of gates to be tested 
+    static const int nb_samples = 50; // number of samples to be tested 
     static const Torus32 MU = modSwitchToTorus32(1,8);
 
     // Parameters
@@ -178,7 +178,7 @@ if (argc==2) {
 
         // verification 
         if (bootsSymDecrypt(test+out, keyset) != mess){
-            cerr << i << " " << gate << " " << t32tod(lwePhase(test+out, keyset->lwe_key) - (mess?MU:(-MU))) << endl; 
+            cerr << "ERROR!!!" << i << " " << gate << " " << t32tod(lwePhase(test+out, keyset->lwe_key) - (mess?MU:(-MU))) << endl; 
         }
         cout << i << " " << gate << " " << t32tod(lwePhase(test+out, keyset->lwe_key) - (mess?MU:(-MU))) << endl;
 
