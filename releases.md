@@ -45,7 +45,7 @@ The new features and optimizations are described in [CGGI17]
 
 ### References
 
-[[CGGI16]](https://eprint.iacr.org/2017/430){:target="_blank"}: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. *Improving TFHE: faster packed homomorphic
+[[CGGI17]](https://eprint.iacr.org/2017/430){:target="_blank"}: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. *Improving TFHE: faster packed homomorphic
 operations and efficient circuit bootstrapping*. Cryptology ePrint Archive, report 2017/430.
 
 
