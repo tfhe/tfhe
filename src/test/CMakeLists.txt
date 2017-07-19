@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
+add_subdirectory(googletest)
+
 include_directories(${GTEST_INCLUDE_DIRS})
 
 set(GOOGLETEST_SOURCES
@@ -51,7 +53,7 @@ endif (FFT_PROCESSOR STREQUAL "fftw")
 
 #the unittests are compiled with the google test framework
 add_executable(unittests-${FFT_PROCESSOR} ${GOOGLETEST_SOURCES} ${TFHE_HEADERS})
-target_link_libraries(unittests-${FFT_PROCESSOR} ${RUNTIME_LIBS} ${GTEST_BOTH_LIBRARIES} -lpthread)
+target_link_libraries(unittests-${FFT_PROCESSOR} ${RUNTIME_LIBS} gtest gtest_main -lpthread)
 add_test(unittests-${FFT_PROCESSOR} unittests-${FFT_PROCESSOR})
 
 #the integration tests must be single source code, and are compiled as a standalone application

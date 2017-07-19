@@ -68,6 +68,5 @@ install(FILES ${TFHE_HEADERS}
 add_subdirectory(libtfhe)
 if (ENABLE_TESTS)
 enable_testing()
-find_package(GTest REQUIRED)
 add_subdirectory(test)
 endif (ENABLE_TESTS)
