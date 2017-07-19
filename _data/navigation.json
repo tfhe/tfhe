@@ -4,6 +4,10 @@
         "url" : "/"
     },
     {
+        "topic" : "Versions and Features",
+        "url" : "/releases.html"
+    },
+    {
         "topic" : "Installation",
         "url" : "/installation.html"
     },
