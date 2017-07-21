@@ -33,65 +33,65 @@ void dieDramatically(string message) {
 
 
 #ifndef NDEBUG
-extern const TLweKey* debug_accum_key;
-extern const LweKey* debug_extract_key;
-extern const LweKey* debug_in_key;
+extern const TLweKey *debug_accum_key;
+extern const LweKey *debug_extract_key;
+extern const LweKey *debug_in_key;
 #endif
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
 #ifndef NDEBUG
     cout << "DEBUG MODE!" << endl;
 #endif
     const int nb_samples = 64;
     const int nb_trials = 10;
-    
+
     // generate params 
     int minimum_lambda = 100;
-    TFheGateBootstrappingParameterSet* params = new_default_gate_bootstrapping_parameters(minimum_lambda);
-    const LweParams* in_out_params = params->in_out_params;
+    TFheGateBootstrappingParameterSet *params = new_default_gate_bootstrapping_parameters(minimum_lambda);
+    const LweParams *in_out_params = params->in_out_params;
     // generate the secret keyset
-    TFheGateBootstrappingSecretKeySet* keyset = new_random_gate_bootstrapping_secret_keyset(params);
+    TFheGateBootstrappingSecretKeySet *keyset = new_random_gate_bootstrapping_secret_keyset(params);
 
 
     for (int trial = 0; trial < nb_trials; ++trial) {
 
         // generate samples
-        LweSample* test_in = new_LweSample_array(2*nb_samples, in_out_params);
+        LweSample *test_in = new_LweSample_array(2 * nb_samples, in_out_params);
         // generate inputs (64-->127)
-        for (int i = nb_samples; i < 2*nb_samples; ++i) {
-            bootsSymEncrypt(test_in+i, rand()%2, keyset);
+        for (int i = nb_samples; i < 2 * nb_samples; ++i) {
+            bootsSymEncrypt(test_in + i, rand() % 2, keyset);
         }
         // fake encrypt
-        bootsSymEncrypt(test_in+0, rand()%2, keyset);
+        bootsSymEncrypt(test_in + 0, rand() % 2, keyset);
 
         // evaluate the NAND tree
         cout << "starting bootstrapping NAND tree...trial " << trial << endl;
         clock_t begin = clock();
-        for (int i = nb_samples-1; i > 0; --i) {
-            bootsNAND(test_in+i, test_in+(2*i), test_in+(2*i+1), &keyset->cloud);
+        for (int i = nb_samples - 1; i > 0; --i) {
+            bootsNAND(test_in + i, test_in + (2 * i), test_in + (2 * i + 1), &keyset->cloud);
         }
         clock_t end = clock();
         cout << "finished bootstrappings NAND tree" << endl;
-        cout << "time per bootNAND gate (microsecs)... " << (end-begin)/double(nb_samples-1) << endl;
+        cout << "time per bootNAND gate (microsecs)... " << (end - begin) / double(nb_samples - 1) << endl;
 
         // verification
-        for (int i = nb_samples-1; i > 0; --i) {
-            bool mess1 = bootsSymDecrypt(test_in+(2*i), keyset);
-            bool mess2 = bootsSymDecrypt(test_in+(2*i+1), keyset);
-            bool out = bootsSymDecrypt(test_in+i, keyset);
-            
-            if (out != 1-(mess1*mess2)){
+        for (int i = nb_samples - 1; i > 0; --i) {
+            bool mess1 = bootsSymDecrypt(test_in + (2 * i), keyset);
+            bool mess2 = bootsSymDecrypt(test_in + (2 * i + 1), keyset);
+            bool out = bootsSymDecrypt(test_in + i, keyset);
+
+            if (out != 1 - (mess1 * mess2)) {
                 cout << "ERROR!!! " << trial << "," << i << " - ";
-                cout << t32tod(lwePhase(test_in+i, keyset->lwe_key)) << " - ";
-                cout << t32tod(lwePhase(test_in+(2*i), keyset->lwe_key)) << " - ";
-                cout << t32tod(lwePhase(test_in+(2*i+1), keyset->lwe_key)) << endl; 
+                cout << t32tod(lwePhase(test_in + i, keyset->lwe_key)) << " - ";
+                cout << t32tod(lwePhase(test_in + (2 * i), keyset->lwe_key)) << " - ";
+                cout << t32tod(lwePhase(test_in + (2 * i + 1), keyset->lwe_key)) << endl;
             }
-            
+
         }
 
-        delete_LweSample_array(2*nb_samples,test_in);
+        delete_LweSample_array(2 * nb_samples, test_in);
     }
-    
+
     delete_gate_bootstrapping_secret_keyset(keyset);
     delete_gate_bootstrapping_parameters(params);
 

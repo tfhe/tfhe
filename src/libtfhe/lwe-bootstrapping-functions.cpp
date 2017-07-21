@@ -1,7 +1,9 @@
 #ifndef TFHE_TEST_ENVIRONMENT
+
 #include <iostream>
 #include <cassert>
 #include "tfhe.h"
+
 using namespace std;
 #define INCLUDE_ALL
 #else
@@ -10,26 +12,27 @@ using namespace std;
 #endif
 
 
-EXPORT void init_LweBootstrappingKey(LweBootstrappingKey* obj, int ks_t, int ks_basebit, const LweParams* in_out_params, const TGswParams* bk_params) {
-    const TLweParams* accum_params = bk_params->tlwe_params;
-    const LweParams* extract_params = &accum_params->extracted_lweparams;
+EXPORT void init_LweBootstrappingKey(LweBootstrappingKey *obj, int ks_t, int ks_basebit, const LweParams *in_out_params,
+                                     const TGswParams *bk_params) {
+    const TLweParams *accum_params = bk_params->tlwe_params;
+    const LweParams *extract_params = &accum_params->extracted_lweparams;
     const int n = in_out_params->n;
     const int N = extract_params->n;
-    
-    TGswSample* bk=new_TGswSample_array(n,bk_params);
-    LweKeySwitchKey* ks=new_LweKeySwitchKey(N, ks_t, ks_basebit, in_out_params);
+
+    TGswSample *bk = new_TGswSample_array(n, bk_params);
+    LweKeySwitchKey *ks = new_LweKeySwitchKey(N, ks_t, ks_basebit, in_out_params);
 
     new(obj) LweBootstrappingKey(in_out_params, bk_params, accum_params, extract_params, bk, ks);
 }
-EXPORT void destroy_LweBootstrappingKey(LweBootstrappingKey* obj) {
+EXPORT void destroy_LweBootstrappingKey(LweBootstrappingKey *obj) {
     delete_LweKeySwitchKey(obj->ks);
-    delete_TGswSample_array(obj->in_out_params->n,obj->bk);
+    delete_TGswSample_array(obj->in_out_params->n, obj->bk);
     obj->~LweBootstrappingKey();
 }
 
 
-
-void tfhe_MuxRotate(TLweSample* result, const TLweSample* accum, const TGswSample* bki, const int barai, const TGswParams* bk_params) {
+void tfhe_MuxRotate(TLweSample *result, const TLweSample *accum, const TGswSample *bki, const int barai,
+                    const TGswParams *bk_params) {
     // ACC = BKi*[(X^barai-1)*ACC]+ACC
     // temp = (X^barai-1)*ACC
     tLweMulByXaiMinusOne(result, barai, accum, bk_params->tlwe_params);
@@ -38,9 +41,6 @@ void tfhe_MuxRotate(TLweSample* result, const TLweSample* accum, const TGswSampl
     // ACC += temp
     tLweAddTo(result, accum, bk_params->tlwe_params);
 }
-
-
-
 
 
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_BLIND_ROTATE
@@ -52,31 +52,30 @@ void tfhe_MuxRotate(TLweSample* result, const TLweSample* accum, const TGswSampl
  * @param bara An array of n coefficients between 0 and 2N-1
  * @param bk_params The parameters of bk
  */
-EXPORT void tfhe_blindRotate(TLweSample* accum, const TGswSample* bk, const int* bara, const int n, const TGswParams* bk_params) {
-    
-    //TGswSample* temp = new_TGswSample(bk_params);
-    TLweSample* temp = new_TLweSample(bk_params->tlwe_params);
-    TLweSample* temp2 = temp;
-    TLweSample* temp3 = accum; 
+EXPORT void
+tfhe_blindRotate(TLweSample *accum, const TGswSample *bk, const int *bara, const int n, const TGswParams *bk_params) {
 
-    for (int i=0; i<n; i++) {
-	const int barai=bara[i];
-	if (barai==0) continue; //indeed, this is an easy case!
-    
-    tfhe_MuxRotate(temp2, temp3, bk+i, barai, bk_params);
-    swap(temp2, temp3);
-    
+    //TGswSample* temp = new_TGswSample(bk_params);
+    TLweSample *temp = new_TLweSample(bk_params->tlwe_params);
+    TLweSample *temp2 = temp;
+    TLweSample *temp3 = accum;
+
+    for (int i = 0; i < n; i++) {
+        const int barai = bara[i];
+        if (barai == 0) continue; //indeed, this is an easy case!
+
+        tfhe_MuxRotate(temp2, temp3, bk + i, barai, bk_params);
+        swap(temp2, temp3);
+
     }
     if (temp3 != accum) {
         tLweCopy(accum, temp3, bk_params->tlwe_params);
     }
-    
+
     delete_TLweSample(temp);
     //delete_TGswSample(temp);
 }
-#endif 
-
-
+#endif
 
 
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_BLIND_ROTATE_AND_EXTRACT
@@ -90,23 +89,23 @@ EXPORT void tfhe_blindRotate(TLweSample* accum, const TGswSample* bk, const int*
  * @param bara An array of n coefficients between 0 and 2N-1
  * @param bk_params The parameters of bk
  */
-EXPORT void tfhe_blindRotateAndExtract(LweSample* result, 
-	const TorusPolynomial* v,
-	const TGswSample* bk, 
-	const int barb,
-	const int* bara,
-	const int n,
-	const TGswParams* bk_params) {
+EXPORT void tfhe_blindRotateAndExtract(LweSample *result,
+                                       const TorusPolynomial *v,
+                                       const TGswSample *bk,
+                                       const int barb,
+                                       const int *bara,
+                                       const int n,
+                                       const TGswParams *bk_params) {
 
-    const TLweParams* accum_params = bk_params->tlwe_params;
-    const LweParams* extract_params = &accum_params->extracted_lweparams;
+    const TLweParams *accum_params = bk_params->tlwe_params;
+    const LweParams *extract_params = &accum_params->extracted_lweparams;
     const int N = accum_params->N;
-    const int _2N = 2*N;
+    const int _2N = 2 * N;
 
-    TorusPolynomial* testvectbis=new_TorusPolynomial(N);
-    TLweSample* acc = new_TLweSample(accum_params);
+    TorusPolynomial *testvectbis = new_TorusPolynomial(N);
+    TLweSample *acc = new_TLweSample(accum_params);
 
-    if (barb!=0) torusPolynomialMulByXai(testvectbis, _2N-barb, v);
+    if (barb != 0) torusPolynomialMulByXai(testvectbis, _2N - barb, v);
     else torusPolynomialCopy(testvectbis, v);
     tLweNoiselessTrivial(acc, testvectbis, accum_params);
     tfhe_blindRotate(acc, bk, bara, n, bk_params);
@@ -115,7 +114,7 @@ EXPORT void tfhe_blindRotateAndExtract(LweSample* result,
     delete_TLweSample(acc);
     delete_TorusPolynomial(testvectbis);
 }
-#endif 
+#endif
 
 
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_BOOTSTRAP_WO_KS
@@ -127,27 +126,27 @@ EXPORT void tfhe_blindRotateAndExtract(LweSample* result,
  * @param mu The output message (if phase(x)>0)
  * @param x The input sample
  */
-EXPORT void tfhe_bootstrap_woKS(LweSample* result, 
-    const LweBootstrappingKey* bk, 
-    Torus32 mu, const LweSample* x){
-    
-    const TGswParams* bk_params = bk->bk_params;
-    const TLweParams* accum_params = bk->accum_params;
-    const LweParams* in_params = bk->in_out_params;
-    const int N=accum_params->N;
-    const int Nx2= 2*N;
+EXPORT void tfhe_bootstrap_woKS(LweSample *result,
+                                const LweBootstrappingKey *bk,
+                                Torus32 mu, const LweSample *x) {
+
+    const TGswParams *bk_params = bk->bk_params;
+    const TLweParams *accum_params = bk->accum_params;
+    const LweParams *in_params = bk->in_out_params;
+    const int N = accum_params->N;
+    const int Nx2 = 2 * N;
     const int n = in_params->n;
 
-    TorusPolynomial* testvect=new_TorusPolynomial(N);
-    int* bara = new int[N];
+    TorusPolynomial *testvect = new_TorusPolynomial(N);
+    int *bara = new int[N];
 
-    int barb=modSwitchFromTorus32(x->b,Nx2);
-    for (int i=0; i<n; i++) {
-    bara[i]=modSwitchFromTorus32(x->a[i],Nx2);
+    int barb = modSwitchFromTorus32(x->b, Nx2);
+    for (int i = 0; i < n; i++) {
+        bara[i] = modSwitchFromTorus32(x->a[i], Nx2);
     }
- 
+
     //the initial testvec = [mu,mu,mu,...,mu]
-    for (int i=0;i<N;i++) testvect->coefsT[i]=mu;
+    for (int i = 0; i < N; i++) testvect->coefsT[i] = mu;
 
     tfhe_blindRotateAndExtract(result, testvect, bk->bk, barb, bara, n, bk_params);
 
@@ -155,7 +154,7 @@ EXPORT void tfhe_bootstrap_woKS(LweSample* result,
     delete_TorusPolynomial(testvect);
 }
 #endif
-   
+
 
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_BOOTSTRAP
 #undef INCLUDE_TFHE_BOOTSTRAP
@@ -166,11 +165,11 @@ EXPORT void tfhe_bootstrap_woKS(LweSample* result,
  * @param mu The output message (if phase(x)>0)
  * @param x The input sample
  */
-EXPORT void tfhe_bootstrap(LweSample* result, 
-	const LweBootstrappingKey* bk, 
-	Torus32 mu, const LweSample* x){
-    
-    LweSample* u = new_LweSample(&bk->accum_params->extracted_lweparams);
+EXPORT void tfhe_bootstrap(LweSample *result,
+                           const LweBootstrappingKey *bk,
+                           Torus32 mu, const LweSample *x) {
+
+    LweSample *u = new_LweSample(&bk->accum_params->extracted_lweparams);
 
     tfhe_bootstrap_woKS(u, bk, mu, x);
     // Key Switching
@@ -181,32 +180,29 @@ EXPORT void tfhe_bootstrap(LweSample* result,
 #endif
 
 
-
-
-
 #if defined INCLUDE_ALL || defined INCLUDE_TFHE_CREATEBOOTSTRAPPINGKEY
 #undef INCLUDE_TFHE_CREATEBOOTSTRAPPINGKEY
 EXPORT void tfhe_createLweBootstrappingKey(
-	LweBootstrappingKey* bk, 
-	const LweKey* key_in, 
-	const TGswKey* rgsw_key) {
-    assert(bk->bk_params==rgsw_key->params);
-    assert(bk->in_out_params==key_in->params);
+        LweBootstrappingKey *bk,
+        const LweKey *key_in,
+        const TGswKey *rgsw_key) {
+    assert(bk->bk_params == rgsw_key->params);
+    assert(bk->in_out_params == key_in->params);
 
-    const LweParams* in_out_params = bk->in_out_params; 
-    const TGswParams* bk_params = bk->bk_params;
-    const TLweParams* accum_params = bk_params->tlwe_params;
-    const LweParams* extract_params = &accum_params->extracted_lweparams;
+    const LweParams *in_out_params = bk->in_out_params;
+    const TGswParams *bk_params = bk->bk_params;
+    const TLweParams *accum_params = bk_params->tlwe_params;
+    const LweParams *extract_params = &accum_params->extracted_lweparams;
 
     //LweKeySwitchKey* ks; ///< the keyswitch key (s'->s)
-    const TLweKey* accum_key = &rgsw_key->tlwe_key;
-    LweKey* extracted_key = new_LweKey(extract_params);
+    const TLweKey *accum_key = &rgsw_key->tlwe_key;
+    LweKey *extracted_key = new_LweKey(extract_params);
     tLweExtractKey(extracted_key, accum_key);
     lweCreateKeySwitchKey(bk->ks, extracted_key, key_in);
     delete_LweKey(extracted_key);
 
     //TGswSample* bk; ///< the bootstrapping key (s->s")
-    int* kin = key_in->key;
+    int *kin = key_in->key;
     const double alpha = accum_params->alpha_min;
     const int n = in_out_params->n;
     //const int kpl = bk_params->kpl;
@@ -214,80 +210,78 @@ EXPORT void tfhe_createLweBootstrappingKey(
     //const int N = accum_params->N;
     //cout << "create the bootstrapping key bk ("  << "  " << n*kpl*(k+1)*N*4 << " bytes)" << endl;
     //cout << "  with noise_stdev: " << alpha << endl;
-    for (int i=0; i<n; i++) {
-	tGswSymEncryptInt(&bk->bk[i], kin[i], alpha, rgsw_key);
+    for (int i = 0; i < n; i++) {
+        tGswSymEncryptInt(&bk->bk[i], kin[i], alpha, rgsw_key);
     }
 
 }
 #endif
 
 
-
-
-
-
-
-#include "lwebootstrappingkey.h" 
+#include "lwebootstrappingkey.h"
 //allocate memory space for a LweBootstrappingKey
 
-EXPORT LweBootstrappingKey* alloc_LweBootstrappingKey() {
-    return (LweBootstrappingKey*) malloc(sizeof(LweBootstrappingKey));
+EXPORT LweBootstrappingKey *alloc_LweBootstrappingKey() {
+    return (LweBootstrappingKey *) malloc(sizeof(LweBootstrappingKey));
 }
-EXPORT LweBootstrappingKey* alloc_LweBootstrappingKey_array(int nbelts) {
-    return (LweBootstrappingKey*) malloc(nbelts*sizeof(LweBootstrappingKey));
+EXPORT LweBootstrappingKey *alloc_LweBootstrappingKey_array(int nbelts) {
+    return (LweBootstrappingKey *) malloc(nbelts * sizeof(LweBootstrappingKey));
 }
 
 //free memory space for a LweKey
-EXPORT void free_LweBootstrappingKey(LweBootstrappingKey* ptr) {
+EXPORT void free_LweBootstrappingKey(LweBootstrappingKey *ptr) {
     free(ptr);
 }
-EXPORT void free_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey* ptr) {
+EXPORT void free_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey *ptr) {
     free(ptr);
 }
 
 //initialize the key structure
 //(equivalent of the C++ constructor)
 
-EXPORT void init_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey* obj, int ks_t, int ks_basebit, const LweParams* in_out_params, const TGswParams* bk_params) {
-    for (int i=0; i<nbelts; i++) {
-        init_LweBootstrappingKey(obj+i, ks_t, ks_basebit, in_out_params, bk_params);
+EXPORT void init_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey *obj, int ks_t, int ks_basebit,
+                                           const LweParams *in_out_params, const TGswParams *bk_params) {
+    for (int i = 0; i < nbelts; i++) {
+        init_LweBootstrappingKey(obj + i, ks_t, ks_basebit, in_out_params, bk_params);
     }
 }
 
 //destroys the LweBootstrappingKey structure
 //(equivalent of the C++ destructor)
 
-EXPORT void destroy_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey* obj) {
-    for (int i=0; i<nbelts; i++) {
-        destroy_LweBootstrappingKey(obj+i);
+EXPORT void destroy_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey *obj) {
+    for (int i = 0; i < nbelts; i++) {
+        destroy_LweBootstrappingKey(obj + i);
     }
 }
- 
+
 //allocates and initialize the LweBootstrappingKey structure
 //(equivalent of the C++ new)
-EXPORT LweBootstrappingKey* new_LweBootstrappingKey(const int ks_t, const int ks_basebit, const LweParams* in_out_params, const TGswParams* bk_params) {
-    LweBootstrappingKey* obj = alloc_LweBootstrappingKey();
-    init_LweBootstrappingKey(obj,ks_t,ks_basebit,in_out_params,bk_params);
+EXPORT LweBootstrappingKey *
+new_LweBootstrappingKey(const int ks_t, const int ks_basebit, const LweParams *in_out_params,
+                        const TGswParams *bk_params) {
+    LweBootstrappingKey *obj = alloc_LweBootstrappingKey();
+    init_LweBootstrappingKey(obj, ks_t, ks_basebit, in_out_params, bk_params);
     return obj;
 }
-EXPORT LweBootstrappingKey* new_LweBootstrappingKey_array(int nbelts, const int ks_t, const int ks_basebit, const LweParams* in_out_params, const TGswParams* bk_params) {
-    LweBootstrappingKey* obj = alloc_LweBootstrappingKey_array(nbelts);
-    init_LweBootstrappingKey_array(nbelts,obj,ks_t,ks_basebit,in_out_params,bk_params);
+EXPORT LweBootstrappingKey *
+new_LweBootstrappingKey_array(int nbelts, const int ks_t, const int ks_basebit, const LweParams *in_out_params,
+                              const TGswParams *bk_params) {
+    LweBootstrappingKey *obj = alloc_LweBootstrappingKey_array(nbelts);
+    init_LweBootstrappingKey_array(nbelts, obj, ks_t, ks_basebit, in_out_params, bk_params);
     return obj;
 }
 
 //destroys and frees the LweBootstrappingKey structure
 //(equivalent of the C++ delete)
-EXPORT void delete_LweBootstrappingKey(LweBootstrappingKey* obj) {
+EXPORT void delete_LweBootstrappingKey(LweBootstrappingKey *obj) {
     destroy_LweBootstrappingKey(obj);
     free_LweBootstrappingKey(obj);
 }
-EXPORT void delete_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey* obj) {
-    destroy_LweBootstrappingKey_array(nbelts,obj);
-    free_LweBootstrappingKey_array(nbelts,obj);
+EXPORT void delete_LweBootstrappingKey_array(int nbelts, LweBootstrappingKey *obj) {
+    destroy_LweBootstrappingKey_array(nbelts, obj);
+    free_LweBootstrappingKey_array(nbelts, obj);
 }
-
-
 
 
 #undef INCLUDE_ALL

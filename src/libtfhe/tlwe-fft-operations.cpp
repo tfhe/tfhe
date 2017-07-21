@@ -27,10 +27,10 @@ using namespace std;
 
 #if defined INCLUDE_ALL || defined INCLUDE_INIT_TLWESAMPLE_FFT
 #undef INCLUDE_INIT_TLWESAMPLE_FFT
-EXPORT void init_TLweSampleFFT(TLweSampleFFT* obj, const TLweParams* params) {
+EXPORT void init_TLweSampleFFT(TLweSampleFFT *obj, const TLweParams *params) {
     //a is a table of k+1 polynomials, b is an alias for &a[k]
     const int k = params->k;
-    LagrangeHalfCPolynomial* a = new_LagrangeHalfCPolynomial_array(k+1, params->N);
+    LagrangeHalfCPolynomial *a = new_LagrangeHalfCPolynomial_array(k + 1, params->N);
     double current_variance = 0;
     new(obj) TLweSampleFFT(params, a, current_variance);
 }
@@ -38,9 +38,9 @@ EXPORT void init_TLweSampleFFT(TLweSampleFFT* obj, const TLweParams* params) {
 
 #if defined INCLUDE_ALL || defined INCLUDE_DESTROY_TLWESAMPLE_FFT
 #undef INCLUDE_DESTROY_TLWESAMPLE_FFT
-EXPORT void destroy_TLweSampleFFT(TLweSampleFFT* obj) {
+EXPORT void destroy_TLweSampleFFT(TLweSampleFFT *obj) {
     const int k = obj->k;
-    delete_LagrangeHalfCPolynomial_array(k+1, obj->a);
+    delete_LagrangeHalfCPolynomial_array(k + 1, obj->a);
     obj->~TLweSampleFFT();
 }
 #endif
@@ -49,12 +49,12 @@ EXPORT void destroy_TLweSampleFFT(TLweSampleFFT* obj) {
 #if defined INCLUDE_ALL || defined INCLUDE_TLWE_TO_FFT_CONVERT
 #undef INCLUDE_TLWE_TO_FFT_CONVERT
 // Computes the inverse FFT of the coefficients of the TLWE sample
-EXPORT void tLweToFFTConvert(TLweSampleFFT* result, const TLweSample* source, const TLweParams* params){
+EXPORT void tLweToFFTConvert(TLweSampleFFT *result, const TLweSample *source, const TLweParams *params) {
     const int k = params->k;
 
     for (int i = 0; i <= k; ++i)
-	TorusPolynomial_ifft(result->a+i,source->a+i);
-    result->current_variance=source->current_variance;
+        TorusPolynomial_ifft(result->a + i, source->a + i);
+    result->current_variance = source->current_variance;
 }
 #endif
 
@@ -62,12 +62,12 @@ EXPORT void tLweToFFTConvert(TLweSampleFFT* result, const TLweSample* source, co
 #if defined INCLUDE_ALL || defined INCLUDE_TLWE_FROM_FFT_CONVERT
 #undef INCLUDE_TLWE_FROM_FFT_CONVERT
 // Computes the FFT of the coefficients of the TLWEfft sample
-EXPORT void tLweFromFFTConvert(TLweSample* result, const TLweSampleFFT* source, const TLweParams* params){
+EXPORT void tLweFromFFTConvert(TLweSample *result, const TLweSampleFFT *source, const TLweParams *params) {
     const int k = params->k;
 
     for (int i = 0; i <= k; ++i)
-	TorusPolynomial_fft(result->a+i,source->a+i);
-    result->current_variance=source->current_variance;
+        TorusPolynomial_fft(result->a + i, source->a + i);
+    result->current_variance = source->current_variance;
 }
 #endif
 
@@ -76,11 +76,11 @@ EXPORT void tLweFromFFTConvert(TLweSample* result, const TLweSampleFFT* source, 
 #undef INCLUDE_TLWE_FFT_CLEAR
 //Arithmetic operations on TLwe samples
 /** result = (0,0) */
-EXPORT void tLweFFTClear(TLweSampleFFT* result, const TLweParams* params){
+EXPORT void tLweFFTClear(TLweSampleFFT *result, const TLweParams *params) {
     int k = params->k;
 
-    for (int i = 0; i <= k; ++i) 
-	LagrangeHalfCPolynomialClear(&result->a[i]);
+    for (int i = 0; i <= k; ++i)
+        LagrangeHalfCPolynomialClear(&result->a[i]);
     result->current_variance = 0.;
 }
 #endif
@@ -89,11 +89,12 @@ EXPORT void tLweFFTClear(TLweSampleFFT* result, const TLweParams* params){
 #if defined INCLUDE_ALL || defined INCLUDE_TLWE_FFT_ADDMULRTO
 #undef INCLUDE_TLWE_FFT_ADDMULRTO
 // result = result + p*sample
-EXPORT void tLweFFTAddMulRTo(TLweSampleFFT* result, const LagrangeHalfCPolynomial* p, const TLweSampleFFT* sample, const TLweParams* params) {
+EXPORT void tLweFFTAddMulRTo(TLweSampleFFT *result, const LagrangeHalfCPolynomial *p, const TLweSampleFFT *sample,
+                             const TLweParams *params) {
     const int k = params->k;
 
-    for (int i=0; i<=k; i++)
-	LagrangeHalfCPolynomialAddMul(result->a+i,p,sample->a+i);
+    for (int i = 0; i <= k; i++)
+        LagrangeHalfCPolynomialAddMul(result->a + i, p, sample->a + i);
     //result->current_variance += sample->current_variance; 
     //TODO: how to compute the variance correctly?
 }
