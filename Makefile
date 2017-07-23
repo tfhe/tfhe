@@ -17,10 +17,10 @@ distclean:
 	rm -rf build builddtests buildotests; true
 
 test: builddtests buildotests 
-	make -C builddtests
-	make -C buildotests
-	make -C builddtests test
-	make -C buildotests test
+	make -j 4 -C builddtests
+	make -j 4 -C buildotests
+	make -j 4 -C builddtests test
+	make -j 4 -C buildotests test
 
 build:
 	mkdir build; cd build; cmake ../src; cd ..
