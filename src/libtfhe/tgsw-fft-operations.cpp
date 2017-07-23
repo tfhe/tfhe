@@ -28,89 +28,89 @@ using namespace std;
 
 
 //constructor content
-EXPORT void init_TGswSampleFFT(TGswSampleFFT* obj, const TGswParams* params) {
+EXPORT void init_TGswSampleFFT(TGswSampleFFT *obj, const TGswParams *params) {
     const int k = params->tlwe_params->k;
     const int l = params->l;
-    TLweSampleFFT* all_samples = new_TLweSampleFFT_array((k+1)*l,params->tlwe_params);
+    TLweSampleFFT *all_samples = new_TLweSampleFFT_array((k + 1) * l, params->tlwe_params);
     new(obj) TGswSampleFFT(params, all_samples);
 }
 
 //destructor content
-EXPORT void destroy_TGswSampleFFT(TGswSampleFFT* obj) {
+EXPORT void destroy_TGswSampleFFT(TGswSampleFFT *obj) {
     int k = obj->k;
     int l = obj->l;
-    delete_TLweSampleFFT_array((k+1)*l,obj->all_samples);
+    delete_TLweSampleFFT_array((k + 1) * l, obj->all_samples);
     obj->~TGswSampleFFT();
 }
 
 
 // For all the kpl TLWE samples composing the TGSW sample 
 // It computes the inverse FFT of the coefficients of the TLWE sample   
-EXPORT void tGswToFFTConvert(TGswSampleFFT* result, const TGswSample* source, const TGswParams* params) {
+EXPORT void tGswToFFTConvert(TGswSampleFFT *result, const TGswSample *source, const TGswParams *params) {
     const int kpl = params->kpl;
-    
-    for (int p=0; p<kpl; p++)
-    tLweToFFTConvert(result->all_samples+p, source->all_sample+p, params->tlwe_params);
+
+    for (int p = 0; p < kpl; p++)
+        tLweToFFTConvert(result->all_samples + p, source->all_sample + p, params->tlwe_params);
 }
 
 // For all the kpl TLWE samples composing the TGSW sample 
 // It computes the FFT of the coefficients of the TLWEfft sample
-EXPORT void tGswFromFFTConvert(TGswSample* result, const TGswSampleFFT* source, const TGswParams* params){
+EXPORT void tGswFromFFTConvert(TGswSample *result, const TGswSampleFFT *source, const TGswParams *params) {
     const int kpl = params->kpl;
-    
-    for (int p=0; p<kpl; p++)
-    tLweFromFFTConvert(result->all_sample+p, source->all_samples+p, params->tlwe_params);
+
+    for (int p = 0; p < kpl; p++)
+        tLweFromFFTConvert(result->all_sample + p, source->all_samples + p, params->tlwe_params);
 }
 
 
 
 // result = result + H
-EXPORT void tGswFFTAddH(TGswSampleFFT* result, const TGswParams* params) {
+EXPORT void tGswFFTAddH(TGswSampleFFT *result, const TGswParams *params) {
     const int k = params->tlwe_params->k;
     const int l = params->l;
 
-    for (int j=0; j<l; j++) {
+    for (int j = 0; j < l; j++) {
         Torus32 hj = params->h[j];
-        for (int i=0; i<=k; i++)
-       LagrangeHalfCPolynomialAddTorusConstant(&result->sample[i][j].a[i],hj); 
+        for (int i = 0; i <= k; i++)
+            LagrangeHalfCPolynomialAddTorusConstant(&result->sample[i][j].a[i], hj);
     }
 
 }
 
 // result = list of TLWE (0,0)
-EXPORT void tGswFFTClear(TGswSampleFFT* result, const TGswParams* params) {
+EXPORT void tGswFFTClear(TGswSampleFFT *result, const TGswParams *params) {
     const int kpl = params->kpl;
 
-    for (int p=0; p<kpl; p++)
-    tLweFFTClear(result->all_samples+p, params->tlwe_params);
-}    
+    for (int p = 0; p < kpl; p++)
+        tLweFFTClear(result->all_samples + p, params->tlwe_params);
+}
 
 // External product (*): accum = gsw (*) accum 
-EXPORT void tGswFFTExternMulToTLwe(TLweSample* accum, const TGswSampleFFT* gsw, const TGswParams* params) {
-    const TLweParams* tlwe_params=params->tlwe_params;
+EXPORT void tGswFFTExternMulToTLwe(TLweSample *accum, const TGswSampleFFT *gsw, const TGswParams *params) {
+    const TLweParams *tlwe_params = params->tlwe_params;
     const int k = tlwe_params->k;
     const int l = params->l;
     const int kpl = params->kpl;
     const int N = tlwe_params->N;
     //TODO attention, improve these new/delete...
-    IntPolynomial* deca = new_IntPolynomial_array(kpl,N); //decomposed accumulator 
-    LagrangeHalfCPolynomial* decaFFT=new_LagrangeHalfCPolynomial_array(kpl,N); //fft version
-    TLweSampleFFT* tmpa = new_TLweSampleFFT(tlwe_params);
+    IntPolynomial *deca = new_IntPolynomial_array(kpl, N); //decomposed accumulator
+    LagrangeHalfCPolynomial *decaFFT = new_LagrangeHalfCPolynomial_array(kpl, N); //fft version
+    TLweSampleFFT *tmpa = new_TLweSampleFFT(tlwe_params);
 
-    for (int i=0; i<=k; i++)
-	tGswTorus32PolynomialDecompH(deca+i*l,accum->a+i, params);
-    for (int p=0; p<kpl; p++)
-	IntPolynomial_ifft(decaFFT+p,deca+p);
+    for (int i = 0; i <= k; i++)
+        tGswTorus32PolynomialDecompH(deca + i * l, accum->a + i, params);
+    for (int p = 0; p < kpl; p++)
+        IntPolynomial_ifft(decaFFT + p, deca + p);
 
     tLweFFTClear(tmpa, tlwe_params);
-    for (int p=0; p<kpl; p++) {
-	tLweFFTAddMulRTo(tmpa, decaFFT+p, gsw->all_samples+p, tlwe_params);
+    for (int p = 0; p < kpl; p++) {
+        tLweFFTAddMulRTo(tmpa, decaFFT + p, gsw->all_samples + p, tlwe_params);
     }
     tLweFromFFTConvert(accum, tmpa, tlwe_params);
 
     delete_TLweSampleFFT(tmpa);
-    delete_LagrangeHalfCPolynomial_array(kpl,decaFFT);
-    delete_IntPolynomial_array(kpl,deca);
+    delete_LagrangeHalfCPolynomial_array(kpl, decaFFT);
+    delete_IntPolynomial_array(kpl, deca);
 }
 
 // result = (X^ai -1)*bki  
@@ -125,6 +125,7 @@ EXPORT void tGswFFTMulByXaiMinusOne(TGswSampleFFT* result, const int ai, const T
     const int N = tlwe_params->N;
     //on calcule x^ai-1 en fft
     //TODO attention, this prevents parallelization...
+    //TODO: parallelization
     static LagrangeHalfCPolynomial* xaim1=new_LagrangeHalfCPolynomial(N);
     LagrangeHalfCPolynomialSetXaiMinusOne(xaim1,ai);
     for (int p=0; p<kpl; p++) {
@@ -214,7 +215,7 @@ EXPORT void tfhe_bootstrapFFT(LweSample* result, const LweBootstrappingKeyFFT* b
 
 //NICOLAS: et surtout, j'ai ajouté celui-ci!
 #ifndef NDEBUG
-	tLwePhase(phase,acc,debug_accum_key);  //celui-ci, c'est la phase de acc (FFT)
+    tLwePhase(phase,acc,debug_accum_key);  //celui-ci, c'est la phase de acc (FFT)
     if (debug_in_key->key[i]==1) correctOffset = (correctOffset+bara)%Nx2; 
         torusPolynomialMulByXai(testvectbis, correctOffset, testvect); //celui-ci, c'est la phase idéale (calculée sans bruit avec la clé privée)
     for (int j=0; j<N; j++) {
