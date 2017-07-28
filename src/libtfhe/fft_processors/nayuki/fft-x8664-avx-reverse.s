@@ -104,8 +104,8 @@ size2loop:
 	jb          size2loop
 	
 	/* Size 4 merge (special) */
-	vmovapd     size4negation1, %ymm14
-	vmovapd     size4negation0, %ymm15
+	vmovapd     size4negation1(%rip), %ymm14
+	vmovapd     size4negation0(%rip), %ymm15
 	movq        $0, %rcx  /* Loop counter: Range [0, rdx), step size 4 */
 size4loop:
 	vmovupd     (%rdi,%rcx,8), %ymm0
