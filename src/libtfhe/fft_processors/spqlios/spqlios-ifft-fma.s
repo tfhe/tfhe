@@ -184,10 +184,10 @@ offloop:
     }
 */
     	/* r10 is still = n/4  (constant) */
-	vmovapd     size4negation0, %ymm15
-	vmovapd     size4negation1, %ymm14
-	vmovapd     size4negation2, %ymm13
-	vmovapd     size4negation3, %ymm12
+	vmovapd     size4negation0(%rip), %ymm15
+	vmovapd     size4negation1(%rip), %ymm14
+	vmovapd     size4negation2(%rip), %ymm13
+	vmovapd     size4negation3(%rip), %ymm12
 	movq $0,%rax /* rax (block) */
 	movq %rdi,%r11 /* r11 (are+block) */
 	movq %rsi,%r12 /* r12 (aim+block) */

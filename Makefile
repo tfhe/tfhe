@@ -16,13 +16,13 @@ clean: build
 distclean:
 	rm -rf build builddtests buildotests; true
 
-test: builddtests buildotests 
+test: builddtests buildotests src/test/googletest/CMakeLists.txt
 	make -j 4 -C builddtests
 	make -j 4 -C buildotests
 	make -j 4 -C builddtests test
 	make -j 4 -C buildotests test
 
-build:
+build: src/test/googletest/CMakeLists.txt
 	mkdir build; cd build; cmake ../src; cd ..
 
 builddtests:
@@ -36,3 +36,7 @@ buildotests:
 	cd $@; cmake ../src ${CMAKE_OTESTS_OPTS}; 
 	cd $@; cmake ../src ${CMAKE_OTESTS_OPTS};
 	cd ..
+
+src/test/googletest/CMakeLists.txt:
+	git submodule init
+	git submodule update
