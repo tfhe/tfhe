@@ -1,6 +1,6 @@
 DCFLAGS=-g3 -O0 -Wall
 OCFLAGS=-O2 -DNDEBUG
-CFLAGS=${DCFLAGS}
+CFLAGS=${DCFLAGS} -fPIC
 
 n:
 	gcc -c ${CFLAGS} spqlios-fft-avx.s	-o spqlios-fft.o
