@@ -14,7 +14,7 @@ set(ENABLE_TESTS OFF CACHE BOOL "Build the tests (requires googletest)")
 
 project(tfhe CXX)
 
-if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "AppleClang")
   # https://stackoverflow.com/a/16229679
   set(CLANG_FLAGS "-stdlib=libc++")
 endif()
