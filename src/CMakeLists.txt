@@ -12,14 +12,14 @@ set(ENABLE_SPQLIOS_AVX ON CACHE BOOL "Enable the SPQLIOS AVX assembly FFT proces
 set(ENABLE_SPQLIOS_FMA ON CACHE BOOL "Enable the SPQLIOS FMA assembly FFT processor")
 set(ENABLE_TESTS OFF CACHE BOOL "Build the tests (requires googletest)")
 
-set(CMAKE_CXX_FLAGS_DEBUG "-std=gnu++11 -g3 -O0 -Wall -Werror")
-set(CMAKE_C_FLAGS_DEBUG "-g3 -O0 -Wall -Werror")
+set(CMAKE_CXX_FLAGS_DEBUG "-stdlib=libc++ -std=gnu++11 -g3 -O0 -Wall -Wno-invalid-constexpr")
+set(CMAKE_C_FLAGS_DEBUG "-g3 -O0 -Wall -Wno-invalid-constexpr")
 
-set(CMAKE_CXX_FLAGS_OPTIM "-std=gnu++11 -g3 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
-set(CMAKE_C_FLAGS_OPTIM "-g3 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_CXX_FLAGS_OPTIM "-stdlib=libc++ -std=gnu++11 -g3 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Wno-invalid-constexpr")
+set(CMAKE_C_FLAGS_OPTIM "-g3 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Wno-invalid-constexpr")
 
-set(CMAKE_CXX_FLAGS_RELEASE "-std=gnu++11 -g0 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
-set(CMAKE_C_FLAGS_RELEASE "-g0 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_CXX_FLAGS_RELEASE "-stdlib=libc++ -std=gnu++11 -g0 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Wno-invalid-constexpr")
+set(CMAKE_C_FLAGS_RELEASE "-g0 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Wno-invalid-constexpr")
 
 project(tfhe)
 

@@ -12,7 +12,7 @@ FFT_Processor_nayuki::FFT_Processor_nayuki(const int N): _2N(2*N),N(N),Ns2(N/2) 
     tables_reverse = fft_init_reverse(_2N);
     omegaxminus1 = (cplx*) malloc(sizeof(cplx) * _2N);
     for (int x=0; x<_2N; x++) {
-	omegaxminus1[x]=cos(x*M_PI/N)-1. + sin(x*M_PI/N) * I; 
+	omegaxminus1[x]=cos(x*M_PI/N)-1. + sin(x*M_PI/N) * 1i; 
 	//exp(i.x.pi/N)-1
     }
 }
@@ -43,7 +43,7 @@ void FFT_Processor_nayuki::execute_reverse_int(cplx* res, const int* a) {
 	res_dbl[i+1]=imag_inout[i+1];
     }
     for (int i=0; i<Ns2; i++) {
-	assert(cabs(real_inout[2*i+1]+I*imag_inout[2*i+1]-res[i])<1e-20);
+	assert(cabs(real_inout[2*i+1]+1i*imag_inout[2*i+1]-res[i])<1e-20);
     }
     check_conjugate_cplx();
 }
@@ -56,7 +56,7 @@ void FFT_Processor_nayuki::execute_reverse_torus32(cplx* res, const Torus32* a) 
     for (int i=0; i<_2N; i++) imag_inout[i]=0;
     check_alternate_real();
     fft_transform_reverse(tables_reverse,real_inout,imag_inout);
-    for (int i=0; i<Ns2; i++) res[i]=real_inout[2*i+1]+I*imag_inout[2*i+1];
+    for (int i=0; i<Ns2; i++) res[i]=real_inout[2*i+1]+1i*imag_inout[2*i+1];
     check_conjugate_cplx();
 }
 
@@ -66,17 +66,17 @@ void FFT_Processor_nayuki::execute_direct_torus32(Torus32* res, const cplx* a) {
     //double* a_dbl=(double*) a;
     for (int i=0; i<N; i++) real_inout[2*i]=0;
     for (int i=0; i<N; i++) imag_inout[2*i]=0;
-    for (int i=0; i<Ns2; i++) real_inout[2*i+1]=creal(a[i]);
-    for (int i=0; i<Ns2; i++) imag_inout[2*i+1]=cimag(a[i]);
-    for (int i=0; i<Ns2; i++) real_inout[_2N-1-2*i]=creal(a[i]);
-    for (int i=0; i<Ns2; i++) imag_inout[_2N-1-2*i]=-cimag(a[i]);
+    for (int i=0; i<Ns2; i++) real_inout[2*i+1]=real(a[i]);
+    for (int i=0; i<Ns2; i++) imag_inout[2*i+1]=imag(a[i]);
+    for (int i=0; i<Ns2; i++) real_inout[_2N-1-2*i]=real(a[i]);
+    for (int i=0; i<Ns2; i++) imag_inout[_2N-1-2*i]=-imag(a[i]);
 #ifndef NDEBUG
     for (int i=0; i<N; i++) assert(real_inout[2*i]==0);
     for (int i=0; i<N; i++) assert(imag_inout[2*i]==0);
-    for (int i=0; i<Ns2; i++) assert(real_inout[2*i+1]==creal(a[i]));
-    for (int i=0; i<Ns2; i++) assert(imag_inout[2*i+1]==cimag(a[i]));
-    for (int i=0; i<Ns2; i++) assert(real_inout[_2N-1-2*i]==creal(a[i]));
-    for (int i=0; i<Ns2; i++) assert(imag_inout[_2N-1-2*i]==-cimag(a[i]));
+    for (int i=0; i<Ns2; i++) assert(real_inout[2*i+1]==real(a[i]));
+    for (int i=0; i<Ns2; i++) assert(imag_inout[2*i+1]==imag(a[i]));
+    for (int i=0; i<Ns2; i++) assert(real_inout[_2N-1-2*i]==real(a[i]));
+    for (int i=0; i<Ns2; i++) assert(imag_inout[_2N-1-2*i]==-imag(a[i]));
     check_conjugate_cplx();
 #endif
     fft_transform(tables_direct,real_inout,imag_inout);

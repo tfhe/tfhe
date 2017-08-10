@@ -4,7 +4,8 @@
 #include <cassert>
 #include <cmath>
 #include <complex.h>
-typedef double _Complex cplx;
+// typedef double _Complex cplx;
+typedef std::complex< double > cplx; // https://stackoverflow.com/a/31800404
 #include "tfhe.h"
 #include "polynomials.h"
 

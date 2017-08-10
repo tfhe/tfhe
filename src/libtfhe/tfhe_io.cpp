@@ -1,5 +1,6 @@
 #ifndef TFHE_TESTING_ENVIRONMENT
 
+#include <stdlib.h>
 #include <tfhe_io.h>
 #include <map>
 #include <string>
