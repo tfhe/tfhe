@@ -12,16 +12,21 @@ set(ENABLE_SPQLIOS_AVX ON CACHE BOOL "Enable the SPQLIOS AVX assembly FFT proces
 set(ENABLE_SPQLIOS_FMA ON CACHE BOOL "Enable the SPQLIOS FMA assembly FFT processor")
 set(ENABLE_TESTS OFF CACHE BOOL "Build the tests (requires googletest)")
 
-set(CMAKE_CXX_FLAGS_DEBUG "-stdlib=libc++ -std=gnu++11 -g3 -O0 -Wall -Wno-invalid-constexpr")
+project(tfhe CXX)
+
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+  # https://stackoverflow.com/a/16229679
+  set(CLANG_FLAGS "-stdlib=libc++")
+endif()
+
+set(CMAKE_CXX_FLAGS_DEBUG "${CLANG_FLAGS} -std=gnu++11 -g3 -O0 -Wall -Wno-invalid-constexpr")
 set(CMAKE_C_FLAGS_DEBUG "-g3 -O0 -Wall -Wno-invalid-constexpr")
 
-set(CMAKE_CXX_FLAGS_OPTIM "-stdlib=libc++ -std=gnu++11 -g3 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Wno-invalid-constexpr")
+set(CMAKE_CXX_FLAGS_OPTIM "${CLANG_FLAGS} -std=gnu++11 -g3 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Wno-invalid-constexpr")
 set(CMAKE_C_FLAGS_OPTIM "-g3 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Wno-invalid-constexpr")
 
-set(CMAKE_CXX_FLAGS_RELEASE "-stdlib=libc++ -std=gnu++11 -g0 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Wno-invalid-constexpr")
+set(CMAKE_CXX_FLAGS_RELEASE "${CLANG_FLAGS} -std=gnu++11 -g0 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Wno-invalid-constexpr")
 set(CMAKE_C_FLAGS_RELEASE "-g0 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Wno-invalid-constexpr")
-
-project(tfhe)
 
 if (ENABLE_NAYUKI_PORTABLE)
 list(APPEND FFT_PROCESSORS "nayuki-portable")
