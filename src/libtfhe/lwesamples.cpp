@@ -1,7 +1,7 @@
 #include "lwesamples.h"
 #include "lweparams.h"
 
-using namespace std;
+// using namespace std;
 
 LweSample::LweSample(const LweParams* params) 
 {
