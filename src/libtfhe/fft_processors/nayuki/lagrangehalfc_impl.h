@@ -3,7 +3,7 @@
 
 #include <cassert>
 #include <cmath>
-#include <complex.h>
+#include <complex>
 // typedef double _Complex cplx;
 typedef std::complex< double > cplx; // https://stackoverflow.com/a/31800404
 #include "tfhe.h"

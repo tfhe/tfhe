@@ -68,7 +68,7 @@ namespace {
     vector<const TGswKey *> all_keys1024 = {key1024_1, key1024_2};
 
     /* Tolerance factor for the equality between two TorusPolynomial */
-    const double toler = 1e-8;
+    //const double toler = 1e-8;
 
     /* This class fixture is for testing tgsw functions that entirely
      * rely on the Tlwe api, by faking ideal Tlwe behaviour */

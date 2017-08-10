@@ -22,8 +22,8 @@ int main(int argc, char **argv) {
 
     const int N = 1024;
     const int k = 2;
-    const int alpha_min = 0.01;
-    const int alpha_max = 0.071;
+    const double alpha_min = 0.01;
+    const double alpha_max = 0.071;
     const int Msize = 7; // taille de l'espace des coeffs du polynome du message
     const double alpha = 0.02;
     //TODO: parallelization

@@ -173,10 +173,9 @@ namespace {
     // Fake decryption of a Torus polynomial message
     inline void fake_tLweSymDecrypt(TorusPolynomial *result, const TLweSample *sample, const TLweKey *key, int Msize) {
         int N = key->params->N;
-        TorusPolynomial *phase;
+        const FakeTLwe *fsamp = fake(sample);
 
-        fake_tLwePhase(phase, sample, key);
-        fake_tLweApproxPhase(result, phase, Msize, N);
+        fake_tLweApproxPhase(result, fsamp->message, Msize, N);
     }
 
 #define USE_FAKE_tLweSymDecrypt \
@@ -188,13 +187,9 @@ namespace {
     // Fake decryption of a Torus message
     inline Torus32 fake_tLweSymDecryptT(const TLweSample *sample, const TLweKey *key, int Msize) {
         Torus32 message;
-        int N = key->params->N;
-        TorusPolynomial *phase;
-        TorusPolynomial *approx_phase;
+        const FakeTLwe *fsamp = fake(sample);
 
-        fake_tLwePhase(phase, sample, key);
-        fake_tLweApproxPhase(approx_phase, phase, Msize, N);
-        message = approx_phase->coefsT[0];
+        message = fsamp->message->coefsT[0];
 
         return message;
     }

@@ -44,7 +44,7 @@ void FFT_Processor_fftw::execute_direct_Torus32(Torus32* res, const cplx* a) {
     fftw_execute(p);
     for (int i=0; i<N; i++) res[i]=Torus32(int64_t(out[i]*_1sN*_2p32));
     //pas besoin du fmod... Torus32(int64_t(fmod(rev_out[i]*_1sN,1.)*_2p32));
-    for (int i=0; i<N; i++) assert(abs(out[N+i]+out[i])<1e-20);
+    for (int i=0; i<N; i++) assert(fabs(out[N+i]+out[i])<1e-20);
 }
 
 FFT_Processor_fftw::~FFT_Processor_fftw() {

@@ -1,4 +1,4 @@
-#include <complex.h>
+#include <complex>
 #include <polynomials.h>
 #include "lagrangehalfc_impl.h"
 #include "fft.h"
@@ -19,15 +19,15 @@ FFT_Processor_nayuki::FFT_Processor_nayuki(const int N): _2N(2*N),N(N),Ns2(N/2) 
 
 void FFT_Processor_nayuki::check_alternate_real() {
 #ifndef NDEBUG
-    for (int i=0; i<_2N; i++) assert(abs(imag_inout[i])<1e-20);
-    for (int i=0; i<N; i++) assert(abs(real_inout[i]+real_inout[N+i])<1e-20);
+    for (int i=0; i<_2N; i++) assert(fabs(imag_inout[i])<1e-8);
+    for (int i=0; i<N; i++) assert(fabs(real_inout[i]+real_inout[N+i])<1e-9);
 #endif
 }
 
 void FFT_Processor_nayuki::check_conjugate_cplx() {
 #ifndef NDEBUG
-    for (int i=0; i<N; i++) assert(abs(real_inout[2*i])+abs(imag_inout[2*i])<1e-20);
-    for (int i=0; i<Ns2; i++) assert(abs(imag_inout[2*i+1]+imag_inout[_2N-1-2*i])<1e-20);
+    for (int i=0; i<N; i++) assert(fabs(real_inout[2*i])+fabs(imag_inout[2*i])<1e-20);
+    for (int i=0; i<Ns2; i++) assert(fabs(imag_inout[2*i+1]+imag_inout[_2N-1-2*i])<1e-20);
 #endif
 }
 
@@ -43,7 +43,7 @@ void FFT_Processor_nayuki::execute_reverse_int(cplx* res, const int* a) {
 	res_dbl[i+1]=imag_inout[i+1];
     }
     for (int i=0; i<Ns2; i++) {
-	assert(cabs(real_inout[2*i+1]+1i*imag_inout[2*i+1]-res[i])<1e-20);
+	assert(abs(cplx(real_inout[2*i+1],imag_inout[2*i+1])-res[i])<1e-20);
     }
     check_conjugate_cplx();
 }
@@ -56,7 +56,7 @@ void FFT_Processor_nayuki::execute_reverse_torus32(cplx* res, const Torus32* a) 
     for (int i=0; i<_2N; i++) imag_inout[i]=0;
     check_alternate_real();
     fft_transform_reverse(tables_reverse,real_inout,imag_inout);
-    for (int i=0; i<Ns2; i++) res[i]=real_inout[2*i+1]+1i*imag_inout[2*i+1];
+    for (int i=0; i<Ns2; i++) res[i]=cplx(real_inout[2*i+1],imag_inout[2*i+1]);
     check_conjugate_cplx();
 }
 

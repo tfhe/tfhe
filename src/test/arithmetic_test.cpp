@@ -46,7 +46,7 @@ namespace {
 	ASSERT_EQ(1<<31,dtot32(0.5));
 	ASSERT_EQ(1<<31,dtot32(-0.5));
 	ASSERT_EQ(1<<30,dtot32(0.25));
-	ASSERT_EQ(-1<<30,dtot32(-0.25));
+	ASSERT_EQ(int32_t(0xC0000000),dtot32(-0.25));
     }
 
     //  Used to approximate the phase to the nearest multiple of  1/Msize 
