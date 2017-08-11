@@ -36,7 +36,7 @@ namespace {
 	reps2 = gaussian32(MESSAGE2, 0.5);
 	ASSERT_NE(MESSAGE1,reps1);
 	ASSERT_NE(MESSAGE2,reps2);
-	ASSERT_LE(abs(MESSAGE1-reps1),8000000);
+	ASSERT_LE(abs(MESSAGE1-reps1),80000000);
     }
 
     // conversion from double to Torus32 
