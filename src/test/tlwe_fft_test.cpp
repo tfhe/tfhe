@@ -22,7 +22,7 @@ using namespace ::testing;
 namespace {
 
     /* Tolerance factor for the equality between two TorusPolynomial */
-    const double toler = 1e-8;
+    //const double toler = 1e-8;
 
     const TLweParams *params1024 = new TLweParams(1024, 1, 0.1, 0.2);
 

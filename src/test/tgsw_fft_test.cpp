@@ -36,7 +36,7 @@ namespace {
     vector<const TGswParams *> all_params1024 = {params1024_1, params1024_2};
 
     /* Tolerance factor for the equality between two TorusPolynomial */
-    const double toler = 1e-8;
+    //const double toler = 1e-8;
 
     class TGswFFTTest : public ::testing::Test {
     public:

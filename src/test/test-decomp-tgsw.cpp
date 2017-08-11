@@ -26,8 +26,8 @@ int main(int argc, char **argv) {
 
     const int N = 1024;
     const int k = 1;
-    const int alpha_min_gsw = 0.;
-    const int alpha_max_gsw = 0.071;
+    const double alpha_min_gsw = 0.;
+    const double alpha_max_gsw = 0.071;
     const int Msize = 2;
     const double alpha = 1e-6;
     const int l = 3;

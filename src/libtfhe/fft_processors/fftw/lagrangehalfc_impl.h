@@ -3,11 +3,13 @@
 
 #include <cassert>
 #include <cmath>
-#include <complex.h>
-typedef double _Complex cplx;
+#include <ccomplex>
+//typedef double _Complex cplx;
+typedef std::complex<double> cplx;
 #include <fftw3.h>
 #include "tfhe.h"
 #include "polynomials.h"
+
 
 class FFT_Processor_fftw {
     public:
