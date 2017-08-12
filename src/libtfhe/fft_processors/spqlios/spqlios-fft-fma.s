@@ -1,14 +1,14 @@
 	.file	"spqlios-fft-avx.s"
-	.section	.text.unlikely,"ax",@progbits
-.LCOLDB0:
 	.text
-.LHOTB0:
-	.p2align 4,,15
+	.p2align 4
+#if !__APPLE__
 	.globl	fft
 	.type	fft, @function
 fft:
-.LFB0:
-	.cfi_startproc
+#else
+	.globl	_fft
+_fft:
+#endif
 //c has size n/2
 //void fft(const void* tables, double* c) {
 
@@ -29,7 +29,7 @@ fft:
 	movq        %rsi, %rdi      /* rdi: base of the real data CONSTANT */
 	
 	/* Load struct FftTables fields */
-	movq         0(%rax), %rdx  /* rdx: n (logical Size of FFT  = a power of 2, must be at least 4) */
+	movq         0(%rax), %rdx  /* rdx: n (logical Size of _fft  = a power of 2, must be at least 4) */
 	movq         8(%rax), %r8   /* r8: Base address of trigonometric tables array (CONSTANT) */
 	
 //    int ns4 = n/4;
@@ -292,13 +292,6 @@ size4negation1: .double +1.0, -1.0, -1.0, +1.0 /* ymm14 */
 size4negation2: .double +1.0, +1.0, -1.0, -1.0 /* ymm13 */
 size4negation3: .double +1.0, -1.0, +1.0, -1.0 /* ymm12 */
 
-	.cfi_endproc
-.LFE0:
+#if !__APPLE__
 	.size	fft, .-fft
-	.section	.text.unlikely
-.LCOLDE0:
-	.text
-.LHOTE0:
-	.ident	"GCC: (Ubuntu 5.2.1-22ubuntu2) 5.2.1 20151010"
-	.section	.note.GNU-stack,"",@progbits
-
+#endif

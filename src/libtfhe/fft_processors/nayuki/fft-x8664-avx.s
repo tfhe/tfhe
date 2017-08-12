@@ -45,10 +45,18 @@
  *        8  [rsp+16]  Caller's value of r11
  *        8  [rsp+24]  Caller's value of r10
  */
-
-/* void fft_transform(const void *tables, double *real, double *imag) */
-.globl fft_transform
+	.file	"fft-x8664-avx.s"
+	.text
+	.p2align 4
+#if !__APPLE__
+	.globl	fft_transform
+	.type	fft_transform, @function
 fft_transform:
+#else
+	.globl	_fft_transform
+_fft_transform:
+#endif
+/* void fft_transform(const void *tables, double *real, double *imag) */
 	/* Save registers */
 	pushq       %r10
 	pushq       %r11
@@ -186,3 +194,7 @@ end:
 .balign 32
 size4negation0: .double +1.0, +1.0, -1.0, -1.0
 size4negation1: .double +1.0, -1.0, -1.0, +1.0
+
+#if !__APPLE__
+	.size	fft_transform, .-fft_transform
+#endif

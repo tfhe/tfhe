@@ -46,9 +46,18 @@
  *        8  [rsp+24]  Caller's value of r10
  */
 
-/* void fft_transform(const void *tables, double *real, double *imag) */
-.globl fft_transform_reverse
+	.file	"fft-x8664-avx-reverse.s"
+	.text
+	.p2align 4
+#if !__APPLE__
+	.globl	fft_transform_reverse
+	.type	fft_transform_reverse, @function
 fft_transform_reverse:
+#else
+	.globl	_fft_transform_reverse
+_fft_transform_reverse:
+#endif
+/* void fft_transform(const void *tables, double *real, double *imag) */
 	/* Save registers */
 	pushq       %r10
 	pushq       %r11
@@ -186,3 +195,7 @@ end:
 .balign 32
 size4negation0: .double +1.0, +1.0, -1.0, -1.0
 size4negation1: .double +1.0, -1.0, -1.0, +1.0
+
+#if !__APPLE__
+	.size	fft_transform_reverse, .-fft_transform_reverse
+#endif

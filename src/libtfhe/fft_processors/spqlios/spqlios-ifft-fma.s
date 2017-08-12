@@ -1,20 +1,21 @@
 	.file	"spqlios-ifft-avx.s"
-	.section	.text.unlikely,"ax",@progbits
-.LCOLDB0:
 	.text
-.LHOTB0:
-	.p2align 4,,15
+	.p2align 4
+#if !__APPLE__
 	.globl	ifft
 	.type	ifft, @function
 ifft:
-.LFB0:
-	.cfi_startproc
+#else
+	.globl	_ifft
+_ifft:
+#endif
+
 //typedef struct  {
 //    uint64_t n;
 //    double* trig_tables;
 //} IFFT_PRECOMP;
 
-/* void ifft(const void *tables, double *real) */
+/* void _ifft(const void *tables, double *real) */
 	/* Save registers */
 	pushq       %r10
 	pushq       %r11
@@ -282,14 +283,7 @@ size4negation1: .double +1.0, +1.0, -1.0, +1.0
 size4negation2: .double +1.0, +1.0, -1.0, -1.0
 size4negation3: .double +1.0, -1.0, +1.0, -1.0
 
-	.cfi_endproc
-.LFE0:
+#if !__APPLE__
 	.size	ifft, .-ifft
-	.section	.text.unlikely
-.LCOLDE0:
-	.text
-.LHOTE0:
-	.ident	"GCC: (Ubuntu 5.2.1-22ubuntu2) 5.2.1 20151010"
-	.section	.note.GNU-stack,"",@progbits
-
+#endif
 
