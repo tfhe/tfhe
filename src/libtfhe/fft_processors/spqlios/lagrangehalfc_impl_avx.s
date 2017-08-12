@@ -1,20 +1,15 @@
-	.file	"lagrangehalfc_impl_asm.cpp"
-#if __APPLE__
+	.file	"lagrangehalfc_impl_avx.s"
 	.text
-#else
-	.section	.text.unlikely,"ax",@progbits
-#endif
-.LCOLDB0:
-	.text
-.LHOTB0:
-	.p2align 4,,15
-	.globl	_LagrangeHalfCPolynomialMul
+	.p2align 4
 #if !__APPLE__
-	.type	_LagrangeHalfCPolynomialMul, @function
-#endif
+	.globl	LagrangeHalfCPolynomialMul
+	.type	LagrangeHalfCPolynomialMul, @function
+LagrangeHalfCPolynomialMul:
+#else
+	.globl	_LagrangeHalfCPolynomialMul
 _LagrangeHalfCPolynomialMul:
-.LFB7134:
-	.cfi_startproc
+#endif
+
 	pushq	%r12
 	pushq	%r13
 	pushq	%r14
@@ -59,43 +54,24 @@ _LagrangeHalfCPolynomialMul:
 	popq	%r14
 	popq	%r13
 	popq	%r12
-.L1:
-	rep ret
-	.p2align 4,,10
-	.p2align 3
-.L22:
-	rep ret
-	.p2align 4,,10
-	.p2align 3
-.L21:
-	rep ret
-	.cfi_endproc
-.LFE7134:
-#if __APPLE__
-	.text
-#else
-	.size	_LagrangeHalfCPolynomialMul, .-_LagrangeHalfCPolynomialMul
-	.section	.text.unlikely
-#endif
-.LCOLDE0:
-	.text
-.LHOTE0:
-#if __APPLE__
-	.text
-#else
-	.section	.text.unlikely
-#endif
-.LCOLDB1:
-	.text
-.LHOTB1:
-	.p2align 4,,15
-	.globl	_LagrangeHalfCPolynomialAddMul
+	retq
+
 #if !__APPLE__
-	.type	_LagrangeHalfCPolynomialAddMul, @function
+	.size	LagrangeHalfCPolynomialMul, .-LagrangeHalfCPolynomialMul
 #endif
+
+
+//	.text
+	.p2align 4
+#if !__APPLE__
+	.globl	LagrangeHalfCPolynomialAddMul
+	.type	LagrangeHalfCPolynomialAddMul, @function
+LagrangeHalfCPolynomialAddMul:
+#else
+	.globl	_LagrangeHalfCPolynomialAddMul
 _LagrangeHalfCPolynomialAddMul:
-.LFB7135:
-	.cfi_startproc
+#endif
+
 	pushq	%r12
 	pushq	%r13
 	pushq	%r14
@@ -144,43 +120,21 @@ _LagrangeHalfCPolynomialAddMul:
 	popq	%r14
 	popq	%r13
 	popq	%r12
-.L23:
-	rep ret
-	.p2align 4,,10
-	.p2align 3
-.L43:
-	rep ret
-	.p2align 4,,10
-	.p2align 3
-.L42:
-	rep ret
-	.cfi_endproc
-.LFE7135:
-#if __APPLE__
-	.text
-#else
-	.size	_LagrangeHalfCPolynomialAddMul, .-_LagrangeHalfCPolynomialAddMul
-	.section	.text.unlikely
-#endif
-.LCOLDE1:
-	.text
-.LHOTE1:
-#if __APPLE__
-	.text
-#else
-	.section	.text.unlikely
-#endif
-.LCOLDB2:
-	.text
-.LHOTB2:
-	.p2align 4,,15
-	.globl	_LagrangeHalfCPolynomialSubMul
+	retq
 #if !__APPLE__
-	.type	_LagrangeHalfCPolynomialSubMul, @function
+	.size	LagrangeHalfCPolynomialAddMul, .-LagrangeHalfCPolynomialAddMul
 #endif
+
+//	.text
+	.p2align 4
+#if !__APPLE__
+	.globl	LagrangeHalfCPolynomialSubMul
+	.type	LagrangeHalfCPolynomialSubMul, @function
+LagrangeHalfCPolynomialSubMul:
+#else
+	.globl	_LagrangeHalfCPolynomialSubMul
 _LagrangeHalfCPolynomialSubMul:
-.LFB7136:
-	.cfi_startproc
+#endif
 	pushq	%r12
 	pushq	%r13
 	pushq	%r14
@@ -229,28 +183,7 @@ _LagrangeHalfCPolynomialSubMul:
 	popq	%r14
 	popq	%r13
 	popq	%r12
-.L44:
-	rep ret
-	.p2align 4,,10
-	.p2align 3
-.L64:
-	rep ret
-	.p2align 4,,10
-	.p2align 3
-.L63:
-	rep ret
-	.cfi_endproc
-.LFE7136:
-#if __APPLE__
-	.text
-#else
-	.size	_LagrangeHalfCPolynomialSubMul, .-_LagrangeHalfCPolynomialSubMul
-	.section	.text.unlikely
-#endif
-.LCOLDE2:
-	.text
-.LHOTE2:
-	.ident	"GCC: (Ubuntu 5.2.1-22ubuntu2) 5.2.1 20151010"
+	retq
 #if !__APPLE__
-	.section	.note.GNU-stack,"",@progbits
+	.size	LagrangeHalfCPolynomialSubMul, .-LagrangeHalfCPolynomialSubMul
 #endif
