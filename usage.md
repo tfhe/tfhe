@@ -20,8 +20,7 @@ that you compiled the SPQLIOS_FMA version of tfhe)
 All the external API use C naming convention, which means that you can use 
 any language to code your functions (C, C++, Fortran, ...) 
 and do separate compilation with the corresponding compiler
-(gcc, g++, g77, ...). However, you **must always** link the final binary with a c++
-compiler (like g++).
+(gcc, g++, g77, ...).
 
 # More details
 
@@ -31,9 +30,10 @@ If you are using gcc/g++, you can do it on the current shell by setting these en
 ~~~sh
 #configure environment variables
 TFHE_PREFIX=/usr/local #the prefix where you installed tfhe
-export LIBRARY_PATH=$LIBRARY_PATH:$TFHE_PREFIX/lib
 export C_INCLUDE_PATH=$C_INCLUDE_PATH:$TFHE_PREFIX/include
 export CPLUS_INCLUDE_PATH=$CPLUS_INCLUDE_PATH:$TFHE_PREFIX/include
+export LIBRARY_PATH=$LIBRARY_PATH:$TFHE_PREFIX/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$TFHE_PREFIX/lib
 ~~~
 
 To make these changes persistent, you may define these variables in your
@@ -47,13 +47,11 @@ you can do
 g++ your-program.cpp -o your-program -ltfhe-spqlios-fma 
 ~~~
 
-Finally, since tfhe uses c++ functions, even if you write C code that you separately compile with gcc, 
-you will need to link the final executable with g++. For instance,
+If you have a C source file, you can do:
 
 ~~~sh
 # compile a c source code
-gcc -c your-program.c -o your-program.o
-g++ your-program.o -o your-program -ltfhe-spqlios-fma 
+gcc your-program.c -o -ltfhe-spqlios-fma 
 ~~~
 
 
