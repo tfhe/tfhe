@@ -15,7 +15,7 @@ version of the library directly on the cloud environment where homomorphic
 computations will be run. 
 
 To build the library, you need at least cmake is already installed on the
-system, and an up-to-date c++ compiler (i.e. g++ >=5.2) as well.
+system, and an up-to-date c++ compiler (i.e. g++ >=5.2 or clang >= 3.8) as well.
 
 On Debian/Ubuntu, you can get these tools by issuing:
 
@@ -101,27 +101,30 @@ The available build options are the following:
     </tr>
     <tr>
       <td>ENABLE_TESTS</td>
-      <td><em>on/off</em> compiles the library’s unit tests and sample applications in the test/ folder. This assumes that googletest&gt;1.8 is installed on the system. (use <code class="highlighter-rouge">ctest</code> to run all tests)</td>
+      <td><em>on/off</em> compiles the library’s unit tests and sample applications in the test/ folder.<br>
+<strong>Important:</strong> Please run <code>git submodule init; git submodule update</code> to checkout the last version of 
+googletest before running cmake if you plan to compile the tests.<br>
+(Then, after compilation, use <code class="highlighter-rouge">ctest</code> to run all unittests)</td>
     </tr>
     <tr>
       <td>ENABLE_FFTW</td>
-      <td><em>on/off</em> compiles libtfhe-fftw.a, using FFTW3 (GPL licence) for fast FFT computations</td>
+      <td><em>on/off</em> compiles libtfhe-fftw.so, using FFTW3 (GPL licence) for fast FFT computations</td>
     </tr>
     <tr>
       <td>ENABLE_NAYUKI_PORTABLE</td>
-      <td><em>on/off</em> compiles libtfhe-nayuki-portable.a, using the fast C version of nayuki for FFT computations</td>
+      <td><em>on/off</em> compiles libtfhe-nayuki-portable.so, using the fast C version of nayuki for FFT computations</td>
     </tr>
     <tr>
       <td>ENABLE_NAYUKI_AVX</td>
-      <td><em>on/off</em> compiles libtfhe-nayuki-avx.a, using the avx assembly version of nayuki for FFT computations</td>
+      <td><em>on/off</em> compiles libtfhe-nayuki-avx.so, using the avx assembly version of nayuki for FFT computations</td>
     </tr>
     <tr>
       <td>ENABLE_SPQLIOS_AVX</td>
-      <td><em>on/off</em> compiles libtfhe-spqlios-avx.a, using tfhe’s dedicated avx assembly version for FFT computations</td>
+      <td><em>on/off</em> compiles libtfhe-spqlios-avx.so, using tfhe’s dedicated avx assembly version for FFT computations</td>
     </tr>
     <tr>
       <td>ENABLE_SPQLIOS_FMA</td>
-      <td><em>on/off</em> compiles libtfhe-spqlios-fma.a, using tfhe’s dedicated fma assembly version for FFT computations</td>
+      <td><em>on/off</em> compiles libtfhe-spqlios-fma.so, using tfhe’s dedicated fma assembly version for FFT computations</td>
     </tr>
   </tbody>
 </table>
