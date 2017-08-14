@@ -11,6 +11,7 @@ public:
     const int _2N;
     const int N;
     const int Ns2;
+
 private:
     double *real_inout_direct;
     double *imag_inout_direct;
