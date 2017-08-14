@@ -17,8 +17,9 @@ EXPORT void die_dramatically(const char *message) {
 /** 
  * multiplies by sqrt(2/pi)  to convert a "litterature" gaussian
  * parameter into a standard deviation
+ * TODO: get rid of this function and express everything as a function of the standard deviation
  */
-constexpr inline double mulBySqrtTwoOverPi(double x) { return x * sqrt(2. / M_PI); }
+const inline double mulBySqrtTwoOverPi(double x) { return x * sqrt(2. / M_PI); }
 
 /** generate default gate bootstrapping parameters */
 EXPORT TFheGateBootstrappingParameterSet *new_default_gate_bootstrapping_parameters(int minimum_lambda) {
