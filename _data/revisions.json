@@ -1,5 +1,10 @@
 [
     {
+        "name": "v1.0.1",
+        "title": "TFHE for Linux and MacOs",
+        "date": "2017.08.15"
+    },
+    {
         "name": "v1.0",
         "title": "First official release",
         "date": "2017.05.02"

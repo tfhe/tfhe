@@ -28,8 +28,8 @@ without revealing any information on the data.
 
 The library supports the homomorphic evaluation of the 10 binary gates (And, Or, Xor, 
 Nand, Nor, etc...), as well as the negation and the Mux gate. Each binary gate takes 
-about 20 milliseconds single-core time to evaluate, which improves [DM15] by a factor 30, 
-and the mux gate takes about 40 CPU-ms.
+about 13 milliseconds single-core time to evaluate, which improves [DM15] by a factor 90, 
+and the mux gate takes about 26 CPU-ms.
 
 Unlike other libraries, the gate-bootstrapping mode of TFHE has no
 restriction on the number of gates or on their composition. This allows
@@ -47,7 +47,7 @@ From the user point of view, the library can:
   The encrypted data can safely be outsourced to the cloud, in order to perform
   secure homomorphic computations. 
 * With the cloud-keyset, the library can evaluate a net-list of
-  binary gates homomorphically at a rate of about 50 gates per second per
+  binary gates homomorphically at a rate of about 76 gates per second per
   core, without decrypting its input. It suffices to provide the sequence
   of gates, as well as ciphertexts of the input bits. And the
   library computes ciphertexts of the output bits.
@@ -61,7 +61,7 @@ cryptosystem and makes many optimizations described in [DM15] and
 It also implements a dedicated Fast Fourier
 Transformation for the anticyclic ring \\(\mathbb{R}[X]/(X^N+1)\\), and uses AVX
 assembly vectorization instructions. 
-The default parameter set achieves a 120-bit cryptographic security,
+The default parameter set achieves a 110-bit cryptographic security,
 based on ideal lattice assumptions.
 
 
@@ -75,9 +75,8 @@ possibility to evaluate them in parallel.
 
 The library interface can be used in a regular C code. However, to
 compile the core of the library you will need a standard C++11 compiler.
-Currently, the project has only been tested with the g++ compiler under
-Linux. In the future, we plan to extend the compatibility to other
-compilers, platforms and operating systems.
+The project has been tested and reported to work with the GNU compiler 
+g++/gcc (>=5.2) as well as the clang compiler (>=3.8) on both Linux and MacOS platforms.
 
 At least one FFT processor is needed to run the project:
 
