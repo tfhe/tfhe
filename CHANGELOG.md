@@ -9,13 +9,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [1.0.1] - 2017-08-15
 ### Added
 - Compatibility with MacOS, CentOS (clang compiler with libc++).
-- Compatibility with Linux (clang compiler with libc++).
+- Compatibility with Linux (g++ >= 5.2 and clang >=3.8 compilers with either libstdc++ or libc++).
 
 ### Changed
 - All assembly sources are now position independent.
 - libtfhe is compiled as a shared library
 - optim and release builds use -O3 instead of -O2
-- googletest is now part of the repository (do 
+- googletest is now a submodule of the repository (do 
   ```git submodule init; git submodule update``` 
   once before compiling the tests
 
