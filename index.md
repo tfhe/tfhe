@@ -28,7 +28,7 @@ without revealing any information on the data.
 
 The library supports the homomorphic evaluation of the 10 binary gates (And, Or, Xor, 
 Nand, Nor, etc...), as well as the negation and the Mux gate. Each binary gate takes 
-about 13 milliseconds single-core time to evaluate, which improves [DM15] by a factor 90, 
+about 13 milliseconds single-core time to evaluate, which improves [DM15] by a factor 53, 
 and the mux gate takes about 26 CPU-ms.
 
 Unlike other libraries, the gate-bootstrapping mode of TFHE has no
@@ -74,9 +74,10 @@ possibility to evaluate them in parallel.
 ### Dependencies 
 
 The library interface can be used in a regular C code. However, to
-compile the core of the library you will need a standard C++11 compiler.
+compile the core of the library you will need a standard x86_64 C++11 compiler.
 The project has been tested and reported to work with the GNU compiler 
 g++/gcc (>=5.2) as well as the clang compiler (>=3.8) on both Linux and MacOS platforms.
+Compilation under Windows is not supported at this time. 
 
 At least one FFT processor is needed to run the project:
 
