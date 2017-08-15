@@ -21,7 +21,7 @@ The library implements a Ring-variant of the GSW [GSW13]
 cryptosystem and makes many optimizations described in [DM15] and [CGGI16]. 
 
 It also implements a dedicated Fast Fourier
-Transformation for the anticyclic ring R[X]/(X^N+1), and uses AVX assembly vectorization instructions. 
+Transformation for the anticyclic ring R[X]/(X^N+1), and uses AVX, AVX2 and FMA assembly vectorization instructions. 
 The default parameter set achieves at least 110-bit of cryptographic security, based on ideal lattice assumptions.
 
 From the user point of view, the library can evaluate a net-list of binary gates homomorphically at a rate of about 50 gates per second per core, without decrypting its input. It suffices to provide the sequence of gates, as well as ciphertexts of the input bits. And the
@@ -37,7 +37,7 @@ and to a lesser extent, the possibility to evaluate them in parallel.
 
 
 The library interface can be used in a regular C code. However, to compile the core of the library you will need a standard C++11 compiler.
-Currently, the project has only been tested with the g++ compiler under Linux. In the future, we plan to extend the compatibility to other compilers, platforms and operating systems.
+Currently, the project has been tested with the g++ >= 5.2 compiler and clang >=3.8 under Linux, as well as clang under MacOS. In the future, we plan to extend the compatibility to other compilers, platforms and operating systems.
 
 At least one FFT processor is needed to run the project:
 
@@ -51,9 +51,8 @@ This component is licensed under the MIT license, and we added the code of the r
 ### Installation
 
 To build the library with the default options, run ```make``` and ```make install``` from the top level directory of the TFHE project. This assumes that the standard tool cmake is already installed on the system, and an
-up-to-date c++ compiler (i.e. g++ >=5.2) as well.
-It will compile the library in optimized mode, and install it to ```/usr/local/lib``` folder.
-Currently, only static libraries are generated. 
+up-to-date c++ compiler (i.e. g++ >=5.2 or clang >= 3.8) as well.
+It will compile the shared library in optimized mode, and install it to the ```/usr/local/lib``` folder.
 
 If you want to choose additional compile options (i.e. other installation folder, debug mode, tests, fftw), you need to run cmake manually and pass the desired options:
 ```

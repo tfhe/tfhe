@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-add_subdirectory(googletest)
+add_subdirectory(googletest EXCLUDE_FROM_ALL)
 
 include_directories(${GTEST_INCLUDE_DIRS})
 

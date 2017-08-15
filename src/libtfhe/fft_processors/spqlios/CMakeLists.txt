@@ -28,8 +28,10 @@ set(HEADERS
 
 if (ENABLE_SPQLIOS_AVX) 
     add_library(tfhe-fft-spqlios-avx OBJECT ${SRCS_AVX} ${HEADERS})
+    set_property(TARGET tfhe-fft-spqlios-avx PROPERTY POSITION_INDEPENDENT_CODE ON)
 endif (ENABLE_SPQLIOS_AVX) 
 
 if (ENABLE_SPQLIOS_FMA) 
     add_library(tfhe-fft-spqlios-fma OBJECT ${SRCS_FMA} ${HEADERS})
-endif (ENABLE_SPQLIOS_FMA) 
+    set_property(TARGET tfhe-fft-spqlios-fma PROPERTY POSITION_INDEPENDENT_CODE ON)
+endif (ENABLE_SPQLIOS_FMA)
