@@ -64,7 +64,7 @@ You may choose different or additional compile options (i.e. debug mode,
 tests, fftw), which are described in the advanced section at the bottom
 of this page.
 
-Once you exit the configuration tool (by choosing congigure and generate of course),
+Once you exit the configuration tool (by choosing configure and generate of course),
 you can build and install the library.
 
 ~~~sh
