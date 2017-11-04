@@ -22,7 +22,7 @@ Ilaria Chillotti, Nicolas Gama, Mariya Georgieva and Malika Izabachène.
 ### Description 
 
 TFHE is a C/C++ library which implements a very fast gate-by-gate
-bootstrapping, based on [CGGI16]. The library allows to evaluate an
+bootstrapping, based on [CGGI16] and [CGGI17]. The library allows to evaluate an
 arbitrary boolean circuit composed of binary gates, over encrypted data,
 without revealing any information on the data.
 
@@ -55,8 +55,8 @@ From the user point of view, the library can:
 ### Under the hood
 
 The library implements a Ring-variant of the GSW [GSW13]
-cryptosystem and makes many optimizations described in [DM15] and
-[CGGI16]. 
+cryptosystem and makes many optimizations described in [DM15],
+[CGGI16] and [CGGI17]. 
 
 It also implements a dedicated Fast Fourier
 Transformation for the anticyclic ring \\(\mathbb{R}[X]/(X^N+1)\\), and uses AVX
@@ -103,6 +103,8 @@ At least one FFT processor is needed to run the project:
 
 
 ### References
+
+[[CGGI17]](https://eprint.iacr.org/2017/430){:target="_blank"}: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. *Improving TFHE: faster packed homomorphic operations and efficient circuit bootstrapping*. Asiacrypt 2017. Cryptology ePrint Archive, report 2017/430.
 
 [[CGGI16]](https://eprint.iacr.org/2016/870){:target="_blank"}: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. *Faster fully homomorphic encryption: Bootstrapping in less than 0.1 seconds*. Asiacrypt 2016. Cryptology ePrint Archive, report 2016/870.
 
