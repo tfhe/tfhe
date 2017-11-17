@@ -18,13 +18,22 @@
 EXPORT void die_dramatically(const char* message);
 
 
-// Idea:
-// we may want to represent an element x of the real torus by 
-// the integer rint(2^32.x) modulo 2^32
-//  -- addition, subtraction and integer combinations are native operation
-//  -- modulo 1 is mapped to mod 2^32, which is also native!
-// This looks much better than using float/doubles, where modulo 1 is not
-// natural at all.
+// Torus32 and Torus64 types: approximate real numbers modulo 1
+
+// Torus32 represents approximations of torus numbers up to precision 2^-32
+//   the 32-bits (b0,b1,..,b31) little-endian encode
+//   the real number 0.<b31><b30>...<b0> written in binary, and reduced modulo 1
+// Under this representation,
+//  -- addition, subtraction coincide bit-wise with the native 32-bit integer addition/subtraction
+//  -- external multiplication by an integer with result modulo 1 coincide bit-wise with the native 32-bit product
+//  -- the typedef trick below ensures that Torus32 are treated syntaxically as a primitive type and enables
+//     the =,==,!=,+,-,+=,-= operators between Torus32 elements, as well as *,*= between any small integer and a Torus32.
+//  -- despite the typedef line, Torus32 are not integers: any other operator, such as increment, division, cast,
+//     internal product is illegal and will yield Undefined Behaviour.
+
+// Similarly, Torus64 type represents approximations of torus numbers up to precision 2^-64
+//   the 64-bits (b0,b1,..,b63) little-endian encode
+//   the real number 0.<b63><b62>...<b0> written in binary, and reduced modulo 1
 typedef int32_t Torus32; //avant uint32_t
 //typedef int64_t Torus64; //avant uint64_t
 
