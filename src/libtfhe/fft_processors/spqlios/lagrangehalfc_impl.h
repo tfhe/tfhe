@@ -32,7 +32,7 @@ class FFT_Processor_Spqlios {
     ~FFT_Processor_Spqlios();
 };
 
-extern FFT_Processor_Spqlios fftp1024;
+extern thread_local FFT_Processor_Spqlios fftp1024;
 
 /**
  * structure that represents a real polynomial P mod X^N+1
