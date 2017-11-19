@@ -11,19 +11,19 @@
 // **********************************************************************************
 
 
-void dieDramatically(const char* message) {
+void dieDramatically(const char *message) {
     fputs(message, stderr);
     abort();
 }
 
 
 #ifndef NDEBUG
-extern const TLweKey* debug_accum_key;
-extern const LweKey* debug_extract_key;
-extern const LweKey* debug_in_key;
+extern const TLweKey *debug_accum_key;
+extern const LweKey *debug_extract_key;
+extern const LweKey *debug_in_key;
 #endif
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
 #ifndef NDEBUG
     printf("DEBUG MODE!\n");
 #endif
@@ -39,52 +39,52 @@ int main(int argc, char** argv) {
     const double alpha_bk = 9e-9;
     //const int alpha_ks = 1e-6;
 
-    LweParams* params_in = new_LweParams(n, alpha_in, 1./16.);
-    TLweParams* params_accum = new_TLweParams(N, k, alpha_bk, 1./16.);
-    TGswParams* params_bk = new_TGswParams(l_bk, Bgbit_bk, params_accum);
+    LweParams *params_in = new_LweParams(n, alpha_in, 1. / 16.);
+    TLweParams *params_accum = new_TLweParams(N, k, alpha_bk, 1. / 16.);
+    TGswParams *params_bk = new_TGswParams(l_bk, Bgbit_bk, params_accum);
 
-    LweKey* key = new_LweKey(params_in);
+    LweKey *key = new_LweKey(params_in);
     lweKeyGen(key);
 
-    TGswKey* key_bk = new_TGswKey(params_bk);
+    TGswKey *key_bk = new_TGswKey(params_bk);
     tGswKeyGen(key_bk);
 
-    LweBootstrappingKey* bk = new_LweBootstrappingKey(ks_t, ks_basebit, params_in, params_bk);
+    LweBootstrappingKey *bk = new_LweBootstrappingKey(ks_t, ks_basebit, params_in, params_bk);
     tfhe_createLweBootstrappingKey(bk, key, key_bk);
 
-    LweSample* test = new_LweSample(params_in);
-    LweSample* test_out = new_LweSample(params_in);
-    
-    const Torus32 mu = modSwitchToTorus32(1,4);
-    
-    Torus32 mu_in = modSwitchToTorus32(-1,4);
+    LweSample *test = new_LweSample(params_in);
+    LweSample *test_out = new_LweSample(params_in);
+
+    const Torus32 mu = modSwitchToTorus32(1, 4);
+
+    Torus32 mu_in = modSwitchToTorus32(-1, 4);
     lweSymEncrypt(test, mu_in, alpha_in, key);
     printf("in_message: %d\n", mu_in);
-    
+
 #ifndef NDEBUG
-    debug_accum_key=&key_bk->tlwe_key;
-    LweKey* debug_extract_key2=new_LweKey(&params_accum->extracted_lweparams);
+    debug_accum_key = &key_bk->tlwe_key;
+    LweKey *debug_extract_key2 = new_LweKey(&params_accum->extracted_lweparams);
     tLweExtractKey(debug_extract_key2, debug_accum_key);
-    debug_extract_key=debug_extract_key2;
-    debug_in_key=key;
+    debug_extract_key = debug_extract_key2;
+    debug_in_key = key;
 #endif
 
     printf("starting bootstrapping...\n");
 
     int nbtrials = 50;
     clock_t begin = clock();
-    for (int i=0; i<nbtrials; i++)
-	tfhe_bootstrap(test_out, bk, mu, test);
+    for (int i = 0; i < nbtrials; i++)
+        tfhe_bootstrap(test_out, bk, mu, test);
     clock_t end = clock();
-    printf("finished bootstrapping in (microsecs)... %lf\n",(double)(end-begin)/(double)(nbtrials));
+    printf("finished bootstrapping in (microsecs)... %lf\n", (double) (end - begin) / (double) (nbtrials));
     Torus32 mu_out = lweSymDecrypt(test_out, key, 4);
     Torus32 phase_out = lwePhase(test_out, key);
-    printf("end_variance: %lf\n",test_out->current_variance);
-    printf("end_phase: %d\n ",phase_out);
-    printf("end_message: %d\n",mu_out);
+    printf("end_variance: %lf\n", test_out->current_variance);
+    printf("end_phase: %d\n ", phase_out);
+    printf("end_message: %d\n", mu_out);
 
-    if (mu_in != mu_out) 
-	dieDramatically("et Zut!");
+    if (mu_in != mu_out)
+        dieDramatically("et Zut!");
 
 
     delete_LweSample(test_out);

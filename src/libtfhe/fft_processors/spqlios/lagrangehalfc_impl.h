@@ -7,27 +7,30 @@
 #include <polynomials.h>
 
 class FFT_Processor_Spqlios {
-    public:
+public:
     const int _2N;
-    const int N;    
+    const int N;
     const int Ns2;
-    private:
-    double* real_inout_direct;
-    double* imag_inout_direct;
-    double* real_inout_rev;
-    double* imag_inout_rev;
-    void* tables_direct;
-    void* tables_reverse;
-    public:
-    double* cosomegaxminus1;
-    double* sinomegaxminus1;
-    int* reva; //rev(2i+1,_2N)
+
+private:
+    double *real_inout_direct;
+    double *imag_inout_direct;
+    double *real_inout_rev;
+    double *imag_inout_rev;
+    void *tables_direct;
+    void *tables_reverse;
+public:
+    double *cosomegaxminus1;
+    double *sinomegaxminus1;
+    int *reva; //rev(2i+1,_2N)
 
     FFT_Processor_Spqlios(const int N);
 
-    void execute_reverse_int(double* res, const int* a);
-    void execute_reverse_torus32(double* res, const Torus32* a);
-    void execute_direct_torus32(Torus32* res, const double* a);
+    void execute_reverse_int(double *res, const int *a);
+
+    void execute_reverse_torus32(double *res, const Torus32 *a);
+
+    void execute_direct_torus32(Torus32 *res, const double *a);
 
     ~FFT_Processor_Spqlios();
 };
@@ -40,13 +43,13 @@ extern thread_local FFT_Processor_Spqlios fftp1024;
  * P(w), P(w^3), ..., P(w^(N-1))
  * where w is exp(i.pi/N)
  */
-struct LagrangeHalfCPolynomial_IMPL
-{
-   double* coefsC;
-   FFT_Processor_Spqlios* proc;
+struct LagrangeHalfCPolynomial_IMPL {
+    double *coefsC;
+    FFT_Processor_Spqlios *proc;
 
-   LagrangeHalfCPolynomial_IMPL(int N);
-   ~LagrangeHalfCPolynomial_IMPL();
+    LagrangeHalfCPolynomial_IMPL(int N);
+
+    ~LagrangeHalfCPolynomial_IMPL();
 };
 
 #endif // LAGRANGEHALFC_IMPL_SPQLIOS_H

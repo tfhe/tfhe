@@ -1,9 +1,8 @@
 #include "lwesamples.h"
 #include "lweparams.h"
 
-using namespace std;
 
-LweSample::LweSample(const LweParams* params) 
+LweSample::LweSample(const LweParams* params)
 {
 	this->a = new Torus32[params->n];
     this->b = 0;

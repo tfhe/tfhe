@@ -12,16 +12,21 @@ set(ENABLE_SPQLIOS_AVX ON CACHE BOOL "Enable the SPQLIOS AVX assembly FFT proces
 set(ENABLE_SPQLIOS_FMA ON CACHE BOOL "Enable the SPQLIOS FMA assembly FFT processor")
 set(ENABLE_TESTS OFF CACHE BOOL "Build the tests (requires googletest)")
 
-set(CMAKE_CXX_FLAGS_DEBUG "-std=gnu++11 -g3 -O0 -Wall -Werror")
+project(tfhe)
+
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "AppleClang")
+  # https://stackoverflow.com/a/16229679
+  set(CLANG_FLAGS "-stdlib=libc++")
+endif()
+
+set(CMAKE_CXX_FLAGS_DEBUG "${CLANG_FLAGS} -std=gnu++11 -g3 -O0 -Wall -Werror")
 set(CMAKE_C_FLAGS_DEBUG "-g3 -O0 -Wall -Werror")
 
-set(CMAKE_CXX_FLAGS_OPTIM "-std=gnu++11 -g3 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
-set(CMAKE_C_FLAGS_OPTIM "-g3 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_CXX_FLAGS_OPTIM "${CLANG_FLAGS} -std=gnu++11 -g3 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_C_FLAGS_OPTIM "-g3 -march=native -O3 -DNDEBUG -funroll-loops -Wall -Werror")
 
-set(CMAKE_CXX_FLAGS_RELEASE "-std=gnu++11 -g0 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
-set(CMAKE_C_FLAGS_RELEASE "-g0 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
-
-project(tfhe)
+set(CMAKE_CXX_FLAGS_RELEASE "${CLANG_FLAGS} -std=gnu++11 -g0 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_C_FLAGS_RELEASE "-g0 -march=native -O3 -DNDEBUG -funroll-loops -Wall -Werror")
 
 if (ENABLE_NAYUKI_PORTABLE)
 list(APPEND FFT_PROCESSORS "nayuki-portable")
@@ -68,6 +73,5 @@ install(FILES ${TFHE_HEADERS}
 add_subdirectory(libtfhe)
 if (ENABLE_TESTS)
 enable_testing()
-find_package(GTest REQUIRED)
 add_subdirectory(test)
 endif (ENABLE_TESTS)

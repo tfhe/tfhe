@@ -9,13 +9,12 @@
 //    const double alpha_max;
 //};
 
-TLweParams::TLweParams(int N, int k, double alpha_min, double alpha_max):
-    N(N),
-    k(k),
-    alpha_min(alpha_min),
-    alpha_max(alpha_max),
-    extracted_lweparams(N*k,alpha_min, alpha_max)
-{}
+TLweParams::TLweParams(int N, int k, double alpha_min, double alpha_max) :
+        N(N),
+        k(k),
+        alpha_min(alpha_min),
+        alpha_max(alpha_max),
+        extracted_lweparams(N * k, alpha_min, alpha_max) {}
 
 TLweParams::~TLweParams() {}
 
@@ -24,14 +23,13 @@ TLweParams::~TLweParams() {}
 //    IntPolynomial* key;
 //};
 
-TLweKey::TLweKey(const TLweParams* params):
-    params(params)
-{
-    key = new_IntPolynomial_array(params->k,params->N);   
+TLweKey::TLweKey(const TLweParams *params) :
+        params(params) {
+    key = new_IntPolynomial_array(params->k, params->N);
 }
 
 TLweKey::~TLweKey() {
-    delete_IntPolynomial_array(params->k,key);
+    delete_IntPolynomial_array(params->k, key);
 }
 
 
@@ -41,26 +39,27 @@ TLweKey::~TLweKey() {
 //    double current_variance;
 //};
 
-TLweSample::TLweSample(const TLweParams* params): k(params->k) {
+TLweSample::TLweSample(const TLweParams *params) : k(params->k) {
     //Small change here: 
     //a is a table of k+1 polynomials, b is an alias for &a[k]
     //like that, we can access all the coefficients as before:
     //  &sample->a[0],...,&sample->a[k-1]  and &sample->b
     //or we can also do it in a single for loop
     //  &sample->a[0],...,&sample->a[k]
-    a = new_TorusPolynomial_array(k+1, params->N);
-    b = a+k;
+    a = new_TorusPolynomial_array(k + 1, params->N);
+    b = a + k;
     current_variance = 0;
 }
 
 TLweSample::~TLweSample() {
-    delete_TorusPolynomial_array(k+1, a);
+    delete_TorusPolynomial_array(k + 1, a);
 }
 
-TLweSampleFFT::TLweSampleFFT(const TLweParams* params, LagrangeHalfCPolynomial* arr, double current_variance): k(params->k) {
+TLweSampleFFT::TLweSampleFFT(const TLweParams *params, LagrangeHalfCPolynomial *arr, double current_variance) : k(
+        params->k) {
     //a is a table of k+1 polynomials, b is an alias for &a[k]
     a = arr;
-    b = a+k;
+    b = a + k;
     current_variance = 0;
 }
 

@@ -1,20 +1,21 @@
 	.file	"spqlios-ifft-avx.s"
-	.section	.text.unlikely,"ax",@progbits
-.LCOLDB0:
 	.text
-.LHOTB0:
-	.p2align 4,,15
+	.p2align 4
+#if !__APPLE__
 	.globl	ifft
 	.type	ifft, @function
 ifft:
-.LFB0:
-	.cfi_startproc
+#else
+	.globl	_ifft
+_ifft:
+#endif
+
 //typedef struct  {
 //    uint64_t n;
 //    double* trig_tables;
 //} IFFT_PRECOMP;
 
-/* void ifft(const void *tables, double *real) */
+/* void _ifft(const void *tables, double *real) */
 	/* Save registers */
 	pushq       %r10
 	pushq       %r11
@@ -188,10 +189,10 @@ offloop:
     }
 */
     	/* r10 is still = n/4  (constant) */
-	vmovapd     size4negation0, %ymm15
-	vmovapd     size4negation1, %ymm14
-	vmovapd     size4negation2, %ymm13
-	vmovapd     size4negation3, %ymm12
+	vmovapd     size4negation0(%rip), %ymm15
+	vmovapd     size4negation1(%rip), %ymm14
+	vmovapd     size4negation2(%rip), %ymm13
+	vmovapd     size4negation3(%rip), %ymm12
 	movq $0,%rax /* rax (block) */
 	movq %rdi,%r11 /* r11 (are+block) */
 	movq %rsi,%r12 /* r12 (aim+block) */
@@ -290,14 +291,7 @@ size4negation1: .double +1.0, +1.0, -1.0, +1.0
 size4negation2: .double +1.0, +1.0, -1.0, -1.0
 size4negation3: .double +1.0, -1.0, +1.0, -1.0
 
-	.cfi_endproc
-.LFE0:
+#if !__APPLE__
 	.size	ifft, .-ifft
-	.section	.text.unlikely
-.LCOLDE0:
-	.text
-.LHOTE0:
-	.ident	"GCC: (Ubuntu 5.2.1-22ubuntu2) 5.2.1 20151010"
-	.section	.note.GNU-stack,"",@progbits
-
+#endif
 

@@ -2,6 +2,7 @@
 #include "lwe-functions.h"
 #include "tlwe_functions.h"
 #include "tgsw_functions.h"
+#include "tfhe_gate_bootstrapping_functions.h"
 
 using namespace std;
 
