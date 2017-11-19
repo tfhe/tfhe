@@ -28,6 +28,10 @@
 #include <string.h>
 #include "fft.h"
 
+// M_PI isn't defined with C99 for whatever reason
+#ifndef M_PI
+    #define M_PI 3.14159265358979323846
+#endif
 
 // Private data structure
 struct FftTables {
