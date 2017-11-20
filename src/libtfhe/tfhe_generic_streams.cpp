@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 #include <tfhe_generic_streams.h>
+#include <cstdlib>
 
 using namespace std;
 
