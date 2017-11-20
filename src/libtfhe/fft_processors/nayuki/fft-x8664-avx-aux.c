@@ -39,8 +39,8 @@ struct FftTables {
 
 // Private function prototypes
 static double accurate_sine(uint64_t i, uint64_t n);
-static int floor_log2(uint64_t n);
-static uint64_t reverse_bits(uint64_t x, unsigned int n);
+static int32_t floor_log2(uint64_t n);
+static uint64_t reverse_bits(uint64_t x, uint32_t n);
 
 
 /*---- Function implementations ----*/
@@ -70,7 +70,7 @@ void *fft_init(size_t n) {
 	}
 	
 	// Precompute bit reversal table
-	int levels = floor_log2(n);
+	int32_t levels = floor_log2(n);
 	uint64_t i;
 	for (i = 0; i < n; i++)
 		tables->bit_reversed[i] = reverse_bits(i, levels);
@@ -117,7 +117,7 @@ void *fft_init_reverse(size_t n) {
 	}
 	
 	// Precompute bit reversal table
-	int levels = floor_log2(n);
+	int32_t levels = floor_log2(n);
 	uint64_t i;
 	for (i = 0; i < n; i++)
 		tables->bit_reversed[i] = reverse_bits(i, levels);
@@ -158,7 +158,7 @@ static double accurate_sine(uint64_t i, uint64_t n) {
 	if (n % 4 != 0)
 		return NAN;
 	else {
-		int neg = 0;  // Boolean
+		int32_t neg = 0;  // Boolean
 		// Reduce to full cycle
 		i %= n;
 		// Reduce to half cycle
@@ -182,8 +182,8 @@ static double accurate_sine(uint64_t i, uint64_t n) {
 
 
 // Returns the largest i such that 2^i <= n.
-static int floor_log2(uint64_t n) {
-	int result = 0;
+static int32_t floor_log2(uint64_t n) {
+	int32_t result = 0;
 	for (; n > 1; n /= 2)
 		result++;
 	return result;
@@ -191,9 +191,9 @@ static int floor_log2(uint64_t n) {
 
 
 // Returns the bit reversal of the n-bit unsigned integer x.
-static uint64_t reverse_bits(uint64_t x, unsigned int n) {
+static uint64_t reverse_bits(uint64_t x, uint32_t n) {
 	uint64_t result = 0;
-	unsigned int i;
+	uint32_t i;
 	for (i = 0; i < n; i++, x >>= 1)
 		result = (result << 1) | (x & 1);
 	return result;

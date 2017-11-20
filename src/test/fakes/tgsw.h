@@ -8,13 +8,13 @@ namespace {
     // Fake TGSW structure 
     struct FakeTGsw {
         //TODO: parallelization
-        static const long FAKE_TGSW_UID = 123444802642375465l; // precaution: do not confuse fakes with trues
-        const long fake_uid;
+        static const int64_t FAKE_TGSW_UID = 123444802642375465l; // precaution: do not confuse fakes with trues
+        const int64_t fake_uid;
         IntPolynomial *message;
         double current_variance;
 
         //this padding is here to make sure that FakeTLwe and TLweSample have the same size
-        char unused_padding[sizeof(TGswSample) - sizeof(long) - sizeof(IntPolynomial *) - sizeof(double)];
+        char unused_padding[sizeof(TGswSample) - sizeof(int64_t) - sizeof(IntPolynomial *) - sizeof(double)];
 
         void setMessageVariance(bool mess, double variance) {
             intPolynomialClear(message);
@@ -23,7 +23,7 @@ namespace {
         }
 
         // construct
-        FakeTGsw(int N) : fake_uid(FAKE_TGSW_UID) {
+        FakeTGsw(int32_t N) : fake_uid(FAKE_TGSW_UID) {
             message = new_IntPolynomial(N);
             current_variance = 0.;
         }
@@ -58,7 +58,7 @@ namespace {
 
 
     inline void fake_init_TGswSample(TGswSample *ptr, const TGswParams *params) {
-        int N = params->tlwe_params->N;
+        int32_t N = params->tlwe_params->N;
         FakeTGsw *arr = (FakeTGsw *) ptr;
         new(arr) FakeTGsw(N);
     }
@@ -78,31 +78,31 @@ namespace {
     return fake_destroy_TGswSample(ptr); \
     }
 
-    inline TGswSample *fake_new_TGswSample_array(int nbelts, const TGswParams *params) {
-        int N = params->tlwe_params->N;
+    inline TGswSample *fake_new_TGswSample_array(int32_t nbelts, const TGswParams *params) {
+        int32_t N = params->tlwe_params->N;
         FakeTGsw *arr = (FakeTGsw *) malloc(nbelts * sizeof(FakeTGsw));
-        for (int i = 0; i < nbelts; i++) new(arr + i) FakeTGsw(N);
+        for (int32_t i = 0; i < nbelts; i++) new(arr + i) FakeTGsw(N);
         return (TGswSample *) arr;
     }
 
 #define USE_FAKE_new_TGswSample_array \
-    inline TGswSample* new_TGswSample_array(int nbelts, const TGswParams* params) { \
+    inline TGswSample* new_TGswSample_array(int32_t nbelts, const TGswParams* params) { \
     return fake_new_TGswSample_array(nbelts,params); \
     }
 
-    inline void fake_delete_TGswSample_array(int nbelts, TGswSample *sample) {
+    inline void fake_delete_TGswSample_array(int32_t nbelts, TGswSample *sample) {
         FakeTGsw *arr = fake(sample);
-        for (int i = 0; i < nbelts; i++) (arr + i)->~FakeTGsw();
+        for (int32_t i = 0; i < nbelts; i++) (arr + i)->~FakeTGsw();
         free(arr);
     }
 
 #define USE_FAKE_delete_TGswSample_array \
-    inline void delete_TGswSample_array(int nbelts, TGswSample* sample) { \
+    inline void delete_TGswSample_array(int32_t nbelts, TGswSample* sample) { \
     fake_delete_TGswSample_array(nbelts, sample); \
     }
 
     inline TGswSample *fake_new_TGswSample(const TGswParams *params) {
-        int N = params->tlwe_params->N;
+        int32_t N = params->tlwe_params->N;
         return (TGswSample *) new FakeTGsw(N);
     }
 
@@ -132,7 +132,7 @@ namespace {
     fake_tGswSymEncrypt(result, message, alpha, key); \
     }
 
-    inline void fake_tGswSymEncryptInt(TGswSample *result, const int message, double alpha, const TGswKey *key) {
+    inline void fake_tGswSymEncryptInt(TGswSample *result, const int32_t message, double alpha, const TGswKey *key) {
         FakeTGsw *fres = fake(result);
         intPolynomialClear(fres->message);
         fres->message->coefs[0] = message;
@@ -140,21 +140,21 @@ namespace {
     }
 
 #define USE_FAKE_tGswSymEncryptInt \
-    inline void tGswSymEncryptInt(TGswSample* result, const int message, double alpha, const TGswKey* key) { \
+    inline void tGswSymEncryptInt(TGswSample* result, const int32_t message, double alpha, const TGswKey* key) { \
     fake_tGswSymEncryptInt(result, message, alpha, key); \
     }
 
     inline void
-    fake_tGswSymDecrypt(IntPolynomial *result, const TGswSample *sample, const TGswKey *key, const int Msize) {
+    fake_tGswSymDecrypt(IntPolynomial *result, const TGswSample *sample, const TGswKey *key, const int32_t Msize) {
         intPolynomialCopy(result, fake(sample)->message);
     }
 
 #define USE_FAKE_tGswSymDecrypt \
-    inline void tGswSymDecrypt(IntPolynomial* result, const TGswSample* sample, const TGswKey* key, const int Msize) { \
+    inline void tGswSymDecrypt(IntPolynomial* result, const TGswSample* sample, const TGswKey* key, const int32_t Msize) { \
     fake_tGswSymDecrypt(result, sample, key, Msize); \
     }
 
-    //EXPORT int tGswSymDecryptInt(const TGswSample* sample, const TGswKey* key); 
+    //EXPORT int32_t tGswSymDecryptInt(const TGswSample* sample, const TGswKey* key); 
     //do we really decrypt Gsw samples?
 
     // support Functions for TGsw
@@ -194,13 +194,13 @@ namespace {
 
 
     // Result += mu*H, mu integer
-    inline void fake_tGswAddMuIntH(TGswSample *result, const int message, const TGswParams *params) {
+    inline void fake_tGswAddMuIntH(TGswSample *result, const int32_t message, const TGswParams *params) {
         FakeTGsw *fres = fake(result);
         fres->message->coefs[0] += message;
     }
 
 #define USE_FAKE_tGswAddMuIntH \
-    inline void tGswAddMuIntH(TGswSample* result, const int message, const TGswParams* params) { \
+    inline void tGswAddMuIntH(TGswSample* result, const int32_t message, const TGswParams* params) { \
     return fake_tGswAddMuIntH(result,message, params); \
     }
 
@@ -222,7 +222,7 @@ namespace {
     //EXPORT void tGswTLweDecompH(IntPolynomial* result, const TLweSample* sample,const TGswParams* params);	
 
     // result= (X^ai-1)*bk (ligne 5 de l'algo)
-    inline void fake_tGswMulByXaiMinusOne(TGswSample *result, int ai, const TGswSample *bk, const TGswParams *params) {
+    inline void fake_tGswMulByXaiMinusOne(TGswSample *result, int32_t ai, const TGswSample *bk, const TGswParams *params) {
         FakeTGsw *fres = fake(result);
         const FakeTGsw *fbk = fake(bk);
         intPolynomialMulByXaiMinusOne(fres->message, ai, fbk->message);
@@ -230,13 +230,13 @@ namespace {
     }
 
 #define USE_FAKE_tGswMulByXaiMinusOne \
-    inline void tGswMulByXaiMinusOne(TGswSample* result, int ai, const TGswSample* bk, const TGswParams* params) { \
+    inline void tGswMulByXaiMinusOne(TGswSample* result, int32_t ai, const TGswSample* bk, const TGswParams* params) { \
     return fake_tGswMulByXaiMinusOne(result,ai,bk,params); \
     }
 
     //ligne 5 algo,mult externe
     inline void fake_tGswExternMulToTLwe(TLweSample *accum, const TGswSample *sample, const TGswParams *params) {
-        const int N = params->tlwe_params->N;
+        const int32_t N = params->tlwe_params->N;
         const FakeTGsw *fgsw = fake(sample);
         const FakeTLwe *faccum = fake(accum);
         TorusPolynomial *tmp = new_TorusPolynomial(N);
@@ -262,9 +262,9 @@ namespace {
     /** result = result - sample */
     //EXPORT void tGswSubTo(TLweSample* result, const TLweSample* sample, const TLweParams* params);
     /** result = result + p.sample */
-    //EXPORT void tGswAddMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params);
+    //EXPORT void tGswAddMulTo(TLweSample* result, int32_t p, const TLweSample* sample, const TLweParams* params);
     /** result = result - p.sample */
-    //EXPORT void tGswSubMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params);
+    //EXPORT void tGswSubMulTo(TLweSample* result, int32_t p, const TLweSample* sample, const TLweParams* params);
 
     EXPORT void tfhe_createLweBootstrappingKey(LweBootstrappingKey *bk, const LweKey *key_in, const TGswKey *rgsw_key);
     EXPORT void tfhe_bootstrap(LweSample *result, const LweBootstrappingKey *bk, Torus32 mu, const LweSample *x);

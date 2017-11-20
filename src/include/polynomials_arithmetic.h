@@ -31,22 +31,22 @@ EXPORT void torusPolynomialSub(TorusPolynomial* result, const TorusPolynomial* p
 EXPORT void torusPolynomialSubTo(TorusPolynomial* result, const TorusPolynomial* poly2);
 
 /**  TorusPolynomial + p*TorusPolynomial */
-EXPORT void torusPolynomialAddMulZ(TorusPolynomial* result, const TorusPolynomial* poly1, int p, const TorusPolynomial* poly2);
+EXPORT void torusPolynomialAddMulZ(TorusPolynomial* result, const TorusPolynomial* poly1, int32_t p, const TorusPolynomial* poly2);
 
 /**  TorusPolynomial += p*TorusPolynomial */
-EXPORT void torusPolynomialAddMulZTo(TorusPolynomial* result, const int p, const TorusPolynomial* poly2);
+EXPORT void torusPolynomialAddMulZTo(TorusPolynomial* result, const int32_t p, const TorusPolynomial* poly2);
 
 /**  TorusPolynomial - p*TorusPolynomial */
-EXPORT void torusPolynomialSubMulZ(TorusPolynomial* result, const TorusPolynomial* poly1, const int p, const TorusPolynomial* poly2);
+EXPORT void torusPolynomialSubMulZ(TorusPolynomial* result, const TorusPolynomial* poly1, const int32_t p, const TorusPolynomial* poly2);
 
 /**  TorusPolynomial -= p*TorusPolynomial */
-EXPORT void torusPolynomialSubMulZTo(TorusPolynomial* result, int p, const TorusPolynomial* poly2);
+EXPORT void torusPolynomialSubMulZTo(TorusPolynomial* result, int32_t p, const TorusPolynomial* poly2);
 
 /**  TorusPolynomial = (X^a-1)* TorusPolynomial */
-EXPORT void torusPolynomialMulByXaiMinusOne(TorusPolynomial* result, int a, const TorusPolynomial* source);
+EXPORT void torusPolynomialMulByXaiMinusOne(TorusPolynomial* result, int32_t a, const TorusPolynomial* source);
 
 /** result= X^{a}*source */
-EXPORT void torusPolynomialMulByXai(TorusPolynomial* result, int a, const TorusPolynomial* source);
+EXPORT void torusPolynomialMulByXai(TorusPolynomial* result, int32_t a, const TorusPolynomial* source);
 
 /**  Norme Euclidienne d'un IntPolynomial */
 EXPORT double intPolynomialNormSq2(const IntPolynomial* poly);
@@ -61,7 +61,7 @@ EXPORT void intPolynomialCopy(IntPolynomial* result, const IntPolynomial* source
 EXPORT void intPolynomialAddTo(IntPolynomial* result, const IntPolynomial* poly1);
 
 /**  result = (X^ai-1) * source */
-EXPORT void intPolynomialMulByXaiMinusOne(IntPolynomial* result, int ai, const IntPolynomial* source);
+EXPORT void intPolynomialMulByXaiMinusOne(IntPolynomial* result, int32_t ai, const IntPolynomial* source);
 
 /**  ILA: Norme infini de la distance entre deux TorusPolynomial */
 EXPORT double torusPolynomialNormInftyDist(const TorusPolynomial* poly1, const TorusPolynomial* poly2);

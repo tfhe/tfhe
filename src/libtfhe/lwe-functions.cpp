@@ -19,10 +19,10 @@ using namespace std;
  * (this means that the parameters are already in the result)
  */
 EXPORT void lweKeyGen(LweKey* result) {
-  const int n = result->params->n;
-  uniform_int_distribution<int> distribution(0,1);
+  const int32_t n = result->params->n;
+  uniform_int_distribution<int32_t> distribution(0,1);
 
-  for (int i=0; i<n; i++) 
+  for (int32_t i=0; i<n; i++) 
     result->key[i]=distribution(generator);
 }
 
@@ -34,10 +34,10 @@ EXPORT void lweKeyGen(LweKey* result) {
  * (this means that the parameters are already in the result)
  */
 EXPORT void lweSymEncrypt(LweSample* result, Torus32 message, double alpha, const LweKey* key){
-    const int n = key->params->n;
+    const int32_t n = key->params->n;
 
     result->b = gaussian32(message, alpha); 
-    for (int i = 0; i < n; ++i)
+    for (int32_t i = 0; i < n; ++i)
     {
         result->a[i] = uniformTorus32_distrib(generator);
         result->b += result->a[i]*key->key[i];
@@ -51,10 +51,10 @@ EXPORT void lweSymEncrypt(LweSample* result, Torus32 message, double alpha, cons
  * This function encrypts a message by using key and a given noise value
 */
 EXPORT void lweSymEncryptWithExternalNoise(LweSample* result, Torus32 message, double noise, double alpha, const LweKey* key){
-    const int n = key->params->n;
+    const int32_t n = key->params->n;
 
     result->b = message + dtot32(noise); 
-    for (int i = 0; i < n; ++i)
+    for (int32_t i = 0; i < n; ++i)
     {
         result->a[i] = uniformTorus32_distrib(generator);
         result->b += result->a[i]*key->key[i];
@@ -70,12 +70,12 @@ EXPORT void lweSymEncryptWithExternalNoise(LweSample* result, Torus32 message, d
  * This function computes the phase of sample by using key : phi = b - a.s
  */
 EXPORT Torus32 lwePhase(const LweSample* sample, const LweKey* key){
-    const int n = key->params->n;
+    const int32_t n = key->params->n;
     Torus32 axs = 0;
     const Torus32 *__restrict a = sample->a;
-    const int * __restrict k = key->key;
+    const int32_t * __restrict k = key->key;
 
-    for (int i = 0; i < n; ++i) 
+    for (int32_t i = 0; i < n; ++i) 
 	   axs += a[i]*k[i]; 
     return sample->b - axs;
 }
@@ -85,7 +85,7 @@ EXPORT Torus32 lwePhase(const LweSample* sample, const LweKey* key){
  * This function computes the decryption of sample by using key
  * The constant Msize indicates the message space and is used to approximate the phase
  */
-EXPORT Torus32 lweSymDecrypt(const LweSample* sample, const LweKey* key, const int Msize){
+EXPORT Torus32 lweSymDecrypt(const LweSample* sample, const LweKey* key, const int32_t Msize){
     Torus32 phi;
 
     phi = lwePhase(sample, key);
@@ -98,9 +98,9 @@ EXPORT Torus32 lweSymDecrypt(const LweSample* sample, const LweKey* key, const i
 //Arithmetic operations on Lwe samples
 /** result = (0,0) */
 EXPORT void lweClear(LweSample* result, const LweParams* params){
-    const int n = params->n;
+    const int32_t n = params->n;
 
-    for (int i = 0; i < n; ++i) result->a[i] = 0;
+    for (int32_t i = 0; i < n; ++i) result->a[i] = 0;
     result->b = 0;
     result->current_variance = 0.;
 }
@@ -108,9 +108,9 @@ EXPORT void lweClear(LweSample* result, const LweParams* params){
 
 /** result = sample */
 EXPORT void lweCopy(LweSample* result, const LweSample* sample, const LweParams* params){
-    const int n = params->n;
+    const int32_t n = params->n;
 
-    for (int i = 0; i < n; ++i) result->a[i] = sample->a[i];
+    for (int32_t i = 0; i < n; ++i) result->a[i] = sample->a[i];
     result->b = sample->b;
     result->current_variance = sample->current_variance;
 }
@@ -118,9 +118,9 @@ EXPORT void lweCopy(LweSample* result, const LweSample* sample, const LweParams*
 
 /** result = -sample */
 EXPORT void lweNegate(LweSample* result, const LweSample* sample, const LweParams* params){
-    const int n = params->n;
+    const int32_t n = params->n;
 
-    for (int i = 0; i < n; ++i) result->a[i] = -sample->a[i];
+    for (int32_t i = 0; i < n; ++i) result->a[i] = -sample->a[i];
     result->b = -sample->b;
     result->current_variance = sample->current_variance;
 }
@@ -128,25 +128,25 @@ EXPORT void lweNegate(LweSample* result, const LweSample* sample, const LweParam
 
 /** result = (0,mu) */
 EXPORT void lweNoiselessTrivial(LweSample* result, Torus32 mu, const LweParams* params){
-    const int n = params->n;
+    const int32_t n = params->n;
 
-    for (int i = 0; i < n; ++i) result->a[i] = 0;
+    for (int32_t i = 0; i < n; ++i) result->a[i] = 0;
     result->b = mu;
     result->current_variance = 0.;
 }
 
 /** result = result + sample */
 EXPORT void lweAddTo(LweSample* result, const LweSample* sample, const LweParams* params){
-    const int n = params->n;
+    const int32_t n = params->n;
 
-    for (int i = 0; i < n; ++i) result->a[i] += sample->a[i];
+    for (int32_t i = 0; i < n; ++i) result->a[i] += sample->a[i];
     result->b += sample->b;
     result->current_variance += sample->current_variance; 
 }
 
 #ifdef __AVX2__
 /** r -= a  using avx instructions (of size n, not necessarily multiple of 8) */
-EXPORT void __attribute__ ((noinline)) intVecSubTo_avx(int* r, const int* a, long n) {
+EXPORT void __attribute__ ((noinline)) intVecSubTo_avx(int32_t* r, const int32_t* a, int64_t n) {
     __asm__ __volatile__ (
 	    //"pushq %%r8\n"               //save clobbered regs
 	    //"pushq %%r9\n" 
@@ -199,54 +199,54 @@ EXPORT void __attribute__ ((noinline)) intVecSubTo_avx(int* r, const int* a, lon
 	 );
 }
 
-int intVecSubTo_avx_test() {
+int32_t intVecSubTo_avx_test() {
     fprintf(stderr,"testint intVecSubTo_avx\n");
-    static int tst[1000];
-    static int tst2[1000];
-    static int tst3[1000];
-    for (int i=0; i<1000; i++) tst[i]=rand();
-    for (int i=0; i<1000; i++) tst2[i]=rand();
-    for (int trial=0; trial<100; trial++) {
-	for (int i=0; i<1000; i++) tst3[i]=tst[i];
-	int dim = 500 + (rand()%500);
+    static int32_t tst[1000];
+    static int32_t tst2[1000];
+    static int32_t tst3[1000];
+    for (int32_t i=0; i<1000; i++) tst[i]=rand();
+    for (int32_t i=0; i<1000; i++) tst2[i]=rand();
+    for (int32_t trial=0; trial<100; trial++) {
+	for (int32_t i=0; i<1000; i++) tst3[i]=tst[i];
+	int32_t dim = 500 + (rand()%500);
 	intVecSubTo_avx(tst,tst2,dim);
-	for (int i=0; i<dim; i++) if (tst[i]!=tst3[i]-tst2[i]) abort();
-	for (int i=dim; i<1000; i++) if (tst[i]!=tst3[i]) abort();
+	for (int32_t i=0; i<dim; i++) if (tst[i]!=tst3[i]-tst2[i]) abort();
+	for (int32_t i=dim; i<1000; i++) if (tst[i]!=tst3[i]) abort();
     }
     return tst[0];
 }
-//int ooo = intVecSubTo_avx_test();
+//int32_t ooo = intVecSubTo_avx_test();
 #endif
 
 /** result = result - sample */
 EXPORT void lweSubTo(LweSample* result, const LweSample* sample, const LweParams* params){
-    const int n = params->n;
+    const int32_t n = params->n;
     const Torus32* __restrict sa = sample->a;
     Torus32* __restrict ra = result->a;
 
 #ifdef __AVX2__
     intVecSubTo_avx(ra,sa,n);
 #else
-    for (int i = 0; i < n; ++i) ra[i] -= sa[i];
+    for (int32_t i = 0; i < n; ++i) ra[i] -= sa[i];
 #endif
     result->b -= sample->b;
     result->current_variance += sample->current_variance; 
 }
 
 /** result = result + p.sample */
-EXPORT void lweAddMulTo(LweSample* result, int p, const LweSample* sample, const LweParams* params){
-    const int n = params->n;
+EXPORT void lweAddMulTo(LweSample* result, int32_t p, const LweSample* sample, const LweParams* params){
+    const int32_t n = params->n;
 
-    for (int i = 0; i < n; ++i) result->a[i] += p*sample->a[i];
+    for (int32_t i = 0; i < n; ++i) result->a[i] += p*sample->a[i];
     result->b += p*sample->b;
     result->current_variance += (p*p)*sample->current_variance; 
 }
 
 /** result = result - p.sample */
-EXPORT void lweSubMulTo(LweSample* result, int p, const LweSample* sample, const LweParams* params){
-    const int n = params->n;
+EXPORT void lweSubMulTo(LweSample* result, int32_t p, const LweSample* sample, const LweParams* params){
+    const int32_t n = params->n;
 
-    for (int i = 0; i < n; ++i) result->a[i] -= p*sample->a[i];
+    for (int32_t i = 0; i < n; ++i) result->a[i] -= p*sample->a[i];
     result->b -= p*sample->b;
     result->current_variance += (p*p)*sample->current_variance; 
 }

@@ -86,7 +86,7 @@ StdIstream to_Istream(std::istream &in);
 
 /**
  * This is a property map: a title and a set of name-value properties.
- * For convenience, this class accepts string, long or doubles for 
+ * For convenience, this class accepts string, int64_ts (longs) or doubles for 
  * the property values, with implicit conversion between them.
  */
 class TextModeProperties {
@@ -99,13 +99,13 @@ public:
 
     virtual double getProperty_double(const std::string &name) const =0;
 
-    virtual long getProperty_long(const std::string &name) const =0;
+    virtual int64_t getProperty_int64_t(const std::string &name) const =0;
 
     virtual void setProperty(const std::string &name, const std::string &value)=0;
 
     virtual void setProperty_double(const std::string &name, double value)=0;
 
-    virtual void setProperty_long(const std::string &name, long value)=0;
+    virtual void setProperty_int64_t(const std::string &name, int64_t value)=0;
 
     virtual ~TextModeProperties() {}
 };

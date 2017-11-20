@@ -5,42 +5,42 @@
 
 using namespace std;
 
-int rev(int x, int M) {
-    int reps = 0;
-    for (int j = M; j > 1; j /= 2) {
+int32_t rev(int32_t x, int32_t M) {
+    int32_t reps = 0;
+    for (int32_t j = M; j > 1; j /= 2) {
         reps = 2 * reps + (x % 2);
         x /= 2;
     }
     return reps;
 }
 
-FFT_Processor_Spqlios::FFT_Processor_Spqlios(const int N) : _2N(2 * N), N(N), Ns2(N / 2) {
+FFT_Processor_Spqlios::FFT_Processor_Spqlios(const int32_t N) : _2N(2 * N), N(N), Ns2(N / 2) {
     tables_direct = new_fft_table(N);
     tables_reverse = new_ifft_table(N);
     real_inout_direct = fft_table_get_buffer(tables_direct);
     imag_inout_direct = real_inout_direct + Ns2;
     real_inout_rev = fft_table_get_buffer(tables_reverse);
     imag_inout_rev = real_inout_rev + Ns2;
-    reva = new int[Ns2];
+    reva = new int32_t[Ns2];
     cosomegaxminus1 = new double[2 * _2N];
     sinomegaxminus1 = cosomegaxminus1 + _2N;
-    int rev1 = rev(1, _2N);
-    int rev3 = rev(3, _2N);
+    int32_t rev1 = rev(1, _2N);
+    int32_t rev3 = rev(3, _2N);
     //printf("rev-interval: %d, %d\n",rev1,rev3);
-    for (int revi = rev1; revi < rev3; revi++)
+    for (int32_t revi = rev1; revi < rev3; revi++)
         reva[revi - rev1] = rev(revi, _2N);
-    for (int j = 0; j < _2N; j++) {
+    for (int32_t j = 0; j < _2N; j++) {
         cosomegaxminus1[j] = cos(2 * M_PI * j / _2N) - 1.;
         sinomegaxminus1[j] = sin(2 * M_PI * j / _2N);
     }
 }
 
-void FFT_Processor_Spqlios::execute_reverse_int(double *res, const int *a) {
-    //for (int i=0; i<N; i++) real_inout_rev[i]=(double)a[i];
+void FFT_Processor_Spqlios::execute_reverse_int(double *res, const int32_t *a) {
+    //for (int32_t i=0; i<N; i++) real_inout_rev[i]=(double)a[i];
     {
         double *dst = real_inout_rev;
-        const int *ait = a;
-        const int *aend = a + N;
+        const int32_t *ait = a;
+        const int32_t *aend = a + N;
         __asm__ __volatile__ (
         "0:\n"
                 "vmovupd (%1),%%xmm0\n"
@@ -56,7 +56,7 @@ void FFT_Processor_Spqlios::execute_reverse_int(double *res, const int *a) {
         );
     }
     ifft(tables_reverse, real_inout_rev);
-    //for (int i=0; i<N; i++) res[i]=real_inout_rev[i];
+    //for (int32_t i=0; i<N; i++) res[i]=real_inout_rev[i];
     {
         double *dst = res;
         double *sit = real_inout_rev;
@@ -79,16 +79,16 @@ void FFT_Processor_Spqlios::execute_reverse_int(double *res, const int *a) {
 
 void FFT_Processor_Spqlios::execute_reverse_torus32(double *res, const Torus32 *a) {
     int32_t *aa = (int32_t *) a;
-    //for (int i=0; i<N; i++) real_inout_rev[i]=aa[i]; //we do not rescale
+    //for (int32_t i=0; i<N; i++) real_inout_rev[i]=aa[i]; //we do not rescale
     //ifft(tables_reverse,real_inout_rev);
-    //for (int i=0; i<N; i++) res[i]=real_inout_rev[i];
+    //for (int32_t i=0; i<N; i++) res[i]=real_inout_rev[i];
     execute_reverse_int(res, aa);
 }
 
 void FFT_Processor_Spqlios::execute_direct_torus32(Torus32 *res, const double *a) {
     //TODO: parallelization
     static const double _2sN = double(2) / double(N);
-    //for (int i=0; i<N; i++) real_inout_direct[i]=a[i]*_2sn;
+    //for (int32_t i=0; i<N; i++) real_inout_direct[i]=a[i]*_2sn;
     {
         double *dst = real_inout_direct;
         const double *sit = a;
@@ -111,7 +111,7 @@ void FFT_Processor_Spqlios::execute_direct_torus32(Torus32 *res, const double *a
         );
     }
     fft(tables_direct, real_inout_direct);
-    for (int i = 0; i < N; i++) res[i] = Torus32(int64_t(real_inout_direct[i]));
+    for (int32_t i = 0; i < N; i++) res[i] = Torus32(int64_t(real_inout_direct[i]));
 }
 
 FFT_Processor_Spqlios::~FFT_Processor_Spqlios() {

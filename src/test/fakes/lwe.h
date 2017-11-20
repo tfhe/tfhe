@@ -11,13 +11,13 @@ Fakes for LWE
 // Fake LWE structure 
 struct FakeLwe {
     //TODO: parallelization
-    static const int FAKE_LWE_UID = 45287951; // precaution: do not confuse fakes with trues
-    const int fake_uid;
+    static const int32_t FAKE_LWE_UID = 45287951; // precaution: do not confuse fakes with trues
+    const int32_t fake_uid;
     Torus32 message;
     double current_variance;
 
     //this padding is here to make sure that FakeLwe and LweSample have the same size
-    char unused_padding[sizeof(LweSample) - sizeof(int) - sizeof(Torus32) - sizeof(double)];
+    char unused_padding[sizeof(LweSample) - sizeof(int32_t) - sizeof(Torus32) - sizeof(double)];
 
     // construct
     FakeLwe() : fake_uid(FAKE_LWE_UID) {
@@ -79,25 +79,25 @@ static inline void delete_LweSample(LweSample *sample) { \
 }
 
 
-inline LweSample *fake_new_LweSample_array(int nbelts, const LweParams *params) {
+inline LweSample *fake_new_LweSample_array(int32_t nbelts, const LweParams *params) {
     FakeLwe *arr = (FakeLwe *) malloc(nbelts * sizeof(FakeLwe));
-    for (int i = 0; i < nbelts; i++) new(arr + i) FakeLwe();
+    for (int32_t i = 0; i < nbelts; i++) new(arr + i) FakeLwe();
     return (LweSample *) arr;
 }
 
 #define USE_FAKE_new_LweSample_array \
-inline LweSample* new_LweSample_array(int nbelts, const LweParams* params) { \
+inline LweSample* new_LweSample_array(int32_t nbelts, const LweParams* params) { \
     return fake_new_LweSample_array(nbelts, params); \
 }
 
-inline void fake_delete_LweSample_array(int nbelts, LweSample *sample) {
+inline void fake_delete_LweSample_array(int32_t nbelts, LweSample *sample) {
     FakeLwe *arr = fake(sample);
-    for (int i = 0; i < nbelts; i++) (arr + i)->~FakeLwe();
+    for (int32_t i = 0; i < nbelts; i++) (arr + i)->~FakeLwe();
     free(arr);
 }
 
 #define USE_FAKE_delete_LweSample_array \
-inline void delete_LweSample_array(int nbelts, LweSample* samples) { \
+inline void delete_LweSample_array(int32_t nbelts, LweSample* samples) { \
     fake_delete_LweSample_array(nbelts,samples); \
 }
 
@@ -226,7 +226,7 @@ static inline void lweAddTo(LweSample *result, const LweSample *sample, const Lw
 
 
 /** result = result + p*sample */
-inline void fake_lweAddMulTo(LweSample *result, const int p, const LweSample *sample, const LweParams *params) {
+inline void fake_lweAddMulTo(LweSample *result, const int32_t p, const LweSample *sample, const LweParams *params) {
     FakeLwe *fres = fake(result);
     const FakeLwe *fsample = fake(sample);
     fres->message += p * fsample->message;
@@ -235,13 +235,13 @@ inline void fake_lweAddMulTo(LweSample *result, const int p, const LweSample *sa
 
 //TODO: parallelization
 #define USE_FAKE_lweAddMulTo \
-static inline void lweAddMulTo(LweSample *result, const int p, const LweSample *sample, const LweParams *params) {\
+static inline void lweAddMulTo(LweSample *result, const int32_t p, const LweSample *sample, const LweParams *params) {\
     return fake_lweAddMulTo(result, p, sample, params); \
 }
 
 
 /** result = result - p*sample */
-inline void fake_lweSubMulTo(LweSample *result, const int p, const LweSample *sample, const LweParams *params) {
+inline void fake_lweSubMulTo(LweSample *result, const int32_t p, const LweSample *sample, const LweParams *params) {
     FakeLwe *fres = fake(result);
     const FakeLwe *fsample = fake(sample);
     fres->message -= p * fsample->message;
@@ -250,7 +250,7 @@ inline void fake_lweSubMulTo(LweSample *result, const int p, const LweSample *sa
 
 //TODO: parallelization
 #define USE_FAKE_lweSubMulTo \
-static inline void lweSubMulTo(LweSample *result, const int p, const LweSample *sample, const LweParams *params) {\
+static inline void lweSubMulTo(LweSample *result, const int32_t p, const LweSample *sample, const LweParams *params) {\
     return fake_lweSubMulTo(result, p, sample, params); \
 }
 

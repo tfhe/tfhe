@@ -11,7 +11,7 @@
 //////////////////////////////////////////
 
 /** generate default gate bootstrapping parameters */
-EXPORT TFheGateBootstrappingParameterSet *new_default_gate_bootstrapping_parameters(int minimum_lambda);
+EXPORT TFheGateBootstrappingParameterSet *new_default_gate_bootstrapping_parameters(int32_t minimum_lambda);
 
 /** generate a random gate bootstrapping secret key */
 EXPORT TFheGateBootstrappingSecretKeySet *
@@ -30,22 +30,22 @@ EXPORT void delete_gate_bootstrapping_cloud_keyset(TFheGateBootstrappingCloudKey
 EXPORT LweSample *new_gate_bootstrapping_ciphertext(const TFheGateBootstrappingParameterSet *params);
 
 /** generate a new unititialized ciphertext array of length nbelems */
-EXPORT LweSample *new_gate_bootstrapping_ciphertext_array(int nbelems, const TFheGateBootstrappingParameterSet *params);
+EXPORT LweSample *new_gate_bootstrapping_ciphertext_array(int32_t nbelems, const TFheGateBootstrappingParameterSet *params);
 
 /** deletes a ciphertext */
 EXPORT void delete_gate_bootstrapping_ciphertext(LweSample *sample);
 
 /** deletes a ciphertext array of length nbelems */
-EXPORT void delete_gate_bootstrapping_ciphertext_array(int nbelems, LweSample *samples);
+EXPORT void delete_gate_bootstrapping_ciphertext_array(int32_t nbelems, LweSample *samples);
 
 /** encrypts a boolean */
-EXPORT void bootsSymEncrypt(LweSample *result, int message, const TFheGateBootstrappingSecretKeySet *params);
+EXPORT void bootsSymEncrypt(LweSample *result, int32_t message, const TFheGateBootstrappingSecretKeySet *params);
 
 /** decrypts a boolean */
-EXPORT int bootsSymDecrypt(const LweSample *sample, const TFheGateBootstrappingSecretKeySet *params);
+EXPORT int32_t bootsSymDecrypt(const LweSample *sample, const TFheGateBootstrappingSecretKeySet *params);
 
 /** bootstrapped Constant (true or false) trivial Gate */
-EXPORT void bootsCONSTANT(LweSample *result, int value, const TFheGateBootstrappingCloudKeySet *bk);
+EXPORT void bootsCONSTANT(LweSample *result, int32_t value, const TFheGateBootstrappingCloudKeySet *bk);
 
 /** bootstrapped Nand Gate */
 EXPORT void

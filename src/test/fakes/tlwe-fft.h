@@ -9,16 +9,16 @@ namespace {
     // Fake TLWE structure 
     struct FakeTLweFFT {
         //TODO: parallelization
-        static const int FAKE_TYPE_UID = 816458235; // precaution: distinguish fakes from trues
-        const int fake_uid;
+        static const int32_t FAKE_TYPE_UID = 816458235; // precaution: distinguish fakes from trues
+        const int32_t fake_uid;
         TorusPolynomial *message;
         double current_variance;
 
         //this padding is here to make sure that FakeTLwe and TLweSample have the same size
-        char unused_padding[sizeof(TLweSampleFFT) - sizeof(long) - sizeof(TorusPolynomial *) - sizeof(double)];
+        char unused_padding[sizeof(TLweSampleFFT) - sizeof(int64_t) - sizeof(TorusPolynomial *) - sizeof(double)];
 
         // construct
-        FakeTLweFFT(int N) : fake_uid(FAKE_TYPE_UID) {
+        FakeTLweFFT(int32_t N) : fake_uid(FAKE_TYPE_UID) {
             message = new_TorusPolynomial(N);
             current_variance = 0.;
         }
@@ -59,34 +59,34 @@ namespace {
     //-----------------------------------------
 
 
-    inline TLweSampleFFT *fake_new_TLweSampleFFT_array(int nbelts, const TLweParams *params) {
-        int N = params->N;
+    inline TLweSampleFFT *fake_new_TLweSampleFFT_array(int32_t nbelts, const TLweParams *params) {
+        int32_t N = params->N;
         FakeTLweFFT *reps = (FakeTLweFFT *) malloc(sizeof(FakeTLweFFT) * nbelts);
-        for (int i = 0; i < nbelts; i++) new(reps + i) FakeTLweFFT(N);
+        for (int32_t i = 0; i < nbelts; i++) new(reps + i) FakeTLweFFT(N);
         return (TLweSampleFFT *) reps;
     }
 
 
 #define USE_FAKE_new_TLweSampleFFT_array \
-    inline TLweSampleFFT* new_TLweSampleFFT_array(int nbelts, const TLweParams* params) { \
+    inline TLweSampleFFT* new_TLweSampleFFT_array(int32_t nbelts, const TLweParams* params) { \
     return fake_new_TLweSampleFFT_array(nbelts,params); \
     }
 
-    inline void fake_delete_TLweSampleFFT_array(int nbelts, TLweSampleFFT *sample) {
+    inline void fake_delete_TLweSampleFFT_array(int32_t nbelts, TLweSampleFFT *sample) {
         FakeTLweFFT *arr = fake(sample);
-        for (int i = 0; i < nbelts; i++) (arr + i)->~FakeTLweFFT();
+        for (int32_t i = 0; i < nbelts; i++) (arr + i)->~FakeTLweFFT();
         free(arr);
     }
 
     // 
 #define USE_FAKE_delete_TLweSampleFFT_array \
-    inline void delete_TLweSampleFFT_array(int nbelts, TLweSampleFFT* samples) { \
+    inline void delete_TLweSampleFFT_array(int32_t nbelts, TLweSampleFFT* samples) { \
     fake_delete_TLweSampleFFT_array(nbelts,samples); \
     }
 
 
     inline TLweSampleFFT *fake_new_TLweSampleFFT(const TLweParams *params) {
-        int N = params->N;
+        int32_t N = params->N;
         FakeTLweFFT *reps = (FakeTLweFFT *) malloc(sizeof(FakeTLweFFT));
         new(reps) FakeTLweFFT(N);
         return (TLweSampleFFT *) reps;

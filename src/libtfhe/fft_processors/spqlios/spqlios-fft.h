@@ -5,9 +5,9 @@
 extern "C" {
 #endif
 
-void *new_fft_table(int nn);
+void *new_fft_table(int32_t nn);
 double *fft_table_get_buffer(const void *tables);
-void *new_ifft_table(int nn);
+void *new_ifft_table(int32_t nn);
 double *ifft_table_get_buffer(const void *tables);
 void fft_model(const void *tables);
 void ifft_model(void *tables);

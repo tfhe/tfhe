@@ -22,10 +22,10 @@ void dieDramatically(string message) {
 }
 
 
-int main(int argc, char **argv) {
-    const int count = 1000; //number of tests to compare the 3 types of multiplication
+int32_t main(int32_t argc, char **argv) {
+    const int32_t count = 1000; //number of tests to compare the 3 types of multiplication
 
-    const int N = 1024;
+    const int32_t N = 1024;
     IntPolynomial *a = new_IntPolynomial(N);
     TorusPolynomial *b = new_TorusPolynomial(N);
     TorusPolynomial *resNaive = new_TorusPolynomial(N);
@@ -37,8 +37,8 @@ int main(int argc, char **argv) {
     double cycles_karatsuba[count];
     double cycles_fft[count];
 
-    for (int i = 0; i < count; ++i) {
-        for (int i = 0; i < N; i++) {
+    for (int32_t i = 0; i < count; ++i) {
+        for (int32_t i = 0; i < N; i++) {
             a->coefs[i] = (rand() % (4 * N)) - (2 * N);
             b->coefsT[i] = rand();
         }
@@ -63,14 +63,14 @@ int main(int argc, char **argv) {
         cend = clock();
         cycles_fft[i] = cend - cstart;
 
-        for (int i = 0; i < N; i++) {
-            if (abs(int(resNaive->coefsT[i] - resFFT->coefsT[i])) > 1) {
+        for (int32_t i = 0; i < N; i++) {
+            if (abs(int32_t(resNaive->coefsT[i] - resFFT->coefsT[i])) > 1) {
                 cerr << i << " " << resNaive->coefsT[i] << " vs. " << resFFT->coefsT[i] << endl;
                 dieDramatically("Naive != FFT\n");
             }
         }
-        for (int i = 0; i < N; i++) {
-            if (abs(int(resNaive->coefsT[i] - resKaratsuba->coefsT[i])) > 1) {
+        for (int32_t i = 0; i < N; i++) {
+            if (abs(int32_t(resNaive->coefsT[i] - resKaratsuba->coefsT[i])) > 1) {
                 cerr << i << " " << resNaive->coefsT[i] << " vs. " << resKaratsuba->coefsT[i] << endl;
                 dieDramatically("Naive != Karatsuba\n");
             }
@@ -81,7 +81,7 @@ int main(int argc, char **argv) {
     double cyc_naive = 0;
     double cyc_karatsuba = 0;
     double cyc_fft = 0;
-    for (int i = 0; i < count; ++i) {
+    for (int32_t i = 0; i < count; ++i) {
         cyc_naive += cycles_naive[i];
         cyc_karatsuba += cycles_karatsuba[i];
         cyc_fft += cycles_fft[i];

@@ -69,7 +69,7 @@ namespace {
             FakeLwe *fb = fake(b);
             FakeLwe *fc = fake(c);
 
-            for (int i = 0; i < 4; i++) {
+            for (int32_t i = 0; i < 4; i++) {
                 bool ba = i % 2;
                 bool bb = i / 2;
 
@@ -100,7 +100,7 @@ namespace {
             FakeLwe *fa = fake(a);
             FakeLwe *fc = fake(c);
 
-            for (int i = 0; i < 2; i++) {
+            for (int32_t i = 0; i < 2; i++) {
                 bool ba = i;
 
                 fa->message = ba ? ENC_TRUE : ENC_FALSE;
@@ -136,7 +136,7 @@ namespace {
             FakeLwe *fb = fake(b);
             FakeLwe *fc = fake(c);
 
-            for (int i = 0; i < 8; i++) {
+            for (int32_t i = 0; i < 8; i++) {
                 bool ba = (i >> 0) & 1;
                 bool bb = (i >> 1) & 1;
                 bool bc = (i >> 2) & 1;

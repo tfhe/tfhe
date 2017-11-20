@@ -10,10 +10,10 @@ using namespace std;
 
 default_random_engine generator;
 uniform_int_distribution<Torus32> uniformTorus32_distrib(INT32_MIN, INT32_MAX);
-uniform_int_distribution<int> uniformInt_distrib(INT_MIN, INT_MAX);
+uniform_int_distribution<int32_t> uniformInt_distrib(INT_MIN, INT_MAX);
 
 /** sets the seed of the random number generator to the given values */
-EXPORT void tfhe_random_generator_setSeed(uint32_t* values, int size) {
+EXPORT void tfhe_random_generator_setSeed(uint32_t* values, int32_t size) {
     seed_seq seeds(values, values+size);
     generator.seed(seeds);
 }
@@ -42,7 +42,7 @@ EXPORT double t32tod(Torus32 x) {
 // The constant Msize will indicate on which message space we are working (how many messages possible)
 //
 // "travailler sur 63 bits au lieu de 64, car dans nos cas pratiques, c'est plus précis"
-EXPORT Torus32 approxPhase(Torus32 phase, int Msize){
+EXPORT Torus32 approxPhase(Torus32 phase, int32_t Msize){
     uint64_t interv = ((UINT64_C(1)<<63)/Msize)*2; // width of each intervall
     uint64_t half_interval = interv/2; // begin of the first intervall
     uint64_t phase64 = (uint64_t(phase)<<32) + half_interval;
@@ -56,7 +56,7 @@ EXPORT Torus32 approxPhase(Torus32 phase, int Msize){
 // The constant Msize will indicate on which message space we are working (how many messages possible)
 //
 // "travailler sur 63 bits au lieu de 64, car dans nos cas pratiques, c'est plus précis"
-EXPORT int modSwitchFromTorus32(Torus32 phase, int Msize){
+EXPORT int32_t modSwitchFromTorus32(Torus32 phase, int32_t Msize){
     uint64_t interv = ((UINT64_C(1)<<63)/Msize)*2; // width of each intervall
     uint64_t half_interval = interv/2; // begin of the first intervall
     uint64_t phase64 = (uint64_t(phase)<<32) + half_interval;
@@ -68,7 +68,7 @@ EXPORT int modSwitchFromTorus32(Torus32 phase, int Msize){
 // The constant Msize will indicate on which message space we are working (how many messages possible)
 //
 // "travailler sur 63 bits au lieu de 64, car dans nos cas pratiques, c'est plus précis"
-EXPORT Torus32 modSwitchToTorus32(int mu, int Msize){
+EXPORT Torus32 modSwitchToTorus32(int32_t mu, int32_t Msize){
     uint64_t interv = ((UINT64_C(1)<<63)/Msize)*2; // width of each intervall
     uint64_t phase64 = mu*interv;
     //floor to the nearest multiples of interv

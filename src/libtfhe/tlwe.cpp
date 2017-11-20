@@ -3,13 +3,13 @@
 #include "polynomials.h"
 
 //struct TLweParams {
-//    const int k; //number of polynomials in the mask
-//    const int N; //a power of 2: degree of the polynomials
+//    const int32_t k; //number of polynomials in the mask
+//    const int32_t N; //a power of 2: degree of the polynomials
 //    const double alpha_min;
 //    const double alpha_max;
 //};
 
-TLweParams::TLweParams(int N, int k, double alpha_min, double alpha_max) :
+TLweParams::TLweParams(int32_t N, int32_t k, double alpha_min, double alpha_max) :
         N(N),
         k(k),
         alpha_min(alpha_min),

@@ -51,7 +51,7 @@ namespace {
 
     //  Used to approximate the phase to the nearest multiple of  1/Msize 
     TEST_F(ArithmeticTest, approxPhase) {
-	for (int i=2; i<200; i++) {
+	for (int32_t i=2; i<200; i++) {
 	    Torus32 v = uniformTorus32_distrib(generator);
 	    Torus32 w = approxPhase(v,i);
 	    double dv = t32tod(v);
@@ -65,9 +65,9 @@ namespace {
 
     // computes rountToNearestInteger(Msize*phase)
     TEST_F(ArithmeticTest, modSwitchFromTorus32) {
-	for (int i=2; i<200; i++) {
+	for (int32_t i=2; i<200; i++) {
 	    Torus32 v = uniformTorus32_distrib(generator);
-	    int w = modSwitchFromTorus32(v,i);
+	    int32_t w = modSwitchFromTorus32(v,i);
 	    double dv = t32tod(v);
 	    double dw = double(w)/double(i);
 	    ASSERT_LE(absfrac(dv-dw),1./(2.*i)+1e-40);
@@ -76,8 +76,8 @@ namespace {
 
     // converts mu/Msize to a Torus32 for mu in [0,Msize[
     TEST_F (ArithmeticTest,modSwitchToTorus32) {
-	for (int i=2; i<200; i++) {
-	    int j = uniformTorus32_distrib(generator)%i;
+	for (int32_t i=2; i<200; i++) {
+	    int32_t j = uniformTorus32_distrib(generator)%i;
 	    Torus32 v = modSwitchToTorus32(j,i);
 	    double dv = t32tod(v);
 	    //printf("%d, %d, %lf, %lf\n", j, i, dv, double(j)/i);

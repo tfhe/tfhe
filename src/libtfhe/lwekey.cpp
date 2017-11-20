@@ -6,7 +6,7 @@ using namespace std;
 
 LweKey::LweKey(const LweParams* params) {
     this->params = params;
-    this->key = new int[params->n];
+    this->key = new int32_t[params->n];
 }
 
 LweKey::~LweKey() {

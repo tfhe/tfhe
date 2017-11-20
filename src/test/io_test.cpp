@@ -26,30 +26,30 @@ namespace {
 
     //generate a random lwekey
     LweKey* new_random_lwe_key(const LweParams* params) {
-	const int n = params->n;
+	const int32_t n = params->n;
 	LweKey* key = new_LweKey(params);
-	for (int i=0; i<n; i++) key->key[i]=rand()%2;
+	for (int32_t i=0; i<n; i++) key->key[i]=rand()%2;
 	return key;
     }
 
     //generate a random tlwekey
     TLweKey* new_random_tlwe_key(const TLweParams* params) {
-	const int N = params->N;
-	const int k = params->k;
+	const int32_t N = params->N;
+	const int32_t k = params->k;
 	TLweKey* key = new_TLweKey(params);
-	for (int i=0; i<k; i++) 
-	    for (int j=0; j<N; j++)
+	for (int32_t i=0; i<k; i++) 
+	    for (int32_t j=0; j<N; j++)
 		key->key[i].coefs[j]=rand()%2;
 	return key;
     }
 
     //generate a random tgswkey
     TGswKey* new_random_tgsw_key(const TGswParams* params) {
-	const int N = params->tlwe_params->N;
-	const int k = params->tlwe_params->k;
+	const int32_t N = params->tlwe_params->N;
+	const int32_t k = params->tlwe_params->k;
 	TGswKey* key = new_TGswKey(params);
-	for (int i=0; i<k; i++) 
-	    for (int j=0; j<N; j++)
+	for (int32_t i=0; i<k; i++) 
+	    for (int32_t j=0; j<N; j++)
 		key->key[i].coefs[j]=rand()%2;
 	return key;
     }
@@ -57,23 +57,23 @@ namespace {
     
     //generate a random ks
     void random_ks_key(LweKeySwitchKey* key) {
-        const int N = key->n;
-        const int t = key->t;
-        const int base = key->base;
-	const int n = key->out_params->n;
-	const int length = N*t*base;
+        const int32_t N = key->n;
+        const int32_t t = key->t;
+        const int32_t base = key->base;
+	const int32_t n = key->out_params->n;
+	const int32_t length = N*t*base;
 	double variance = rand()/double(RAND_MAX);
         LweSample* begin = key->ks0_raw;
 	LweSample* end = begin+length;
 	for (LweSample* it=begin; it!=end; ++it) {
-	    for (int j=0; j<n; j++) it->a[j]=rand();
+	    for (int32_t j=0; j<n; j++) it->a[j]=rand();
             it->b=rand();
             it->current_variance=variance;
         }
     }
 
     //generate a random ks
-    LweKeySwitchKey* new_random_ks_key(int N, int t, int basebit, const LweParams* out_params) {
+    LweKeySwitchKey* new_random_ks_key(int32_t N, int32_t t, int32_t basebit, const LweParams* out_params) {
 	LweKeySwitchKey* key = new_LweKeySwitchKey(N,t,basebit,out_params);
         random_ks_key(key);
 	return key;
@@ -81,19 +81,19 @@ namespace {
 
     
     //generate a random ks
-    LweBootstrappingKey* new_random_bk_key(int ks_t, int ks_basebit, const LweParams* in_out_params, const TGswParams* bk_params) {
-	const int n = in_out_params->n;
-        const int kpl = bk_params->kpl;
-        const int k = bk_params->tlwe_params->k;
-        const int N = bk_params->tlwe_params->N;
+    LweBootstrappingKey* new_random_bk_key(int32_t ks_t, int32_t ks_basebit, const LweParams* in_out_params, const TGswParams* bk_params) {
+	const int32_t n = in_out_params->n;
+        const int32_t kpl = bk_params->kpl;
+        const int32_t k = bk_params->tlwe_params->k;
+        const int32_t N = bk_params->tlwe_params->N;
         LweBootstrappingKey* bk = new_LweBootstrappingKey(ks_t, ks_basebit, in_out_params, bk_params);
         random_ks_key(bk->ks);
         double variance = rand()/double(RAND_MAX);
-        for (int i=0; i<n; i++) {
-            for (int p=0; p<kpl; p++) {
+        for (int32_t i=0; i<n; i++) {
+            for (int32_t p=0; p<kpl; p++) {
                 TLweSample& sample = bk->bk[i].all_sample[p];
-                for (int j=0; j<=k; j++) {
-                    for (int x=0; x<N; x++)
+                for (int32_t j=0; j<=k; j++) {
+                    for (int32_t x=0; x<N; x++)
                         sample.a[j].coefsT[x]=rand();
                 }
                 sample.current_variance=variance;
@@ -150,18 +150,18 @@ namespace {
     //equality test for keys
     void assert_equals(const LweKey* a, const LweKey* b) {
 	assert_equals(a->params,b->params);
-	const int n = a->params->n;
-	for (int i=0; i<n; i++)
+	const int32_t n = a->params->n;
+	for (int32_t i=0; i<n; i++)
 	    ASSERT_EQ(a->key[i], b->key[i]);	
     }
 
     //equality test for keys
     void assert_equals(const TLweKey* a, const TLweKey* b) {
 	assert_equals(a->params,b->params);
-	const int N = a->params->N;
-	const int k = a->params->k;
-	for (int i=0; i<k; i++)
-	    for (int j=0; j<N; j++)
+	const int32_t N = a->params->N;
+	const int32_t k = a->params->k;
+	for (int32_t i=0; i<k; i++)
+	    for (int32_t j=0; j<N; j++)
 		ASSERT_EQ(a->key[i].coefs[j], b->key[i].coefs[j]);	
     }
 
@@ -173,49 +173,49 @@ namespace {
 
     //generate a random sample
     void lweSampleUniform(LweSample* a, const LweParams* params) {
-	const int n = params->n;
-	for (int i=0; i<n; i++) a->a[i]=rand();
+	const int32_t n = params->n;
+	for (int32_t i=0; i<n; i++) a->a[i]=rand();
 	a->b=rand();
 	a->current_variance=rand()/double(RAND_MAX);
     }
 
     //generate a random sample
     void tlweSampleUniform(TLweSample* a, const TLweParams* params) {
-	const int k = params->k;
-	for (int i=0; i<=k; i++) 
+	const int32_t k = params->k;
+	for (int32_t i=0; i<=k; i++) 
 	    torusPolynomialUniform(a->a+i);
 	a->current_variance=rand()/double(RAND_MAX);
     }
 
     //generate a random sample
     void tgswSampleUniform(TGswSample* a, const TGswParams* params) {
-	const int kpl = params->kpl;
+	const int32_t kpl = params->kpl;
 	const TLweParams* tlwe_params = params->tlwe_params;
-	for (int i=0; i<kpl; i++) 
+	for (int32_t i=0; i<kpl; i++) 
 	    tlweSampleUniform(a->all_sample+i,tlwe_params);
     }
 
     //equality test for samples
     void assert_equals(const LweSample* a, const LweSample* b, const LweParams* params) {
-	const int n = params->n;
-	for (int i=0; i<n; i++) ASSERT_EQ(a->a[i], b->a[i]);
+	const int32_t n = params->n;
+	for (int32_t i=0; i<n; i++) ASSERT_EQ(a->a[i], b->a[i]);
 	ASSERT_EQ(a->b,b->b);
 	ASSERT_DOUBLE_EQ(a->current_variance,b->current_variance);	
     }
 
     //equality test for samples
     void assert_equals(const TLweSample* a, const TLweSample* b, const TLweParams* params) {
-	const int k = params->k;
-	for (int i=0; i<=k; i++) 
+	const int32_t k = params->k;
+	for (int32_t i=0; i<=k; i++) 
 	    ASSERT_EQ(torusPolynomialNormInftyDist(a->a+i, b->a+i),0);
 	ASSERT_DOUBLE_EQ(a->current_variance,b->current_variance);	
     }
 
     //equality test for samples
     void assert_equals(const TGswSample* a, const TGswSample* b, const TGswParams* params) {
-	const int kpl = params->kpl;
+	const int32_t kpl = params->kpl;
 	const TLweParams* tlwe_params = params->tlwe_params;
-	for (int i=0; i<kpl; i++) 
+	for (int32_t i=0; i<kpl; i++) 
 	    assert_equals(a->all_sample+i,b->all_sample+i,tlwe_params);
     }
 
@@ -227,14 +227,14 @@ namespace {
 	ASSERT_EQ(a->basebit,b->basebit);
 	ASSERT_EQ(a->base,b->base);
 	assert_equals(a->out_params, b->out_params);
-	const int length = a->n * a->t * a->base;
-	const int outn = a->out_params->n;
+	const int32_t length = a->n * a->t * a->base;
+	const int32_t outn = a->out_params->n;
 	double max_vara=-1;
 	double max_varb=-1;
-	for (int i=0; i<length; i++) {
+	for (int32_t i=0; i<length; i++) {
 	    const LweSample& sa = a->ks0_raw[i];
 	    const LweSample& sb = b->ks0_raw[i];
-	    for (int j=0; j<outn; j++) ASSERT_EQ(sa.a[j],sb.a[j]);
+	    for (int32_t j=0; j<outn; j++) ASSERT_EQ(sa.a[j],sb.a[j]);
 	    ASSERT_EQ(sa.b,sb.b);
 	    if (sa.current_variance>max_vara) max_vara=sa.current_variance;
 	    if (sb.current_variance>max_varb) max_varb=sb.current_variance;
@@ -244,17 +244,17 @@ namespace {
 
     //equality test for bootstrapping key
     void assert_equals(const LweBootstrappingKey* a, const LweBootstrappingKey* b) {
-        const int n = a->in_out_params->n;
-        const int kpl = a->bk_params->kpl;
-        //const int N = a->bk_params->tlwe_params->N;
-        const int k = a->bk_params->tlwe_params->k;
+        const int32_t n = a->in_out_params->n;
+        const int32_t kpl = a->bk_params->kpl;
+        //const int32_t N = a->bk_params->tlwe_params->N;
+        const int32_t k = a->bk_params->tlwe_params->k;
         //compare ks
         assert_equals(a->ks, b->ks);
         //compute the max variance
         double max_vara = -1;
         double max_varb = -1;
-        for (int i=0; i<n; i++)
-            for (int j=0; j<kpl; j++) {
+        for (int32_t i=0; i<n; i++)
+            for (int32_t j=0; j<kpl; j++) {
                 TLweSample& samplea = a->bk[i].all_sample[j];
                 TLweSample& sampleb = b->bk[i].all_sample[j];
                 if (samplea.current_variance > max_vara)
@@ -264,11 +264,11 @@ namespace {
             }
         ASSERT_EQ(max_vara,max_varb);
         //compare the coefficients
-        for (int i=0; i<n; i++)
-            for (int j=0; j<kpl; j++) {
+        for (int32_t i=0; i<n; i++)
+            for (int32_t j=0; j<kpl; j++) {
                 TLweSample& samplea = a->bk[i].all_sample[j];
                 TLweSample& sampleb = b->bk[i].all_sample[j];
-                for (int l=0; l<=k; l++)
+                for (int32_t l=0; l<=k; l++)
                     ASSERT_EQ(torusPolynomialNormInftyDist(samplea.a+l,sampleb.a+l),0);
             }
     }

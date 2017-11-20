@@ -8,7 +8,7 @@ namespace {
         //TODO: parallelization
         static const int32_t FAKE_TYPE_UID = 213579845; // precaution: distinguish fakes from trues
         const int32_t fake_uid;
-        int32_t isInt; // -1: nsp, 0: torus, 1: int
+        int32_t isInt; // -1: nsp, 0: torus, 1: int32_t
         union innerPolynomial {
             IntPolynomial *as_intPolynomial;
             TorusPolynomial *as_torusPolynomial;
@@ -17,7 +17,7 @@ namespace {
         innerPolynomial value;
 
         // construct
-        FakeLagrangeHalfCPolynomial(int N) : fake_uid(FAKE_TYPE_UID) {
+        FakeLagrangeHalfCPolynomial(int32_t N) : fake_uid(FAKE_TYPE_UID) {
             isInt = -1;
             value.as_nothing = 0;
         }
@@ -35,7 +35,7 @@ namespace {
         }
 
         void set_torusPolynomial(const TorusPolynomial *p) {
-            if (isInt == 1) abort(); //should not mix int/torus
+            if (isInt == 1) abort(); //should not mix int32_t/torus
             if (isInt == -1) {
                 isInt = 0;
                 value.as_torusPolynomial = new_TorusPolynomial(p->N);
@@ -96,37 +96,37 @@ namespace {
         return reps;
     }
 
-    inline LagrangeHalfCPolynomial *fake_new_LagrangeHalfCPolynomial_array(int nbelts, int N) {
+    inline LagrangeHalfCPolynomial *fake_new_LagrangeHalfCPolynomial_array(int32_t nbelts, int32_t N) {
         FakeLagrangeHalfCPolynomial *reps = (FakeLagrangeHalfCPolynomial *) malloc(
                 nbelts * sizeof(FakeLagrangeHalfCPolynomial));
-        for (int i = 0; i < nbelts; i++)
+        for (int32_t i = 0; i < nbelts; i++)
             new(reps + i) FakeLagrangeHalfCPolynomial(N);
         return (LagrangeHalfCPolynomial *) reps;
     }
 
 #define USE_FAKE_new_LagrangeHalfCPolynomial_array \
-    inline LagrangeHalfCPolynomial* new_LagrangeHalfCPolynomial_array(int nbelts, int N) { \
+    inline LagrangeHalfCPolynomial* new_LagrangeHalfCPolynomial_array(int32_t nbelts, int32_t N) { \
     return fake_new_LagrangeHalfCPolynomial_array(nbelts, N); \
     }
 
-    inline void fake_delete_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolynomial *ptr) {
+    inline void fake_delete_LagrangeHalfCPolynomial_array(int32_t nbelts, LagrangeHalfCPolynomial *ptr) {
         FakeLagrangeHalfCPolynomial *fptr = fake(ptr);
-        for (int i = 0; i < nbelts; i++)
+        for (int32_t i = 0; i < nbelts; i++)
             (fptr + i)->~FakeLagrangeHalfCPolynomial();
         free(ptr);
     }
 
 #define USE_FAKE_delete_LagrangeHalfCPolynomial_array \
-    inline void delete_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolynomial* ptr) { \
+    inline void delete_LagrangeHalfCPolynomial_array(int32_t nbelts, LagrangeHalfCPolynomial* ptr) { \
     fake_delete_LagrangeHalfCPolynomial_array(nbelts, ptr); \
     }
 
-    inline LagrangeHalfCPolynomial *fake_new_LagrangeHalfCPolynomial(int N) {
+    inline LagrangeHalfCPolynomial *fake_new_LagrangeHalfCPolynomial(int32_t N) {
         return fake_new_LagrangeHalfCPolynomial_array(1, N);
     }
 
 #define USE_FAKE_new_LagrangeHalfCPolynomial \
-    inline LagrangeHalfCPolynomial* new_LagrangeHalfCPolynomial(int N) { \
+    inline LagrangeHalfCPolynomial* new_LagrangeHalfCPolynomial(int32_t N) { \
     return fake_new_LagrangeHalfCPolynomial(N); \
     }
 
@@ -185,7 +185,7 @@ namespace {
 
 //EXPORT void LagrangeHalfCPolynomialSetTorusConstant(LagrangeHalfCPolynomial* result, const Torus32 mu);
 //EXPORT void LagrangeHalfCPolynomialAddTorusConstant(LagrangeHalfCPolynomial* result, const Torus32 cst);
-//EXPORT void LagrangeHalfCPolynomialSetXaiMinusOne(LagrangeHalfCPolynomial* result, const int ai);
+//EXPORT void LagrangeHalfCPolynomialSetXaiMinusOne(LagrangeHalfCPolynomial* result, const int32_t ai);
 
 //EXPORT void LagrangeHalfCPolynomialMul(LagrangeHalfCPolynomial* result, const LagrangeHalfCPolynomial* a, const LagrangeHalfCPolynomial* b);
 

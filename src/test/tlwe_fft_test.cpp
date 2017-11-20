@@ -52,7 +52,7 @@ namespace {
 #include "../libtfhe/tlwe-fft-operations.cpp"
 
         inline void tlweSampleUniform(TLweSample *sample, const TLweParams *params) {
-            for (int i = 0; i <= params->k; i++)
+            for (int32_t i = 0; i <= params->k; i++)
                 torusPolynomialUniform(sample->a + i);
             sample->current_variance = rand() / double(RAND_MAX);
         }
@@ -60,7 +60,7 @@ namespace {
         inline void tlweSampleFFTUniform(TLweSampleFFT *sample, const TLweParams *params) {
             FakeLagrangeHalfCPolynomial *samplea = fake(sample->a);
             TorusPolynomial *tmp = new_TorusPolynomial(params->N);
-            for (int i = 0; i <= params->k; i++) {
+            for (int32_t i = 0; i <= params->k; i++) {
                 torusPolynomialUniform(tmp);
                 samplea[i].set_torusPolynomial(tmp);
             }
@@ -68,10 +68,10 @@ namespace {
             delete_TorusPolynomial(tmp);
         }
 
-        inline void intLagrangeHalfCPolynomialUniform(LagrangeHalfCPolynomial *a, int N) {
+        inline void intLagrangeHalfCPolynomialUniform(LagrangeHalfCPolynomial *a, int32_t N) {
             FakeLagrangeHalfCPolynomial *fa = fake(a);
             IntPolynomial *tmp = new_IntPolynomial(N);
-            for (int i = 0; i < N; i++) {
+            for (int32_t i = 0; i < N; i++) {
                 tmp->coefs[i] = rand() % 1000 - 500;
             }
             fa->set_intPolynomial(tmp);
@@ -91,7 +91,7 @@ namespace {
     //EXPORT void tLweToFFTConvert(TLweSampleFFT* result, const TLweSample* source, const TLweParams* params)
     TEST_F(TLweFFTTest, tLweToFFTConvert) {
         for (const TLweParams *params: all_params) {
-            const int k = params->k;
+            const int32_t k = params->k;
             TLweSample *source = new_TLweSample(params);
             TLweSampleFFT *result = new_TLweSampleFFT(params);
             FakeLagrangeHalfCPolynomial *resulta = fake(result->a);
@@ -101,7 +101,7 @@ namespace {
 
             tLweToFFTConvert(result, source, params);
 
-            for (int i = 0; i <= k; i++)
+            for (int32_t i = 0; i <= k; i++)
                 ASSERT_EQ(torusPolynomialNormInftyDist(source->a + i, resulta[i].getTorusPolynomialPtr()), 0);
             ASSERT_EQ(result->current_variance, source->current_variance);
 
@@ -115,7 +115,7 @@ namespace {
     //EXPORT void fake_tLweFromFFTConvert(TLweSample* result, const TLweSampleFFT* source, const TLweParams* params);
     TEST_F(TLweFFTTest, tLweFromFFTConvert) {
         for (const TLweParams *params: all_params) {
-            const int k = params->k;
+            const int32_t k = params->k;
             TLweSampleFFT *source = new_TLweSampleFFT(params);
             TLweSample *result = new_TLweSample(params);
             FakeLagrangeHalfCPolynomial *sourcea = fake(source->a);
@@ -125,7 +125,7 @@ namespace {
 
             tLweFromFFTConvert(result, source, params);
 
-            for (int i = 0; i <= k; i++)
+            for (int32_t i = 0; i <= k; i++)
                 ASSERT_EQ(torusPolynomialNormInftyDist(result->a + i, sourcea[i].getTorusPolynomialPtr()), 0);
             ASSERT_EQ(result->current_variance, source->current_variance);
 
@@ -140,7 +140,7 @@ namespace {
     //EXPORT void fake_tLweFFTClear(TLweSampleFFT* result, const TLweParams* params);
     TEST_F(TLweFFTTest, tLweFFTClear) {
         for (const TLweParams *params: all_params) {
-            const int k = params->k;
+            const int32_t k = params->k;
             TLweSampleFFT *result = new_TLweSampleFFT(params);
             FakeLagrangeHalfCPolynomial *resulta = fake(result->a);
             TorusPolynomial *zero = new_TorusPolynomial(params->N);
@@ -150,7 +150,7 @@ namespace {
 
             tLweFFTClear(result, params);
 
-            for (int i = 0; i <= k; i++)
+            for (int32_t i = 0; i <= k; i++)
                 ASSERT_EQ(torusPolynomialNormInftyDist(resulta[i].getTorusPolynomialPtr(), zero), 0);
             ASSERT_EQ(result->current_variance, 0);
 
@@ -163,8 +163,8 @@ namespace {
     //EXPORT void fake_tLweFFTAddMulRTo(TLweSampleFFT* result, const LagrangeHalfCPolynomial* p, const TLweSampleFFT* sample, const TLweParams* params);
     TEST_F(TLweFFTTest, tLweAddMulRTo) {
         for (const TLweParams *params: all_params) {
-            const int k = params->k;
-            const int N = params->N;
+            const int32_t k = params->k;
+            const int32_t N = params->N;
             TLweSampleFFT *result = new_TLweSampleFFT(params);
             TLweSampleFFT *sample = new_TLweSampleFFT(params);
             LagrangeHalfCPolynomial *p = new_LagrangeHalfCPolynomial(N);
@@ -178,7 +178,7 @@ namespace {
 
             //copy the initial sample
             TorusPolynomial *tmp = new_TorusPolynomial_array(k + 1, N);
-            for (int i = 0; i <= k; i++) {
+            for (int32_t i = 0; i <= k; i++) {
                 torusPolynomialCopy(tmp + i, resulta[i].getTorusPolynomialPtr());
             }
             //double initial_variance = result->current_variance;
@@ -188,7 +188,7 @@ namespace {
             tLweFFTAddMulRTo(result, p, sample, params);
 
             //check the result
-            for (int i = 0; i <= k; i++) {
+            for (int32_t i = 0; i <= k; i++) {
                 torusPolynomialAddMulRKaratsuba(tmp + i, fp->getIntPolynomialPtr(), samplea[i].getTorusPolynomialPtr());
                 ASSERT_EQ(torusPolynomialNormInftyDist(resulta[i].getTorusPolynomialPtr(), tmp + i), 0);
             }

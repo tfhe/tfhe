@@ -8,7 +8,7 @@
 
 //initialize the LagrangeHalfCPolynomial structure
 //(equivalent of the C++ constructor)
-EXPORT void init_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* obj, const int N);
+EXPORT void init_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* obj, const int32_t N);
 
 //destroys the LagrangeHalfCPolynomial structure
 //(equivalent of the C++ destructor)
@@ -33,7 +33,7 @@ EXPORT void LagrangeHalfCPolynomialAddTorusConstant(LagrangeHalfCPolynomial* res
 // /* sets to X^ai-1 */
 //This function is commented, because it is not used 
 //in the current version. However, it may be included in future releases
-//EXPORT void LagrangeHalfCPolynomialSetXaiMinusOne(LagrangeHalfCPolynomial* result, const int ai);
+//EXPORT void LagrangeHalfCPolynomialSetXaiMinusOne(LagrangeHalfCPolynomial* result, const int32_t ai);
 
 
 /** multiplication via direct FFT */

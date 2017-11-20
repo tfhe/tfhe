@@ -26,17 +26,17 @@ EXPORT void init_LweBootstrappingKeyFFT(LweBootstrappingKeyFFT *obj, const LweBo
     const TGswParams *bk_params = bk->bk_params;
     const TLweParams *accum_params = bk_params->tlwe_params;
     const LweParams *extract_params = &accum_params->extracted_lweparams;
-    const int n = in_out_params->n;
-    const int t = bk->ks->t;
-    const int basebit = bk->ks->basebit;
-    const int base = bk->ks->base;
-    const int N = extract_params->n;
+    const int32_t n = in_out_params->n;
+    const int32_t t = bk->ks->t;
+    const int32_t basebit = bk->ks->basebit;
+    const int32_t base = bk->ks->base;
+    const int32_t N = extract_params->n;
 
     LweKeySwitchKey *ks = new_LweKeySwitchKey(N, t, basebit, in_out_params);
     // Copy the KeySwitching key
-    for (int i = 0; i < N; i++) {
-        for (int j = 0; j < t; j++) {
-            for (int p = 0; p < base; p++) {
+    for (int32_t i = 0; i < N; i++) {
+        for (int32_t j = 0; j < t; j++) {
+            for (int32_t p = 0; p < base; p++) {
                 lweCopy(&ks->ks[i][j][p], &bk->ks->ks[i][j][p], in_out_params);
             }
         }
@@ -44,7 +44,7 @@ EXPORT void init_LweBootstrappingKeyFFT(LweBootstrappingKeyFFT *obj, const LweBo
 
     // Bootstrapping Key FFT 
     TGswSampleFFT *bkFFT = new_TGswSampleFFT_array(n, bk_params);
-    for (int i = 0; i < n; ++i) {
+    for (int32_t i = 0; i < n; ++i) {
         tGswToFFTConvert(&bkFFT[i], &bk->bk[i], bk_params);
     }
 
@@ -64,7 +64,7 @@ EXPORT void destroy_LweBootstrappingKeyFFT(LweBootstrappingKeyFFT *obj) {
 }
 
 
-void tfhe_MuxRotate_FFT(TLweSample *result, const TLweSample *accum, const TGswSampleFFT *bki, const int barai,
+void tfhe_MuxRotate_FFT(TLweSample *result, const TLweSample *accum, const TGswSampleFFT *bki, const int32_t barai,
                         const TGswParams *bk_params) {
     // ACC = BKi*[(X^barai-1)*ACC]+ACC
     // temp = (X^barai-1)*ACC
@@ -87,8 +87,8 @@ void tfhe_MuxRotate_FFT(TLweSample *result, const TLweSample *accum, const TGswS
  */
 EXPORT void tfhe_blindRotate_FFT(TLweSample *accum,
                                  const TGswSampleFFT *bkFFT,
-                                 const int *bara,
-                                 const int n,
+                                 const int32_t *bara,
+                                 const int32_t n,
                                  const TGswParams *bk_params) {
 
     //TGswSampleFFT* temp = new_TGswSampleFFT(bk_params);
@@ -96,8 +96,8 @@ EXPORT void tfhe_blindRotate_FFT(TLweSample *accum,
     TLweSample *temp2 = temp;
     TLweSample *temp3 = accum;
 
-    for (int i = 0; i < n; i++) {
-        const int barai = bara[i];
+    for (int32_t i = 0; i < n; i++) {
+        const int32_t barai = bara[i];
         if (barai == 0) continue; //indeed, this is an easy case!
 
         tfhe_MuxRotate_FFT(temp2, temp3, bkFFT + i, barai, bk_params);
@@ -127,15 +127,15 @@ EXPORT void tfhe_blindRotate_FFT(TLweSample *accum,
 EXPORT void tfhe_blindRotateAndExtract_FFT(LweSample *result,
                                            const TorusPolynomial *v,
                                            const TGswSampleFFT *bk,
-                                           const int barb,
-                                           const int *bara,
-                                           const int n,
+                                           const int32_t barb,
+                                           const int32_t *bara,
+                                           const int32_t n,
                                            const TGswParams *bk_params) {
 
     const TLweParams *accum_params = bk_params->tlwe_params;
     const LweParams *extract_params = &accum_params->extracted_lweparams;
-    const int N = accum_params->N;
-    const int _2N = 2 * N;
+    const int32_t N = accum_params->N;
+    const int32_t _2N = 2 * N;
 
     // Test polynomial 
     TorusPolynomial *testvectbis = new_TorusPolynomial(N);
@@ -174,22 +174,22 @@ EXPORT void tfhe_bootstrap_woKS_FFT(LweSample *result,
     const TGswParams *bk_params = bk->bk_params;
     const TLweParams *accum_params = bk->accum_params;
     const LweParams *in_params = bk->in_out_params;
-    const int N = accum_params->N;
-    const int Nx2 = 2 * N;
-    const int n = in_params->n;
+    const int32_t N = accum_params->N;
+    const int32_t Nx2 = 2 * N;
+    const int32_t n = in_params->n;
 
     TorusPolynomial *testvect = new_TorusPolynomial(N);
-    int *bara = new int[N];
+    int32_t *bara = new int32_t[N];
 
 
     // Modulus switching
-    int barb = modSwitchFromTorus32(x->b, Nx2);
-    for (int i = 0; i < n; i++) {
+    int32_t barb = modSwitchFromTorus32(x->b, Nx2);
+    for (int32_t i = 0; i < n; i++) {
         bara[i] = modSwitchFromTorus32(x->a[i], Nx2);
     }
 
     // the initial testvec = [mu,mu,mu,...,mu]
-    for (int i = 0; i < N; i++) testvect->coefsT[i] = mu;
+    for (int32_t i = 0; i < N; i++) testvect->coefsT[i] = mu;
 
     // Bootstrapping rotation and extraction
     tfhe_blindRotateAndExtract_FFT(result, testvect, bk->bkFFT, barb, bara, n, bk_params);
@@ -245,7 +245,7 @@ EXPORT void tfhe_bootstrap_FFT(LweSample *result,
 EXPORT LweBootstrappingKeyFFT *alloc_LweBootstrappingKeyFFT() {
     return (LweBootstrappingKeyFFT *) malloc(sizeof(LweBootstrappingKeyFFT));
 }
-EXPORT LweBootstrappingKeyFFT *alloc_LweBootstrappingKeyFFT_array(int nbelts) {
+EXPORT LweBootstrappingKeyFFT *alloc_LweBootstrappingKeyFFT_array(int32_t nbelts) {
     return (LweBootstrappingKeyFFT *) malloc(nbelts * sizeof(LweBootstrappingKeyFFT));
 }
 
@@ -253,21 +253,21 @@ EXPORT LweBootstrappingKeyFFT *alloc_LweBootstrappingKeyFFT_array(int nbelts) {
 EXPORT void free_LweBootstrappingKeyFFT(LweBootstrappingKeyFFT *ptr) {
     free(ptr);
 }
-EXPORT void free_LweBootstrappingKeyFFT_array(int nbelts, LweBootstrappingKeyFFT *ptr) {
+EXPORT void free_LweBootstrappingKeyFFT_array(int32_t nbelts, LweBootstrappingKeyFFT *ptr) {
     free(ptr);
 }
 
 //initialize the key structure
 
-EXPORT void init_LweBootstrappingKeyFFT_array(int nbelts, LweBootstrappingKeyFFT *obj, const LweBootstrappingKey *bk) {
-    for (int i = 0; i < nbelts; i++) {
+EXPORT void init_LweBootstrappingKeyFFT_array(int32_t nbelts, LweBootstrappingKeyFFT *obj, const LweBootstrappingKey *bk) {
+    for (int32_t i = 0; i < nbelts; i++) {
         init_LweBootstrappingKeyFFT(obj + i, bk);
     }
 }
 
 
-EXPORT void destroy_LweBootstrappingKeyFFT_array(int nbelts, LweBootstrappingKeyFFT *obj) {
-    for (int i = 0; i < nbelts; i++) {
+EXPORT void destroy_LweBootstrappingKeyFFT_array(int32_t nbelts, LweBootstrappingKeyFFT *obj) {
+    for (int32_t i = 0; i < nbelts; i++) {
         destroy_LweBootstrappingKeyFFT(obj + i);
     }
 }
@@ -279,7 +279,7 @@ EXPORT LweBootstrappingKeyFFT *new_LweBootstrappingKeyFFT(const LweBootstrapping
     init_LweBootstrappingKeyFFT(obj, bk);
     return obj;
 }
-EXPORT LweBootstrappingKeyFFT *new_LweBootstrappingKeyFFT_array(int nbelts, const LweBootstrappingKey *bk) {
+EXPORT LweBootstrappingKeyFFT *new_LweBootstrappingKeyFFT_array(int32_t nbelts, const LweBootstrappingKey *bk) {
     LweBootstrappingKeyFFT *obj = alloc_LweBootstrappingKeyFFT_array(nbelts);
     init_LweBootstrappingKeyFFT_array(nbelts, obj, bk);
     return obj;
@@ -291,7 +291,7 @@ EXPORT void delete_LweBootstrappingKeyFFT(LweBootstrappingKeyFFT *obj) {
     destroy_LweBootstrappingKeyFFT(obj);
     free_LweBootstrappingKeyFFT(obj);
 }
-EXPORT void delete_LweBootstrappingKeyFFT_array(int nbelts, LweBootstrappingKeyFFT *obj) {
+EXPORT void delete_LweBootstrappingKeyFFT_array(int32_t nbelts, LweBootstrappingKeyFFT *obj) {
     destroy_LweBootstrappingKeyFFT_array(nbelts, obj);
     free_LweBootstrappingKeyFFT_array(nbelts, obj);
 }

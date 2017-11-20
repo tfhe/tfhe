@@ -35,7 +35,7 @@ using namespace std;
 void write_lweParams(const Ostream &F, const LweParams *lweparams) {
     TextModeProperties *props = new_TextModeProperties_blank();
     props->setTypeTitle("LWEPARAMS");
-    props->setProperty_long("n", lweparams->n);
+    props->setProperty_int64_t("n", lweparams->n);
     props->setProperty_double("alpha_min", lweparams->alpha_min);
     props->setProperty_double("alpha_max", lweparams->alpha_max);
     print_TextModeProperties_toOStream(F, props);
@@ -49,7 +49,7 @@ void write_lweParams(const Ostream &F, const LweParams *lweparams) {
 LweParams *read_new_lweParams(const Istream &F) {
     TextModeProperties *props = new_TextModeProperties_fromIstream(F);
     if (props->getTypeTitle() != string("LWEPARAMS")) abort();
-    int n = props->getProperty_long("n");
+    int32_t n = props->getProperty_int64_t("n");
     double alpha_min = props->getProperty_double("alpha_min");
     double alpha_max = props->getProperty_double("alpha_max");
     delete_TextModeProperties(props);
@@ -88,7 +88,7 @@ EXPORT LweParams *new_lweParams_fromFile(FILE *F) { return read_new_lweParams(to
 **************************** */
 
 void read_lweSample(const Istream &F, LweSample *sample, const LweParams *params) {
-    const int n = params->n;
+    const int32_t n = params->n;
     int32_t type_uid;
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != LWE_SAMPLE_TYPE_UID) abort();
@@ -99,7 +99,7 @@ void read_lweSample(const Istream &F, LweSample *sample, const LweParams *params
 
 
 void write_lweSample(const Ostream &F, const LweSample *sample, const LweParams *params) {
-    const int n = params->n;
+    const int32_t n = params->n;
     F.fwrite(&LWE_SAMPLE_TYPE_UID, sizeof(int32_t));
     F.fwrite(sample->a, sizeof(Torus32) * n);
     F.fwrite(&sample->b, sizeof(Torus32));
@@ -152,11 +152,11 @@ EXPORT void import_lweSample_fromFile(FILE *F, LweSample *lwesample, const LwePa
  * @param key the destination key
  */
 void read_lweKey_content(const Istream &F, LweKey *key) {
-    const int n = key->params->n;
+    const int32_t n = key->params->n;
     int32_t type_uid;
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != LWE_KEY_TYPE_UID) abort();
-    F.fread(key->key, sizeof(int) * n);
+    F.fread(key->key, sizeof(int32_t) * n);
 }
 
 
@@ -166,9 +166,9 @@ void read_lweKey_content(const Istream &F, LweKey *key) {
  * @param key the input key
  */
 void write_lweKey_content(const Ostream &F, const LweKey *key) {
-    const int n = key->params->n;
+    const int32_t n = key->params->n;
     F.fwrite(&LWE_KEY_TYPE_UID, sizeof(int32_t));
-    F.fwrite(key->key, sizeof(int) * n);
+    F.fwrite(key->key, sizeof(int32_t) * n);
 }
 
 /**
@@ -243,8 +243,8 @@ EXPORT LweKey *new_lweKey_fromFile(FILE *F) { return read_new_lweKey(to_Istream(
 void write_tLweParams(const Ostream &F, const TLweParams *tlweparams) {
     TextModeProperties *props = new_TextModeProperties_blank();
     props->setTypeTitle("TLWEPARAMS");
-    props->setProperty_long("N", tlweparams->N);
-    props->setProperty_long("k", tlweparams->k);
+    props->setProperty_int64_t("N", tlweparams->N);
+    props->setProperty_int64_t("k", tlweparams->k);
     props->setProperty_double("alpha_min", tlweparams->alpha_min);
     props->setProperty_double("alpha_max", tlweparams->alpha_max);
     print_TextModeProperties_toOStream(F, props);
@@ -259,8 +259,8 @@ void write_tLweParams(const Ostream &F, const TLweParams *tlweparams) {
 TLweParams *read_new_tLweParams(const Istream &F) {
     TextModeProperties *props = new_TextModeProperties_fromIstream(F);
     if (props->getTypeTitle() != string("TLWEPARAMS")) abort();
-    int N = props->getProperty_long("N");
-    int k = props->getProperty_long("k");
+    int32_t N = props->getProperty_int64_t("N");
+    int32_t k = props->getProperty_int64_t("k");
     double alpha_min = props->getProperty_double("alpha_min");
     double alpha_max = props->getProperty_double("alpha_max");
     delete_TextModeProperties(props);
@@ -301,22 +301,22 @@ EXPORT TLweParams *new_tLweParams_fromFile(FILE *F) { return read_new_tLweParams
 **************************** */
 
 void read_tLweSample(const Istream &F, TLweSample *sample, const TLweParams *params) {
-    const int N = params->N;
-    const int k = params->k;
+    const int32_t N = params->N;
+    const int32_t k = params->k;
     int32_t type_uid;
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != TLWE_SAMPLE_TYPE_UID) abort();
-    for (int i = 0; i <= k; ++i) {
+    for (int32_t i = 0; i <= k; ++i) {
         F.fread(sample->a[i].coefsT, sizeof(Torus32) * N);
     }
     F.fread(&sample->current_variance, sizeof(double));
 }
 
 void write_tLweSample(const Ostream &F, const TLweSample *sample, const TLweParams *params) {
-    const int N = params->N;
-    const int k = params->k;
+    const int32_t N = params->N;
+    const int32_t k = params->k;
     F.fwrite(&TLWE_SAMPLE_TYPE_UID, sizeof(int32_t));
-    for (int i = 0; i <= k; ++i) {
+    for (int32_t i = 0; i <= k; ++i) {
         F.fwrite(sample->a[i].coefsT, sizeof(Torus32) * N);
     }
     F.fwrite(&sample->current_variance, sizeof(double));
@@ -361,11 +361,11 @@ EXPORT void import_tlweSample_fromStream(std::istream &F, TLweSample *tlwesample
 **************************** */
 /*
 void read_tLweSampleFFT(const Istream& F, TLweSampleFFT* sample, const TLweParams* params) {
-    const int k = params->k;
+    const int32_t k = params->k;
     int32_t type_uid;
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != TLWE_SAMPLE_FFT_TYPE_UID) abort();
-    for (int i = 0; i <= k; ++i) {
+    for (int32_t i = 0; i <= k; ++i) {
         F.fread(&sample->a[i], sizeof(LagrangeHalfCPolynomial));
     }
     F.fread(&sample->current_variance, sizeof(double));
@@ -373,9 +373,9 @@ void read_tLweSampleFFT(const Istream& F, TLweSampleFFT* sample, const TLweParam
 
 
 void write_tLweSampleFFT(const Ostream& F, const TLweSampleFFT* sample, const TLweParams* params) {
-    const int k = params->k;
+    const int32_t k = params->k;
     F.fwrite(&TLWE_SAMPLE_FFT_TYPE_UID, sizeof(int32_t));
-    for (int i = 0; i <= k; ++i) {
+    for (int32_t i = 0; i <= k; ++i) {
         F.fwrite(&sample->a[i], sizeof(LagrangeHalfCPolynomial));
     }
     F.fwrite(&sample->current_variance, sizeof(double));
@@ -393,13 +393,13 @@ void write_tLweSampleFFT(const Ostream& F, const TLweSampleFFT* sample, const TL
  * reads the coefficients of a tlweKey, which has been previously be instantiated (the parameters are already given)
  */
 void read_tLweKey_content(const Istream &F, TLweKey *key) {
-    const int N = key->params->N;
-    const int k = key->params->k;
+    const int32_t N = key->params->N;
+    const int32_t k = key->params->k;
     int32_t type_uid;
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != TLWE_KEY_TYPE_UID) abort();
-    for (int i = 0; i < k; ++i) {
-        F.fread(key->key[i].coefs, sizeof(int) * N);
+    for (int32_t i = 0; i < k; ++i) {
+        F.fread(key->key[i].coefs, sizeof(int32_t) * N);
     }
 }
 
@@ -407,11 +407,11 @@ void read_tLweKey_content(const Istream &F, TLweKey *key) {
  * writes the coefficients of a tlweKey
  */
 void write_tLweKey_content(const Ostream &F, const TLweKey *key) {
-    const int N = key->params->N;
-    const int k = key->params->k;
+    const int32_t N = key->params->N;
+    const int32_t k = key->params->k;
     F.fwrite(&TLWE_KEY_TYPE_UID, sizeof(int32_t));
-    for (int i = 0; i < k; ++i) {
-        F.fwrite(key->key[i].coefs, sizeof(int) * N);
+    for (int32_t i = 0; i < k; ++i) {
+        F.fwrite(key->key[i].coefs, sizeof(int32_t) * N);
     }
 }
 
@@ -480,8 +480,8 @@ EXPORT TLweKey *new_tlweKey_fromStream(std::istream &F) { return read_new_tLweKe
 void write_tGswParams_section(const Ostream &F, const TGswParams *tgswparams) {
     TextModeProperties *props = new_TextModeProperties_blank();
     props->setTypeTitle("TGSWPARAMS");
-    props->setProperty_long("l", tgswparams->l);
-    props->setProperty_long("Bgbit", tgswparams->Bgbit);
+    props->setProperty_int64_t("l", tgswparams->l);
+    props->setProperty_int64_t("Bgbit", tgswparams->Bgbit);
     print_TextModeProperties_toOStream(F, props);
     delete_TextModeProperties(props);
 }
@@ -501,8 +501,8 @@ void write_tGswParams(const Ostream &F, const TGswParams *tgswparams) {
 TGswParams *read_new_tGswParams_section(const Istream &F, const TLweParams *tlwe_params) {
     TextModeProperties *props = new_TextModeProperties_fromIstream(F);
     if (props->getTypeTitle() != string("TGSWPARAMS")) abort();
-    int l = props->getProperty_long("l");
-    int Bgbit = props->getProperty_long("Bgbit");
+    int32_t l = props->getProperty_int64_t("l");
+    int32_t Bgbit = props->getProperty_int64_t("Bgbit");
     // ATTENTION ici!!!
     delete_TextModeProperties(props);
     return new_TGswParams(l, Bgbit, tlwe_params);
@@ -553,21 +553,21 @@ EXPORT TGswParams *new_tGswParams_fromFile(FILE *F) { return read_new_tGswParams
 **************************** */
 
 void read_tGswSample(const Istream &F, TGswSample *sample, const TGswParams *params) {
-    const int kpl = params->kpl;
+    const int32_t kpl = params->kpl;
     int32_t type_uid;
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != TGSW_SAMPLE_TYPE_UID) abort();
 
-    for (int i = 0; i < kpl; ++i) {
+    for (int32_t i = 0; i < kpl; ++i) {
         read_tLweSample(F, &sample->all_sample[i], params->tlwe_params);
     }
 }
 
 void write_tGswSample(const Ostream &F, const TGswSample *sample, const TGswParams *params) {
-    const int kpl = params->kpl;
+    const int32_t kpl = params->kpl;
     F.fwrite(&TGSW_SAMPLE_TYPE_UID, sizeof(int32_t));
 
-    for (int i = 0; i < kpl; ++i) {
+    for (int32_t i = 0; i < kpl; ++i) {
         write_tLweSample(F, &sample->all_sample[i], params->tlwe_params);
     }
 }
@@ -610,22 +610,22 @@ EXPORT void import_tgswSample_fromStream(std::istream &F, TGswSample *tgswsample
 **************************** */
 /*
 void read_tGswSampleFFT(const Istream& F, TGswSampleFFT* sample, const TGswParams* params) {
-    const int kpl = params->kpl;
+    const int32_t kpl = params->kpl;
     int32_t type_uid;
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != TGSW_SAMPLE_FFT_TYPE_UID) abort();
 
-    for (int i = 0; i < kpl; ++i) {
+    for (int32_t i = 0; i < kpl; ++i) {
         read_tLweSampleFFT(F, &sample->all_samples[i], params->tlwe_params);
     }
 }
 
 
 void write_tGswSampleFFT(const Ostream& F, const TGswSampleFFT* sample, const TGswParams* params) {
-    const int kpl = params->kpl;
+    const int32_t kpl = params->kpl;
     F.fwrite(&TGSW_SAMPLE_FFT_TYPE_UID, sizeof(int32_t));
 
-    for (int i = 0; i < kpl; ++i) {
+    for (int32_t i = 0; i < kpl; ++i) {
         write_tLweSampleFFT(F, &sample->all_samples[i], params->tlwe_params);
     }
 }
@@ -642,14 +642,14 @@ void write_tGswSampleFFT(const Ostream& F, const TGswSampleFFT* sample, const TG
  * reads a tgsw key coefficients in a previously defined structure
  */
 void read_tGswKey_content(const Istream &F, TGswKey *key) {
-    const int N = key->params->tlwe_params->N;
-    const int k = key->params->tlwe_params->k;
+    const int32_t N = key->params->tlwe_params->N;
+    const int32_t k = key->params->tlwe_params->k;
     int32_t type_uid;
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != TGSW_KEY_TYPE_UID) abort();
 
-    for (int i = 0; i < k; ++i) {
-        F.fread(key->key[i].coefs, sizeof(int) * N);
+    for (int32_t i = 0; i < k; ++i) {
+        F.fread(key->key[i].coefs, sizeof(int32_t) * N);
     }
 }
 
@@ -658,12 +658,12 @@ void read_tGswKey_content(const Istream &F, TGswKey *key) {
  * writes the tgsw key coefficients
  */
 void write_tGswKey_content(const Ostream &F, const TGswKey *key) {
-    const int N = key->params->tlwe_params->N;
-    const int k = key->params->tlwe_params->k;
+    const int32_t N = key->params->tlwe_params->N;
+    const int32_t k = key->params->tlwe_params->k;
     F.fwrite(&TGSW_KEY_TYPE_UID, sizeof(int32_t));
 
-    for (int i = 0; i < k; ++i) {
-        F.fwrite(key->key[i].coefs, sizeof(int) * N);
+    for (int32_t i = 0; i < k; ++i) {
+        F.fwrite(key->key[i].coefs, sizeof(int32_t) * N);
     }
 }
 
@@ -719,9 +719,9 @@ EXPORT TGswKey *new_tgswKey_fromStream(std::istream &F) { return read_new_tGswKe
  **************************** */
 
 struct LweKeySwitchParameters {
-    int n;
-    int t;
-    int basebit;
+    int32_t n;
+    int32_t t;
+    int32_t basebit;
 };
 
 /**
@@ -731,9 +731,9 @@ struct LweKeySwitchParameters {
 void write_LweKeySwitchParameters_section(const Ostream &F, const LweKeySwitchKey *ks) {
     TextModeProperties *props = new_TextModeProperties_blank();
     props->setTypeTitle("LWEKSPARAMS");
-    props->setProperty_long("n", ks->n);
-    props->setProperty_long("t", ks->t);
-    props->setProperty_long("basebit", ks->basebit);
+    props->setProperty_int64_t("n", ks->n);
+    props->setProperty_int64_t("t", ks->t);
+    props->setProperty_int64_t("basebit", ks->basebit);
     print_TextModeProperties_toOStream(F, props);
     delete_TextModeProperties(props);
 }
@@ -745,9 +745,9 @@ void write_LweKeySwitchParameters_section(const Ostream &F, const LweKeySwitchKe
 void read_lweKeySwitchParameters_section(const Istream &F, LweKeySwitchParameters *reps) {
     TextModeProperties *props = new_TextModeProperties_fromIstream(F);
     if (props->getTypeTitle() != string("LWEKSPARAMS")) abort();
-    reps->n = props->getProperty_long("n");
-    reps->t = props->getProperty_long("t");
-    reps->basebit = props->getProperty_long("basebit");
+    reps->n = props->getProperty_int64_t("n");
+    reps->t = props->getProperty_int64_t("t");
+    reps->basebit = props->getProperty_int64_t("basebit");
     delete_TextModeProperties(props);
 }
 
@@ -756,16 +756,16 @@ void read_lweKeySwitchParameters_section(const Istream &F, LweKeySwitchParameter
  */
 void write_LweKeySwitchKey_content(const Ostream &F, const LweKeySwitchKey *ks) {
     const LweParams *out_params = ks->out_params;
-    const int N = ks->n;
-    const int t = ks->t;
-    const int base = ks->base;
-    const int n = out_params->n;
+    const int32_t N = ks->n;
+    const int32_t t = ks->t;
+    const int32_t base = ks->base;
+    const int32_t n = out_params->n;
     double current_variance = -1;
 
     //computes the maximum variance
-    for (int i = 0; i < N; i++)
-        for (int j = 0; j < t; j++)
-            for (int k = 0; k < base; k++) {
+    for (int32_t i = 0; i < N; i++)
+        for (int32_t j = 0; j < t; j++)
+            for (int32_t k = 0; k < base; k++) {
                 const LweSample &sample = ks->ks[i][j][k];
                 if (sample.current_variance > current_variance)
                     current_variance = sample.current_variance;
@@ -774,9 +774,9 @@ void write_LweKeySwitchKey_content(const Ostream &F, const LweKeySwitchKey *ks) 
     //write the variance once
     F.fwrite(&current_variance, sizeof(double));
     //and dump the coefficients
-    for (int i = 0; i < N; i++)
-        for (int j = 0; j < t; j++)
-            for (int k = 0; k < base; k++) {
+    for (int32_t i = 0; i < N; i++)
+        for (int32_t j = 0; j < t; j++)
+            for (int32_t k = 0; k < base; k++) {
                 const LweSample &sample = ks->ks[i][j][k];
                 //bin output the sample coefs
                 F.fwrite(sample.a, n * sizeof(Torus32));
@@ -789,10 +789,10 @@ void write_LweKeySwitchKey_content(const Ostream &F, const LweKeySwitchKey *ks) 
  */
 void read_lweKeySwitchKey_content(const Istream &F, LweKeySwitchKey *ks) {
     const LweParams *out_params = ks->out_params;
-    const int N = ks->n;
-    const int t = ks->t;
-    const int base = ks->base;
-    const int n = out_params->n;
+    const int32_t N = ks->n;
+    const int32_t t = ks->t;
+    const int32_t base = ks->base;
+    const int32_t n = out_params->n;
     double current_variance = -1;
 
     int32_t type_uid = -1;
@@ -802,9 +802,9 @@ void read_lweKeySwitchKey_content(const Istream &F, LweKeySwitchKey *ks) {
     //reads the variance only once in the end
     F.fread(&current_variance, sizeof(double));
     //and read the coefficients
-    for (int i = 0; i < N; i++)
-        for (int j = 0; j < t; j++)
-            for (int k = 0; k < base; k++) {
+    for (int32_t i = 0; i < N; i++)
+        for (int32_t j = 0; j < t; j++)
+            for (int32_t k = 0; k < base; k++) {
                 LweSample &sample = ks->ks[i][j][k];
                 //bin output the sample coefs
                 F.fread(sample.a, n * sizeof(Torus32));
@@ -881,13 +881,13 @@ EXPORT LweKeySwitchKey *new_lweKeySwitchKey_fromStream(std::istream &F) {
  * This function prints the bootstrapping the coefficients (tgsw array section only)
  */
 void write_LweBootstrappingKey_content(const Ostream &F, const LweBootstrappingKey *bk) {
-    const int n = bk->in_out_params->n;
-    const int kpl = bk->bk_params->kpl;
-    const int k = bk->bk_params->tlwe_params->k;
-    const int N = bk->bk_params->tlwe_params->N;
+    const int32_t n = bk->in_out_params->n;
+    const int32_t kpl = bk->bk_params->kpl;
+    const int32_t k = bk->bk_params->tlwe_params->k;
+    const int32_t N = bk->bk_params->tlwe_params->N;
     double max_variance = -1;
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < kpl; j++) {
+    for (int32_t i = 0; i < n; i++)
+        for (int32_t j = 0; j < kpl; j++) {
             TLweSample &sample = bk->bk[i].all_sample[j];
             if (sample.current_variance > max_variance)
                 max_variance = sample.current_variance;
@@ -896,10 +896,10 @@ void write_LweBootstrappingKey_content(const Ostream &F, const LweBootstrappingK
     //print the variance once
     F.fwrite(&max_variance, sizeof(double));
     //then print all the coefficients
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < kpl; j++) {
+    for (int32_t i = 0; i < n; i++)
+        for (int32_t j = 0; j < kpl; j++) {
             TLweSample &sample = bk->bk[i].all_sample[j];
-            for (int l = 0; l <= k; l++) {
+            for (int32_t l = 0; l <= k; l++) {
                 F.fwrite(sample.a[l].coefsT, N * sizeof(Torus32));
             }
         }
@@ -909,20 +909,20 @@ void write_LweBootstrappingKey_content(const Ostream &F, const LweBootstrappingK
  * This function reads the bootstrapping the coefficients (tgsw array section only)
  */
 void read_LweBootstrappingKey_content(const Istream &F, LweBootstrappingKey *bk) {
-    const int n = bk->in_out_params->n;
-    const int kpl = bk->bk_params->kpl;
-    const int k = bk->bk_params->tlwe_params->k;
-    const int N = bk->bk_params->tlwe_params->N;
+    const int32_t n = bk->in_out_params->n;
+    const int32_t kpl = bk->bk_params->kpl;
+    const int32_t k = bk->bk_params->tlwe_params->k;
+    const int32_t N = bk->bk_params->tlwe_params->N;
     double max_variance = -1;
     int32_t type_uid = -1;
     F.fread(&type_uid, sizeof(int32_t));
     if (type_uid != LWE_BOOTSTRAPPING_KEY_TYPE_UID)
         die_dramatically("Trying to read something that is not a BK content");
     F.fread(&max_variance, sizeof(double));
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < kpl; j++) {
+    for (int32_t i = 0; i < n; i++)
+        for (int32_t j = 0; j < kpl; j++) {
             TLweSample &sample = bk->bk[i].all_sample[j];
-            for (int l = 0; l <= k; l++) {
+            for (int32_t l = 0; l <= k; l++) {
                 F.fread(sample.a[l].coefsT, N * sizeof(Torus32));
             }
             sample.current_variance = max_variance;
@@ -1014,16 +1014,16 @@ void
 write_tfheGateBootstrappingProperParameters_section(const Ostream &F, const TFheGateBootstrappingParameterSet *params) {
     TextModeProperties *props = new_TextModeProperties_blank();
     props->setTypeTitle("GATEBOOTSPARAMS");
-    props->setProperty_long("ks_t", params->ks_t);
-    props->setProperty_long("ks_basebit", params->ks_basebit);
+    props->setProperty_int64_t("ks_t", params->ks_t);
+    props->setProperty_int64_t("ks_basebit", params->ks_basebit);
     print_TextModeProperties_toOStream(F, props);
     delete_TextModeProperties(props);
 }
 
-void read_tfheGateBootstrappingProperParameters_section(const Istream &F, int &ks_t, int &ks_basebit) {
+void read_tfheGateBootstrappingProperParameters_section(const Istream &F, int32_t &ks_t, int32_t &ks_basebit) {
     TextModeProperties *props = new_TextModeProperties_fromIstream(F);
     if (props->getTypeTitle() != string("GATEBOOTSPARAMS")) abort();
-    ks_t = props->getProperty_long("ks_t");
+    ks_t = props->getProperty_int64_t("ks_t");
     ks_basebit = props->getProperty_double("ks_basebit");
     delete_TextModeProperties(props);
 }
@@ -1035,7 +1035,7 @@ void write_tfheGateBootstrappingParameters(const Ostream &F, const TFheGateBoots
 }
 
 TFheGateBootstrappingParameterSet *read_new_tfheGateBootstrappingParameters(const Istream &F) {
-    int ks_t, ks_basebit;
+    int32_t ks_t, ks_basebit;
     read_tfheGateBootstrappingProperParameters_section(F, ks_t, ks_basebit);
     LweParams *in_out_params = read_new_lweParams(F);
     TGswParams *bk_params = read_new_tGswParams(F);

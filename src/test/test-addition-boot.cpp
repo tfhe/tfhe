@@ -27,7 +27,7 @@ void dieDramatically(string message) {
 }
 
 
-void full_adder_MUX(LweSample *sum, const LweSample *x, const LweSample *y, const int nb_bits,
+void full_adder_MUX(LweSample *sum, const LweSample *x, const LweSample *y, const int32_t nb_bits,
                     const TFheGateBootstrappingSecretKeySet *keyset) {
     const LweParams *in_out_params = keyset->params->in_out_params;
     // carries
@@ -36,7 +36,7 @@ void full_adder_MUX(LweSample *sum, const LweSample *x, const LweSample *y, cons
     // temps
     LweSample *temp = new_LweSample_array(2, in_out_params);
 
-    for (int i = 0; i < nb_bits; ++i) {
+    for (int32_t i = 0; i < nb_bits; ++i) {
         //sumi = xi XOR yi XOR carry(i-1) 
         bootsXOR(temp, x + i, y + i, &keyset->cloud); // temp = xi XOR yi
         bootsXOR(sum + i, temp, carry, &keyset->cloud);
@@ -67,7 +67,7 @@ void full_adder_MUX(LweSample *sum, const LweSample *x, const LweSample *y, cons
 }
 
 
-void full_adder(LweSample *sum, const LweSample *x, const LweSample *y, const int nb_bits,
+void full_adder(LweSample *sum, const LweSample *x, const LweSample *y, const int32_t nb_bits,
                 const TFheGateBootstrappingSecretKeySet *keyset) {
     const LweParams *in_out_params = keyset->params->in_out_params;
     // carries
@@ -76,7 +76,7 @@ void full_adder(LweSample *sum, const LweSample *x, const LweSample *y, const in
     // temps
     LweSample *temp = new_LweSample_array(3, in_out_params);
 
-    for (int i = 0; i < nb_bits; ++i) {
+    for (int32_t i = 0; i < nb_bits; ++i) {
         //sumi = xi XOR yi XOR carry(i-1) 
         bootsXOR(temp, x + i, y + i, &keyset->cloud); // temp = xi XOR yi
         bootsXOR(sum + i, temp, carry, &keyset->cloud);
@@ -94,7 +94,7 @@ void full_adder(LweSample *sum, const LweSample *x, const LweSample *y, const in
 }
 
 
-void comparison_MUX(LweSample *comp, const LweSample *x, const LweSample *y, const int nb_bits,
+void comparison_MUX(LweSample *comp, const LweSample *x, const LweSample *y, const int32_t nb_bits,
                     const TFheGateBootstrappingSecretKeySet *keyset) {
     const LweParams *in_out_params = keyset->params->in_out_params;
     // carries
@@ -103,7 +103,7 @@ void comparison_MUX(LweSample *comp, const LweSample *x, const LweSample *y, con
     // temps
     LweSample *temp = new_LweSample(in_out_params);
 
-    for (int i = 0; i < nb_bits; ++i) {
+    for (int32_t i = 0; i < nb_bits; ++i) {
         bootsXOR(temp, x + i, y + i, &keyset->cloud); // temp = xi XOR yi
         bootsMUX(carry + 1, temp, y + i, carry, &keyset->cloud);
         bootsCOPY(carry, carry + 1, &keyset->cloud);
@@ -133,27 +133,27 @@ extern const LweKey *debug_extract_key;
 extern const LweKey *debug_in_key;
 #endif
 
-int main(int argc, char **argv) {
+int32_t main(int32_t argc, char **argv) {
 #ifndef NDEBUG
     cout << "DEBUG MODE!" << endl;
 #endif
-    const int nb_bits = 16;
-    const int nb_trials = 10;
+    const int32_t nb_bits = 16;
+    const int32_t nb_trials = 10;
 
     // generate params 
-    int minimum_lambda = 100;
+    int32_t minimum_lambda = 100;
     TFheGateBootstrappingParameterSet *params = new_default_gate_bootstrapping_parameters(minimum_lambda);
     const LweParams *in_out_params = params->in_out_params;
     // generate the secret keyset
     TFheGateBootstrappingSecretKeySet *keyset = new_random_gate_bootstrapping_secret_keyset(params);
 
 
-    for (int trial = 0; trial < nb_trials; ++trial) {
+    for (int32_t trial = 0; trial < nb_trials; ++trial) {
 
         // generate samples
         LweSample *x = new_LweSample_array(nb_bits, in_out_params);
         LweSample *y = new_LweSample_array(nb_bits, in_out_params);
-        for (int i = 0; i < nb_bits; ++i) {
+        for (int32_t i = 0; i < nb_bits; ++i) {
             bootsSymEncrypt(x + i, rand() % 2, keyset);
             bootsSymEncrypt(y + i, rand() % 2, keyset);
         }
@@ -174,7 +174,7 @@ int main(int argc, char **argv) {
 
         // verification
         bool messCarry = 0;
-        for (int i = 0; i < nb_bits; ++i) {
+        for (int32_t i = 0; i < nb_bits; ++i) {
             bool messX = bootsSymDecrypt(x + i, keyset);
             bool messY = bootsSymDecrypt(y + i, keyset);
             bool messSum = bootsSymDecrypt(sum + i, keyset);
@@ -209,7 +209,7 @@ int main(int argc, char **argv) {
         // verification
         {
             bool messCarry = 0;
-            for (int i = 0; i < nb_bits; ++i) {
+            for (int32_t i = 0; i < nb_bits; ++i) {
                 bool messX = bootsSymDecrypt(x + i, keyset);
                 bool messY = bootsSymDecrypt(y + i, keyset);
                 bool messSum = bootsSymDecrypt(sum + i, keyset);
@@ -239,7 +239,7 @@ int main(int argc, char **argv) {
         // verification
         {
             bool messCarry = 1;
-            for (int i = 0; i < nb_bits; ++i) {
+            for (int32_t i = 0; i < nb_bits; ++i) {
                 bool messX = bootsSymDecrypt(x + i, keyset);
                 bool messY = bootsSymDecrypt(y + i, keyset);
 

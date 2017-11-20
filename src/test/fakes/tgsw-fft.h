@@ -9,13 +9,13 @@ namespace {
     // Fake TGSW FFT structure 
     struct FakeTGswFFT {
         //TODO: parallelization
-        static const int FAKE_TYPE_UID = 574569852; // precaution: distinguish fakes from trues
-        const int fake_uid;
+        static const int32_t FAKE_TYPE_UID = 574569852; // precaution: distinguish fakes from trues
+        const int32_t fake_uid;
         IntPolynomial *message;
         double current_variance;
 
         //this padding is here to make sure that FakeTLwe and TLweSample have the same size
-        char unused_padding[sizeof(TGswSampleFFT) - sizeof(long) - sizeof(IntPolynomial *) - sizeof(double)];
+        char unused_padding[sizeof(TGswSampleFFT) - sizeof(int64_t) - sizeof(IntPolynomial *) - sizeof(double)];
 
         void setMessageVariance(bool mess, double variance) {
             intPolynomialClear(message);
@@ -24,7 +24,7 @@ namespace {
         }
 
         // construct
-        FakeTGswFFT(int N) : fake_uid(FAKE_TYPE_UID) {
+        FakeTGswFFT(int32_t N) : fake_uid(FAKE_TYPE_UID) {
             message = new_IntPolynomial(N);
             current_variance = 0.;
         }
@@ -64,33 +64,33 @@ namespace {
     //  constructor/destructor
     //-----------------------------------------
 
-    inline TGswSampleFFT *fake_new_TGswSampleFFT_array(int nbelts, const TGswParams *params) {
-        int N = params->tlwe_params->N;
+    inline TGswSampleFFT *fake_new_TGswSampleFFT_array(int32_t nbelts, const TGswParams *params) {
+        int32_t N = params->tlwe_params->N;
         FakeTGswFFT *reps = (FakeTGswFFT *) malloc(nbelts * sizeof(FakeTGswFFT));
-        for (int i = 0; i < nbelts; i++) new(reps + i) FakeTGswFFT(N);
+        for (int32_t i = 0; i < nbelts; i++) new(reps + i) FakeTGswFFT(N);
         return (TGswSampleFFT *) reps;
     }
 
 #define USE_FAKE_new_TGswSampleFFT_array \
-    inline TGswSampleFFT* new_TGswSampleFFT_array(int nbelts, const TGswParams* params) { \
+    inline TGswSampleFFT* new_TGswSampleFFT_array(int32_t nbelts, const TGswParams* params) { \
         return fake_new_TGswSampleFFT_array(nbelts,params); \
     }
 
-    inline void fake_delete_TGswSampleFFT_array(int nbelts, TGswSampleFFT *sample) {
+    inline void fake_delete_TGswSampleFFT_array(int32_t nbelts, TGswSampleFFT *sample) {
         FakeTGswFFT *arr = fake(sample);
-        for (int i = 0; i < nbelts; i++) (arr + i)->~FakeTGswFFT();
+        for (int32_t i = 0; i < nbelts; i++) (arr + i)->~FakeTGswFFT();
         free(arr);
     }
 
     // 
 #define USE_FAKE_delete_TGswSampleFFT_array \
-    inline void delete_TGswSampleFFT_array(int nbelts, TGswSampleFFT* samples) { \
+    inline void delete_TGswSampleFFT_array(int32_t nbelts, TGswSampleFFT* samples) { \
         fake_delete_TGswSampleFFT_array(nbelts,samples); \
     }
 
 
     inline TGswSampleFFT *fake_new_TGswSampleFFT(const TGswParams *params) {
-        int N = params->tlwe_params->N;
+        int32_t N = params->tlwe_params->N;
         FakeTGswFFT *reps = (FakeTGswFFT *) malloc(sizeof(FakeTGswFFT));
         new(reps) FakeTGswFFT(N);
         return (TGswSampleFFT *) reps;
@@ -191,7 +191,7 @@ namespace {
 
     // External product (*): accum = gsw (*) accum 
     inline void fake_tGswFFTExternMulToTLwe(TLweSample *accum, const TGswSampleFFT *gsw, const TGswParams *params) {
-        const int N = params->tlwe_params->N;
+        const int32_t N = params->tlwe_params->N;
         const FakeTGswFFT *fgsw = fake(gsw);
         const FakeTLwe *faccum = fake(accum);
         TorusPolynomial *tmp = new_TorusPolynomial(N);
@@ -206,7 +206,7 @@ namespace {
     }
 
     // result = (X^ai -1)*bki  
-    inline void fake_tGswFFTMulByXaiMinusOne(TGswSampleFFT *result, const int ai, const TGswSampleFFT *bki,
+    inline void fake_tGswFFTMulByXaiMinusOne(TGswSampleFFT *result, const int32_t ai, const TGswSampleFFT *bki,
                                              const TGswParams *params) {
         FakeTGswFFT *fres = fake(result);
         const FakeTGswFFT *fbki = fake(bki);
@@ -214,7 +214,7 @@ namespace {
     }
 
 #define USE_FAKE_tGswFFTMulByXaiMinusOne \
-    inline void tGswFFTMulByXaiMinusOne(TGswSampleFFT* result, const int ai, const TGswSampleFFT* bki, const TGswParams* params) { \
+    inline void tGswFFTMulByXaiMinusOne(TGswSampleFFT* result, const int32_t ai, const TGswSampleFFT* bki, const TGswParams* params) { \
     fake_tGswFFTMulByXaiMinusOne(result, ai, bki, params); \
     }
 

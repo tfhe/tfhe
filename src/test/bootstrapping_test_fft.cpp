@@ -11,16 +11,16 @@ using namespace ::testing;
 
 namespace {
 
-    const int N = 1024;
-    const int k = 1;
-    const int n = 500;
-    const int l_bk = 3; //ell
-    const int Bgbit_bk = 10;
-    const int ks_t = 15;
-    const int ks_basebit = 1;
+    const int32_t N = 1024;
+    const int32_t k = 1;
+    const int32_t n = 500;
+    const int32_t l_bk = 3; //ell
+    const int32_t Bgbit_bk = 10;
+    const int32_t ks_t = 15;
+    const int32_t ks_basebit = 1;
     const double alpha_in = 5e-4;
     const double alpha_bk = 9e-9;
-    //const int alpha_ks = 1e-6;
+    //const int32_t alpha_ks = 1e-6;
 
     const LweParams *in_params = new_LweParams(n, alpha_in, 1. / 16.);
     const TLweParams *accum_params = new_TLweParams(N, k, alpha_bk, 1. / 16.);
@@ -37,9 +37,9 @@ namespace {
     }
 
 
-    vector<bool> random_binary_key(const int n) {
+    vector<bool> random_binary_key(const int32_t n) {
         vector<bool> rand_vect(n);
-        for (int i = 0; i < n; ++i) {
+        for (int32_t i = 0; i < n; ++i) {
             rand_vect[i] = rand() % 2;
         }
         return rand_vect;
@@ -92,8 +92,8 @@ namespace {
      */
     //EXPORT void tfhe_BlindRotate(TLweSample* accum, 
     //      const TGswSample* bk, 
-    //      const int* bara,
-    //      const int n,
+    //      const int32_t* bara,
+    //      const int32_t n,
     //      const TGswParams* bk_params) {
 
     TEST_F(TfheBlindRotateFFTTest, tfheBlindRotateFFTTest) {
@@ -101,16 +101,16 @@ namespace {
         vector<bool> key = random_binary_key(n);
         TGswSampleFFT *bkFFT = fake_new_TGswSampleFFT_array(n, bk_params);
         FakeTGswFFT *fbkFFT = fake(bkFFT);
-        for (int i = 0; i < n; i++) fbkFFT[i].setMessageVariance(key[i], alpha_bk * alpha_bk);
+        for (int32_t i = 0; i < n; i++) fbkFFT[i].setMessageVariance(key[i], alpha_bk * alpha_bk);
 
         //create bara
-        int *bara = new int[n];
-        for (int i = 0; i < n; i++) bara[i] = rand() % (2 * N);
+        int32_t *bara = new int32_t[n];
+        for (int32_t i = 0; i < n; i++) bara[i] = rand() % (2 * N);
         //create accum
         TorusPolynomial *initAccumMessage = new_TorusPolynomial(N);
         torusPolynomialUniform(initAccumMessage);
         const double initAlphaAccum = 0.2;
-        int expectedOffset = 0;
+        int32_t expectedOffset = 0;
         TorusPolynomial *expectedAccumMessage = new_TorusPolynomial(N);
         torusPolynomialCopy(expectedAccumMessage, initAccumMessage);
         //double expectedAccumVariance=initAlphaAccum*initAlphaAccum;
@@ -120,20 +120,20 @@ namespace {
         faccum->current_variance = initAlphaAccum * initAlphaAccum;
 
         //call bootstraprotate: one iteration at a time
-        for (int i = 0; i < n; i++) {
+        for (int32_t i = 0; i < n; i++) {
             tfhe_blindRotate_FFT(accum, bkFFT + i, bara + i, 1, bk_params);
             if (key[i] == 1 && bara[i] != 0) {
                 expectedOffset = (expectedOffset + bara[i]) % (2 * N);
                 torusPolynomialMulByXai(expectedAccumMessage, expectedOffset, initAccumMessage);
             }
             //printf("i=%d,si=%d,barai=%d,offset=%d\n",i,key->key[i],bara[i],expectedOffset);
-            for (int j = 0; j < N; j++) ASSERT_EQ(expectedAccumMessage->coefsT[j], accum->b->coefsT[j]);
+            for (int32_t j = 0; j < N; j++) ASSERT_EQ(expectedAccumMessage->coefsT[j], accum->b->coefsT[j]);
         }
         //Now, bootstraprotate: all iterations at once (same offset)
         torusPolynomialCopy(faccum->message, initAccumMessage);
         faccum->current_variance = initAlphaAccum * initAlphaAccum;
         tfhe_blindRotate_FFT(accum, bkFFT, bara, n, bk_params);
-        for (int j = 0; j < N; j++) ASSERT_EQ(expectedAccumMessage->coefsT[j], accum->b->coefsT[j]);
+        for (int32_t j = 0; j < N; j++) ASSERT_EQ(expectedAccumMessage->coefsT[j], accum->b->coefsT[j]);
 
         //cleanup everything
         fake_delete_TLweSample(accum);
@@ -183,24 +183,24 @@ namespace {
      */
 
     TEST_F(TfheBlindRotateAndExtractFFTTest, tfheBlindRotateAndExtractFFTTest) {
-        const int NB_TRIALS = 30;
+        const int32_t NB_TRIALS = 30;
 
         vector<bool> key = random_binary_key(n);
         TGswSampleFFT *bkFFT = fake_new_TGswSampleFFT_array(n, bk_params);
         FakeTGswFFT *fbkFFT = fake(bkFFT);
-        for (int i = 0; i < n; i++) fbkFFT[i].setMessageVariance(key[i], alpha_bk * alpha_bk);
+        for (int32_t i = 0; i < n; i++) fbkFFT[i].setMessageVariance(key[i], alpha_bk * alpha_bk);
 
         //create bara and b
-        int *bara = new int[n];
+        int32_t *bara = new int32_t[n];
         //create v
         TorusPolynomial *v = new_TorusPolynomial(N);
         //create result
         LweSample *result = fake_new_LweSample(&accum_params->extracted_lweparams);
         FakeLwe *fres = fake(result);
 
-        for (int trial = 0; trial < NB_TRIALS; trial++) {
-            for (int i = 0; i < n; i++) bara[i] = rand() % (2 * N);
-            int barb = rand() % (2 * N);
+        for (int32_t trial = 0; trial < NB_TRIALS; trial++) {
+            for (int32_t i = 0; i < n; i++) bara[i] = rand() % (2 * N);
+            int32_t barb = rand() % (2 * N);
             torusPolynomialUniform(v);
             //const double initAlphaAccum=0.2;
 
@@ -208,8 +208,8 @@ namespace {
             tfhe_blindRotateAndExtract_FFT(result, v, bkFFT, barb, bara, n, bk_params);
 
             //verify
-            int offset = barb;
-            for (int i = 0; i < n; i++) offset = (offset + 2 * N - key[i] * bara[i]) % (2 * N);
+            int32_t offset = barb;
+            for (int32_t i = 0; i < n; i++) offset = (offset + 2 * N - key[i] * bara[i]) % (2 * N);
             ASSERT_EQ(fres->message, (offset < N) ? (v->coefsT[offset]) : (-v->coefsT[offset - N]));
             //TODO variance
         }
@@ -264,9 +264,9 @@ namespace {
 
     TEST_F(TfheBootstrapWoKSFFTTest, tfheBootstrapWoKSFFTTest) {
         const Torus32 TEST_MU = 123456789;
-        const int NB_TRIALS = 30;
-        const int Nx2 = 2 * N;
-        const int n = in_params->n;
+        const int32_t NB_TRIALS = 30;
+        const int32_t Nx2 = 2 * N;
+        const int32_t n = in_params->n;
 
         //create a fake bootstrapping key
         LweKey *key = new_LweKey(in_params);
@@ -284,14 +284,14 @@ namespace {
 
         //create a random input sample
         LweSample *insample = real_new_LweSample(extract_params);
-        for (int trial = 0; trial < NB_TRIALS; trial++) {
+        for (int32_t trial = 0; trial < NB_TRIALS; trial++) {
             lweSymEncrypt(insample, uniformTorus32_distrib(generator), 0.001, key);
 
             //compute the approx. phase mod 2N
-            int barb = modSwitchFromTorus32(insample->b, Nx2);
-            int phase = barb;
-            for (int i = 0; i < n; i++) {
-                int barai = modSwitchFromTorus32(insample->a[i], Nx2);
+            int32_t barb = modSwitchFromTorus32(insample->b, Nx2);
+            int32_t phase = barb;
+            for (int32_t i = 0; i < n; i++) {
+                int32_t barai = modSwitchFromTorus32(insample->a[i], Nx2);
                 phase -= key->key[i] * barai;
             }
             phase = (Nx2 + (phase % Nx2)) % Nx2; //positive modulo
@@ -363,7 +363,7 @@ namespace {
 
     TEST_F(TfheBootstrapFFTTest, tfheBootstrapFFTTest) {
         const Torus32 TEST_MU = 123456789;
-        const int NB_TRIALS = 30;
+        const int32_t NB_TRIALS = 30;
 
         //fake keys
         LweKey *key = 0x0;
@@ -379,7 +379,7 @@ namespace {
         //create a random input sample
         LweSample *insample = fake_new_LweSample(extract_params);
         FakeLwe *fin = fake(insample);
-        for (int trial = 0; trial < NB_TRIALS; trial++) {
+        for (int32_t trial = 0; trial < NB_TRIALS; trial++) {
             lweSymEncrypt(insample, uniformTorus32_distrib(generator), 0.001, key);
 
             //call the function
@@ -472,15 +472,15 @@ namespace {
         // create (allocate and initialize) the BK FFT
         LweBootstrappingKeyFFT *bkFFT = new_LweBootstrappingKeyFFT(bk);
 
-        const int n = in_params->n;
-        const int t = bk->ks->t;
-        const int base = bk->ks->base;
-        const int N = bk_params->tlwe_params->extracted_lweparams.n;
+        const int32_t n = in_params->n;
+        const int32_t t = bk->ks->t;
+        const int32_t base = bk->ks->base;
+        const int32_t N = bk_params->tlwe_params->extracted_lweparams.n;
 
         // KeySwitching 
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < t; j++) {
-                for (int p = 0; p < base; p++) {
+        for (int32_t i = 0; i < N; i++) {
+            for (int32_t j = 0; j < t; j++) {
+                for (int32_t p = 0; p < base; p++) {
                     ASSERT_EQ(fake(&bkFFT->ks->ks[i][j][p])->message, fake(&bk->ks->ks[i][j][p])->message);
                     ASSERT_EQ(fake(&bkFFT->ks->ks[i][j][p])->current_variance,
                               fake(&bk->ks->ks[i][j][p])->current_variance);
@@ -489,7 +489,7 @@ namespace {
         }
 
         // Bootstrapping Key FFT 
-        for (int i = 0; i < n; ++i) {
+        for (int32_t i = 0; i < n; ++i) {
             ASSERT_EQ(intPolynomialNormInftyDist(fake(&bkFFT->bkFFT[i])->message, fake(&bk->bk[i])->message), 0);
             ASSERT_EQ(fake(&bkFFT->bkFFT[i])->current_variance, fake(&bk->bk[i])->current_variance);
         }
