@@ -23,6 +23,7 @@ class FFT_Processor_fftw {
     double* out;
     fftw_plan p;
     fftw_plan rev_p;
+    void plan_fftw();
     public:
     cplx* omegaxminus1;
 
@@ -33,7 +34,7 @@ class FFT_Processor_fftw {
     ~FFT_Processor_fftw();
 };
 
-extern FFT_Processor_fftw fp1024_fftw;
+extern thread_local FFT_Processor_fftw fp1024_fftw;
 
 /**
  * structure that represents a real polynomial P mod X^N+1

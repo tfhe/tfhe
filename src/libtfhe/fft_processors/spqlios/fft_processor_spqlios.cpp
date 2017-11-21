@@ -120,7 +120,7 @@ FFT_Processor_Spqlios::~FFT_Processor_Spqlios() {
     delete[] cosomegaxminus1;
 }
 
-FFT_Processor_Spqlios fftp1024(1024);
+thread_local FFT_Processor_Spqlios fftp1024(1024);
 
 /**
  * FFT functions 

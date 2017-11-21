@@ -31,7 +31,7 @@ class FFT_Processor_nayuki {
     ~FFT_Processor_nayuki();
 };
 
-extern FFT_Processor_nayuki fp1024_nayuki;
+extern thread_local FFT_Processor_nayuki fp1024_nayuki;
 
 /**
  * structure that represents a real polynomial P mod X^N+1
