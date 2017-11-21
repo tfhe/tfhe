@@ -5,14 +5,14 @@
 #include "lagrangehalfc_impl.h"
 #include <cassert>
 #include <cmath>
+#include <mutex>
 
 FFT_Processor_fftw::FFT_Processor_fftw(const int32_t N): _2N(2*N),N(N),Ns2(N/2) {
     rev_in = (double*) malloc(sizeof(double) * _2N);
     out = (double*) malloc(sizeof(double) * _2N);
     rev_out = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (N+1));
     in = (fftw_complex*) fftw_malloc(sizeof(fftw_complex) * (N+1));
-    rev_p = fftw_plan_dft_r2c_1d(_2N, rev_in, rev_out, FFTW_ESTIMATE);	
-    p = fftw_plan_dft_c2r_1d(_2N, in, out, FFTW_ESTIMATE);	
+    plan_fftw();
     omegaxminus1 = new cplx[_2N];
     for (int32_t x=0; x<_2N; x++) {
 	omegaxminus1[x]=cplx(cos(x*M_PI/N)-1.,-sin(x*M_PI/N)); // instead of cos(x*M_PI/N)-1. + sin(x*M_PI/N) * I
@@ -20,7 +20,15 @@ FFT_Processor_fftw::FFT_Processor_fftw(const int32_t N): _2N(2*N),N(N),Ns2(N/2) 
     }
 }
 
-void FFT_Processor_fftw::execute_reverse_int(cplx* res, const int32_t* a) {
+void FFT_Processor_fftw::plan_fftw() {
+    //ensure fftw plan thread safety
+    static std::mutex mutex;
+    std::lock_guard<std::mutex> lock(mutex);
+    rev_p = fftw_plan_dft_r2c_1d(_2N, rev_in, rev_out, FFTW_ESTIMATE);
+    p = fftw_plan_dft_c2r_1d(_2N, in, out, FFTW_ESTIMATE);
+}
+
+void FFT_Processor_fftw::execute_reverse_int(cplx* res, const int* a) {
     cplx* rev_out_cplx = (cplx*) rev_out; //fftw_complex and cplx are layout-compatible
     for (int32_t i=0; i<N; i++) rev_in[i]=a[i]/2.;
     for (int32_t i=0; i<N; i++) rev_in[N+i]=-rev_in[i];

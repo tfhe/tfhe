@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <cinttypes>
 #include <tfhe_generic_streams.h>
+#include <cstdlib>
 
 using namespace std;
 

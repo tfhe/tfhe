@@ -93,7 +93,7 @@ FFT_Processor_nayuki::~FFT_Processor_nayuki() {
     free(omegaxminus1);    
 }
 
-FFT_Processor_nayuki fp1024_nayuki(1024);
+thread_local FFT_Processor_nayuki fp1024_nayuki(1024);
 
 /**
  * FFT functions 

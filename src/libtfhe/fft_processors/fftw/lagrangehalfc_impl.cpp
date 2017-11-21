@@ -1,7 +1,7 @@
 #include <polynomials.h>
 #include "lagrangehalfc_impl.h"
 
-FFT_Processor_fftw fp1024_fftw(1024);
+thread_local FFT_Processor_fftw fp1024_fftw(1024);
 
 LagrangeHalfCPolynomial_IMPL::LagrangeHalfCPolynomial_IMPL(const int32_t N) {
     assert(N==1024);
