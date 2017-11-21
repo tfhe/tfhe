@@ -10,8 +10,8 @@ namespace {
     //a deadlock mode on static const initializers
     const LweKey *new_random_LweKey(const LweParams *params) {
         LweKey *key = new_LweKey(params);
-        const int n = params->n;
-        for (int i = 0; i < n; i++)
+        const int32_t n = params->n;
+        for (int32_t i = 0; i < n; i++)
             key->key[i] = rand() % 2;
         return key;
     }
@@ -43,16 +43,16 @@ namespace {
 
     // fills a LweSample with random Torus32
     void fillRandom(LweSample *result, const LweParams *params) {
-        const int n = params->n;
-        for (int i = 0; i < n; i++) result->a[i] = uniformTorus32_distrib(generator);
+        const int32_t n = params->n;
+        for (int32_t i = 0; i < n; i++) result->a[i] = uniformTorus32_distrib(generator);
         result->b = uniformTorus32_distrib(generator);
         result->current_variance = 0.2;
     }
 
     // copy a LweSample
     void copySample(LweSample *result, const LweSample *sample, const LweParams *params) {
-        const int n = params->n;
-        for (int i = 0; i < n; i++) result->a[i] = sample->a[i];
+        const int32_t n = params->n;
+        for (int32_t i = 0; i < n; i++) result->a[i] = sample->a[i];
         result->b = sample->b;
         result->current_variance = sample->current_variance;
     }
@@ -66,11 +66,11 @@ namespace {
             LweKey *key = new_LweKey(params);
             lweKeyGen(key);
             ASSERT_EQ(params, key->params);
-            int n = key->params->n;
-            int *s = key->key;
+            int32_t n = key->params->n;
+            int32_t *s = key->key;
             //verify that the key is binary and kind-of random
-            int count = 0;
-            for (int i = 0; i < n; i++) {
+            int32_t count = 0;
+            for (int32_t i = 0; i < n; i++) {
                 ASSERT_TRUE(s[i] == 0 || s[i] == 1);
                 count += s[i];
             }
@@ -85,14 +85,14 @@ namespace {
     // (this means that the parameters are already in the result)
     TEST_F (LweTest, lweSymEncryptPhaseDecrypt) {
         //TODO: parallelization
-        static const int NB_SAMPLES = 10;
-        static const int M = 8;
+        static const int32_t NB_SAMPLES = 10;
+        static const int32_t M = 8;
         static const double alpha = 1. / (10. * M);
         for (const LweKey *key: all_keys) {
             const LweParams *params = key->params;
             LweSample *samples = new_LweSample_array(NB_SAMPLES, params);
             //verify correctness of the decryption
-            for (int trial = 0; trial < NB_SAMPLES; trial++) {
+            for (int32_t trial = 0; trial < NB_SAMPLES; trial++) {
                 Torus32 message = modSwitchToTorus32(trial, M);
                 lweSymEncrypt(&samples[trial], message, alpha, key);
                 Torus32 phase = lwePhase(&samples[trial], key);
@@ -104,10 +104,10 @@ namespace {
                 ASSERT_EQ(alpha * alpha, samples[trial].current_variance);
             }
             //verify that samples are random enough (all coordinates different)
-            const int n = params->n;
-            for (int i = 0; i < n; i++) {
+            const int32_t n = params->n;
+            for (int32_t i = 0; i < n; i++) {
                 set<Torus32> testset;
-                for (int trial = 0; trial < NB_SAMPLES; trial++) {
+                for (int32_t trial = 0; trial < NB_SAMPLES; trial++) {
                     testset.insert(samples[trial].a[i]);
                 }
                 ASSERT_GE(testset.size(), 0.9 * NB_SAMPLES);
@@ -121,11 +121,11 @@ namespace {
     TEST_F(LweTest, lweClear) {
         for (const LweKey *key: all_keys) {
             const LweParams *params = key->params;
-            const int n = params->n;
+            const int32_t n = params->n;
             LweSample *sample = new_LweSample(params);
             fillRandom(sample, params);
             lweClear(sample, params);
-            for (int i = 0; i < n; i++) {
+            for (int32_t i = 0; i < n; i++) {
                 ASSERT_EQ(0, sample->a[i]);
             }
             ASSERT_EQ(0, sample->b);
@@ -139,11 +139,11 @@ namespace {
         for (const LweKey *key: all_keys) {
             const Torus32 message = uniformTorus32_distrib(generator);
             const LweParams *params = key->params;
-            const int n = params->n;
+            const int32_t n = params->n;
             LweSample *sample = new_LweSample(params);
             fillRandom(sample, params);
             lweNoiselessTrivial(sample, message, params);
-            for (int i = 0; i < n; i++) {
+            for (int32_t i = 0; i < n; i++) {
                 ASSERT_EQ(0, sample->a[i]);
             }
             ASSERT_EQ(message, sample->b);
@@ -158,7 +158,7 @@ namespace {
     TEST_F(LweTest, lweAddTo) {
         for (const LweKey *key: all_keys) {
             const LweParams *params = key->params;
-            const int n = params->n;
+            const int32_t n = params->n;
             LweSample *a = new_LweSample(params);
             LweSample *b = new_LweSample(params);
             LweSample *acopy = new_LweSample(params);
@@ -166,7 +166,7 @@ namespace {
             fillRandom(b, params);
             copySample(acopy, a, params);
             lweAddTo(a, b, params);
-            for (int i = 0; i < n; i++) {
+            for (int32_t i = 0; i < n; i++) {
                 ASSERT_EQ(acopy->a[i] + b->a[i], a->a[i]);
             }
             ASSERT_EQ(acopy->b + b->b, a->b);
@@ -182,7 +182,7 @@ namespace {
     TEST_F(LweTest, lweSubTo) {
         for (const LweKey *key: all_keys) {
             const LweParams *params = key->params;
-            const int n = params->n;
+            const int32_t n = params->n;
             LweSample *a = new_LweSample(params);
             LweSample *b = new_LweSample(params);
             LweSample *acopy = new_LweSample(params);
@@ -190,7 +190,7 @@ namespace {
             fillRandom(b, params);
             copySample(acopy, a, params);
             lweSubTo(a, b, params);
-            for (int i = 0; i < n; i++) {
+            for (int32_t i = 0; i < n; i++) {
                 ASSERT_EQ(acopy->a[i] - b->a[i], a->a[i]);
             }
             ASSERT_EQ(acopy->b - b->b, a->b);
@@ -203,12 +203,12 @@ namespace {
 
 
     // result = result + p.sample
-    //EXPORT void lweAddMulTo(LweSample* result, int p, const LweSample* sample, const LweParams* params);
+    //EXPORT void lweAddMulTo(LweSample* result, int32_t p, const LweSample* sample, const LweParams* params);
     TEST_F(LweTest, lweAddMulTo) {
-        const int p = 3;
+        const int32_t p = 3;
         for (const LweKey *key: all_keys) {
             const LweParams *params = key->params;
-            const int n = params->n;
+            const int32_t n = params->n;
             LweSample *a = new_LweSample(params);
             LweSample *b = new_LweSample(params);
             LweSample *acopy = new_LweSample(params);
@@ -216,7 +216,7 @@ namespace {
             fillRandom(b, params);
             copySample(acopy, a, params);
             lweAddMulTo(a, p, b, params);
-            for (int i = 0; i < n; i++) {
+            for (int32_t i = 0; i < n; i++) {
                 ASSERT_EQ(acopy->a[i] + p * b->a[i], a->a[i]);
             }
             ASSERT_EQ(acopy->b + p * b->b, a->b);
@@ -228,12 +228,12 @@ namespace {
     }
 
     // result = result - p.sample
-    //EXPORT void lweSubMulTo(LweSample* result, int p, const LweSample* sample, const LweParams* params);
+    //EXPORT void lweSubMulTo(LweSample* result, int32_t p, const LweSample* sample, const LweParams* params);
     TEST_F(LweTest, lweSubMulTo) {
-        const int p = 3;
+        const int32_t p = 3;
         for (const LweKey *key: all_keys) {
             const LweParams *params = key->params;
-            const int n = params->n;
+            const int32_t n = params->n;
             LweSample *a = new_LweSample(params);
             LweSample *b = new_LweSample(params);
             LweSample *acopy = new_LweSample(params);
@@ -241,7 +241,7 @@ namespace {
             fillRandom(b, params);
             copySample(acopy, a, params);
             lweSubMulTo(a, p, b, params);
-            for (int i = 0; i < n; i++) {
+            for (int32_t i = 0; i < n; i++) {
                 ASSERT_EQ(acopy->a[i] - p * b->a[i], a->a[i]);
             }
             ASSERT_EQ(acopy->b - p * b->b, a->b);

@@ -13,7 +13,7 @@ _fft:
 //void fft(const void* tables, double* c) {
 
 //    FFT_PRECOMP* fft_tables = (FFT_PRECOMP*) tables;
-//    const int n = fft_tables->n;
+//    const int32_t n = fft_tables->n;
 //    const double* trig_tables = fft_tables->trig_tables;
 
 	/* Save registers */
@@ -32,7 +32,7 @@ _fft:
 	movq         0(%rax), %rdx  /* rdx: n (logical Size of _fft  = a power of 2, must be at least 4) */
 	movq         8(%rax), %r8   /* r8: Base address of trigonometric tables array (CONSTANT) */
 	
-//    int ns4 = n/4;
+//    int32_t ns4 = n/4;
 //    double* pre = c;     //size n/4
 //    double* pim = c+ns4; //size n/4
 	movq	%rdx, %r9
@@ -45,7 +45,7 @@ _fft:
 //	//[1 -1]
 //	//     [1  1]
 //	//     [1 -1]
-//	for (int block=0; block<ns4; block+=4) {
+//	for (int32_t block=0; block<ns4; block+=4) {
 //	    double* d0 = pre+block;
 //	    double* d1 = pim+block;
 //	    tmp0[0]=d0[0];
@@ -105,7 +105,7 @@ fftsize2loop:
 //    // r0 - r2    i0 - i2
 //    // r1 - i3    i1 + r3
 //    {
-//	for (int block=0; block<ns4; block+=4) {
+//	for (int32_t block=0; block<ns4; block+=4) {
 //	    double* re = pre+block;
 //	    double* im = pim+block;
 //	    tmp0[0]=re[0];
@@ -155,10 +155,10 @@ fftsize4loop:
 //    
 //    //general loop
 //    const double* cur_tt = trig_tables;
-//    for (int halfnn=4; halfnn<ns4; halfnn*=2) {
-//	int nn = 2*halfnn;
-//	for (int block=0; block<ns4; block+=nn) {
-//	    for (int off=0; off<halfnn; off+=4) {
+//    for (int32_t halfnn=4; halfnn<ns4; halfnn*=2) {
+//	int32_t nn = 2*halfnn;
+//	for (int32_t block=0; block<ns4; block+=nn) {
+//	    for (int32_t off=0; off<halfnn; off+=4) {
 //		double* re0 = pre + block + off;
 //		double* im0 = pim + block + off;
 //		double* re1 = pre + block + halfnn + off;
@@ -234,7 +234,7 @@ fftoffloop:
 	jb ffthalfnnloop
 
 //    //multiply by omb^j
-//    for (int j=0; j<ns4; j+=4) {
+//    for (int32_t j=0; j<ns4; j+=4) {
 //	const double* r0 = cur_tt+2*j;
 //	const double* r1 = r0+4;
 //	//(re*cos-im*sin) + i (im*cos+re*sin)

@@ -29,14 +29,14 @@ _ifft:
 	movq        %rsi, %rdi      /* rsi: base of the real data */
 	
         //IFFT_PRECOMP* fft_tables = (IFFT_PRECOMP*) tables;
-        //const int n = fft_tables->n;
+        //const int32_t n = fft_tables->n;
         //const double* trig_tables = fft_tables->trig_tables;
 
 	/* Load struct FftTables fields */
 	movq         0(%rax), %rdx  /* rdx: Size of FFT (a power of 2, must be at least 4) */
 	movq         8(%rax), %r8   /* r8: Base address of trigonometric tables array */
 	
-        //int ns4 = n/4;
+        //int32_t ns4 = n/4;
         //double* are = c;    //size n/4 (x8 because doubles)
         //double* aim = c+ns4; //size n/4
 	movq	%rdx, %r10
@@ -44,7 +44,7 @@ _ifft:
 	add	%r10, %rsi          /* rsi: base of the imaginary data */
 
 	//    //multiply by omega^j
-	//    for (int j=0; j<ns4; j+=4) {
+	//    for (int32_t j=0; j<ns4; j+=4) {
 	//	const double* r0 = trig_tables+2*j;
 	//	const double* r1 = r0+4;
 	//	//(re*cos-im*sin) + i (im*cos+re*sin)
@@ -83,11 +83,11 @@ firstloop:
 
 /*	
     const double* cur_tt = trig_tables;
-    for (int nn=ns4; nn>=8; nn/=2) {
-	int halfnn = nn/2;
+    for (int32_t nn=ns4; nn>=8; nn/=2) {
+	int32_t halfnn = nn/2;
 	cur_tt += 2*nn;
-	for (int block=0; block<ns4; block+=nn) {
-	    for (int off=0; off<halfnn; off+=4) {
+	for (int32_t block=0; block<ns4; block+=nn) {
+	    for (int32_t off=0; off<halfnn; off+=4) {
 		double* d00 = are + block + off;
 		double* d01 = aim + block + off;
 		double* d10 = are + block + halfnn + off;
@@ -164,7 +164,7 @@ offloop:
 /*
     //size 4 loop
     {
-	for (int block=0; block<ns4; block+=4) {
+	for (int32_t block=0; block<ns4; block+=4) {
 	    double* d0 = are+block;
 	    double* d1 = aim+block;
 	    tmp0[0]=d0[0];
@@ -223,7 +223,7 @@ size4loop:
 /*
     //size 2
     {
-	for (int block=0; block<ns4; block+=4) {
+	for (int32_t block=0; block<ns4; block+=4) {
 	    double* d0 = are+block;
 	    double* d1 = aim+block;
 	    tmp0[0]=d0[0];

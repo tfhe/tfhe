@@ -8,11 +8,11 @@
 
 /** This structure represents an integer polynomial modulo X^N+1 */
 struct IntPolynomial {
-   const int N;
-   int* coefs;
+   const int32_t N;
+   int32_t* coefs;
 
 #ifdef __cplusplus   
-   IntPolynomial(const int N);
+   IntPolynomial(const int32_t N);
    ~IntPolynomial();
    IntPolynomial(const IntPolynomial&) = delete; //forbidden 
    IntPolynomial* operator=(const IntPolynomial&) = delete; //forbidden
@@ -22,11 +22,11 @@ struct IntPolynomial {
 
 /** This structure represents an torus polynomial modulo X^N+1 */
 struct TorusPolynomial {
-   const int N;
+   const int32_t N;
    Torus32* coefsT;
 
 #ifdef __cplusplus   
-   TorusPolynomial(const int N);
+   TorusPolynomial(const int32_t N);
    ~TorusPolynomial();
    TorusPolynomial(const TorusPolynomial&) = delete; //forbidden 
    TorusPolynomial* operator=(const TorusPolynomial&) = delete; //forbidden
@@ -48,86 +48,86 @@ struct LagrangeHalfCPolynomial
 
 //allocate memory space for a IntPolynomial
 EXPORT IntPolynomial* alloc_IntPolynomial();
-EXPORT IntPolynomial* alloc_IntPolynomial_array(int nbelts);
+EXPORT IntPolynomial* alloc_IntPolynomial_array(int32_t nbelts);
 
 //free memory space for a IntPolynomial
 EXPORT void free_IntPolynomial(IntPolynomial* ptr);
-EXPORT void free_IntPolynomial_array(int nbelts, IntPolynomial* ptr);
+EXPORT void free_IntPolynomial_array(int32_t nbelts, IntPolynomial* ptr);
 
 //initialize the IntPolynomial structure
 //(equivalent of the C++ constructor)
-EXPORT void init_IntPolynomial(IntPolynomial* obj, const int N);
-EXPORT void init_IntPolynomial_array(int nbelts, IntPolynomial* obj, const int N);
+EXPORT void init_IntPolynomial(IntPolynomial* obj, const int32_t N);
+EXPORT void init_IntPolynomial_array(int32_t nbelts, IntPolynomial* obj, const int32_t N);
 
 //destroys the IntPolynomial structure
 //(equivalent of the C++ destructor)
 EXPORT void destroy_IntPolynomial(IntPolynomial* obj);
-EXPORT void destroy_IntPolynomial_array(int nbelts, IntPolynomial* obj);
+EXPORT void destroy_IntPolynomial_array(int32_t nbelts, IntPolynomial* obj);
  
 //allocates and initialize the IntPolynomial structure
 //(equivalent of the C++ new)
-EXPORT IntPolynomial* new_IntPolynomial(const int N);
-EXPORT IntPolynomial* new_IntPolynomial_array(int nbelts, const int N);
+EXPORT IntPolynomial* new_IntPolynomial(const int32_t N);
+EXPORT IntPolynomial* new_IntPolynomial_array(int32_t nbelts, const int32_t N);
 
 //destroys and frees the IntPolynomial structure
 //(equivalent of the C++ delete)
 EXPORT void delete_IntPolynomial(IntPolynomial* obj);
-EXPORT void delete_IntPolynomial_array(int nbelts, IntPolynomial* obj);
+EXPORT void delete_IntPolynomial_array(int32_t nbelts, IntPolynomial* obj);
 
 //allocate memory space for a TorusPolynomial
 EXPORT TorusPolynomial* alloc_TorusPolynomial();
-EXPORT TorusPolynomial* alloc_TorusPolynomial_array(int nbelts);
+EXPORT TorusPolynomial* alloc_TorusPolynomial_array(int32_t nbelts);
 
 //free memory space for a TorusPolynomial
 EXPORT void free_TorusPolynomial(TorusPolynomial* ptr);
-EXPORT void free_TorusPolynomial_array(int nbelts, TorusPolynomial* ptr);
+EXPORT void free_TorusPolynomial_array(int32_t nbelts, TorusPolynomial* ptr);
 
 //initialize the TorusPolynomial structure
 //(equivalent of the C++ constructor)
-EXPORT void init_TorusPolynomial(TorusPolynomial* obj, const int N);
-EXPORT void init_TorusPolynomial_array(int nbelts, TorusPolynomial* obj, const int N);
+EXPORT void init_TorusPolynomial(TorusPolynomial* obj, const int32_t N);
+EXPORT void init_TorusPolynomial_array(int32_t nbelts, TorusPolynomial* obj, const int32_t N);
 
 //destroys the TorusPolynomial structure
 //(equivalent of the C++ destructor)
 EXPORT void destroy_TorusPolynomial(TorusPolynomial* obj);
-EXPORT void destroy_TorusPolynomial_array(int nbelts, TorusPolynomial* obj);
+EXPORT void destroy_TorusPolynomial_array(int32_t nbelts, TorusPolynomial* obj);
  
 //allocates and initialize the TorusPolynomial structure
 //(equivalent of the C++ new)
-EXPORT TorusPolynomial* new_TorusPolynomial(const int N);
-EXPORT TorusPolynomial* new_TorusPolynomial_array(int nbelts, const int N);
+EXPORT TorusPolynomial* new_TorusPolynomial(const int32_t N);
+EXPORT TorusPolynomial* new_TorusPolynomial_array(int32_t nbelts, const int32_t N);
 
 //destroys and frees the TorusPolynomial structure
 //(equivalent of the C++ delete)
 EXPORT void delete_TorusPolynomial(TorusPolynomial* obj);
-EXPORT void delete_TorusPolynomial_array(int nbelts, TorusPolynomial* obj);
+EXPORT void delete_TorusPolynomial_array(int32_t nbelts, TorusPolynomial* obj);
 
 //allocate memory space for a LagrangeHalfCPolynomial
 EXPORT LagrangeHalfCPolynomial* alloc_LagrangeHalfCPolynomial();
-EXPORT LagrangeHalfCPolynomial* alloc_LagrangeHalfCPolynomial_array(int nbelts);
+EXPORT LagrangeHalfCPolynomial* alloc_LagrangeHalfCPolynomial_array(int32_t nbelts);
 
 //free memory space for a LagrangeHalfCPolynomial
 EXPORT void free_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* ptr);
-EXPORT void free_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolynomial* ptr);
+EXPORT void free_LagrangeHalfCPolynomial_array(int32_t nbelts, LagrangeHalfCPolynomial* ptr);
 
 //initialize the LagrangeHalfCPolynomial structure
 //(equivalent of the C++ constructor)
-EXPORT void init_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* obj, const int N);
-EXPORT void init_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolynomial* obj, const int N);
+EXPORT void init_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* obj, const int32_t N);
+EXPORT void init_LagrangeHalfCPolynomial_array(int32_t nbelts, LagrangeHalfCPolynomial* obj, const int32_t N);
 
 //destroys the LagrangeHalfCPolynomial structure
 //(equivalent of the C++ destructor)
 EXPORT void destroy_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* obj);
-EXPORT void destroy_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolynomial* obj);
+EXPORT void destroy_LagrangeHalfCPolynomial_array(int32_t nbelts, LagrangeHalfCPolynomial* obj);
  
 //allocates and initialize the LagrangeHalfCPolynomial structure
 //(equivalent of the C++ new)
-EXPORT LagrangeHalfCPolynomial* new_LagrangeHalfCPolynomial(const int N);
-EXPORT LagrangeHalfCPolynomial* new_LagrangeHalfCPolynomial_array(int nbelts, const int N);
+EXPORT LagrangeHalfCPolynomial* new_LagrangeHalfCPolynomial(const int32_t N);
+EXPORT LagrangeHalfCPolynomial* new_LagrangeHalfCPolynomial_array(int32_t nbelts, const int32_t N);
 
 //destroys and frees the LagrangeHalfCPolynomial structure
 //(equivalent of the C++ delete)
 EXPORT void delete_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* obj);
-EXPORT void delete_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolynomial* obj);
+EXPORT void delete_LagrangeHalfCPolynomial_array(int32_t nbelts, LagrangeHalfCPolynomial* obj);
 
 #endif //POLYNOMIALS_H

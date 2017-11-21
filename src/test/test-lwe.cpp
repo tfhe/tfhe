@@ -18,10 +18,10 @@ using namespace std;
 // **********************************************************************************
 double approxEquals(Torus32 a, Torus32 b) { return abs(a - b) < 10; }
 
-int main(int argc, char **argv) {
+int32_t main(int32_t argc, char **argv) {
 
     LweParams *params = new_LweParams(512, 0.2, 0.5); //les deux alpha mis un peu au hasard
-    int n = params->n;
+    int32_t n = params->n;
     LweKey *key = new_LweKey(params);
     LweSample *cipher = new_LweSample(params);
     Torus32 mu = dtot32(0.5);
@@ -29,12 +29,12 @@ int main(int argc, char **argv) {
     double alpha = 0.0625;
     Torus32 phi;
     double message;
-    int Msize = 2;
+    int32_t Msize = 2;
 
     lweKeyGen(key);
     lweSymEncrypt(cipher, mu, alpha, key);
     cout << "a = [";
-    for (int i = 0; i < n - 1; ++i) cout << t32tod(cipher->a[i]) << ", ";
+    for (int32_t i = 0; i < n - 1; ++i) cout << t32tod(cipher->a[i]) << ", ";
     cout << t32tod(cipher->a[n - 1]) << "]" << endl;
     cout << "b = " << t32tod(cipher->b) << endl;
 
@@ -44,9 +44,9 @@ int main(int argc, char **argv) {
     cout << "message = " << t32tod(message) << endl;
 
     //lwe crash test
-    int failures = 0;
-    int trials = 1000;
-    for (int i = 0; i < trials; i++) {
+    int32_t failures = 0;
+    int32_t trials = 1000;
+    for (int32_t i = 0; i < trials; i++) {
         Torus32 input = dtot32((i % 3) / 3.);
         lweKeyGen(key);
         lweSymEncrypt(cipher, input, 0.047,

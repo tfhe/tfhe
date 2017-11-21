@@ -9,19 +9,19 @@ namespace {
 
     struct FakeLweKeySwitchKey {
         //TODO: parallelization
-        static const long FAKE_LWEKEYSWITCH_UID = 956475132024584l; // precaution: distinguish fakes from trues
-        const long fake_uid;
-        const int n;
-        const int t;
-        const int basebit;
-        const int base;
+        static const int64_t FAKE_LWEKEYSWITCH_UID = 956475132024584l; // precaution: distinguish fakes from trues
+        const int64_t fake_uid;
+        const int32_t n;
+        const int32_t t;
+        const int32_t basebit;
+        const int32_t base;
         double variance_overhead;
 
         //this padding is here to make sure that FakeLweKeySwitchKey and LweKeySwitchKey have the same size
-        char unused_padding[sizeof(LweKeySwitchKey) - sizeof(long) - 4 * sizeof(int) - sizeof(double)];
+        char unused_padding[sizeof(LweKeySwitchKey) - sizeof(int64_t) - 4 * sizeof(int32_t) - sizeof(double)];
 
         // construct
-        FakeLweKeySwitchKey(int n, int t, int basebit) : fake_uid(FAKE_LWEKEYSWITCH_UID),
+        FakeLweKeySwitchKey(int32_t n, int32_t t, int32_t basebit) : fake_uid(FAKE_LWEKEYSWITCH_UID),
                                                          n(n), t(t),
                                                          basebit(basebit),
                                                          base(1 << basebit) {
@@ -69,12 +69,12 @@ namespace {
  */
     inline void fake_lweCreateKeySwitchKey_fromArray(LweSample ***result,
                                                      const LweKey *out_key, const double out_alpha,
-                                                     const int *in_key, const int n, const int t, const int basebit) {
-        const int base = 1 << basebit;       // base=2 in [CGGI16]
+                                                     const int32_t *in_key, const int32_t n, const int32_t t, const int32_t basebit) {
+        const int32_t base = 1 << basebit;       // base=2 in [CGGI16]
 
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < t; j++) {
-                for (int k = 0; k < base; k++) {
+        for (int32_t i = 0; i < n; i++) {
+            for (int32_t j = 0; j < t; j++) {
+                for (int32_t k = 0; k < base; k++) {
                     Torus32 x = (in_key[i] * k) * (1 << (32 - (j + 1) * basebit));
                     fake_lweSymEncrypt(&result[i][j][k], x, out_alpha, out_key);
                 }
@@ -85,7 +85,7 @@ namespace {
 #define USE_FAKE_lweCreateKeySwitchKey_fromArray \
     inline void lweCreateKeySwitchKey_fromArray(LweSample*** result, \
         const LweKey* out_key, const double out_alpha, \
-        const int* in_key, const int n, const int t, const int basebit){ \
+        const int32_t* in_key, const int32_t n, const int32_t t, const int32_t basebit){ \
     fake_lweCreateKeySwitchKey_fromArray(result, \
         out_key, out_alpha, \
         in_key, n, t, basebit); \
@@ -107,14 +107,14 @@ namespace {
     inline void fake_lweKeySwitchTranslate_fromArray(LweSample *result,
                                                      const LweSample ***ks, const LweParams *params,
                                                      const Torus32 *ai,
-                                                     const int n, const int t, const int basebit) {
-        const int base = 1 << basebit;       // base=2 in [CGGI16]
+                                                     const int32_t n, const int32_t t, const int32_t basebit) {
+        const int32_t base = 1 << basebit;       // base=2 in [CGGI16]
         const int32_t prec_offset = 1 << (32 - (1 + basebit * t)); //precision
-        const int mask = base - 1;
+        const int32_t mask = base - 1;
 
-        for (int i = 0; i < n; i++) {
+        for (int32_t i = 0; i < n; i++) {
             const uint32_t aibar = ai[i] + prec_offset;
-            for (int j = 0; j < t; j++) {
+            for (int32_t j = 0; j < t; j++) {
                 const uint32_t aij = (aibar >> (32 - (j + 1) * basebit)) & mask;
                 fake_lweSubTo(result, &ks[i][j][aij], params);
             }
@@ -125,16 +125,16 @@ namespace {
     inline void lweKeySwitchTranslate_fromArray(LweSample* result, \
         const LweSample*** ks, const LweParams* params, \
         const Torus32* ai, \
-        const int n, const int t, const int basebit){ \
+        const int32_t n, const int32_t t, const int32_t basebit){ \
         fake_lweKeySwitchTranslate_fromArray(result, ks, params, ai, n, t, basebit); \
     }
 
 
     inline void fake_lweCreateKeySwitchKey(LweKeySwitchKey *result, const LweKey *in_key, const LweKey *out_key) {
         const double variance = out_key->params->alpha_min * out_key->params->alpha_min;
-        const int n = result->n;
-        const int basebit = result->basebit;
-        const int t = result->t;
+        const int32_t n = result->n;
+        const int32_t basebit = result->basebit;
+        const int32_t t = result->t;
         const double epsilon2 = pow(0.5, 2 * (basebit * t + 1));
 
         const double variance_overhead = n * t * variance + n * epsilon2;
@@ -166,13 +166,13 @@ namespace {
     }
 
 
-    inline LweKeySwitchKey *fake_new_LweKeySwitchKey(int n, int t, int basebit, const LweParams *params) {
+    inline LweKeySwitchKey *fake_new_LweKeySwitchKey(int32_t n, int32_t t, int32_t basebit, const LweParams *params) {
         FakeLweKeySwitchKey *ks = new FakeLweKeySwitchKey(n, t, basebit);
         return (LweKeySwitchKey *) ks;
     }
 
 #define USE_FAKE_new_LweKeySwitchKey \
-inline LweKeySwitchKey* new_LweKeySwitchKey(int n, int t, int basebit, const LweParams* params) { \
+inline LweKeySwitchKey* new_LweKeySwitchKey(int32_t n, int32_t t, int32_t basebit, const LweParams* params) { \
     return fake_new_LweKeySwitchKey(n,t,basebit,params); \
 }
 

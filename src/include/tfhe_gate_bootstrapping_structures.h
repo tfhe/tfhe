@@ -7,13 +7,13 @@
 #include "tfhe_core.h"
 
 struct TFheGateBootstrappingParameterSet {
-    const int ks_t;
-    const int ks_basebit;
+    const int32_t ks_t;
+    const int32_t ks_basebit;
     const LweParams *const in_out_params;
     const TGswParams *const tgsw_params;
 #ifdef __cplusplus
 
-    TFheGateBootstrappingParameterSet(const int ks_t, const int ks_basebit, const LweParams *const in_out_params,
+    TFheGateBootstrappingParameterSet(const int32_t ks_t, const int32_t ks_basebit, const LweParams *const in_out_params,
                                       const TGswParams *const tgsw_params);
 
     TFheGateBootstrappingParameterSet(const TFheGateBootstrappingParameterSet &) = delete;

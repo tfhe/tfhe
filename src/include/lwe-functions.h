@@ -39,7 +39,7 @@ EXPORT Torus32 lwePhase(const LweSample* sample, const LweKey* key);
  * This function computes the decryption of sample by using key
  * The constant Msize indicates the message space and is used to approximate the phase
  */
-EXPORT Torus32 lweSymDecrypt(const LweSample* sample, const LweKey* key, const int Msize);
+EXPORT Torus32 lweSymDecrypt(const LweSample* sample, const LweKey* key, const int32_t Msize);
 
 
 //Arithmetic operations on Lwe samples
@@ -62,10 +62,10 @@ EXPORT void lweAddTo(LweSample* result, const LweSample* sample, const LweParams
 EXPORT void lweSubTo(LweSample* result, const LweSample* sample, const LweParams* params);
 
 /** result = result + p.sample */
-EXPORT void lweAddMulTo(LweSample* result, int p, const LweSample* sample, const LweParams* params);
+EXPORT void lweAddMulTo(LweSample* result, int32_t p, const LweSample* sample, const LweParams* params);
 
 /** result = result - p.sample */
-EXPORT void lweSubMulTo(LweSample* result, int p, const LweSample* sample, const LweParams* params);
+EXPORT void lweSubMulTo(LweSample* result, int32_t p, const LweSample* sample, const LweParams* params);
 
 /** 
  * creates a Key Switching Key between the two keys

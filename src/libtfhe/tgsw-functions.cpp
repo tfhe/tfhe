@@ -22,13 +22,13 @@
 //initialize the sample structure
 //(equivalent of the C++ constructor)
 EXPORT void init_TGswSample(TGswSample *obj, const TGswParams *params) {
-    const int k = params->tlwe_params->k;
-    const int l = params->l;
+    const int32_t k = params->tlwe_params->k;
+    const int32_t l = params->l;
     TLweSample *all_sample = new_TLweSample_array((k + 1) * l,
                                                   params->tlwe_params); // tous les samples comme un vecteur ligne
     TLweSample **bloc_sample = new TLweSample *[k + 1]; // blocs horizontaux (l lignes) de la matrice TGsw
 
-    for (int p = 0; p < k + 1; ++p)
+    for (int32_t p = 0; p < k + 1; ++p)
         bloc_sample[p] = all_sample + p * l;
 
     new(obj) TGswSample(all_sample, bloc_sample, k, l);
@@ -40,8 +40,8 @@ EXPORT void init_TGswSample(TGswSample *obj, const TGswParams *params) {
 //destroys the TGswSample structure
 //(equivalent of the C++ destructor)
 EXPORT void destroy_TGswSample(TGswSample *obj) {
-    const int k = obj->k;
-    const int l = obj->l;
+    const int32_t k = obj->k;
+    const int32_t l = obj->l;
     delete_TLweSample_array((k + 1) * l, obj->all_sample);
     delete[] obj->bloc_sample;
     obj->~TGswSample();
@@ -63,9 +63,9 @@ EXPORT void tGswKeyGen(TGswKey *result) {
 // support Functions for TGsw
 // Result = 0
 EXPORT void tGswClear(TGswSample *result, const TGswParams *params) {
-    const int kpl = params->kpl;
+    const int32_t kpl = params->kpl;
 
-    for (int p = 0; p < kpl; ++p)
+    for (int32_t p = 0; p < kpl; ++p)
         tLweClear(&result->all_sample[p], params->tlwe_params);
 }
 #endif
@@ -74,13 +74,13 @@ EXPORT void tGswClear(TGswSample *result, const TGswParams *params) {
 #undef INCLUDE_TGSW_ADD_H
 // Result += H
 EXPORT void tGswAddH(TGswSample *result, const TGswParams *params) {
-    const int k = params->tlwe_params->k;
-    const int l = params->l;
+    const int32_t k = params->tlwe_params->k;
+    const int32_t l = params->l;
     const Torus32 *h = params->h;
 
     // compute result += H
-    for (int bloc = 0; bloc <= k; ++bloc)
-        for (int i = 0; i < l; i++)
+    for (int32_t bloc = 0; bloc <= k; ++bloc)
+        for (int32_t i = 0; i < l; i++)
             result->bloc_sample[bloc][i].a[bloc].coefsT[0] += h[i];
 }
 #endif
@@ -89,19 +89,19 @@ EXPORT void tGswAddH(TGswSample *result, const TGswParams *params) {
 #undef INCLUDE_TGSW_ADD_MU_H
 // Result += mu*H
 EXPORT void tGswAddMuH(TGswSample *result, const IntPolynomial *message, const TGswParams *params) {
-    const int k = params->tlwe_params->k;
-    const int N = params->tlwe_params->N;
-    const int l = params->l;
+    const int32_t k = params->tlwe_params->k;
+    const int32_t N = params->tlwe_params->N;
+    const int32_t l = params->l;
     const Torus32 *h = params->h;
-    const int *mu = message->coefs;
+    const int32_t *mu = message->coefs;
 
     // compute result += H
-    for (int bloc = 0; bloc <= k; ++bloc)
-        for (int i = 0; i < l; i++) {
+    for (int32_t bloc = 0; bloc <= k; ++bloc)
+        for (int32_t i = 0; i < l; i++) {
             Torus32 *target =
                     result->bloc_sample[bloc][i].a[bloc].coefsT;
             const Torus32 hi = h[i];
-            for (int j = 0; j < N; j++) {
+            for (int32_t j = 0; j < N; j++) {
                 target[j] += mu[j] * hi;
             }
         }
@@ -111,14 +111,14 @@ EXPORT void tGswAddMuH(TGswSample *result, const IntPolynomial *message, const T
 #if defined INCLUDE_ALL || defined INCLUDE_TGSW_ADD_MU_INT_H
 #undef INCLUDE_TGSW_ADD_MU_INT_H
 // Result += mu*H, mu integer
-EXPORT void tGswAddMuIntH(TGswSample *result, const int message, const TGswParams *params) {
-    const int k = params->tlwe_params->k;
-    const int l = params->l;
+EXPORT void tGswAddMuIntH(TGswSample *result, const int32_t message, const TGswParams *params) {
+    const int32_t k = params->tlwe_params->k;
+    const int32_t l = params->l;
     const Torus32 *h = params->h;
 
     // compute result += H
-    for (int bloc = 0; bloc <= k; ++bloc)
-        for (int i = 0; i < l; i++)
+    for (int32_t bloc = 0; bloc <= k; ++bloc)
+        for (int32_t i = 0; i < l; i++)
             result->bloc_sample[bloc][i].a[bloc].coefsT[0] += message * h[i];
 }
 #endif
@@ -128,9 +128,9 @@ EXPORT void tGswAddMuIntH(TGswSample *result, const int message, const TGswParam
 // Result = tGsw(0)
 EXPORT void tGswEncryptZero(TGswSample *result, double alpha, const TGswKey *key) {
     const TLweKey *rlkey = &key->tlwe_key;
-    const int kpl = key->params->kpl;
+    const int32_t kpl = key->params->kpl;
 
-    for (int p = 0; p < kpl; ++p) {
+    for (int32_t p = 0; p < kpl; ++p) {
         tLweSymEncryptZero(&result->all_sample[p], alpha, rlkey);
     }
 }
@@ -140,10 +140,10 @@ EXPORT void tGswEncryptZero(TGswSample *result, double alpha, const TGswKey *key
 #if defined INCLUDE_ALL || defined INCLUDE_TGSW_MUL_BY_XAI_MINUS_ONE
 #undef INCLUDE_TGSW_MUL_BY_XAI_MINUS_ONE
 //mult externe de X^{a_i} par bki
-EXPORT void tGswMulByXaiMinusOne(TGswSample *result, int ai, const TGswSample *bk, const TGswParams *params) {
+EXPORT void tGswMulByXaiMinusOne(TGswSample *result, int32_t ai, const TGswSample *bk, const TGswParams *params) {
     const TLweParams *par = params->tlwe_params;
-    const int kpl = params->kpl;
-    for (int i = 0; i < kpl; i++)
+    const int32_t kpl = params->kpl;
+    for (int32_t i = 0; i < kpl; i++)
         tLweMulByXaiMinusOne(&result->all_sample[i], ai, &bk->all_sample[i], par);
 }
 #endif
@@ -155,14 +155,14 @@ EXPORT void tGswMulByXaiMinusOne(TGswSample *result, int ai, const TGswSample *b
 //accum *= sample
 EXPORT void tGswExternMulToTLwe(TLweSample *accum, const TGswSample *sample, const TGswParams *params) {
     const TLweParams *par = params->tlwe_params;
-    const int N = par->N;
-    const int kpl = params->kpl;
+    const int32_t N = par->N;
+    const int32_t kpl = params->kpl;
     //TODO: improve this new/delete
     IntPolynomial *dec = new_IntPolynomial_array(kpl, N);
 
     tGswTLweDecompH(dec, accum, params);
     tLweClear(accum, par);
-    for (int i = 0; i < kpl; i++) {
+    for (int32_t i = 0; i < kpl; i++) {
         tLweAddMulRTo(accum, &dec[i], &sample->all_sample[i], par);
     }
 
@@ -188,7 +188,7 @@ EXPORT void tGswSymEncrypt(TGswSample *result, const IntPolynomial *message, dou
 /**
  * encrypts a constant message
  */
-EXPORT void tGswSymEncryptInt(TGswSample *result, const int message, double alpha, const TGswKey *key) {
+EXPORT void tGswSymEncryptInt(TGswSample *result, const int32_t message, double alpha, const TGswKey *key) {
     tGswEncryptZero(result, alpha, key);
     tGswAddMuIntH(result, message, key->params);
 }
@@ -200,7 +200,7 @@ EXPORT void tGswSymEncryptInt(TGswSample *result, const int message, double alph
 /**
  * encrypts a message = 0 ou 1
  */
-EXPORT void tGswEncryptB(TGswSample *result, const int message, double alpha, const TGswKey *key) {
+EXPORT void tGswEncryptB(TGswSample *result, const int32_t message, double alpha, const TGswKey *key) {
     tGswEncryptZero(result, alpha, key);
     if (message == 1)
         tGswAddH(result, key->params);
@@ -211,12 +211,12 @@ EXPORT void tGswEncryptB(TGswSample *result, const int message, double alpha, co
 #if defined INCLUDE_ALL || defined INCLUDE_TGSW_DECRYPT
 #undef INCLUDE_TGSW_DECRYPT
 // à revoir
-EXPORT void tGswSymDecrypt(IntPolynomial *result, const TGswSample *sample, const TGswKey *key, const int Msize) {
+EXPORT void tGswSymDecrypt(IntPolynomial *result, const TGswSample *sample, const TGswKey *key, const int32_t Msize) {
     const TGswParams *params = key->params;
     const TLweParams *rlwe_params = params->tlwe_params;
-    const int N = rlwe_params->N;
-    const int l = params->l;
-    const int k = rlwe_params->k;
+    const int32_t N = rlwe_params->N;
+    const int32_t l = params->l;
+    const int32_t k = rlwe_params->k;
     TorusPolynomial *testvec = new_TorusPolynomial(N);
     TorusPolynomial *tmp = new_TorusPolynomial(N);
     IntPolynomial *decomp = new_IntPolynomial_array(l, N);
@@ -227,12 +227,12 @@ EXPORT void tGswSymDecrypt(IntPolynomial *result, const TGswSample *sample, cons
     tGswTorus32PolynomialDecompH(decomp, testvec, params);
 
     torusPolynomialClear(testvec);
-    for (int i = 0; i < l; i++) {
-        for (int j = 1; j < N; j++) assert(decomp[i].coefs[j] == 0);
+    for (int32_t i = 0; i < l; i++) {
+        for (int32_t j = 1; j < N; j++) assert(decomp[i].coefs[j] == 0);
         tLwePhase(tmp, &sample->bloc_sample[k][i], &key->tlwe_key);
         torusPolynomialAddMulR(testvec, decomp + i, tmp);
     }
-    for (int i = 0; i < N; i++)
+    for (int32_t i = 0; i < N; i++)
         result->coefs[i] = modSwitchFromTorus32(testvec->coefsT[i], Msize);
 
     delete_TorusPolynomial(testvec);
@@ -243,18 +243,18 @@ EXPORT void tGswSymDecrypt(IntPolynomial *result, const TGswSample *sample, cons
 
 /*
 // à revoir
-EXPORT int tGswSymDecryptInt(const TGswSample* sample, const TGswKey* key){
+EXPORT int32_t tGswSymDecryptInt(const TGswSample* sample, const TGswKey* key){
     TorusPolynomial* phase = new_TorusPolynomial(key->params->tlwe_params->N);
 
     tGswPhase(phase, sample, key);
-    int result = modSwitchFromTorus32(phase->coefsT[0], Msize);
+    int32_t result = modSwitchFromTorus32(phase->coefsT[0], Msize);
 
     delete_TorusPolynomial(phase);
     return result;
 }
 */
 //do we really decrypt Gsw samples?
-// EXPORT void tGswMulByXaiMinusOne(Gsw* result, int ai, const Gsw* bk);
+// EXPORT void tGswMulByXaiMinusOne(Gsw* result, int32_t ai, const Gsw* bk);
 // EXPORT void tLweExternMulRLweTo(RLwe* accum, Gsw* a); //  accum = a \odot accum
 
 
@@ -262,10 +262,10 @@ EXPORT int tGswSymDecryptInt(const TGswSample* sample, const TGswKey* key){
 #undef INCLUDE_TGSW_TLWE_DECOMP_H
 //fonction de decomposition
 EXPORT void tGswTLweDecompH(IntPolynomial *result, const TLweSample *sample, const TGswParams *params) {
-    const int k = params->tlwe_params->k;
-    const int l = params->l;
+    const int32_t k = params->tlwe_params->k;
+    const int32_t l = params->l;
 
-    for (int i = 0; i <= k; ++i) // b=a[k]
+    for (int32_t i = 0; i <= k; ++i) // b=a[k]
         tGswTorus32PolynomialDecompH(result + (i * l), &sample->a[i], params);
 }
 #endif
@@ -275,16 +275,16 @@ EXPORT void tGswTLweDecompH(IntPolynomial *result, const TLweSample *sample, con
 #undef INCLUDE_TGSW_TORUS32POLYNOMIAL_DECOMP_H_OLD
 EXPORT void
 Torus32PolynomialDecompH_old(IntPolynomial *result, const TorusPolynomial *sample, const TGswParams *params) {
-    const int N = params->tlwe_params->N;
-    const int l = params->l;
-    const int Bgbit = params->Bgbit;
+    const int32_t N = params->tlwe_params->N;
+    const int32_t l = params->l;
+    const int32_t Bgbit = params->Bgbit;
     const uint32_t maskMod = params->maskMod;
     const int32_t halfBg = params->halfBg;
     const uint32_t offset = params->offset;
 
-    for (int j = 0; j < N; ++j) {
+    for (int32_t j = 0; j < N; ++j) {
         uint32_t temp0 = sample->coefsT[j] + offset;
-        for (int p = 0; p < l; ++p) {
+        for (int32_t p = 0; p < l; ++p) {
             uint32_t temp1 = (temp0 >> (32 - (p + 1) * Bgbit)) & maskMod; // doute
             result[p].coefs[j] = temp1 - halfBg;
         }
@@ -296,9 +296,9 @@ Torus32PolynomialDecompH_old(IntPolynomial *result, const TorusPolynomial *sampl
 #undef INCLUDE_TGSW_TORUS32POLYNOMIAL_DECOMP_H
 EXPORT void
 tGswTorus32PolynomialDecompH(IntPolynomial *result, const TorusPolynomial *sample, const TGswParams *params) {
-    const int N = params->tlwe_params->N;
-    const int l = params->l;
-    const int Bgbit = params->Bgbit;
+    const int32_t N = params->tlwe_params->N;
+    const int32_t l = params->l;
+    const int32_t Bgbit = params->Bgbit;
     uint32_t *buf = (uint32_t *) sample->coefsT;
 //#define __AVX2__ //(to test)
 #ifndef __AVX2__
@@ -316,7 +316,7 @@ tGswTorus32PolynomialDecompH(IntPolynomial *result, const TorusPolynomial *sampl
 
     //First, add offset to everyone
 #ifndef __AVX2__
-    for (int j = 0; j < N; ++j) buf[j] += offset;
+    for (int32_t j = 0; j < N; ++j) buf[j] += offset;
 #else
     {
     const uint32_t* sit = buf;
@@ -338,11 +338,11 @@ tGswTorus32PolynomialDecompH(IntPolynomial *result, const TorusPolynomial *sampl
 #endif
 
     //then, do the decomposition (in parallel)
-    for (int p = 0; p < l; ++p) {
-        const int decal = (32 - (p + 1) * Bgbit);
+    for (int32_t p = 0; p < l; ++p) {
+        const int32_t decal = (32 - (p + 1) * Bgbit);
 #ifndef __AVX2__
         int32_t *res_p = result[p].coefs;
-        for (int j = 0; j < N; ++j) {
+        for (int32_t j = 0; j < N; ++j) {
             uint32_t temp1 = (buf[j] >> decal) & maskMod;
             res_p[j] = temp1 - halfBg;
         }
@@ -371,7 +371,7 @@ tGswTorus32PolynomialDecompH(IntPolynomial *result, const TorusPolynomial *sampl
             );
         /* // verify that the assembly block was ok
         int32_t* res_p = result[p].coefs;
-        for (int j = 0; j < N; ++j)
+        for (int32_t j = 0; j < N; ++j)
         {
             uint32_t temp1 = (buf[j] >> decal) & maskMod;
             if (res_p[j] != int32_t(temp1 - halfBg)) {
@@ -385,7 +385,7 @@ tGswTorus32PolynomialDecompH(IntPolynomial *result, const TorusPolynomial *sampl
 
     //finally, remove offset to everyone
 #ifndef __AVX2__
-    for (int j = 0; j < N; ++j) buf[j] -= offset;
+    for (int32_t j = 0; j < N; ++j) buf[j] -= offset;
 #else
     {
     const uint32_t* sit = buf;
@@ -415,14 +415,14 @@ tGswTorus32PolynomialDecompH(IntPolynomial *result, const TorusPolynomial *sampl
 //result = a*b
 EXPORT void tGswExternProduct(TLweSample *result, const TGswSample *a, const TLweSample *b, const TGswParams *params) {
     const TLweParams *parlwe = params->tlwe_params;
-    const int N = parlwe->N;
-    const int kpl = params->kpl;
+    const int32_t N = parlwe->N;
+    const int32_t kpl = params->kpl;
     IntPolynomial *dec = new_IntPolynomial_array(kpl, N);
 
     tGswTLweDecompH(dec, b, params);
 
     tLweClear(result, parlwe);
-    for (int i = 0; i < kpl; i++)
+    for (int32_t i = 0; i < kpl; i++)
         tLweAddMulRTo(result, &dec[i], &a->all_sample[i], parlwe);
 
     result->current_variance += b->current_variance; //todo + the error term?

@@ -55,18 +55,18 @@ namespace {
     TEST_F(LweKeySwitchTest, lweCreateKeySwitchKey_fromArray) {
         //EXPECT_CALL(*this, lweSymEncrypt(_,_,_,_)).WillRepeatedly(Invoke(fake_lweSymEncrypt));
         LweKeySwitchKey *test = new_LweKeySwitchKey(300, 14, 2, params500_1em5);
-        //int n = test->out_params->n;
+        //int32_t n = test->out_params->n;
         double alpha = 1e-5;
-        int N = test->n;
-        int t = test->t;
-        int basebit = test->basebit;
-        int base = test->base;
-        int *in_key = new int[N];
-        for (int i = 0; i < N; i++) in_key[i] = (uniformTorus32_distrib(generator) % 2 == 0 ? 1 : 0);
+        int32_t N = test->n;
+        int32_t t = test->t;
+        int32_t basebit = test->basebit;
+        int32_t base = test->base;
+        int32_t *in_key = new int32_t[N];
+        for (int32_t i = 0; i < N; i++) in_key[i] = (uniformTorus32_distrib(generator) % 2 == 0 ? 1 : 0);
         lweCreateKeySwitchKey_fromArray(test->ks, key500, alpha, in_key, N, t, basebit);
-        for (int i = 0; i < N; i++) {
-            for (int j = 0; j < t; j++) {
-                for (int k = 0; k < base; k++) {
+        for (int32_t i = 0; i < N; i++) {
+            for (int32_t j = 0; j < t; j++) {
+                for (int32_t k = 0; k < base; k++) {
                     LweSample *ks_ijk = &test->ks[i][j][k];
                     ASSERT_EQ(alpha * alpha, ks_ijk->current_variance);
                     ASSERT_EQ(k * in_key[i] * 1 << (32 - (j + 1) * basebit), ks_ijk->b);
@@ -92,25 +92,25 @@ namespace {
     //void lweKeySwitchTranslate_fromArray(LweSample* result, 
     //	    const LweSample*** ks, const LweParams* params, 
     //	    const Torus32* ai, 
-    //	    const int n, const int t, const int basebit)
+    //	    const int32_t n, const int32_t t, const int32_t basebit)
     TEST_F(LweKeySwitchTest, lweKeySwitchTranslate_fromArray) {
         //EXPECT_CALL(*this, lweSymEncrypt(_,_,_,_)).WillRepeatedly(Invoke(fake_lweSymEncrypt));
         LweKeySwitchKey *test = new_LweKeySwitchKey(300, 14, 2, params500_1em5);
-        //int n = test->out_params->n;
+        //int32_t n = test->out_params->n;
         double alpha = 1e-5;
-        int N = test->n;
-        int t = test->t;
-        int basebit = test->basebit;
-        int base = test->base;
+        int32_t N = test->n;
+        int32_t t = test->t;
+        int32_t basebit = test->basebit;
+        int32_t base = test->base;
         const int32_t prec_offset = 1 << (32 - (1 + basebit * t)); //precision
         const uint32_t prec_mask = -(1 << (32 - (basebit * t))); //precision
         //printf("prec_offset: %08x\n",prec_offset);
         //printf("prec_mask: %08x\n",prec_mask);
-        int *in_key = new int[N];
+        int32_t *in_key = new int32_t[N];
         Torus32 b = uniformTorus32_distrib(generator);
-        Torus32 *ai = new int[N];
+        Torus32 *ai = new int32_t[N];
         uint32_t *aibar = new uint32_t[N];
-        for (int i = 0; i < N; i++) {
+        for (int32_t i = 0; i < N; i++) {
             in_key[i] = (uniformTorus32_distrib(generator) % 2 == 0 ? 1 : 0);
             ai[i] = uniformTorus32_distrib(generator);
             aibar[i] = (ai[i] + prec_offset) & prec_mask;
@@ -121,7 +121,7 @@ namespace {
         lweNoiselessTrivial(res, b, params500_1em5);
         Torus32 barphi = b;
         ASSERT_EQ(barphi, res->b);
-        for (int i = 0; i < N; i++) {
+        for (int32_t i = 0; i < N; i++) {
             lweKeySwitchTranslate_fromArray(res, (const LweSample ***) test->ks + i, params500_1em5, ai + i, 1, t,
                                             basebit);
             barphi -= aibar[i] * in_key[i];
@@ -129,7 +129,7 @@ namespace {
             //printf( "ai:  %08x\n"
             //	    "aib: %08x si: %d\n",ai[i],aibar[i],in_key[i]);
             uint32_t dec = 0;
-            for (int j = 0; j < t; j++) {
+            for (int32_t j = 0; j < t; j++) {
                 const uint32_t aij = (aibar[i] >> (32 - (j + 1) * basebit)) & (base - 1);
                 const uint32_t rec = aij << (32 - (j + 1) * basebit);
                 //printf("rec: %08x at j=%d\n",rec,j);

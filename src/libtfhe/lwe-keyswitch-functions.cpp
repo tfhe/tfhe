@@ -20,11 +20,11 @@ using namespace std;
 Renormalization of KS
  * compute the error of the KS that has been generated and translate the ks to recenter the gaussian in 0
 */
-void renormalizeKSkey(LweKeySwitchKey* ks, const LweKey* out_key, const int* in_key){
-    const int n = ks->n;
-    const int basebit = ks->basebit;
-    const int t = ks->t;
-    const int base = 1<<basebit; 
+void renormalizeKSkey(LweKeySwitchKey* ks, const LweKey* out_key, const int32_t* in_key){
+    const int32_t n = ks->n;
+    const int32_t basebit = ks->basebit;
+    const int32_t t = ks->t;
+    const int32_t base = 1<<basebit; 
 
     Torus32 phase;
     Torus32 temp_err; 
@@ -32,9 +32,9 @@ void renormalizeKSkey(LweKeySwitchKey* ks, const LweKey* out_key, const int* in_
     // double err_norm = 0; 
 
     // compute the average error
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < t; ++j) {
-            for (int h = 1; h < base; ++h) { // pas le terme en 0
+    for (int32_t i = 0; i < n; ++i) {
+        for (int32_t j = 0; j < t; ++j) {
+            for (int32_t h = 1; h < base; ++h) { // pas le terme en 0
                 // compute the phase 
                 phase = lwePhase(&ks->ks[i][j][h], out_key);
                 // compute the error 
@@ -45,13 +45,13 @@ void renormalizeKSkey(LweKeySwitchKey* ks, const LweKey* out_key, const int* in_
             }
         }
     }
-    int nb = n*t*(base-1); 
+    int32_t nb = n*t*(base-1); 
     error = dtot32(t32tod(error)/nb);
 
     // relinearize
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < t; ++j) {
-            for (int h = 1; h < base; ++h) { // pas le terme en 0
+    for (int32_t i = 0; i < n; ++i) {
+        for (int32_t j = 0; j < t; ++j) {
+            for (int32_t h = 1; h < base; ++h) { // pas le terme en 0
                 ks->ks[i][j][h].b -= error;                
             }
         }
@@ -84,12 +84,12 @@ void renormalizeKSkey(LweKeySwitchKey* ks, const LweKey* out_key, const int* in_
  */
 void lweCreateKeySwitchKey_fromArray(LweSample*** result, 
 	const LweKey* out_key, const double out_alpha, 
-	const int* in_key, const int n, const int t, const int basebit){
-    const int base=1<<basebit;       // base=2 in [CGGI16]
+	const int32_t* in_key, const int32_t n, const int32_t t, const int32_t basebit){
+    const int32_t base=1<<basebit;       // base=2 in [CGGI16]
 
-    for(int i=0;i<n;i++) {
-    	for(int j=0;j<t;j++){
-    	    for(int k=0;k<base;k++){
+    for(int32_t i=0;i<n;i++) {
+    	for(int32_t j=0;j<t;j++){
+    	    for(int32_t k=0;k<base;k++){
 		Torus32 x=(in_key[i]*k)*(1<<(32-(j+1)*basebit));
 		lweSymEncrypt(&result[i][j][k],x,out_alpha,out_key);
 		//printf("i,j,k,ki,x,phase=%d,%d,%d,%d,%d,%d\n",i,j,k,in_key->key[i],x,lwePhase(&result->ks[i][j][k],out_key));
@@ -114,14 +114,14 @@ void lweCreateKeySwitchKey_fromArray(LweSample*** result,
 void lweKeySwitchTranslate_fromArray(LweSample* result, 
 	const LweSample*** ks, const LweParams* params, 
 	const Torus32* ai, 
-	const int n, const int t, const int basebit){
-    const int base=1<<basebit;       // base=2 in [CGGI16]
+	const int32_t n, const int32_t t, const int32_t basebit){
+    const int32_t base=1<<basebit;       // base=2 in [CGGI16]
     const int32_t prec_offset=1<<(32-(1+basebit*t)); //precision
-    const int mask=base-1;
+    const int32_t mask=base-1;
 
-    for (int i=0;i<n;i++){
+    for (int32_t i=0;i<n;i++){
 	const uint32_t aibar=ai[i]+prec_offset;
-	for (int j=0;j<t;j++){
+	for (int32_t j=0;j<t;j++){
 	    const uint32_t aij=(aibar>>(32-(j+1)*basebit)) & mask;
 	    if(aij != 0) {lweSubTo(result,&ks[i][j][aij],params);}
 	}
@@ -131,9 +131,9 @@ void lweKeySwitchTranslate_fromArray(LweSample* result,
 
 
 EXPORT void lweCreateKeySwitchKey_old(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key){
-    const int n=result->n;
-    const int basebit=result->basebit;
-    const int t=result->t;
+    const int32_t n=result->n;
+    const int32_t basebit=result->basebit;
+    const int32_t t=result->t;
 
     //TODO check the parameters
 
@@ -161,42 +161,42 @@ Create the key switching key: normalize the error in the beginning
  * generate the ks by creating noiseless encryprions and then add the noise
 */
 EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key){
-    const int n = result->n;
-    const int t = result->t;
-    const int basebit = result->basebit;
-    const int base = 1<<basebit;
+    const int32_t n = result->n;
+    const int32_t t = result->t;
+    const int32_t basebit = result->basebit;
+    const int32_t base = 1<<basebit;
     const double alpha = out_key->params->alpha_min;
-    const int sizeks = n*t*(base-1);
-    //const int n_out = out_key->params->n;
+    const int32_t sizeks = n*t*(base-1);
+    //const int32_t n_out = out_key->params->n;
 
     double err = 0;
 
     // chose a random vector of gaussian noises
     double* noise = new double[sizeks];
-    for (int i = 0; i < sizeks; ++i){
+    for (int32_t i = 0; i < sizeks; ++i){
         normal_distribution<double> distribution(0.,alpha); 
         noise[i] = distribution(generator);
         err += noise[i];
     }
     // recenter the noises
     err = err/sizeks;
-    for (int i = 0; i < sizeks; ++i) noise[i] -= err;
+    for (int32_t i = 0; i < sizeks; ++i) noise[i] -= err;
 
 
     // generate the ks
-    int index = 0; 
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j < t; ++j) {
+    int32_t index = 0; 
+    for (int32_t i = 0; i < n; ++i) {
+        for (int32_t j = 0; j < t; ++j) {
 
             // term h=0 as trivial encryption of 0 (it will not be used in the KeySwitching)
             lweNoiselessTrivial(&result->ks[i][j][0], 0, out_key->params);
             //lweSymEncrypt(&result->ks[i][j][0],0,alpha,out_key);
 
-            for (int h = 1; h < base; ++h) { // pas le terme en 0
+            for (int32_t h = 1; h < base; ++h) { // pas le terme en 0
                 /*
                 // noiseless encryption
                 result->ks[i][j][h].b = (in_key->key[i]*h)*(1<<(32-(j+1)*basebit));
-                for (int p = 0; p < n_out; ++p) {
+                for (int32_t p = 0; p < n_out; ++p) {
                     result->ks[i][j][h].a[p] = uniformTorus32_distrib(generator);
                     result->ks[i][j][h].b += result->ks[i][j][h].a[p] * out_key->key[p];
                 }
@@ -227,9 +227,9 @@ EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key,
 //sample=(a',b')
 EXPORT void lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, const LweSample* sample){
     const LweParams* params=ks->out_params;
-    const int n=ks->n;
-    const int basebit=ks->basebit;
-    const int t=ks->t;
+    const int32_t n=ks->n;
+    const int32_t basebit=ks->basebit;
+    const int32_t t=ks->t;
 
     lweNoiselessTrivial(result,sample->b,params);
     lweKeySwitchTranslate_fromArray(result,
@@ -240,8 +240,8 @@ EXPORT void lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, const Lwe
 /**
  * LweKeySwitchKey constructor function
  */
-EXPORT void init_LweKeySwitchKey(LweKeySwitchKey* obj, int n, int t, int basebit, const LweParams* out_params) {
-    const int base=1<<basebit;
+EXPORT void init_LweKeySwitchKey(LweKeySwitchKey* obj, int32_t n, int32_t t, int32_t basebit, const LweParams* out_params) {
+    const int32_t base=1<<basebit;
     LweSample* ks0_raw = new_LweSample_array(n*t*base, out_params);
 
     new(obj) LweKeySwitchKey(n,t,basebit,out_params, ks0_raw);
@@ -251,9 +251,9 @@ EXPORT void init_LweKeySwitchKey(LweKeySwitchKey* obj, int n, int t, int basebit
  * LweKeySwitchKey destructor
  */
 EXPORT void destroy_LweKeySwitchKey(LweKeySwitchKey* obj) {
-    const int n = obj->n;
-    const int t = obj->t;
-    const int base = obj->base;
+    const int32_t n = obj->n;
+    const int32_t t = obj->t;
+    const int32_t base = obj->base;
     delete_LweSample_array(n*t*base,obj->ks0_raw);
 
     obj->~LweKeySwitchKey();
@@ -266,7 +266,7 @@ EXPORT void destroy_LweKeySwitchKey(LweKeySwitchKey* obj) {
 EXPORT LweKeySwitchKey* alloc_LweKeySwitchKey() {
     return (LweKeySwitchKey*) malloc(sizeof(LweKeySwitchKey));
 }
-EXPORT LweKeySwitchKey* alloc_LweKeySwitchKey_array(int nbelts) {
+EXPORT LweKeySwitchKey* alloc_LweKeySwitchKey_array(int32_t nbelts) {
     return (LweKeySwitchKey*) malloc(nbelts*sizeof(LweKeySwitchKey));
 }
 
@@ -274,34 +274,34 @@ EXPORT LweKeySwitchKey* alloc_LweKeySwitchKey_array(int nbelts) {
 EXPORT void free_LweKeySwitchKey(LweKeySwitchKey* ptr) {
     free(ptr);
 }
-EXPORT void free_LweKeySwitchKey_array(int nbelts, LweKeySwitchKey* ptr) {
+EXPORT void free_LweKeySwitchKey_array(int32_t nbelts, LweKeySwitchKey* ptr) {
     free(ptr);
 }
 
 //initialize the key structure
 //(equivalent of the C++ constructor)
-EXPORT void init_LweKeySwitchKey_array(int nbelts, LweKeySwitchKey* obj, int n, int t, int basebit, const LweParams* out_params) {
-    for (int i=0; i<nbelts; i++) {
+EXPORT void init_LweKeySwitchKey_array(int32_t nbelts, LweKeySwitchKey* obj, int32_t n, int32_t t, int32_t basebit, const LweParams* out_params) {
+    for (int32_t i=0; i<nbelts; i++) {
 	init_LweKeySwitchKey(obj+i, n,t,basebit,out_params);
     }
 }
 
 //destroys the LweKeySwitchKey structure
 //(equivalent of the C++ destructor)
-EXPORT void destroy_LweKeySwitchKey_array(int nbelts, LweKeySwitchKey* obj) {
-    for (int i=0; i<nbelts; i++) {
+EXPORT void destroy_LweKeySwitchKey_array(int32_t nbelts, LweKeySwitchKey* obj) {
+    for (int32_t i=0; i<nbelts; i++) {
 	destroy_LweKeySwitchKey(obj+i);
     }
 }
  
 //allocates and initialize the LweKeySwitchKey structure
 //(equivalent of the C++ new)
-EXPORT LweKeySwitchKey* new_LweKeySwitchKey(int n, int t, int basebit, const LweParams* out_params) {
+EXPORT LweKeySwitchKey* new_LweKeySwitchKey(int32_t n, int32_t t, int32_t basebit, const LweParams* out_params) {
     LweKeySwitchKey* obj = alloc_LweKeySwitchKey();
     init_LweKeySwitchKey(obj, n,t,basebit,out_params);
     return obj;
 }
-EXPORT LweKeySwitchKey* new_LweKeySwitchKey_array(int nbelts, int n, int t, int basebit, const LweParams* out_params) {
+EXPORT LweKeySwitchKey* new_LweKeySwitchKey_array(int32_t nbelts, int32_t n, int32_t t, int32_t basebit, const LweParams* out_params) {
     LweKeySwitchKey* obj = alloc_LweKeySwitchKey_array(nbelts);
     init_LweKeySwitchKey_array(nbelts, obj, n,t,basebit,out_params);
     return obj;
@@ -313,7 +313,7 @@ EXPORT void delete_LweKeySwitchKey(LweKeySwitchKey* obj) {
     destroy_LweKeySwitchKey(obj);
     free_LweKeySwitchKey(obj);
 }
-EXPORT void delete_LweKeySwitchKey_array(int nbelts, LweKeySwitchKey* obj) {
+EXPORT void delete_LweKeySwitchKey_array(int32_t nbelts, LweKeySwitchKey* obj) {
     destroy_LweKeySwitchKey_array(nbelts,obj);
     free_LweKeySwitchKey_array(nbelts,obj);
 }

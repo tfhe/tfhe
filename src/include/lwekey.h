@@ -9,7 +9,7 @@
 
 struct LweKey {
    const LweParams* params;
-   int* key;
+   int32_t* key;
 
 #ifdef __cplusplus   
    LweKey(const LweParams* params);
@@ -29,7 +29,7 @@ struct LweKey {
 EXPORT LweKey* alloc_LweKey();
 /** allocate space for an array of LweKey 
  * @param nbelts the number of elements */
-EXPORT LweKey* alloc_LweKey_array(int nbelts);
+EXPORT LweKey* alloc_LweKey_array(int32_t nbelts);
 
 /** free memory space for a single LweKey 
  * @param ptr the pointer to release */
@@ -37,7 +37,7 @@ EXPORT void free_LweKey(LweKey* ptr);
 /** free memory space for an array of LweKey 
  * @param nbelts the number of elements 
  * @param ptr the pointer to release */
-EXPORT void free_LweKey_array(int nbelts, LweKey* ptr);
+EXPORT void free_LweKey_array(int32_t nbelts, LweKey* ptr);
 
 /** initializes (constructor) a single LweKey on an already allocated space 
  * @param ptr the pointer to the first element
@@ -50,7 +50,7 @@ EXPORT void init_LweKey(LweKey* ptr, const LweParams* params);
  * @param ptr the pointer to the first element
  * @param params the LWE parameters to use
  */
-EXPORT void init_LweKey_array(int nbelts, LweKey* ptr, const LweParams* params);
+EXPORT void init_LweKey_array(int32_t nbelts, LweKey* ptr, const LweParams* params);
 
 /** finalizes (destructor) a single LweKey (before freeing the memory space) 
  * @param ptr the pointer to the first element
@@ -61,7 +61,7 @@ EXPORT void destroy_LweKey(LweKey* ptr);
  * @param nbelts the number of elements to initialize 
  * @param ptr the pointer to the first element
  */
-EXPORT void destroy_LweKey_array(int nbelts, LweKey* ptr);
+EXPORT void destroy_LweKey_array(int32_t nbelts, LweKey* ptr);
  
 /** allocates and initializes (constructor) a single LweKey 
  * @param params the LWE parameters to use
@@ -71,7 +71,7 @@ EXPORT LweKey* new_LweKey(const LweParams* params);
  * @param nbelts the number of consecutive elements to create 
  * @param params the LWE parameters to use
  */
-EXPORT LweKey* new_LweKey_array(int nbelts, const LweParams* params);
+EXPORT LweKey* new_LweKey_array(int32_t nbelts, const LweParams* params);
 
 /** destroy and frees memory space for a single LweKey 
  * @param ptr the pointer to release */
@@ -79,6 +79,6 @@ EXPORT void delete_LweKey(LweKey* obj);
 /** destroys and free memory space for an array of LweKey 
  * @param nbelts the number of elements 
  * @param ptr the pointer to release */
-EXPORT void delete_LweKey_array(int nbelts, LweKey* obj);
+EXPORT void delete_LweKey_array(int32_t nbelts, LweKey* obj);
 
 #endif //LweKEY_H

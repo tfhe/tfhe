@@ -30,7 +30,7 @@ struct LweSample {
 EXPORT LweSample* alloc_LweSample();
 /** allocate space for an array of LweSample 
  * @param nbelts the number of elements */
-EXPORT LweSample* alloc_LweSample_array(int nbelts);
+EXPORT LweSample* alloc_LweSample_array(int32_t nbelts);
 
 /** free memory space for a single LweSample 
  * @param ptr the pointer to release */
@@ -38,7 +38,7 @@ EXPORT void free_LweSample(LweSample* ptr);
 /** free memory space for an array of LweSample 
  * @param nbelts the number of elements 
  * @param ptr the pointer to release */
-EXPORT void free_LweSample_array(int nbelts, LweSample* ptr);
+EXPORT void free_LweSample_array(int32_t nbelts, LweSample* ptr);
 
 /** initializes (constructor) a single LweSample on an already allocated space 
  * @param ptr the pointer to the first element
@@ -51,7 +51,7 @@ EXPORT void init_LweSample(LweSample* ptr, const LweParams* params);
  * @param ptr the pointer to the first element
  * @param params the LWE parameters to use
  */
-EXPORT void init_LweSample_array(int nbelts, LweSample* ptr, const LweParams* params);
+EXPORT void init_LweSample_array(int32_t nbelts, LweSample* ptr, const LweParams* params);
 
 /** finalizes (destructor) a single LweSample (before freeing the memory space) 
  * @param ptr the pointer to the first element
@@ -62,7 +62,7 @@ EXPORT void destroy_LweSample(LweSample* ptr);
  * @param nbelts the number of elements to initialize 
  * @param ptr the pointer to the first element
  */
-EXPORT void destroy_LweSample_array(int nbelts, LweSample* ptr);
+EXPORT void destroy_LweSample_array(int32_t nbelts, LweSample* ptr);
  
 /** allocates and initializes (constructor) a single LweSample 
  * @param params the LWE parameters to use
@@ -72,7 +72,7 @@ EXPORT LweSample* new_LweSample(const LweParams* params);
  * @param nbelts the number of consecutive elements to create 
  * @param params the LWE parameters to use
  */
-EXPORT LweSample* new_LweSample_array(int nbelts, const LweParams* params);
+EXPORT LweSample* new_LweSample_array(int32_t nbelts, const LweParams* params);
 
 /** destroy and frees memory space for a single LweSample 
  * @param ptr the pointer to release */
@@ -80,7 +80,7 @@ EXPORT void delete_LweSample(LweSample* obj);
 /** destroys and free memory space for an array of LweSample 
  * @param nbelts the number of elements 
  * @param ptr the pointer to release */
-EXPORT void delete_LweSample_array(int nbelts, LweSample* obj);
+EXPORT void delete_LweSample_array(int32_t nbelts, LweSample* obj);
 
 #endif //LWESAMPLES_H
 

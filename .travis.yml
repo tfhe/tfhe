@@ -1,0 +1,26 @@
+language: c++
+requires:
+  - sudo
+os:
+  - linux
+  - osx
+compiler:
+  - gcc
+  - clang
+osx_image: xcode9.1
+before_install:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt update; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
+install:
+  - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt install libfftw3-dev; fi
+  - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew install fftw; fi
+script:
+  # We ought to enable all flags, but Travis doesn't have AVX/FMA so we must run the portable version in tests
+  # Note that Travis incorrectly #defines __AVX2__, so we must undefine it manually
+  - make test CMAKE_TESTS_OPTS='-DENABLE_TESTS=on -U__AVX2__ -DENABLE_FFTW=off -DENABLE_NAYUKI_PORTABLE=on -DENABLE_NAYUKI_AVX=off -DENABLE_SPQLIOS_AVX=off -DENABLE_SPQLIOS_FMA=off'
+  - mkdir build
+  - cd build
+  # Test that all versions build (but skip nayuki_portable, which we built in the first step)
+  # Note that spqlios_ versions are disabled because they can't seem to be compiled on Travis
+  - cmake ../src -U__AVX2__ -DENABLE_TESTS=off -DENABLE_FFTW=on -DENABLE_NAYUKI_PORTABLE=off -DENABLE_NAYUKI_AVX=on -DENABLE_SPQLIOS_AVX=off -DENABLE_SPQLIOS_FMA=off
+  - make -j$(nproc) VERBOSE=1

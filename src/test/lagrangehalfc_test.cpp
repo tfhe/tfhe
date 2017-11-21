@@ -14,10 +14,10 @@ using namespace std;
 //EXPORT void TorusPolynomial_ifft(LagrangeHalfCPolynomial* result, const TorusPolynomial* p);
 //EXPORT void TorusPolynomial_fft(TorusPolynomial* result, const LagrangeHalfCPolynomial* p);
 TEST(LagrangeHalfcTest, fftIsBijective) {
-    const int NBTRIALS = 10;
+    const int32_t NBTRIALS = 10;
     const double toler = 1e-9;
-    const int N = 1024;
-    for (int trials = 0; trials < NBTRIALS; ++trials) {
+    const int32_t N = 1024;
+    for (int32_t trials = 0; trials < NBTRIALS; ++trials) {
         TorusPolynomial *a = new_TorusPolynomial(N);
         TorusPolynomial *acopy = new_TorusPolynomial(N);
         TorusPolynomial *b = new_TorusPolynomial(N);
@@ -42,10 +42,10 @@ TEST(LagrangeHalfcTest, fftIsBijective) {
 /** sets to zero */
 //EXPORT void LagrangeHalfCPolynomialClear(LagrangeHalfCPolynomial* result);
 TEST(LagrangeHalfcTest, LagrangeHalfCPolynomialClear) {
-    const int NBTRIALS = 10;
+    const int32_t NBTRIALS = 10;
     //const double toler=1e-9;
-    const int N = 1024;
-    for (int trials = 0; trials < NBTRIALS; ++trials) {
+    const int32_t N = 1024;
+    for (int32_t trials = 0; trials < NBTRIALS; ++trials) {
         TorusPolynomial *a = new_TorusPolynomial(N);
         TorusPolynomial *zero = new_TorusPolynomial(N);
         LagrangeHalfCPolynomial *afft = new_LagrangeHalfCPolynomial(N);
@@ -63,10 +63,10 @@ TEST(LagrangeHalfcTest, LagrangeHalfCPolynomialClear) {
 /** sets to this torus32 constant */
 //EXPORT void LagrangeHalfCPolynomialSetTorusConstant(LagrangeHalfCPolynomial* result, const Torus32 mu);
 TEST(LagrangeHalfcTest, LagrangeHalfCPolynomialSetTorusConstant) {
-    const int NBTRIALS = 10;
+    const int32_t NBTRIALS = 10;
     //const double toler=1e-9;
-    const int N = 1024;
-    for (int trials = 0; trials < NBTRIALS; ++trials) {
+    const int32_t N = 1024;
+    for (int32_t trials = 0; trials < NBTRIALS; ++trials) {
         Torus32 mu = uniformTorus32_distrib(generator);
         TorusPolynomial *a = new_TorusPolynomial(N);
         TorusPolynomial *cste = new_TorusPolynomial(N);
@@ -92,10 +92,10 @@ TEST(LagrangeHalfcTest, LagrangeHalfCPolynomialSetTorusConstant) {
 
 //EXPORT void LagrangeHalfCPolynomialAddTorusConstant(LagrangeHalfCPolynomial* result, const Torus32 cst);
 TEST(LagrangeHalfcTest, LagrangeHalfCPolynomialAddTorusConstant) {
-    const int NBTRIALS = 10;
+    const int32_t NBTRIALS = 10;
     const double toler = 1e-9;
-    const int N = 1024;
-    for (int trials = 0; trials < NBTRIALS; ++trials) {
+    const int32_t N = 1024;
+    for (int32_t trials = 0; trials < NBTRIALS; ++trials) {
         Torus32 mu = uniformTorus32_distrib(generator);
         TorusPolynomial *a = new_TorusPolynomial(N);
         TorusPolynomial *aPlusCste = new_TorusPolynomial(N);
@@ -122,23 +122,23 @@ TEST(LagrangeHalfcTest, LagrangeHalfCPolynomialAddTorusConstant) {
 
 /** sets to X^ai-1 */
 //NICOLAS: do not test this function, as it will likely be removed (cmux formula)
-//EXPORT void LagrangeHalfCPolynomialSetXaiMinusOne(LagrangeHalfCPolynomial* result, const int ai);
+//EXPORT void LagrangeHalfCPolynomialSetXaiMinusOne(LagrangeHalfCPolynomial* result, const int32_t ai);
 
 /** multiplication via direct FFT */
 EXPORT void torusPolynomialMultFFT(TorusPolynomial *result, const IntPolynomial *poly1, const TorusPolynomial *poly2);
 
 TEST(LagrangeHalfcTest, torusPolynomialMultFFT) {
-    const int NBTRIALS = 10;
+    const int32_t NBTRIALS = 10;
     const double toler = 1e-9;
-    const int N = 1024;
-    for (int trials = 0; trials < NBTRIALS; ++trials) {
+    const int32_t N = 1024;
+    for (int32_t trials = 0; trials < NBTRIALS; ++trials) {
         IntPolynomial *a = new_IntPolynomial(N);
         TorusPolynomial *b = new_TorusPolynomial(N);
         TorusPolynomial *aB = new_TorusPolynomial(N);
         TorusPolynomial *aBref = new_TorusPolynomial(N);
 
 
-        for (int i = 0; i < N; i++) a->coefs[i] = uniformTorus32_distrib(generator) % 1000 - 500;
+        for (int32_t i = 0; i < N; i++) a->coefs[i] = uniformTorus32_distrib(generator) % 1000 - 500;
         torusPolynomialUniform(b);
         torusPolynomialMultKaratsuba(aBref, a, b);
 
@@ -157,17 +157,17 @@ EXPORT void
 torusPolynomialAddMulRFFT(TorusPolynomial *result, const IntPolynomial *poly1, const TorusPolynomial *poly2);
 
 TEST(LagrangeHalfcTest, torusPolynomialAddMulRFFT) {
-    const int NBTRIALS = 10;
+    const int32_t NBTRIALS = 10;
     const double toler = 1e-9;
-    const int N = 1024;
-    for (int trials = 0; trials < NBTRIALS; ++trials) {
+    const int32_t N = 1024;
+    for (int32_t trials = 0; trials < NBTRIALS; ++trials) {
         IntPolynomial *a = new_IntPolynomial(N);
         TorusPolynomial *b = new_TorusPolynomial(N);
         TorusPolynomial *aB = new_TorusPolynomial(N);
         TorusPolynomial *aBref = new_TorusPolynomial(N);
 
 
-        for (int i = 0; i < N; i++) a->coefs[i] = uniformTorus32_distrib(generator) % 1000 - 500;
+        for (int32_t i = 0; i < N; i++) a->coefs[i] = uniformTorus32_distrib(generator) % 1000 - 500;
         torusPolynomialUniform(b);
         torusPolynomialUniform(aB);
         torusPolynomialCopy(aBref, aB);
@@ -189,17 +189,17 @@ EXPORT void
 torusPolynomialSubMulRFFT(TorusPolynomial *result, const IntPolynomial *poly1, const TorusPolynomial *poly2);
 
 TEST(LagrangeHalfcTest, torusPolynomialSubMulRFFT) {
-    const int NBTRIALS = 10;
+    const int32_t NBTRIALS = 10;
     const double toler = 1e-9;
-    const int N = 1024;
-    for (int trials = 0; trials < NBTRIALS; ++trials) {
+    const int32_t N = 1024;
+    for (int32_t trials = 0; trials < NBTRIALS; ++trials) {
         IntPolynomial *a = new_IntPolynomial(N);
         TorusPolynomial *b = new_TorusPolynomial(N);
         TorusPolynomial *aB = new_TorusPolynomial(N);
         TorusPolynomial *aBref = new_TorusPolynomial(N);
 
 
-        for (int i = 0; i < N; i++) a->coefs[i] = uniformTorus32_distrib(generator) % 1000 - 500;
+        for (int32_t i = 0; i < N; i++) a->coefs[i] = uniformTorus32_distrib(generator) % 1000 - 500;
         torusPolynomialUniform(b);
         torusPolynomialUniform(aB);
         torusPolynomialCopy(aBref, aB);
@@ -222,10 +222,10 @@ TEST(LagrangeHalfcTest, torusPolynomialSubMulRFFT) {
 //	LagrangeHalfCPolynomial* accum, 
 //	const LagrangeHalfCPolynomial* a);
 TEST(LagrangeHalfcTest, LagrangeHalfCPolynomialAddTo) {
-    const int NBTRIALS = 10;
+    const int32_t NBTRIALS = 10;
     const double toler = 1e-9;
-    const int N = 1024;
-    for (int trials = 0; trials < NBTRIALS; ++trials) {
+    const int32_t N = 1024;
+    for (int32_t trials = 0; trials < NBTRIALS; ++trials) {
         TorusPolynomial *a = new_TorusPolynomial(N);
         TorusPolynomial *b = new_TorusPolynomial(N);
         TorusPolynomial *aPlusB = new_TorusPolynomial(N);

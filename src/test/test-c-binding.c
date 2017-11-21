@@ -23,21 +23,21 @@ extern const LweKey *debug_extract_key;
 extern const LweKey *debug_in_key;
 #endif
 
-int main(int argc, char **argv) {
+int32_t main(int32_t argc, char **argv) {
 #ifndef NDEBUG
     printf("DEBUG MODE!\n");
 #endif
 
-    const int N = 1024;
-    const int k = 1;
-    const int n = 500;
-    const int l_bk = 3;
-    const int Bgbit_bk = 10;
-    const int ks_t = 15;
-    const int ks_basebit = 1;
+    const int32_t N = 1024;
+    const int32_t k = 1;
+    const int32_t n = 500;
+    const int32_t l_bk = 3;
+    const int32_t Bgbit_bk = 10;
+    const int32_t ks_t = 15;
+    const int32_t ks_basebit = 1;
     const double alpha_in = 5e-4;
     const double alpha_bk = 9e-9;
-    //const int alpha_ks = 1e-6;
+    //const int32_t alpha_ks = 1e-6;
 
     LweParams *params_in = new_LweParams(n, alpha_in, 1. / 16.);
     TLweParams *params_accum = new_TLweParams(N, k, alpha_bk, 1. / 16.);
@@ -71,9 +71,9 @@ int main(int argc, char **argv) {
 
     printf("starting bootstrapping...\n");
 
-    int nbtrials = 50;
+    int32_t nbtrials = 50;
     clock_t begin = clock();
-    for (int i = 0; i < nbtrials; i++)
+    for (int32_t i = 0; i < nbtrials; i++)
         tfhe_bootstrap(test_out, bk, mu, test);
     clock_t end = clock();
     printf("finished bootstrapping in (microsecs)... %lf\n", (double) (end - begin) / (double) (nbtrials));

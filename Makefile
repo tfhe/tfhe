@@ -18,10 +18,10 @@ distclean:
 	rm -rf build builddtests buildotests; true
 
 test: builddtests buildotests src/test/googletest/CMakeLists.txt
-	make -j 4 -C builddtests
-	make -j 4 -C buildotests
-	make -j 4 -C builddtests test
-	make -j 4 -C buildotests test
+	make -j $(nproc) -C builddtests VERBOSE=1
+	make -j $(nproc) -C buildotests VERBOSE=1
+	make -j $(nproc) -C builddtests test VERBOSE=1
+	make -j $(nproc) -C buildotests test VERBOSE=1
 
 build: src/test/googletest/CMakeLists.txt
 	mkdir build; cd build; cmake ../src; cd ..

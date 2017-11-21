@@ -11,9 +11,9 @@ typedef std::complex< double > cplx; // https://stackoverflow.com/a/31800404
 
 class FFT_Processor_nayuki {
     public:
-    const int _2N;
-    const int N;    
-    const int Ns2;
+    const int32_t _2N;
+    const int32_t N;    
+    const int32_t Ns2;
     private:
     double* real_inout;
     double* imag_inout;
@@ -22,10 +22,10 @@ class FFT_Processor_nayuki {
     public:
     cplx* omegaxminus1;
 
-    FFT_Processor_nayuki(const int N);
+    FFT_Processor_nayuki(const int32_t N);
     void check_alternate_real();
     void check_conjugate_cplx();
-    void execute_reverse_int(cplx* res, const int* a);
+    void execute_reverse_int(cplx* res, const int32_t* a);
     void execute_reverse_torus32(cplx* res, const Torus32* a);
     void execute_direct_torus32(Torus32* res, const cplx* a);
     ~FFT_Processor_nayuki();
@@ -44,7 +44,7 @@ struct LagrangeHalfCPolynomial_IMPL
    cplx* coefsC;
    FFT_Processor_nayuki* proc;
 
-   LagrangeHalfCPolynomial_IMPL(int N);
+   LagrangeHalfCPolynomial_IMPL(int32_t N);
    ~LagrangeHalfCPolynomial_IMPL();
 };
 

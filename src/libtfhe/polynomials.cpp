@@ -11,7 +11,7 @@ using namespace std;
 EXPORT LagrangeHalfCPolynomial* alloc_LagrangeHalfCPolynomial() {
     return (LagrangeHalfCPolynomial*) malloc(sizeof(LagrangeHalfCPolynomial));
 }
-EXPORT LagrangeHalfCPolynomial* alloc_LagrangeHalfCPolynomial_array(int nbelts) {
+EXPORT LagrangeHalfCPolynomial* alloc_LagrangeHalfCPolynomial_array(int32_t nbelts) {
     return (LagrangeHalfCPolynomial*) malloc(nbelts*sizeof(LagrangeHalfCPolynomial));
 }
 
@@ -19,18 +19,18 @@ EXPORT LagrangeHalfCPolynomial* alloc_LagrangeHalfCPolynomial_array(int nbelts) 
 EXPORT void free_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* ptr) {
     free(ptr);
 }
-EXPORT void free_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolynomial* ptr) {
+EXPORT void free_LagrangeHalfCPolynomial_array(int32_t nbelts, LagrangeHalfCPolynomial* ptr) {
     free(ptr);
 }
 
 //allocates and initialize the LagrangeHalfCPolynomial structure
 //(equivalent of the C++ new)
-EXPORT LagrangeHalfCPolynomial* new_LagrangeHalfCPolynomial(const int N) {
+EXPORT LagrangeHalfCPolynomial* new_LagrangeHalfCPolynomial(const int32_t N) {
     LagrangeHalfCPolynomial* obj = alloc_LagrangeHalfCPolynomial();
     init_LagrangeHalfCPolynomial(obj,N);
     return obj;
 }
-EXPORT LagrangeHalfCPolynomial* new_LagrangeHalfCPolynomial_array(int nbelts, const int N) {
+EXPORT LagrangeHalfCPolynomial* new_LagrangeHalfCPolynomial_array(int32_t nbelts, const int32_t N) {
     LagrangeHalfCPolynomial* obj = alloc_LagrangeHalfCPolynomial_array(nbelts);
     init_LagrangeHalfCPolynomial_array(nbelts,obj,N);
     return obj;
@@ -42,14 +42,14 @@ EXPORT void delete_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* obj) {
     destroy_LagrangeHalfCPolynomial(obj);
     free_LagrangeHalfCPolynomial(obj);
 }
-EXPORT void delete_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolynomial* obj) {
+EXPORT void delete_LagrangeHalfCPolynomial_array(int32_t nbelts, LagrangeHalfCPolynomial* obj) {
     destroy_LagrangeHalfCPolynomial_array(nbelts,obj);
     free_LagrangeHalfCPolynomial_array(nbelts,obj);
 }
 
 /** multiplication via direct FFT (it must know the implem of LagrangeHalfCPolynomial because of the tmp+1 notation */
 EXPORT void torusPolynomialMultFFT(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2) {
-    const int N = poly1->N;
+    const int32_t N = poly1->N;
     LagrangeHalfCPolynomial* tmp = new_LagrangeHalfCPolynomial_array(3,N);
     IntPolynomial_ifft(tmp+0,poly1);
     TorusPolynomial_ifft(tmp+1,poly2);
@@ -58,7 +58,7 @@ EXPORT void torusPolynomialMultFFT(TorusPolynomial* result, const IntPolynomial*
     delete_LagrangeHalfCPolynomial_array(3,tmp);
 }
 EXPORT void torusPolynomialAddMulRFFT(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2) {
-    const int N = poly1->N;
+    const int32_t N = poly1->N;
     LagrangeHalfCPolynomial* tmp = new_LagrangeHalfCPolynomial_array(3,N);
     TorusPolynomial* tmpr = new_TorusPolynomial(N);
     IntPolynomial_ifft(tmp+0,poly1);
@@ -70,7 +70,7 @@ EXPORT void torusPolynomialAddMulRFFT(TorusPolynomial* result, const IntPolynomi
     delete_LagrangeHalfCPolynomial_array(3,tmp);
 }
 EXPORT void torusPolynomialSubMulRFFT(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2) {
-    const int N = poly1->N;
+    const int32_t N = poly1->N;
     LagrangeHalfCPolynomial* tmp = new_LagrangeHalfCPolynomial_array(3,N);
     TorusPolynomial* tmpr = new_TorusPolynomial(N);
     IntPolynomial_ifft(tmp+0,poly1);

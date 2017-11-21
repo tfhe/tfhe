@@ -18,9 +18,9 @@ using namespace std;
 namespace {
 #ifdef DEBUG_ALL
     //reverse the bits of i (mod n)
-    int rev(int i, int n) {
-        int reps=0;
-        for (int j=1; j<n; j*=2) {
+    int32_t rev(int32_t i, int32_t n) {
+        int32_t reps=0;
+        for (int32_t j=1; j<n; j*=2) {
         reps = 2*reps + (i%2);
         i/=2;
         }
@@ -73,19 +73,19 @@ namespace {
 //|cos0,cos2,cos4,cos6|sin0,sin2,sin4,sin6|cos8,cos10,cos12,cos14|.... -> n/4
 
     inline void dotp4(double *__restrict res, const double *__restrict a, const double *__restrict b) {
-        for (int i = 0; i < 4; i++) res[i] = a[i] * b[i];
+        for (int32_t i = 0; i < 4; i++) res[i] = a[i] * b[i];
     }
 
     inline void add4(double *__restrict res, const double *__restrict a, const double *__restrict b) {
-        for (int i = 0; i < 4; i++) res[i] = a[i] + b[i];
+        for (int32_t i = 0; i < 4; i++) res[i] = a[i] + b[i];
     }
 
     inline void sub4(double *__restrict res, const double *__restrict a, const double *__restrict b) {
-        for (int i = 0; i < 4; i++) res[i] = a[i] - b[i];
+        for (int32_t i = 0; i < 4; i++) res[i] = a[i] - b[i];
     }
 
     inline void copy4(double *__restrict res, const double *__restrict a) {
-        for (int i = 0; i < 4; i++) res[i] = a[i];
+        for (int32_t i = 0; i < 4; i++) res[i] = a[i];
     }
 
 
@@ -96,7 +96,7 @@ namespace {
         }
     }
 
-    double accurate_cos(int i, int n) { //cos(2pi*i/n)
+    double accurate_cos(int32_t i, int32_t n) { //cos(2pi*i/n)
         i = ((i % n) + n) % n;
         if (i >= 3 * n / 4) return cos(2. * M_PI * (n - i) / double(n));
         if (i >= 2 * n / 4) return -cos(2. * M_PI * (i - n / 2) / double(n));
@@ -104,7 +104,7 @@ namespace {
         return cos(2. * M_PI * (i) / double(n));
     }
 
-    double accurate_sin(int i, int n) { //sin(2pi*i/n)
+    double accurate_sin(int32_t i, int32_t n) { //sin(2pi*i/n)
         i = ((i % n) + n) % n;
         if (i >= 3 * n / 4) return -sin(2. * M_PI * (n - i) / double(n));
         if (i >= 2 * n / 4) return -sin(2. * M_PI * (i - n / 2) / double(n));
@@ -120,29 +120,29 @@ namespace {
     //   for j in [rev(1,m) to rev(3,m)[
     //   and i in [0,halfnn[
     void fft_check(
-        int n, int halfnn, int table_offset,
+        int32_t n, int32_t halfnn, int32_t table_offset,
             const double* pre, const double* pim,
         const vector<complex<double> >& p,
         const vector<complex<double> >& powombar
         ) {
-            int ns4=n/4;
+            int32_t ns4=n/4;
         cerr << "Checking iteration " << halfnn  << " (offset: "<< (table_offset) << ")" << endl;
-        for (int i=0; i<ns4; i++) {
+        for (int32_t i=0; i<ns4; i++) {
             cout << "i: " << i << "   " << pre[i] << " : " << pim[i] << endl;
         }
-        int m = n/halfnn;
-        int rev1m = rev(1,m);
-        int rev3m = rev(3,m);
-        int idex = 0;
-        for (int revj=rev1m; revj<rev3m; revj++) {
-            int j = rev(revj,m);
+        int32_t m = n/halfnn;
+        int32_t rev1m = rev(1,m);
+        int32_t rev3m = rev(3,m);
+        int32_t idex = 0;
+        for (int32_t revj=rev1m; revj<rev3m; revj++) {
+            int32_t j = rev(revj,m);
             cerr << "check-- j: " << j << "(mod " << m << ")" << endl;
-            for (int i=0; i<halfnn; i++) {
+            for (int32_t i=0; i<halfnn; i++) {
             cerr << "check--- i: " << i << endl;
             complex<double> test_cur(pre[idex],pim[idex]);
             //P_sum_[k=j%m] p_k omb^ik-j
             complex<double> pij = 0;
-            for (int k=j; k<n; k+=m) {
+            for (int32_t k=j; k<n; k+=m) {
                 if (halfnn==8 && j==1 && i==1) cerr << "pij(" << pij << ")" << "+= p_"<<k<<"("<<p[k]<<") * omb["<<i*(k-j)<<"]("<< powombar[(i*(k-j)) % n] <<")" << endl;
                 pij += p[k] * powombar[(i*(k-j)) % n];
             }
@@ -155,11 +155,11 @@ namespace {
 
 }
 
-extern "C" void *new_fft_table(int nn) {
+extern "C" void *new_fft_table(int32_t nn) {
     require(nn >= 16, "n must be >=16");
     require((nn & (nn - 1)) == 0, "n must be a power of 2");
-    int n = 2 * nn;
-    int ns4 = n / 4;
+    int32_t n = 2 * nn;
+    int32_t ns4 = n / 4;
     FFT_PRECOMP *reps = new FFT_PRECOMP;
     void *buf = malloc(32 + n * 8 + nn * 8);
     uint64_t aligned_addr = (uint64_t(buf) + 31) & 0xFFFFFFFFFFFFFFE0l;
@@ -170,23 +170,23 @@ extern "C" void *new_fft_table(int nn) {
     reps->buf = buf;
     double *ptr = reps->aligned_trig_tables;
     //subsequent iterations
-    for (int halfnn = 4; halfnn < ns4; halfnn *= 2) {
-        int nn = 2 * halfnn;
-        int j = n / nn;
+    for (int32_t halfnn = 4; halfnn < ns4; halfnn *= 2) {
+        int32_t nn = 2 * halfnn;
+        int32_t j = n / nn;
         //cerr << "- b: " << halfnn  << "(offset: " << (ptr-reps->trig_tables) << ", mult: " << j << ")" << endl;
-        for (int i = 0; i < halfnn; i += 4) {
+        for (int32_t i = 0; i < halfnn; i += 4) {
             //cerr << "--- i: " << i << endl;
-            for (int k = 0; k < 4; k++)
+            for (int32_t k = 0; k < 4; k++)
                 *(ptr++) = accurate_cos(-j * (i + k), n);
-            for (int k = 0; k < 4; k++)
+            for (int32_t k = 0; k < 4; k++)
                 *(ptr++) = accurate_sin(-j * (i + k), n);
         }
     }
     //last iteration
-    for (int i = 0; i < ns4; i += 4) {
-        for (int k = 0; k < 4; k++)
+    for (int32_t i = 0; i < ns4; i += 4) {
+        for (int32_t k = 0; k < 4; k++)
             *(ptr++) = accurate_cos(-(i + k), n);
-        for (int k = 0; k < 4; k++)
+        for (int32_t k = 0; k < 4; k++)
             *(ptr++) = accurate_sin(-(i + k), n);
     }
     return reps;
@@ -207,25 +207,25 @@ extern "C" void fft_model(const void *tables) {
     double tmp2[4];
     double tmp3[4];
     FFT_PRECOMP *fft_tables = (FFT_PRECOMP *) tables;
-    const int n = fft_tables->n;
+    const int32_t n = fft_tables->n;
     const double *trig_tables = fft_tables->aligned_trig_tables;
     double *c = fft_tables->aligned_data;
 
-    int ns4 = n / 4;
+    int32_t ns4 = n / 4;
     double *pre = c;     //size n/4
     double *pim = c + ns4; //size n/4
 
 #ifdef DEBUG_ALL
     vector<complex<double> > p; p.resize(n);
     vector<complex<double> > powombar; powombar.resize(n);
-    for (int i=0; i<n; i++)
+    for (int32_t i=0; i<n; i++)
     powombar[i]=complex<double>(accurate_cos(-i,n),accurate_sin(-i,n));
-    for (int i=0; i<n; i+=2)
+    for (int32_t i=0; i<n; i+=2)
     p[i]=0;
-    int rev1n = rev(1,n);
-    int rev3n = rev(3,n);
-    for (int revi=rev1n; revi<rev3n; revi++) {
-    int i = rev(revi,n);
+    int32_t rev1n = rev(1,n);
+    int32_t rev3n = rev(3,n);
+    for (int32_t revi=rev1n; revi<rev3n; revi++) {
+    int32_t i = rev(revi,n);
     p[i]=complex<double>(pre[revi-rev1n],pim[revi-rev1n]);
     p[n-i]=conj(p[i]);
     cerr << "p_" << i << " = " << p[i] << endl;
@@ -236,16 +236,16 @@ extern "C" void fft_model(const void *tables) {
     //size 2
     {
 #ifdef DEBUG_ALL
-        int halfnn = 1;
-        //int nn = 2;
-        int table_offset = 0;
+        int32_t halfnn = 1;
+        //int32_t nn = 2;
+        int32_t table_offset = 0;
         fft_check(n, halfnn, table_offset, pre, pim, p, powombar);
 #endif
         //[1  1]
         //[1 -1]
         //     [1  1]
         //     [1 -1]
-        for (int block = 0; block < ns4; block += 4) {
+        for (int32_t block = 0; block < ns4; block += 4) {
             double *d0 = pre + block;
             double *d1 = pim + block;
             tmp0[0] = d0[0];
@@ -281,12 +281,12 @@ extern "C" void fft_model(const void *tables) {
     // r1 - i3    i1 + r3
     {
 #ifdef DEBUG_ALL
-        int halfnn = 2;
-        //int nn = 4;
-        int table_offset = 0;
+        int32_t halfnn = 2;
+        //int32_t nn = 4;
+        int32_t table_offset = 0;
         fft_check(n, halfnn, table_offset, pre, pim, p, powombar);
 #endif
-        for (int block = 0; block < ns4; block += 4) {
+        for (int32_t block = 0; block < ns4; block += 4) {
             double *re = pre + block;
             double *im = pim + block;
             tmp0[0] = re[0];
@@ -312,18 +312,18 @@ extern "C" void fft_model(const void *tables) {
 
     //general loop
     const double *cur_tt = trig_tables;
-    for (int halfnn = 4; halfnn < ns4; halfnn *= 2) {
-        int nn = 2 * halfnn;
+    for (int32_t halfnn = 4; halfnn < ns4; halfnn *= 2) {
+        int32_t nn = 2 * halfnn;
 #ifdef DEBUG_ALL
-        int m = n/halfnn;
+        int32_t m = n/halfnn;
         fft_check(n, halfnn, cur_tt-trig_tables, pre, pim, p, powombar);
 #endif
-        for (int block = 0; block < ns4; block += nn) {
+        for (int32_t block = 0; block < ns4; block += nn) {
 #ifdef DEBUG_ALL
-            int j = rev(rev(1,m)+block,m);
+            int32_t j = rev(rev(1,m)+block,m);
             cerr << "-- j: " << j  << "(mod: " << m << ")" << endl;
 #endif
-            for (int off = 0; off < halfnn; off += 4) {
+            for (int32_t off = 0; off < halfnn; off += 4) {
 #ifdef DEBUG_ALL
                 cerr << "--- i: " << off << endl;
 #endif
@@ -364,14 +364,14 @@ extern "C" void fft_model(const void *tables) {
 
     {
 #ifdef DEBUG_ALL
-        int halfnn = ns4;
-        //int nn = n/2;
+        int32_t halfnn = ns4;
+        //int32_t nn = n/2;
         fft_check(n, halfnn, cur_tt-trig_tables, pre, pim, p, powombar);
 #endif
     }
 
     //multiply by omb^j
-    for (int j = 0; j < ns4; j += 4) {
+    for (int32_t j = 0; j < ns4; j += 4) {
         const double *r0 = cur_tt + 2 * j;
         const double *r1 = r0 + 4;
 #ifdef DEBUG_ALL
@@ -397,11 +397,11 @@ extern "C" void fft_model(const void *tables) {
 }
 
 
-extern "C" void *new_ifft_table(int nn) {
+extern "C" void *new_ifft_table(int32_t nn) {
     require(nn >= 16, "n must be >=16");
     require((nn & (nn - 1)) == 0, "n must be a power of 2");
-    int n = 2 * nn;
-    int ns4 = n / 4;
+    int32_t n = 2 * nn;
+    int32_t ns4 = n / 4;
     IFFT_PRECOMP *reps = new IFFT_PRECOMP;
     //assert(((uint64_t)reps)%32==0); //verify alignment
     void *buf = malloc(32 + n * 8 + nn * 8);
@@ -414,22 +414,22 @@ extern "C" void *new_ifft_table(int nn) {
     reps->n = n;
     double *ptr = reps->aligned_trig_tables;
     //first iteration
-    for (int j = 0; j < ns4; j += 4) {
-        for (int k = 0; k < 4; k++)
+    for (int32_t j = 0; j < ns4; j += 4) {
+        for (int32_t k = 0; k < 4; k++)
             *(ptr++) = accurate_cos(j + k, n);
-        for (int k = 0; k < 4; k++)
+        for (int32_t k = 0; k < 4; k++)
             *(ptr++) = accurate_sin(j + k, n);
     }
     //subsequent iterations
-    for (int nn = ns4; nn >= 8; nn /= 2) {
-        int halfnn = nn / 2;
-        int j = n / nn;
+    for (int32_t nn = ns4; nn >= 8; nn /= 2) {
+        int32_t halfnn = nn / 2;
+        int32_t j = n / nn;
         //cerr << "- b: " << nn  << "(offset: " << (ptr-reps->trig_tables) << ", mult: " << j << ")" << endl;
-        for (int i = 0; i < halfnn; i += 4) {
+        for (int32_t i = 0; i < halfnn; i += 4) {
             //cerr << "--- i: " << i << endl;
-            for (int k = 0; k < 4; k++)
+            for (int32_t k = 0; k < 4; k++)
                 *(ptr++) = accurate_cos(j * (i + k), n);
-            for (int k = 0; k < 4; k++)
+            for (int32_t k = 0; k < 4; k++)
                 *(ptr++) = accurate_sin(j * (i + k), n);
         }
     }
@@ -438,25 +438,25 @@ extern "C" void *new_ifft_table(int nn) {
 
 namespace {
 #ifdef DEBUG_ALL
-    void ifft_check(int n, int nn, int table_offset, const double* are, const double* aim, const vector<complex<double> >& a, const vector<complex<double> >& powomega) {
-        int ns4=n/4;
+    void ifft_check(int32_t n, int32_t nn, int32_t table_offset, const double* are, const double* aim, const vector<complex<double> >& a, const vector<complex<double> >& powomega) {
+        int32_t ns4=n/4;
         cerr << "Checking iteration " << nn  << " (offset: "<< (table_offset) << ")" << endl;
-        for (int i=0; i<ns4; i++) {
+        for (int32_t i=0; i<ns4; i++) {
         cout << "i: " << i << "   " << are[i] << " : " << aim[i] << endl;
         }
-        int m = n/nn;
-        int rev1m = rev(1,m);
-        int rev3m = rev(3,m);
-        int idex = 0;
-        for (int revj=rev1m; revj<rev3m; revj++) {
-        int j = rev(revj,m);
+        int32_t m = n/nn;
+        int32_t rev1m = rev(1,m);
+        int32_t rev3m = rev(3,m);
+        int32_t idex = 0;
+        for (int32_t revj=rev1m; revj<rev3m; revj++) {
+        int32_t j = rev(revj,m);
         cerr << "check-- j: " << j << endl;
-        for (int i=0; i<nn; i++) {
+        for (int32_t i=0; i<nn; i++) {
             cerr << "check--- i: " << i << "(mod " << nn << ")" << endl;
             complex<double> test_cur(are[idex],aim[idex]);
             //sum_[t=i%nn] a_t omega^jt
             complex<double> pij = 0;
-            for (int k=i; k<n; k+=nn)
+            for (int32_t k=i; k<n; k+=nn)
             pij += a[k] * powomega[(k*j) % n];
             assert(very_close(test_cur,pij));
             idex++;
@@ -472,28 +472,28 @@ extern "C" void ifft_model(void *tables) {
     double tmp2[4];
     double tmp3[4];
     IFFT_PRECOMP *fft_tables = (IFFT_PRECOMP *) tables;
-    const int n = fft_tables->n;
+    const int32_t n = fft_tables->n;
     const double *trig_tables = fft_tables->aligned_trig_tables;
     double *c = fft_tables->aligned_data;
 
 #ifdef DEBUG_ALL
     vector<complex<double> > a; a.resize(n);
     vector<complex<double> > powomega; powomega.resize(n);
-    for (int i=0; i<n; i++)
+    for (int32_t i=0; i<n; i++)
     powomega[i]=complex<double>(accurate_cos(i,n),accurate_sin(i,n));
-    for (int i=0; i<n/2; i++)
+    for (int32_t i=0; i<n/2; i++)
     a[i]=c[i]/2.;
-    for (int i=0; i<n/2; i++)
+    for (int32_t i=0; i<n/2; i++)
     a[n/2+i]=-c[i]/2.;
 #endif
 
 
-    int ns4 = n / 4;
+    int32_t ns4 = n / 4;
     double *are = c;    //size n/4
     double *aim = c + ns4; //size n/4
 
     //multiply by omega^j
-    for (int j = 0; j < ns4; j += 4) {
+    for (int32_t j = 0; j < ns4; j += 4) {
         const double *r0 = trig_tables + 2 * j;
         const double *r1 = r0 + 4;
 #ifdef DEBUG_ALL
@@ -523,19 +523,19 @@ extern "C" void ifft_model(void *tables) {
     // where j between [rev(1) and rev(3)[
     // and i between [0 and nn[
     const double *cur_tt = trig_tables;
-    for (int nn = ns4; nn >= 8; nn /= 2) {
-        int halfnn = nn / 2;
+    for (int32_t nn = ns4; nn >= 8; nn /= 2) {
+        int32_t halfnn = nn / 2;
         cur_tt += 2 * nn;
 #ifdef DEBUG_ALL
-        int m = n/nn;
+        int32_t m = n/nn;
         ifft_check(n, nn, cur_tt-trig_tables, are, aim, a, powomega);
 #endif
-        for (int block = 0; block < ns4; block += nn) {
+        for (int32_t block = 0; block < ns4; block += nn) {
 #ifdef DEBUG_ALL
-            int j = rev(rev(1,m)+block,m);
+            int32_t j = rev(rev(1,m)+block,m);
             cerr << "-- j: " << j  << "(offset: " << (cur_tt-trig_tables) << ")" << endl;
 #endif
-            for (int off = 0; off < halfnn; off += 4) {
+            for (int32_t off = 0; off < halfnn; off += 4) {
 #ifdef DEBUG_ALL
                 cerr << "--- i: " << off << endl;
 #endif
@@ -574,11 +574,11 @@ extern "C" void ifft_model(void *tables) {
     //size 4
     {
 #ifdef DEBUG_ALL
-        int nn = 4;
-        //int halfnn = 2;
+        int32_t nn = 4;
+        //int32_t halfnn = 2;
         ifft_check(n, nn, cur_tt-trig_tables, are, aim, a, powomega);
 #endif
-        for (int block = 0; block < ns4; block += 4) {
+        for (int32_t block = 0; block < ns4; block += 4) {
             double *d0 = are + block;
             double *d1 = aim + block;
             tmp0[0] = d0[0];
@@ -605,11 +605,11 @@ extern "C" void ifft_model(void *tables) {
     //size 2
     {
 #ifdef DEBUG_ALL
-        int nn = 2;
-        //int halfnn = 1;
+        int32_t nn = 2;
+        //int32_t halfnn = 1;
         ifft_check(n, nn, cur_tt-trig_tables, are, aim, a, powomega);
 #endif
-        for (int block = 0; block < ns4; block += 4) {
+        for (int32_t block = 0; block < ns4; block += 4) {
             double *d0 = are + block;
             double *d1 = aim + block;
             tmp0[0] = d0[0];
@@ -634,7 +634,7 @@ extern "C" void ifft_model(void *tables) {
     }
     {
 #ifdef DEBUG_ALL
-        int nn = 1;
+        int32_t nn = 1;
         ifft_check(n, nn, cur_tt-trig_tables, are, aim, a, powomega);
 #endif
     }

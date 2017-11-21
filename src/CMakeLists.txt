@@ -19,6 +19,9 @@ if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "AppleClang")
   set(CLANG_FLAGS "-stdlib=libc++")
 endif()
 
+# -std=c99 seems to be required in Travis tests for whatever reason
+set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -std=c99")
+
 set(CMAKE_CXX_FLAGS_DEBUG "${CLANG_FLAGS} -std=gnu++11 -g3 -O0 -Wall -Werror")
 set(CMAKE_C_FLAGS_DEBUG "-g3 -O0 -Wall -Werror")
 
@@ -60,7 +63,6 @@ endif(ENABLE_SPQLIOS_AVX)
 if (ENABLE_SPQLIOS_FMA)
 list(APPEND FFT_PROCESSORS "spqlios-fma")
 endif(ENABLE_SPQLIOS_FMA)
-
 
 include_directories("include")
 file(GLOB TFHE_HEADERS include/*.h)

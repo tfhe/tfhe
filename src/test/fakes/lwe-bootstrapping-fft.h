@@ -24,12 +24,12 @@ namespace {
             this->accum_params = bk_params->tlwe_params;
             this->extract_params = &accum_params->extracted_lweparams;
 
-            const int n = in_out_params->n;
-            const int kslength = 15;
-            const int basebit = 2;
+            const int32_t n = in_out_params->n;
+            const int32_t kslength = 15;
+            const int32_t basebit = 2;
 
             this->bkFFT = fake_new_TGswSampleFFT_array(n, this->bk_params);
-            for (int i = 0; i < n; ++i) {
+            for (int32_t i = 0; i < n; ++i) {
                 fake_tGswToFFTConvert(bkFFT + i, fbk->bk + i, bk_params);
             }
 
@@ -85,14 +85,14 @@ inline void fake_tfhe_createLweBootstrappingKeyFFT(LweBootstrappingKeyFFT* bkFFT
     assert(fbkFFT->in_out_params == fbk->in_out_params);
 
     const LweParams* in_out_params = fbkFFT->in_out_params; 
-    const int n = in_out_params->n;
+    const int32_t n = in_out_params->n;
     const TGswParams* bk_params = fbkFFT->bk_params;
 
     // KeySwitching key
     fksFFT->variance_overhead = fks->variance_overhead;
 
     // Bootstrapping Key FFT
-    for (int i=0; i<n; ++i) {
+    for (int32_t i=0; i<n; ++i) {
         fake_tGswToFFTConvert(&fbkFFT->bkFFT[i], &fbk->bk[i], bk_params);
     }
 }
@@ -105,16 +105,16 @@ inline void fake_tfhe_createLweBootstrappingKeyFFT(LweBootstrappingKeyFFT* bkFFT
  * @param bara An array of n coefficients between 0 and 2N-1
  * @param bk_params The parameters of bk
  */
-    inline void fake_tfhe_blindRotate_FFT(TLweSample *accum, const TGswSampleFFT *bkFFT, const int *bara, const int n,
+    inline void fake_tfhe_blindRotate_FFT(TLweSample *accum, const TGswSampleFFT *bkFFT, const int32_t *bara, const int32_t n,
                                           const TGswParams *bk_params) {
 
         FakeTLwe *facc = fake(accum);
         TorusPolynomial *temp = new_TorusPolynomial(bk_params->tlwe_params->N);
 
-        int offset = 0;
-        for (int i = 0; i < n; i++) {
-            const int si = fake(bkFFT + i)->message->coefs[0];
-            const int barai = bara[i];
+        int32_t offset = 0;
+        for (int32_t i = 0; i < n; i++) {
+            const int32_t si = fake(bkFFT + i)->message->coefs[0];
+            const int32_t barai = bara[i];
             if (barai == 0 || si == 0) continue; //indeed, this is an easy case!
             offset = (offset + barai * si) % (2 * bk_params->tlwe_params->N); // sum_{i=...n-1} barai*si mod 2N
         }
@@ -129,8 +129,8 @@ inline void fake_tfhe_createLweBootstrappingKeyFFT(LweBootstrappingKeyFFT* bkFFT
 #define USE_FAKE_tfhe_blindRotate_FFT \
     inline void tfhe_blindRotate_FFT(TLweSample* accum, \
         const TGswSampleFFT* bkFFT, \
-        const int* bara, \
-        const int n, \
+        const int32_t* bara, \
+        const int32_t n, \
         const TGswParams* bk_params) { \
     fake_tfhe_blindRotate_FFT(accum,bkFFT,bara,n,bk_params); \
     }
@@ -147,20 +147,20 @@ inline void fake_tfhe_createLweBootstrappingKeyFFT(LweBootstrappingKeyFFT* bkFFT
     inline void fake_tfhe_blindRotateAndExtract_FFT(LweSample *result,
                                                     const TorusPolynomial *v,
                                                     const TGswSampleFFT *bkFFT,
-                                                    const int barb,
-                                                    const int *bara,
-                                                    const int n,
+                                                    const int32_t barb,
+                                                    const int32_t *bara,
+                                                    const int32_t n,
                                                     const TGswParams *bk_params) {
 
         FakeLwe *fres = fake(result);
 
-        const int N = bk_params->tlwe_params->N;
-        const int _2N = 2 * N;
+        const int32_t N = bk_params->tlwe_params->N;
+        const int32_t _2N = 2 * N;
 
         // or maybe use the fake_tfhe_blindRotate_FFT
-        int offset = barb;
-        for (int i = 0; i < n; i++) {
-            int si = fake(bkFFT + i)->message->coefs[0];
+        int32_t offset = barb;
+        for (int32_t i = 0; i < n; i++) {
+            int32_t si = fake(bkFFT + i)->message->coefs[0];
             offset = (offset + _2N - si * bara[i]) % (_2N);
         }
 
@@ -172,9 +172,9 @@ inline void fake_tfhe_createLweBootstrappingKeyFFT(LweBootstrappingKeyFFT* bkFFT
     inline void tfhe_blindRotateAndExtract_FFT(LweSample* result, \
         const TorusPolynomial* v, \
         const TGswSampleFFT* bkFFT, \
-        const int barb, \
-        const int* bara, \
-        const int n, \
+        const int32_t barb, \
+        const int32_t* bara, \
+        const int32_t n, \
         const TGswParams* bk_params) { \
     fake_tfhe_blindRotateAndExtract_FFT(result,v,bkFFT,barb,bara,n,bk_params); \
     }
@@ -248,21 +248,21 @@ inline void fake_tfhe_createLweBootstrappingKeyFFT(LweBootstrappingKeyFFT* bkFFT
         const TGswParams *bk_params = fbkFFT->bk_params;
         const TLweParams *accum_params = fbkFFT->accum_params;
         const LweParams *in_params = fbkFFT->in_out_params;
-        const int N = accum_params->N;
-        const int Nx2 = 2 * N;
-        const int n = in_params->n;
+        const int32_t N = accum_params->N;
+        const int32_t Nx2 = 2 * N;
+        const int32_t n = in_params->n;
 
         TorusPolynomial *testvect = new_TorusPolynomial(N);
-        int *bara = new int[N];
+        int32_t *bara = new int32_t[N];
         //LweSample* u = new_LweSample(extract_params);
 
-        int barb = modSwitchFromTorus32(x->b, Nx2);
-        for (int i = 0; i < n; i++) {
+        int32_t barb = modSwitchFromTorus32(x->b, Nx2);
+        for (int32_t i = 0; i < n; i++) {
             bara[i] = modSwitchFromTorus32(x->a[i], Nx2);
         }
 
         //the initial testvec = [mu,mu,mu,...,mu]
-        for (int i = 0; i < N; i++) testvect->coefsT[i] = mu;
+        for (int32_t i = 0; i < N; i++) testvect->coefsT[i] = mu;
 
         //fake_tfhe_blindRotateAndExtract_FFT(u, testvect, bkFFT->bkFFT, barb, bara, n, bk_params);
         fake_tfhe_blindRotateAndExtract_FFT(result, testvect, bkFFT->bkFFT, barb, bara, n, bk_params);

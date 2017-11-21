@@ -8,9 +8,9 @@
 
 class FFT_Processor_Spqlios {
 public:
-    const int _2N;
-    const int N;
-    const int Ns2;
+    const int32_t _2N;
+    const int32_t N;
+    const int32_t Ns2;
 
 private:
     double *real_inout_direct;
@@ -22,11 +22,11 @@ private:
 public:
     double *cosomegaxminus1;
     double *sinomegaxminus1;
-    int *reva; //rev(2i+1,_2N)
+    int32_t *reva; //rev(2i+1,_2N)
 
-    FFT_Processor_Spqlios(const int N);
+    FFT_Processor_Spqlios(const int32_t N);
 
-    void execute_reverse_int(double *res, const int *a);
+    void execute_reverse_int(double *res, const int32_t *a);
 
     void execute_reverse_torus32(double *res, const Torus32 *a);
 
@@ -47,7 +47,7 @@ struct LagrangeHalfCPolynomial_IMPL {
     double *coefsC;
     FFT_Processor_Spqlios *proc;
 
-    LagrangeHalfCPolynomial_IMPL(int N);
+    LagrangeHalfCPolynomial_IMPL(int32_t N);
 
     ~LagrangeHalfCPolynomial_IMPL();
 };

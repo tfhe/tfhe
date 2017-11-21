@@ -43,6 +43,10 @@ foreach (FFT_PROCESSOR IN LISTS FFT_PROCESSORS)
         $<TARGET_OBJECTS:tfhe-fft-${FFT_PROCESSOR}>)
     set_property(TARGET tfhe-${FFT_PROCESSOR} PROPERTY POSITION_INDEPENDENT_CODE ON)
 
+    if (FFT_PROCESSOR STREQUAL "fftw")
+        target_link_libraries(tfhe-fftw ${FFTW_LIBRARIES})
+    endif (FFT_PROCESSOR STREQUAL "fftw")
+
     install(TARGETS tfhe-${FFT_PROCESSOR}
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib

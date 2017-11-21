@@ -18,7 +18,7 @@ using namespace std;
 
 
 
-int main(int argc, char **argv) {
+int32_t main(int32_t argc, char **argv) {
 
     if (argc == 2) {
         uint32_t seed = atoi(argv[1]);
@@ -27,24 +27,24 @@ int main(int argc, char **argv) {
     }
 
 //TODO: parallelization
-    static const int NAND_GATE = 0;
-    static const int OR_GATE = 1;
-    static const int AND_GATE = 2;
-    static const int XOR_GATE = 3;
-    static const int XNOR_GATE = 4;
-    static const int NOR_GATE = 5;
-    static const int ANDNY_GATE = 6;
-    static const int ANDYN_GATE = 7;
-    static const int ORNY_GATE = 8;
-    static const int ORYN_GATE = 9;
-    // static const int MUX_GATE = 10;
+    static const int32_t NAND_GATE = 0;
+    static const int32_t OR_GATE = 1;
+    static const int32_t AND_GATE = 2;
+    static const int32_t XOR_GATE = 3;
+    static const int32_t XNOR_GATE = 4;
+    static const int32_t NOR_GATE = 5;
+    static const int32_t ANDNY_GATE = 6;
+    static const int32_t ANDYN_GATE = 7;
+    static const int32_t ORNY_GATE = 8;
+    static const int32_t ORYN_GATE = 9;
+    // static const int32_t MUX_GATE = 10;
     //TODO: parallelization
-    static const int nb_test_gates = 10000000; // number of gates to be tested 
-    static const int nb_samples = 50; // number of samples to be tested 
+    static const int32_t nb_test_gates = 10000000; // number of gates to be tested 
+    static const int32_t nb_samples = 50; // number of samples to be tested 
     static const Torus32 MU = modSwitchToTorus32(1, 8);
 
     // Parameters
-    int minimum_lambda = 100;
+    int32_t minimum_lambda = 100;
     TFheGateBootstrappingParameterSet *params = new_default_gate_bootstrapping_parameters(minimum_lambda);
     const LweParams *in_out_params = params->in_out_params;
     // Secret keyset
@@ -53,19 +53,19 @@ int main(int argc, char **argv) {
 
     // Generate an array containing nb_samples Lwe samples, all initially encoding false
     LweSample *test = new_LweSample_array(nb_samples, in_out_params);
-    for (int i = 0; i < nb_samples; ++i) {
+    for (int32_t i = 0; i < nb_samples; ++i) {
         bootsSymEncrypt(test + i, 0, keyset);
     }
 
 
-    for (int i = 0; i < nb_test_gates; ++i) {
-        int gate = rand() % 11; // randomly chose a gate between the 10 binary gates and the MUX
+    for (int32_t i = 0; i < nb_test_gates; ++i) {
+        int32_t gate = rand() % 11; // randomly chose a gate between the 10 binary gates and the MUX
 
         // randomply chose 2/3 inputs and the output between the samples
-        int in1 = rand() % nb_samples;
-        int in2 = rand() % nb_samples;
-        int in3 = rand() % nb_samples;
-        int out = rand() % nb_samples;
+        int32_t in1 = rand() % nb_samples;
+        int32_t in2 = rand() % nb_samples;
+        int32_t in3 = rand() % nb_samples;
+        int32_t out = rand() % nb_samples;
         // randomly apply a not to the inputs 
         if (rand() % 2 == 1) { bootsNOT(test + in1, test + in1, key_cloud); }
         if (rand() % 2 == 1) { bootsNOT(test + in2, test + in2, key_cloud); }

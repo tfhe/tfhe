@@ -74,11 +74,11 @@ namespace {
         //of bla as a seed.
         void
         fake_tGswTorus32PolynomialDecompH(IntPolynomial *result, const TorusPolynomial *bla, const TGswParams *params) {
-            const int N = params->tlwe_params->N;
-            const int l = params->l;
+            const int32_t N = params->tlwe_params->N;
+            const int32_t l = params->l;
             const size_t seed = (size_t) bla;
-            for (int p = 0; p < l; p++)
-                for (int i = 0; i < N; i++)
+            for (int32_t p = 0; p < l; p++)
+                for (int32_t i = 0; i < N; i++)
                     result[p].coefs[i] = (17 + i * seed) % 3;
         }
 
@@ -128,9 +128,9 @@ namespace {
         //rows are fake uniformly distributed tlwe. (there is no integer
         //message in the GSW)
         void tGswSampleUniform(TGswSample *result, const TGswParams *params) {
-            const int kpl = params->kpl;
+            const int32_t kpl = params->kpl;
 
-            for (int i = 0; i < kpl; i++) {
+            for (int32_t i = 0; i < kpl; i++) {
                 FakeTLwe *fs = fake(result->all_sample + i);
                 torusPolynomialUniform(fs->message);
                 fs->current_variance = rand() / double(RAND_MAX);
@@ -141,9 +141,9 @@ namespace {
         //rows are fake uniformly distributed tlwe. (there is no integer
         //message in the GSW)
         void tGswSampleFFTUniform(TGswSampleFFT *result, const TGswParams *params) {
-            const int kpl = params->kpl;
+            const int32_t kpl = params->kpl;
 
-            for (int i = 0; i < kpl; i++) {
+            for (int32_t i = 0; i < kpl; i++) {
                 FakeTLweFFT *fs = fake(result->all_samples + i);
                 torusPolynomialUniform(fs->message);
                 fs->current_variance = rand() / double(RAND_MAX);
@@ -168,7 +168,7 @@ namespace {
     //EXPORT void tGswToFFTConvert(TGswSampleFFT* result, const TGswSample* source, const TGswParams* params);
     TEST_F(TGswFFTTest, tGswToFFTConvert) {
         for (const TGswParams *params: all_params) {
-            const int kpl = params->kpl;
+            const int32_t kpl = params->kpl;
             TGswSampleFFT *result = new_TGswSampleFFT(params);
             TGswSample *source = new_TGswSample(params);
             FakeTLwe *fs = fake(source->all_sample);
@@ -180,7 +180,7 @@ namespace {
             tGswToFFTConvert(result, source, params);
 
             //verify the result
-            for (int i = 0; i < kpl; i++) {
+            for (int32_t i = 0; i < kpl; i++) {
                 ASSERT_EQ(torusPolynomialNormInftyDist(fs[i].message, fr[i].message), 0);
                 ASSERT_EQ(fs[i].current_variance, fr[i].current_variance);
             }
@@ -192,7 +192,7 @@ namespace {
     //EXPORT void tGswFromFFTConvert(TGswSample* result, const TGswSampleFFT* source, const TGswParams* params);
     TEST_F(TGswFFTTest, tGswFromFFTConvert) {
         for (const TGswParams *params: all_params) {
-            const int kpl = params->kpl;
+            const int32_t kpl = params->kpl;
             TGswSample *result = new_TGswSample(params);
             TGswSampleFFT *source = new_TGswSampleFFT(params);
             FakeTLweFFT *fs = fake(source->all_samples);
@@ -204,7 +204,7 @@ namespace {
             tGswFromFFTConvert(result, source, params);
 
             //verify the result
-            for (int i = 0; i < kpl; i++) {
+            for (int32_t i = 0; i < kpl; i++) {
                 ASSERT_EQ(torusPolynomialNormInftyDist(fs[i].message, fr[i].message), 0);
                 ASSERT_EQ(fs[i].current_variance, fr[i].current_variance);
             }
@@ -220,8 +220,8 @@ namespace {
     //EXPORT void tGswFFTClear(TGswSampleFFT* result, const TGswParams* params);
     TEST_F(TGswFFTTest, tGswFFTClear) {
         for (const TGswParams *params: all_params) {
-            const int kpl = params->kpl;
-            const int N = params->tlwe_params->N;
+            const int32_t kpl = params->kpl;
+            const int32_t N = params->tlwe_params->N;
             TGswSampleFFT *result = new_TGswSampleFFT(params);
             FakeTLweFFT *fr = fake(result->all_samples);
             TorusPolynomial *zero = new_TorusPolynomial(N);
@@ -233,7 +233,7 @@ namespace {
             tGswFFTClear(result, params);
 
             //verify the result
-            for (int i = 0; i < kpl; i++) {
+            for (int32_t i = 0; i < kpl; i++) {
                 ASSERT_EQ(torusPolynomialNormInftyDist(fr[i].message, zero), 0);
                 ASSERT_EQ(fr[i].current_variance, 0);
             }
@@ -245,11 +245,11 @@ namespace {
     //EXPORT void tGswFFTExternMulToTLwe(TLweSample* accum, TGswSampleFFT* gsw, const TGswParams* params);
     TEST_F(TGswFFTTest, tGswFFTExternMulToTLwe) {
         for (const TGswParams *params: all_params) {
-            const int kpl = params->kpl;
-            const int l = params->l;
+            const int32_t kpl = params->kpl;
+            const int32_t l = params->l;
             const TLweParams *tlwe_params = params->tlwe_params;
-            const int N = tlwe_params->N;
-            const int k = tlwe_params->k;
+            const int32_t N = tlwe_params->N;
+            const int32_t k = tlwe_params->k;
 
             TLweSample *accum = new_TLweSample(tlwe_params);
             TGswSampleFFT *gsw = new_TGswSampleFFT(params);
@@ -262,14 +262,14 @@ namespace {
 
             //simulate the same decomposition as in the fake function
             IntPolynomial *dec = new_IntPolynomial_array(kpl, N);
-            for (int i = 0; i <= k; i++) {
+            for (int32_t i = 0; i <= k; i++) {
                 fake_tGswTorus32PolynomialDecompH(dec + i * l, accum->a + i, params);
             }
 
             //compute the same product
             TorusPolynomial *expected_res = new_TorusPolynomial(N);
             torusPolynomialClear(expected_res);
-            for (int i = 0; i < kpl; i++) {
+            for (int32_t i = 0; i < kpl; i++) {
                 torusPolynomialAddMulRKaratsuba(expected_res, dec + i, fgsw[i].message);
             }
 
@@ -285,7 +285,7 @@ namespace {
             delete_TLweSample(accum);
         }
     }
-    //EXPORT void tGswFFTMulByXaiMinusOne(TGswSampleFFT* result, const int ai, const TGswSampleFFT* bki, const TGswParams* params);
+    //EXPORT void tGswFFTMulByXaiMinusOne(TGswSampleFFT* result, const int32_t ai, const TGswSampleFFT* bki, const TGswParams* params);
     TEST_F(TGswFFTTest, tGswFFTMulByXaiMinusOne) {
         //TODO: A supprimer
     }

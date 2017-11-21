@@ -14,23 +14,23 @@ namespace {
         virtual void TearDown() {
         }
 
-        const set<int> dimensions = {500, 750, 1024, 2000};
-        const set<int> powers_of_two_dimensions = {512, 1024, 2048};
+        const set<int32_t> dimensions = {500, 750, 1024, 2000};
+        const set<int32_t> powers_of_two_dimensions = {512, 1024, 2048};
     };
 
     //  TorusPolynomial = random 
     //EXPORT void torusPolynomialUniform(TorusPolynomial* result);
     TEST_F(PolynomialTest, torusPolynomialUniform) {
         //TODO: parallelization
-        static const int NB_TRIALS = 10;
-        for (int N: dimensions) {
+        static const int32_t NB_TRIALS = 10;
+        for (int32_t N: dimensions) {
             TorusPolynomial *pols = new_TorusPolynomial_array(NB_TRIALS, N);
-            for (int i = 0; i < NB_TRIALS; i++) {
+            for (int32_t i = 0; i < NB_TRIALS; i++) {
                 torusPolynomialUniform(pols + i);
             }
-            for (int j = 0; j < N; j++) {
+            for (int32_t j = 0; j < N; j++) {
                 set<Torus32> testset;
-                for (int i = 0; i < NB_TRIALS; i++) {
+                for (int32_t i = 0; i < NB_TRIALS; i++) {
                     testset.insert(pols[i].coefsT[j]);
                 }
                 ASSERT_GE(testset.size(), 0.9 * NB_TRIALS);
@@ -43,11 +43,11 @@ namespace {
     //  TorusPolynomial = 0 
     //EXPORT void torusPolynomialClear(TorusPolynomial* result);
     TEST_F(PolynomialTest, torusPolynomialClear) {
-        for (int N: dimensions) {
+        for (int32_t N: dimensions) {
             TorusPolynomial *pol = new_TorusPolynomial(N);
             torusPolynomialUniform(pol);
             torusPolynomialClear(pol);
-            for (int j = 0; j < N; j++) {
+            for (int32_t j = 0; j < N; j++) {
                 ASSERT_EQ(0, pol->coefsT[j]);
             }
             delete_TorusPolynomial(pol);
@@ -58,7 +58,7 @@ namespace {
     //  TorusPolynomial = TorusPolynomial 
     //EXPORT void torusPolynomialCopy(TorusPolynomial* result, const TorusPolynomial*  sample);
     TEST_F(PolynomialTest, torusPolynomialCopy) {
-        for (int N: dimensions) {
+        for (int32_t N: dimensions) {
             TorusPolynomial *pol = new_TorusPolynomial(N);
             TorusPolynomial *polc = new_TorusPolynomial(N);
             torusPolynomialUniform(pol);
@@ -70,7 +70,7 @@ namespace {
             ASSERT_EQ(pol0, polc->coefsT[0]);
             ASSERT_EQ(pol1, polc->coefsT[1]);
             //check equality
-            for (int j = 0; j < N; j++) {
+            for (int32_t j = 0; j < N; j++) {
                 ASSERT_EQ(pol->coefsT[j], polc->coefsT[j]);
             }
             delete_TorusPolynomial(pol);
@@ -82,7 +82,7 @@ namespace {
     //  TorusPolynomial + TorusPolynomial 
     //EXPORT void torusPolynomialAdd(TorusPolynomial* result, const TorusPolynomial* poly1, const TorusPolynomial* poly2);
     TEST_F(PolynomialTest, torusPolynomialAdd) {
-        for (int N: dimensions) {
+        for (int32_t N: dimensions) {
             TorusPolynomial *pols = new_TorusPolynomial_array(5, N);
             TorusPolynomial *pola = pols + 0;
             TorusPolynomial *polacopy = pols + 1;
@@ -95,7 +95,7 @@ namespace {
             torusPolynomialCopy(polbcopy, polb);
             torusPolynomialAdd(polc, pola, polb);
             //check equality
-            for (int j = 0; j < N; j++) {
+            for (int32_t j = 0; j < N; j++) {
                 ASSERT_EQ(polacopy->coefsT[j], pola->coefsT[j]);
                 ASSERT_EQ(polbcopy->coefsT[j], polb->coefsT[j]);
                 ASSERT_EQ(polc->coefsT[j], pola->coefsT[j] + polb->coefsT[j]);
@@ -107,7 +107,7 @@ namespace {
     //  TorusPolynomial += TorusPolynomial 
     //EXPORT void torusPolynomialAddTo(TorusPolynomial* result, const TorusPolynomial* poly2);
     TEST_F(PolynomialTest, torusPolynomialAddTo) {
-        for (int N: dimensions) {
+        for (int32_t N: dimensions) {
             TorusPolynomial *pols = new_TorusPolynomial_array(4, N);
             TorusPolynomial *pola = pols + 0;
             TorusPolynomial *polacopy = pols + 1;
@@ -119,7 +119,7 @@ namespace {
             torusPolynomialCopy(polbcopy, polb);
             torusPolynomialAddTo(pola, polb);
             //check equality
-            for (int j = 0; j < N; j++) {
+            for (int32_t j = 0; j < N; j++) {
                 ASSERT_EQ(polbcopy->coefsT[j], polb->coefsT[j]);
                 ASSERT_EQ(pola->coefsT[j], polacopy->coefsT[j] + polbcopy->coefsT[j]);
             }
@@ -130,7 +130,7 @@ namespace {
     //  TorusPolynomial - TorusPolynomial 
     //EXPORT void torusPolynomialSub(TorusPolynomial* result, const TorusPolynomial* poly1, const TorusPolynomial* poly2);
     TEST_F(PolynomialTest, torusPolynomialSub) {
-        for (int N: dimensions) {
+        for (int32_t N: dimensions) {
             TorusPolynomial *pols = new_TorusPolynomial_array(5, N);
             TorusPolynomial *pola = pols + 0;
             TorusPolynomial *polacopy = pols + 1;
@@ -143,7 +143,7 @@ namespace {
             torusPolynomialCopy(polbcopy, polb);
             torusPolynomialSub(polc, pola, polb);
             //check equality
-            for (int j = 0; j < N; j++) {
+            for (int32_t j = 0; j < N; j++) {
                 ASSERT_EQ(polacopy->coefsT[j], pola->coefsT[j]);
                 ASSERT_EQ(polbcopy->coefsT[j], polb->coefsT[j]);
                 ASSERT_EQ(polc->coefsT[j], pola->coefsT[j] - polb->coefsT[j]);
@@ -155,7 +155,7 @@ namespace {
     //  TorusPolynomial -= TorusPolynomial 
     //EXPORT void torusPolynomialSubTo(TorusPolynomial* result, const TorusPolynomial* poly2);
     TEST_F(PolynomialTest, torusPolynomialSubTo) {
-        for (int N: dimensions) {
+        for (int32_t N: dimensions) {
             TorusPolynomial *pols = new_TorusPolynomial_array(4, N);
             TorusPolynomial *pola = pols + 0;
             TorusPolynomial *polacopy = pols + 1;
@@ -167,7 +167,7 @@ namespace {
             torusPolynomialCopy(polbcopy, polb);
             torusPolynomialSubTo(pola, polb);
             //check equality
-            for (int j = 0; j < N; j++) {
+            for (int32_t j = 0; j < N; j++) {
                 ASSERT_EQ(polbcopy->coefsT[j], polb->coefsT[j]);
                 ASSERT_EQ(pola->coefsT[j], polacopy->coefsT[j] - polbcopy->coefsT[j]);
             }
@@ -176,11 +176,11 @@ namespace {
     }
 
     //  TorusPolynomial + p*TorusPolynomial 
-    //EXPORT void torusPolynomialAddMulZ(TorusPolynomial* result, const TorusPolynomial* poly1, int p, const TorusPolynomial* poly2);
+    //EXPORT void torusPolynomialAddMulZ(TorusPolynomial* result, const TorusPolynomial* poly1, int32_t p, const TorusPolynomial* poly2);
     TEST_F(PolynomialTest, torusPolynomialAddMulZ) {
         //TODO: parallelization
-        static const int p = uniformTorus32_distrib(generator);
-        for (int N: dimensions) {
+        static const int32_t p = uniformTorus32_distrib(generator);
+        for (int32_t N: dimensions) {
             TorusPolynomial *pols = new_TorusPolynomial_array(5, N);
             TorusPolynomial *pola = pols + 0;
             TorusPolynomial *polacopy = pols + 1;
@@ -193,7 +193,7 @@ namespace {
             torusPolynomialCopy(polbcopy, polb);
             torusPolynomialAddMulZ(polc, pola, p, polb);
             //check equality
-            for (int j = 0; j < N; j++) {
+            for (int32_t j = 0; j < N; j++) {
                 ASSERT_EQ(polacopy->coefsT[j], pola->coefsT[j]);
                 ASSERT_EQ(polbcopy->coefsT[j], polb->coefsT[j]);
                 ASSERT_EQ(polc->coefsT[j], pola->coefsT[j] + p * polb->coefsT[j]);
@@ -203,11 +203,11 @@ namespace {
     }
 
     //  TorusPolynomial += p*TorusPolynomial 
-    //EXPORT void torusPolynomialAddMulZTo(TorusPolynomial* result, const int p, const TorusPolynomial* poly2);
+    //EXPORT void torusPolynomialAddMulZTo(TorusPolynomial* result, const int32_t p, const TorusPolynomial* poly2);
     TEST_F(PolynomialTest, torusPolynomialAddMulZTo) {
         //TODO: parallelization
-        static const int p = uniformTorus32_distrib(generator);
-        for (int N: dimensions) {
+        static const int32_t p = uniformTorus32_distrib(generator);
+        for (int32_t N: dimensions) {
             TorusPolynomial *pols = new_TorusPolynomial_array(4, N);
             TorusPolynomial *pola = pols + 0;
             TorusPolynomial *polacopy = pols + 1;
@@ -219,7 +219,7 @@ namespace {
             torusPolynomialCopy(polbcopy, polb);
             torusPolynomialAddMulZTo(pola, p, polb);
             //check equality
-            for (int j = 0; j < N; j++) {
+            for (int32_t j = 0; j < N; j++) {
                 ASSERT_EQ(polbcopy->coefsT[j], polb->coefsT[j]);
                 ASSERT_EQ(pola->coefsT[j], polacopy->coefsT[j] + p * polbcopy->coefsT[j]);
             }
@@ -228,11 +228,11 @@ namespace {
     }
 
     //  TorusPolynomial - p*TorusPolynomial 
-    //EXPORT void torusPolynomialSubMulZ(TorusPolynomial* result, const TorusPolynomial* poly1, int p, const TorusPolynomial* poly2);
+    //EXPORT void torusPolynomialSubMulZ(TorusPolynomial* result, const TorusPolynomial* poly1, int32_t p, const TorusPolynomial* poly2);
     TEST_F(PolynomialTest, torusPolynomialSubMulZ) {
         //TODO: parallelization
-        static const int p = uniformTorus32_distrib(generator);
-        for (int N: dimensions) {
+        static const int32_t p = uniformTorus32_distrib(generator);
+        for (int32_t N: dimensions) {
             TorusPolynomial *pols = new_TorusPolynomial_array(5, N);
             TorusPolynomial *pola = pols + 0;
             TorusPolynomial *polacopy = pols + 1;
@@ -245,7 +245,7 @@ namespace {
             torusPolynomialCopy(polbcopy, polb);
             torusPolynomialSubMulZ(polc, pola, p, polb);
             //check equality
-            for (int j = 0; j < N; j++) {
+            for (int32_t j = 0; j < N; j++) {
                 ASSERT_EQ(polacopy->coefsT[j], pola->coefsT[j]);
                 ASSERT_EQ(polbcopy->coefsT[j], polb->coefsT[j]);
                 ASSERT_EQ(polc->coefsT[j], pola->coefsT[j] - p * polb->coefsT[j]);
@@ -255,11 +255,11 @@ namespace {
     }
 
     //  TorusPolynomial -= p*TorusPolynomial 
-    //EXPORT void torusPolynomialSubMulZTo(TorusPolynomial* result, const int p, const TorusPolynomial* poly2);
+    //EXPORT void torusPolynomialSubMulZTo(TorusPolynomial* result, const int32_t p, const TorusPolynomial* poly2);
     TEST_F(PolynomialTest, torusPolynomialSubMulZTo) {
         //TODO: parallelization
-        static const int p = uniformTorus32_distrib(generator);
-        for (int N: dimensions) {
+        static const int32_t p = uniformTorus32_distrib(generator);
+        for (int32_t N: dimensions) {
             TorusPolynomial *pols = new_TorusPolynomial_array(4, N);
             TorusPolynomial *pola = pols + 0;
             TorusPolynomial *polacopy = pols + 1;
@@ -271,7 +271,7 @@ namespace {
             torusPolynomialCopy(polbcopy, polb);
             torusPolynomialSubMulZTo(pola, p, polb);
             //check equality
-            for (int j = 0; j < N; j++) {
+            for (int32_t j = 0; j < N; j++) {
                 ASSERT_EQ(polbcopy->coefsT[j], polb->coefsT[j]);
                 ASSERT_EQ(pola->coefsT[j], polacopy->coefsT[j] - p * polbcopy->coefsT[j]);
             }
@@ -279,36 +279,36 @@ namespace {
         }
     }
 
-    int anticyclic_get(int *tab, int a, int N) {
-        int agood = ((a % (2 * N)) + (2 * N)) % (2 * N);
+    int32_t anticyclic_get(int32_t *tab, int32_t a, int32_t N) {
+        int32_t agood = ((a % (2 * N)) + (2 * N)) % (2 * N);
         if (agood < N)
             return tab[agood];
         else
             return -tab[agood - N];
     }
 
-    void random_small_ints(int *tab, int bound, int N) {
-        for (int j = 0; j < N; j++) {
+    void random_small_ints(int32_t *tab, int32_t bound, int32_t N) {
+        for (int32_t j = 0; j < N; j++) {
             tab[j] = (uniformTorus32_distrib(generator) % bound);
         }
     }
 
-    void int_tab_copy(int *dest, const int *tab, int N) {
-        for (int j = 0; j < N; j++) {
+    void int_tab_copy(int32_t *dest, const int32_t *tab, int32_t N) {
+        for (int32_t j = 0; j < N; j++) {
             dest[j] = tab[j];
         }
     }
 
     //  TorusPolynomial = X^a * TorusPolynomial 
-    //EXPORT void torusPolynomialMulByXai(TorusPolynomial* result, int a, const TorusPolynomial* bk)
+    //EXPORT void torusPolynomialMulByXai(TorusPolynomial* result, int32_t a, const TorusPolynomial* bk)
     TEST_F(PolynomialTest, torusPolynomialMulByXai) {
         //TODO: parallelization
-        static const int NB_TRIALS = 50;
-        for (int N: dimensions) {
-            for (int trial = 0; trial < NB_TRIALS; trial++) {
+        static const int32_t NB_TRIALS = 50;
+        for (int32_t N: dimensions) {
+            for (int32_t trial = 0; trial < NB_TRIALS; trial++) {
                 //TODO: parallelization
-                static const int a = (uniformTorus32_distrib(generator) % 1000000) - 500000;
-                static const int ai = ((a % (2 * N)) + (2 * N)) % (2 * N);
+                static const int32_t a = (uniformTorus32_distrib(generator) % 1000000) - 500000;
+                static const int32_t ai = ((a % (2 * N)) + (2 * N)) % (2 * N);
                 TorusPolynomial *pols = new_TorusPolynomial_array(3, N);
                 TorusPolynomial *pola = pols + 0;
                 TorusPolynomial *polacopy = pols + 1;
@@ -318,7 +318,7 @@ namespace {
                 torusPolynomialCopy(polacopy, pola);
                 torusPolynomialMulByXai(polb, ai, pola);
                 //check equality
-                for (int j = 0; j < N; j++) {
+                for (int32_t j = 0; j < N; j++) {
                     ASSERT_EQ(polacopy->coefsT[j], pola->coefsT[j]);
                     ASSERT_EQ(polb->coefsT[j], anticyclic_get(polacopy->coefsT, j - ai, N));
                 }
@@ -328,28 +328,28 @@ namespace {
     }
 
     //  intPolynomial = (X^ai-1) * intPolynomial 
-    //EXPORT void intPolynomialMulByXaiMinusOne(IntPolynomial* result, int a, const IntPolynomial* bk)
+    //EXPORT void intPolynomialMulByXaiMinusOne(IntPolynomial* result, int32_t a, const IntPolynomial* bk)
     TEST_F(PolynomialTest, intPolynomialMulByXaiMinusOne) {
         //TODO: parallelization
-        static const int NB_TRIALS = 50;
-        for (int N: dimensions) {
-            for (int trial = 0; trial < NB_TRIALS; trial++) {
+        static const int32_t NB_TRIALS = 50;
+        for (int32_t N: dimensions) {
+            for (int32_t trial = 0; trial < NB_TRIALS; trial++) {
                 //TODO: parallelization
-                static const int a = (uniformTorus32_distrib(generator) % 1000000) - 500000;
-                static const int ai = ((a % (2 * N)) + (2 * N)) % (2 * N);
+                static const int32_t a = (uniformTorus32_distrib(generator) % 1000000) - 500000;
+                static const int32_t ai = ((a % (2 * N)) + (2 * N)) % (2 * N);
                 IntPolynomial *pols = new_IntPolynomial_array(3, N);
                 IntPolynomial *pola = pols + 0;
                 IntPolynomial *polacopy = pols + 1;
                 IntPolynomial *polb = pols + 2;
                 //fill the polynomial with random coefs
-                for (int j = 0; j < N; j++) {
+                for (int32_t j = 0; j < N; j++) {
                     pola->coefs[j] = uniformTorus32_distrib(generator);
                     polb->coefs[j] = uniformTorus32_distrib(generator);
                 }
                 intPolynomialCopy(polacopy, pola);
                 intPolynomialMulByXaiMinusOne(polb, ai, pola);
                 //check equality
-                for (int j = 0; j < N; j++) {
+                for (int32_t j = 0; j < N; j++) {
                     ASSERT_EQ(polacopy->coefs[j], pola->coefs[j]);
                     ASSERT_EQ(polb->coefs[j],
                               anticyclic_get(polacopy->coefs, j - ai, N) - anticyclic_get(polacopy->coefs, j, N));
@@ -360,15 +360,15 @@ namespace {
     }
 
     //  TorusPolynomial = (X^ai-1) * TorusPolynomial 
-    //EXPORT void torusPolynomialMulByXaiMinusOne(TorusPolynomial* result, int a, const TorusPolynomial* bk)
+    //EXPORT void torusPolynomialMulByXaiMinusOne(TorusPolynomial* result, int32_t a, const TorusPolynomial* bk)
     TEST_F(PolynomialTest, torusPolynomialMulByXaiMinusOne) {
         //TODO: parallelization
-        static const int NB_TRIALS = 50;
-        for (int N: dimensions) {
-            for (int trial = 0; trial < NB_TRIALS; trial++) {
+        static const int32_t NB_TRIALS = 50;
+        for (int32_t N: dimensions) {
+            for (int32_t trial = 0; trial < NB_TRIALS; trial++) {
                 //TODO: parallelization
-                static const int a = (uniformTorus32_distrib(generator) % 1000000) - 500000;
-                static const int ai = ((a % (2 * N)) + (2 * N)) % (2 * N);
+                static const int32_t a = (uniformTorus32_distrib(generator) % 1000000) - 500000;
+                static const int32_t ai = ((a % (2 * N)) + (2 * N)) % (2 * N);
                 TorusPolynomial *pols = new_TorusPolynomial_array(3, N);
                 TorusPolynomial *pola = pols + 0;
                 TorusPolynomial *polacopy = pols + 1;
@@ -379,7 +379,7 @@ namespace {
                 torusPolynomialCopy(polacopy, pola);
                 torusPolynomialMulByXaiMinusOne(polb, ai, pola);
                 //check equality
-                for (int j = 0; j < N; j++) {
+                for (int32_t j = 0; j < N; j++) {
                     ASSERT_EQ(polacopy->coefsT[j], pola->coefsT[j]);
                     ASSERT_EQ(polb->coefsT[j],
                               anticyclic_get(polacopy->coefsT, j - ai, N) - anticyclic_get(polacopy->coefsT, j, N));
@@ -393,22 +393,22 @@ namespace {
     //EXPORT double intPolynomialNormSq2(const IntPolynomial* poly);
     TEST_F(PolynomialTest, intPolynomialNormSq2) {
         //TODO: parallelization
-        static const int NB_TRIALS = 50;
-        for (int N: dimensions) {
+        static const int32_t NB_TRIALS = 50;
+        for (int32_t N: dimensions) {
             IntPolynomial *pols = new_IntPolynomial_array(2, N);
             IntPolynomial *a = pols + 0;
             IntPolynomial *acopy = pols + 1;
-            for (int trial = 0; trial < NB_TRIALS; trial++) {
+            for (int32_t trial = 0; trial < NB_TRIALS; trial++) {
                 double norm2 = 0;
-                for (int j = 0; j < N; j++) {
-                    int r = (uniformTorus32_distrib(generator) % 1000) - 500;
+                for (int32_t j = 0; j < N; j++) {
+                    int32_t r = (uniformTorus32_distrib(generator) % 1000) - 500;
                     a->coefs[j] = r;
                     acopy->coefs[j] = r;
                     norm2 += r * r;
                 }
                 double value = intPolynomialNormSq2(a);
                 ASSERT_EQ(norm2, value);
-                for (int j = 0; j < N; j++) {
+                for (int32_t j = 0; j < N; j++) {
                     ASSERT_EQ(a->coefs[j], acopy->coefs[j]);
                 }
             }
@@ -422,8 +422,8 @@ namespace {
     //EXPORT void torusPolynomialMultNaive(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
     TEST_F(PolynomialTest, torusPolynomialMultNaive) {
         //TODO: parallelization
-        static const int NB_TRIALS = 5;
-        for (int N: dimensions) {
+        static const int32_t NB_TRIALS = 5;
+        for (int32_t N: dimensions) {
             IntPolynomial *ipols = new_IntPolynomial_array(2, N);
             TorusPolynomial *tpols = new_TorusPolynomial_array(3, N);
             IntPolynomial *a = ipols + 0;
@@ -431,18 +431,18 @@ namespace {
             TorusPolynomial *b = tpols + 0;
             TorusPolynomial *bcopy = tpols + 1;
             TorusPolynomial *c = tpols + 2;
-            for (int trial = 0; trial < NB_TRIALS; trial++) {
+            for (int32_t trial = 0; trial < NB_TRIALS; trial++) {
                 torusPolynomialUniform(b);
                 torusPolynomialUniform(c);
                 torusPolynomialCopy(bcopy, b);
                 random_small_ints(a->coefs, 100000, N);
                 int_tab_copy(acopy->coefs, a->coefs, N);
                 torusPolynomialMultNaive(c, a, b);
-                for (int j = 0; j < N; j++) {
+                for (int32_t j = 0; j < N; j++) {
                     ASSERT_EQ(acopy->coefs[j], a->coefs[j]);
                     ASSERT_EQ(bcopy->coefsT[j], b->coefsT[j]);
                     Torus32 r = 0;
-                    for (int k = 0; k < N; k++) {
+                    for (int32_t k = 0; k < N; k++) {
                         r += bcopy->coefsT[k] * anticyclic_get(acopy->coefs, j - k, N);
                     }
                     ASSERT_EQ(r, c->coefsT[j]);
@@ -459,8 +459,8 @@ namespace {
     //EXPORT void torusPolynomialMultKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
     TEST_F(PolynomialTest, torusPolynomialMultKaratsuba) {
         //TODO: parallelization
-        static const int NB_TRIALS = 5;
-        for (int N: powers_of_two_dimensions) {
+        static const int32_t NB_TRIALS = 5;
+        for (int32_t N: powers_of_two_dimensions) {
             IntPolynomial *ipols = new_IntPolynomial_array(2, N);
             TorusPolynomial *tpols = new_TorusPolynomial_array(3, N);
             IntPolynomial *a = ipols + 0;
@@ -468,18 +468,18 @@ namespace {
             TorusPolynomial *b = tpols + 0;
             TorusPolynomial *bcopy = tpols + 1;
             TorusPolynomial *c = tpols + 2;
-            for (int trial = 0; trial < NB_TRIALS; trial++) {
+            for (int32_t trial = 0; trial < NB_TRIALS; trial++) {
                 torusPolynomialUniform(b);
                 torusPolynomialUniform(c);
                 torusPolynomialCopy(bcopy, b);
                 random_small_ints(a->coefs, 100000, N);
                 int_tab_copy(acopy->coefs, a->coefs, N);
                 torusPolynomialMultKaratsuba(c, a, b);
-                for (int j = 0; j < N; j++) {
+                for (int32_t j = 0; j < N; j++) {
                     ASSERT_EQ(acopy->coefs[j], a->coefs[j]);
                     ASSERT_EQ(bcopy->coefsT[j], b->coefsT[j]);
                     Torus32 r = 0;
-                    for (int k = 0; k < N; k++) {
+                    for (int32_t k = 0; k < N; k++) {
                         r += bcopy->coefsT[k] * anticyclic_get(acopy->coefs, j - k, N);
                     }
                     ASSERT_EQ(r, c->coefsT[j]);
@@ -496,8 +496,8 @@ namespace {
     //EXPORT void torusPolynomialAddMulRKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
     TEST_F(PolynomialTest, torusPolynomialAddMulRKaratsuba) {
         //TODO: parallelization
-        static const int NB_TRIALS = 5;
-        for (int N: powers_of_two_dimensions) {
+        static const int32_t NB_TRIALS = 5;
+        for (int32_t N: powers_of_two_dimensions) {
             IntPolynomial *ipols = new_IntPolynomial_array(2, N);
             TorusPolynomial *tpols = new_TorusPolynomial_array(4, N);
             IntPolynomial *a = ipols + 0;
@@ -506,7 +506,7 @@ namespace {
             TorusPolynomial *bcopy = tpols + 1;
             TorusPolynomial *c = tpols + 2;
             TorusPolynomial *ccopy = tpols + 3;
-            for (int trial = 0; trial < NB_TRIALS; trial++) {
+            for (int32_t trial = 0; trial < NB_TRIALS; trial++) {
                 torusPolynomialUniform(b);
                 torusPolynomialUniform(c);
                 torusPolynomialCopy(bcopy, b);
@@ -514,11 +514,11 @@ namespace {
                 random_small_ints(a->coefs, 100000, N);
                 int_tab_copy(acopy->coefs, a->coefs, N);
                 torusPolynomialAddMulRKaratsuba(c, a, b);
-                for (int j = 0; j < N; j++) {
+                for (int32_t j = 0; j < N; j++) {
                     ASSERT_EQ(acopy->coefs[j], a->coefs[j]);
                     ASSERT_EQ(bcopy->coefsT[j], b->coefsT[j]);
                     Torus32 r = ccopy->coefsT[j];
-                    for (int k = 0; k < N; k++) {
+                    for (int32_t k = 0; k < N; k++) {
                         r += bcopy->coefsT[k] * anticyclic_get(acopy->coefs, j - k, N);
                     }
                     ASSERT_EQ(r, c->coefsT[j]);
@@ -535,8 +535,8 @@ namespace {
     //EXPORT void torusPolynomialAddMulRKaratsuba(TorusPolynomial* result, const IntPolynomial* poly1, const TorusPolynomial* poly2);
     TEST_F(PolynomialTest, torusPolynomialSubMulRKaratsuba) {
         //TODO: parallelization
-        static const int NB_TRIALS = 5;
-        for (int N: powers_of_two_dimensions) {
+        static const int32_t NB_TRIALS = 5;
+        for (int32_t N: powers_of_two_dimensions) {
             IntPolynomial *ipols = new_IntPolynomial_array(2, N);
             TorusPolynomial *tpols = new_TorusPolynomial_array(4, N);
             IntPolynomial *a = ipols + 0;
@@ -545,7 +545,7 @@ namespace {
             TorusPolynomial *bcopy = tpols + 1;
             TorusPolynomial *c = tpols + 2;
             TorusPolynomial *ccopy = tpols + 3;
-            for (int trial = 0; trial < NB_TRIALS; trial++) {
+            for (int32_t trial = 0; trial < NB_TRIALS; trial++) {
                 torusPolynomialUniform(b);
                 torusPolynomialUniform(c);
                 torusPolynomialCopy(bcopy, b);
@@ -553,11 +553,11 @@ namespace {
                 random_small_ints(a->coefs, 100000, N);
                 int_tab_copy(acopy->coefs, a->coefs, N);
                 torusPolynomialSubMulRKaratsuba(c, a, b);
-                for (int j = 0; j < N; j++) {
+                for (int32_t j = 0; j < N; j++) {
                     ASSERT_EQ(acopy->coefs[j], a->coefs[j]);
                     ASSERT_EQ(bcopy->coefsT[j], b->coefsT[j]);
                     Torus32 r = ccopy->coefsT[j];
-                    for (int k = 0; k < N; k++) {
+                    for (int32_t k = 0; k < N; k++) {
                         r -= bcopy->coefsT[k] * anticyclic_get(acopy->coefs, j - k, N);
                     }
                     ASSERT_EQ(r, c->coefsT[j]);

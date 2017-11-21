@@ -33,20 +33,20 @@
 
 
 // Private function prototypes
-static double test_fft_log_error(int n);
-static void naive_dft(const double *inreal, const double *inimag, double *outreal, double *outimag, int inverse, int n);
+static double test_fft_log_error(int32_t n);
+static void naive_dft(const double *inreal, const double *inimag, double *outreal, double *outimag, int32_t inverse, int32_t n);
 static int64_t benchmark_time(const void *fttTables, double *real, double *imag, uint64_t iterations);
-static double log10_rms_err(const double *xreal, const double *ximag, const double *yreal, const double *yimag, int n);
-static double *random_reals(int n);
+static double log10_rms_err(const double *xreal, const double *ximag, const double *yreal, const double *yimag, int32_t n);
+static double *random_reals(int32_t n);
 static void *memdup(const void *src, size_t n);
 
 
 /*---- Function implementations ----*/
 
-int main(int argc, char **argv) {
+int32_t main(int32_t argc, char **argv) {
 	// Self-test to check correct computation of values
 	srand(time(NULL));
-	int i;
+	int32_t i;
 	for (i = 2; i <= 10; i++) {  // Test FFT sizes 4, 8, 16, ..., 512, 1024
 		if (test_fft_log_error(1 << i) > -10) {
 			printf("Self-test failed\n");
@@ -57,7 +57,7 @@ int main(int argc, char **argv) {
 	
 	// Speed benchmark
 	const int64_t TARGET_TIME = 100000000;  // In nanoseconds
-	const int TRIALS = 10;
+	const int32_t TRIALS = 10;
 	printf("%9s    %s\n", "Size", "Time per FFT (ns)");
 	size_t n;
 	for (n = 4; n <= (size_t)1 << 26; n *= 2) {
@@ -85,7 +85,7 @@ int main(int argc, char **argv) {
 		
 		// Run trials and store timing
 		double *runtimes = malloc(TRIALS * sizeof(double));
-		int i;
+		int32_t i;
 		for (i = 0; i < TRIALS; i++)
 			runtimes[i] = (double)benchmark_time(fftTables, real, imag, iterations) / iterations;
 		fft_destroy(fftTables);
@@ -117,7 +117,7 @@ int main(int argc, char **argv) {
 
 
 // Tests the FFT implementation against the naive DFT, returning the base-10 logarithm of the RMS error. This number should be less than -10.
-static double test_fft_log_error(int n) {
+static double test_fft_log_error(int32_t n) {
 	double *inputreal, *inputimag;
 	double *refoutreal, *refoutimag;
 	double *actualoutreal, *actualoutimag;
@@ -149,15 +149,15 @@ static double test_fft_log_error(int n) {
 
 
 // Computes the discrete Fourier transform using the naive O(n^2) time algorithm.
-static void naive_dft(const double *inreal, const double *inimag, double *outreal, double *outimag, int inverse, int n) {
+static void naive_dft(const double *inreal, const double *inimag, double *outreal, double *outimag, int32_t inverse, int32_t n) {
 	double coef = (inverse ? 2 : -2) * M_PI;
-	int k;
+	int32_t k;
 	for (k = 0; k < n; k++) {  // For each output element
 		double sumreal = 0;
 		double sumimag = 0;
-		int t;
+		int32_t t;
 		for (t = 0; t < n; t++) {  // For each input element
-			double angle = coef * ((long long)t * k % n) / n;
+			double angle = coef * ((int64_t)t * k % n) / n;
 			sumreal += inreal[t]*cos(angle) - inimag[t]*sin(angle);
 			sumimag += inreal[t]*sin(angle) + inimag[t]*cos(angle);
 		}
@@ -182,9 +182,9 @@ static int64_t benchmark_time(const void *fftTables, double *real, double *imag,
 
 
 // Returns log10(sqrt(sum(|x[i] - y[i]|^2) / n)).
-static double log10_rms_err(const double *xreal, const double *ximag, const double *yreal, const double *yimag, int n) {
+static double log10_rms_err(const double *xreal, const double *ximag, const double *yreal, const double *yimag, int32_t n) {
 	double err = 0;
-	int i;
+	int32_t i;
 	for (i = 0; i < n; i++)
 		err += (xreal[i] - yreal[i]) * (xreal[i] - yreal[i]) + (ximag[i] - yimag[i]) * (ximag[i] - yimag[i]);
 	
@@ -196,9 +196,9 @@ static double log10_rms_err(const double *xreal, const double *ximag, const doub
 
 
 // Allocates and fills an array of random doubles in the range [-1.0, 1.0]. Must be free()'d by the caller.
-static double *random_reals(int n) {
+static double *random_reals(int32_t n) {
 	double *result = malloc(n * sizeof(double));
-	int i;
+	int32_t i;
 	for (i = 0; i < n; i++)
 		result[i] = (rand() / (RAND_MAX + 1.0)) * 2 - 1;
 	return result;

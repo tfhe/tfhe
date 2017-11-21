@@ -32,8 +32,8 @@ LweBootstrappingKeyFFT::LweBootstrappingKeyFFT(const LweParams* in_out_params, c
     this->bk_params= bk_params;
     this->accum_params= bk_params->tlwe_params;
     this->extract_params=&accum_params->extracted_lweparams;
-    const int n = in_out_params->n;
-    const int N = extract_params->n;
+    const int32_t n = in_out_params->n;
+    const int32_t N = extract_params->n;
 
     this->bk=new_TGswSampleFFT_array(n,this->bk_params);
     this->ks=new_LweKeySwitchKey(N, kslength, basebit, in_out_params);

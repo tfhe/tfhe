@@ -2,6 +2,8 @@
 #include <tfhe_io.h>
 #include <map>
 #include <string>
+#include <cstdint>
+#include <cinttypes>
 #include <tfhe_generic_streams.h>
 #include <cstdlib>
 
@@ -37,7 +39,7 @@ public:
         return stold(getProperty(name));
     }
 
-    virtual long getProperty_long(const std::string &name) const {
+    virtual int64_t getProperty_int64_t(const std::string &name) const {
         return stol(getProperty(name));
     }
 
@@ -47,9 +49,9 @@ public:
         setProperty(name, buf);
     }
 
-    virtual void setProperty_long(const std::string &name, long value) {
+    virtual void setProperty_int64_t(const std::string &name, int64_t value) {
         char buf[64];
-        sprintf(buf, "%ld", value);
+        sprintf(buf, "%10" PRId64, value);
         setProperty(name, buf);
     }
 
@@ -69,7 +71,7 @@ bool StdIstream::feof() const { return !((bool) in); }
 
 void CIstream::getLine(string &reps) const {
     reps.clear();
-    for (int c = fgetc(F); c != EOF; c = fgetc(F)) {
+    for (int32_t c = fgetc(F); c != EOF; c = fgetc(F)) {
         if (c == '\r') continue;
         if (c == '\n') return;
         reps.push_back(c);
@@ -120,7 +122,7 @@ TextModeProperties *new_TextModeProperties_fromIstream(const Istream &F) {
     string endDelimitor;
     bool content_started = false;
     for (F.getLine(line); !F.feof(); F.getLine(line)) {
-        int n = line.length();
+        int32_t n = line.length();
         if (!line.compare(0, 11, "-----BEGIN ") && !line.compare(n - 5, 5, "-----")) {
             string titleType = line.substr(11, n - 16);
             reps->setTypeTitle(titleType);

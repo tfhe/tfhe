@@ -22,17 +22,17 @@ EXPORT void die_dramatically(const char *message) {
 const inline double mulBySqrtTwoOverPi(double x) { return x * sqrt(2. / M_PI); }
 
 /** generate default gate bootstrapping parameters */
-EXPORT TFheGateBootstrappingParameterSet *new_default_gate_bootstrapping_parameters(int minimum_lambda) {
+EXPORT TFheGateBootstrappingParameterSet *new_default_gate_bootstrapping_parameters(int32_t minimum_lambda) {
     if (minimum_lambda > 128)
         die_dramatically("Sorry, for now, the parameters are only implemented for about 128bit of security!");
 
-    static const int N = 1024;
-    static const int k = 1;
-    static const int n = 500;
-    static const int bk_l = 2;
-    static const int bk_Bgbit = 10;
-    static const int ks_basebit = 2;
-    static const int ks_length = 8;
+    static const int32_t N = 1024;
+    static const int32_t k = 1;
+    static const int32_t n = 500;
+    static const int32_t bk_l = 2;
+    static const int32_t bk_Bgbit = 10;
+    static const int32_t ks_basebit = 2;
+    static const int32_t ks_length = 8;
     static const double ks_stdev = mulBySqrtTwoOverPi(pow(2., -15));   //standard deviation
     static const double bk_stdev = mulBySqrtTwoOverPi(9.e-9);          //standard deviation
     static const double max_stdev = mulBySqrtTwoOverPi(pow(2., -4) / 4.); //max standard deviation for a 1/4 msg space
@@ -96,7 +96,7 @@ EXPORT LweSample *new_gate_bootstrapping_ciphertext(const TFheGateBootstrappingP
 
 /** generate a new unititialized ciphertext array of length nbelems */
 EXPORT LweSample *
-new_gate_bootstrapping_ciphertext_array(int nbelems, const TFheGateBootstrappingParameterSet *params) {
+new_gate_bootstrapping_ciphertext_array(int32_t nbelems, const TFheGateBootstrappingParameterSet *params) {
     return new_LweSample_array(nbelems, params->in_out_params);
 }
 
@@ -106,12 +106,12 @@ EXPORT void delete_gate_bootstrapping_ciphertext(LweSample *sample) {
 }
 
 /** deletes a ciphertext array of length nbelems */
-EXPORT void delete_gate_bootstrapping_ciphertext_array(int nbelems, LweSample *samples) {
+EXPORT void delete_gate_bootstrapping_ciphertext_array(int32_t nbelems, LweSample *samples) {
     delete_LweSample_array(nbelems, samples);
 }
 
 /** encrypts a boolean */
-EXPORT void bootsSymEncrypt(LweSample *result, int message, const TFheGateBootstrappingSecretKeySet *key) {
+EXPORT void bootsSymEncrypt(LweSample *result, int32_t message, const TFheGateBootstrappingSecretKeySet *key) {
     Torus32 _1s8 = modSwitchToTorus32(1, 8);
     Torus32 mu = message ? _1s8 : -_1s8;
     double alpha = key->params->in_out_params->alpha_min; //TODO: specify noise
@@ -119,7 +119,7 @@ EXPORT void bootsSymEncrypt(LweSample *result, int message, const TFheGateBootst
 }
 
 /** decrypts a boolean */
-EXPORT int bootsSymDecrypt(const LweSample *sample, const TFheGateBootstrappingSecretKeySet *key) {
+EXPORT int32_t bootsSymDecrypt(const LweSample *sample, const TFheGateBootstrappingSecretKeySet *key) {
     Torus32 mu = lwePhase(sample, key->lwe_key);
     return (mu > 0 ? 1 : 0); //we have to do that because of the C binding
 }

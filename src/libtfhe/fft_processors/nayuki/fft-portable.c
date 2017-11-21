@@ -39,8 +39,8 @@ struct FftTables {
 
 
 // Private function prototypes
-static int floor_log2(size_t n);
-static size_t reverse_bits(size_t x, unsigned int n);
+static int32_t floor_log2(size_t n);
+static size_t reverse_bits(size_t x, uint32_t n);
 
 
 /*---- Function implementations ----*/
@@ -73,7 +73,7 @@ void *fft_init(size_t n) {
 	
 	// Precompute values and store to tables
 	size_t i;
-	int levels = floor_log2(n);
+	int32_t levels = floor_log2(n);
 	for (i = 0; i < n; i++)
 		tables->bit_reversed[i] = reverse_bits(i, levels);
 	for (i = 0; i < n / 2; i++) {
@@ -145,8 +145,8 @@ void fft_destroy(void *tables) {
 
 
 // Returns the largest i such that 2^i <= n.
-static int floor_log2(size_t n) {
-	int result = 0;
+static int32_t floor_log2(size_t n) {
+	int32_t result = 0;
 	for (; n > 1; n /= 2)
 		result++;
 	return result;
@@ -154,9 +154,9 @@ static int floor_log2(size_t n) {
 
 
 // Returns the bit reversal of the n-bit unsigned integer x.
-static size_t reverse_bits(size_t x, unsigned int n) {
+static size_t reverse_bits(size_t x, uint32_t n) {
 	size_t result = 0;
-	unsigned int i;
+	uint32_t i;
 	for (i = 0; i < n; i++, x >>= 1)
 		result = (result << 1) | (x & 1);
 	return result;
