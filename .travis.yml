@@ -7,6 +7,7 @@ os:
 compiler:
   - gcc
   - clang
+osx_image: xcode9.1
 before_install:
   - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sudo apt update; fi
   - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then brew update; fi
