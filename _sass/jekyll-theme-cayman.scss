@@ -147,13 +147,36 @@ a {
   }
 }
 
-.logos {
+section.logos {
+    position: relative;
+    top: 50px;
+    height: 0px;
+    width: 10%;
+
+  @include large {
+    max-width: 150px;
+  }
+  @include medium {
+    max-width: 150px;
+  }
+  @include small {
+    display: none;
+  }
+}
+section.logos img {
+    display: block;
+    max-width: 100%; 
+    max-height: 50px;
+    margin-bottom: 10px;
+}
+
+.slogos {
     float: right;
     display: block;
     height: 50px;
 }
 
-.logos img {
+.slogos img {
     /* display: block; */
     max-width: 100%; 
     max-height: 50px;
