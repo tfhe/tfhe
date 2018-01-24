@@ -9,7 +9,6 @@ set(SRCS
     lwe-functions.cpp
     lwekey.cpp
     lwekeyswitch.cpp
-    lweparams.cpp
     lwesamples.cpp
     polynomials.cpp
     multiplication.cpp

@@ -216,6 +216,14 @@ void TLweFunctions<TORUS>::MulByXaiMinusOne(TLweSample<TORUS>* result, int ai, c
     torusPolynomialMulByXaiMinusOne(&result->a[i],ai,&bk->a[i]);
 }
 
+//mult externe de X^ai par bki
+template<typename TORUS>
+void TLweFunctions<TORUS>::MulByXai(TLweSample<TORUS>* result, int ai, const TLweSample<TORUS>* bk, const TLweParams<TORUS>* params){
+  const int k=params->k;
+  for(int i=0;i<=k;i++)
+    TorusPolyFunctions<TORUS>::MulByXai(&result->a[i], ai, &bk->a[i]);
+}
+
 /** result += (0,x) */
 template<typename TORUS>
 void TLweFunctions<TORUS>::AddTTo(TLweSample<TORUS>* result, const int pos, const TORUS x, const TLweParams<TORUS>* params){

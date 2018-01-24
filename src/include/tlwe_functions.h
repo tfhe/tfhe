@@ -48,6 +48,7 @@ struct TLweFunctions
   // static void PolyCombination(TLweSample<TORUS>* result, const int* combi, const TLweSample<TORUS>* samples, const TLweParams<TORUS>* params);
 
   static void MulByXaiMinusOne(TLweSample<TORUS>* result, int ai, const TLweSample<TORUS>* bk, const TLweParams<TORUS>* params);
+  static void MulByXai(TLweSample<TORUS>* result, int ai, const TLweSample<TORUS>* bk, const TLweParams<TORUS>* params);
 
   static void ExtractLweSampleIndex(LweSample<TORUS>* result, const TLweSample<TORUS>* x, const int index, const LweParams<TORUS>* params,  const TLweParams<TORUS>* rparams);
   static void ExtractLweSample(LweSample<TORUS>* result, const TLweSample<TORUS>* x, const LweParams<TORUS>* params,  const TLweParams<TORUS>* rparams);
