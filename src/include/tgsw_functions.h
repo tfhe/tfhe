@@ -9,79 +9,183 @@
 #include "tlwe.h"
 #include "lwebootstrappingkey.h"
 
+template<typename TORUS>
+struct TGswFunctions
+{
+  // Gsw
+  static void KeyGen(TGswKey<TORUS>* result);
+  static void SymEncrypt(TGswSample<TORUS>* result, const IntPolynomial* message, double alpha, const TGswKey<TORUS>* key);
+  static void SymEncryptInt(TGswSample<TORUS>* result, const int message, double alpha, const TGswKey<TORUS>* key);
+  static void SymDecrypt(IntPolynomial* result, const TGswSample<TORUS>* sample, const TGswKey<TORUS>* key, const int Msize);
+  static int SymDecryptInt(const TGswSample<TORUS>* sample, const TGswKey<TORUS>* key);
+  //do we really decrypt Gsw samples?
+
+  // support Functions for TGsw
+  // Result = 0
+  static void Clear(TGswSample<TORUS>* result, const TGswParams<TORUS>* params);
+  // Result += H
+  static void AddH(TGswSample<TORUS>* result, const TGswParams<TORUS>* params);
+  // Result += mu*H
+  static void AddMuH(TGswSample<TORUS>* result, const IntPolynomial* message, const TGswParams<TORUS>* params);
+  // Result += mu*H, mu integer
+  static void AddMuIntH(TGswSample<TORUS>* result, const int message, const TGswParams<TORUS>* params);
+  // Result = tGsw(0)
+  static void EncryptZero(TGswSample<TORUS>* result, double alpha, const TGswKey<TORUS>* key);
+
+  //fonction de decomposition
+  static void TLweDecompH(IntPolynomial* result, const TLweSample<TORUS>* sample, const TGswParams<TORUS>* params);
+  static void TorusPolynomialDecompH(IntPolynomial* result, const TorusPolynomial<TORUS>* sample, const TGswParams<TORUS>* params);
+
+  //TODO: Ilaria.Theoreme3.5
+  static void ExternProduct(TLweSample<TORUS>* result, const TGswSample<TORUS>* a, const TLweSample<TORUS>* b, const TGswParams<TORUS>* params);
+
+  // result=result+ (X^ai-1)*bi (ligne 5 de l'algo)
+  static void MulByXaiMinusOne(TGswSample<TORUS>* result, int ai, const TGswSample<TORUS>* bk, const TGswParams<TORUS>* params);
+
+  //ligne 5 algo,mult externe
+  static void ExternMulToTLwe(TLweSample<TORUS>* accum, const TGswSample<TORUS>* sample,const TGswParams<TORUS>* params);
+
+  /** result = (0,mu) */
+  static void NoiselessTrivial(TGswSample<TORUS>* result, const IntPolynomial* mu, const TGswParams<TORUS>* params);
+
+  /** result = result + sample */
+  static void AddTo(TGswSample<TORUS>* result, const TGswSample<TORUS>* sample, const TGswParams<TORUS>* params);
+
+  static void ToFFTConvert(TGswSampleFFT<TORUS>* result, const TGswSample<TORUS>* source, const TGswParams<TORUS>* params);
+  static void FromFFTConvert(TGswSample<TORUS>* result, const TGswSampleFFT<TORUS>* source, const TGswParams<TORUS>* params);
+  static void FFTAddH(TGswSampleFFT<TORUS>* result, const TGswParams<TORUS>* params);
+  static void FFTClear(TGswSampleFFT<TORUS>* result, const TGswParams<TORUS>* params);
+  static void FFTExternMulToTLwe(TLweSample<TORUS>* accum, const TGswSampleFFT<TORUS>* gsw, const TGswParams<TORUS>* params);
+  static void FFTMulByXaiMinusOne(TGswSampleFFT<TORUS>* result, const int ai, const TGswSampleFFT<TORUS>* bki, const TGswParams<TORUS>* params);
+};
+
+template struct TGswFunctions<Torus32>;
+template struct TGswFunctions<Torus64>;
+
 // Gsw
-EXPORT void tGswKeyGen(TGswKey* result);
-EXPORT void tGswSymEncrypt(TGswSample* result, const IntPolynomial* message, double alpha, const TGswKey* key);
-EXPORT void tGswSymEncryptInt(TGswSample* result, const int message, double alpha, const TGswKey* key);
-EXPORT void tGswSymDecrypt(IntPolynomial* result, const TGswSample* sample, const TGswKey* key, const int Msize);
-EXPORT int tGswSymDecryptInt(const TGswSample* sample, const TGswKey* key); 
+template<typename TORUS>
+inline void tGswKeyGen(TGswKey<TORUS>* result) {
+  TGswFunctions<TORUS>::KeyGen(result);
+}
+template<typename TORUS>
+inline void tGswSymEncrypt(TGswSample<TORUS>* result, const IntPolynomial* message, double alpha, const TGswKey<TORUS>* key) {
+  TGswFunctions<TORUS>::SymEncrypt(result, message, alpha, key);
+}
+template<typename TORUS>
+inline void tGswSymEncryptInt(TGswSample<TORUS>* result, const int message, double alpha, const TGswKey<TORUS>* key) {
+  TGswFunctions<TORUS>::SymEncryptInt(result, message, alpha, key);
+}
+template<typename TORUS>
+inline void tGswSymDecrypt(IntPolynomial* result, const TGswSample<TORUS>* sample, const TGswKey<TORUS>* key, const int Msize) {
+  TGswFunctions<TORUS>::SymDecrypt(result, sample, key, Msize);
+}
+template<typename TORUS>
+inline int tGswSymDecryptInt(const TGswSample<TORUS>* sample, const TGswKey<TORUS>* key) {
+  return TGswFunctions<TORUS>::SymDecryptInt(sample, key);
+}
 //do we really decrypt Gsw samples?
 
 // support Functions for TGsw
 // Result = 0
-EXPORT void tGswClear(TGswSample* result, const TGswParams* params);
+template<typename TORUS>
+inline void tGswClear(TGswSample<TORUS>* result, const TGswParams<TORUS>* params) {
+  TGswFunctions<TORUS>::Clear(result, params);
+}
 // Result += H
-EXPORT void tGswAddH(TGswSample* result, const TGswParams* params);
+template<typename TORUS>
+inline void tGswAddH(TGswSample<TORUS>* result, const TGswParams<TORUS>* params) {
+  TGswFunctions<TORUS>::AddH(result, params);
+}
 // Result += mu*H
-EXPORT void tGswAddMuH(TGswSample* result, const IntPolynomial* message, const TGswParams* params);
+template<typename TORUS>
+inline void tGswAddMuH(TGswSample<TORUS>* result, const IntPolynomial* message, const TGswParams<TORUS>* params) {
+  TGswFunctions<TORUS>::AddMuH(result, message, params);
+}
 // Result += mu*H, mu integer
-EXPORT void tGswAddMuIntH(TGswSample* result, const int message, const TGswParams* params);
+template<typename TORUS>
+inline void tGswAddMuIntH(TGswSample<TORUS>* result, const int message, const TGswParams<TORUS>* params) {
+  TGswFunctions<TORUS>::AddMuIntH(result, message, params);
+}
 // Result = tGsw(0)
-EXPORT void tGswEncryptZero(TGswSample* result, double alpha, const TGswKey* key);
+template<typename TORUS>
+inline void tGswEncryptZero(TGswSample<TORUS>* result, double alpha, const TGswKey<TORUS>* key) {
+  TGswFunctions<TORUS>::EncryptZero(result, alpha, key);
+}
 
 //fonction de decomposition
-EXPORT void tGswTLweDecompH(IntPolynomial* result, const TLweSample* sample, const TGswParams* params);
+template<typename TORUS>
+inline void tGswTLweDecompH(IntPolynomial* result, const TLweSample<TORUS>* sample, const TGswParams<TORUS>* params) {
+  TGswFunctions<TORUS>::TLweDecompH(result, sample, params);
+}
 
-EXPORT void tGswTorus32PolynomialDecompH(IntPolynomial* result, const TorusPolynomial* sample, const TGswParams* params);
-EXPORT void tGswTLweDecompH(IntPolynomial* result, const TLweSample* sample,const TGswParams* params);	
+template<typename TORUS>
+inline void tGswTorusPolynomialDecompH(IntPolynomial* result, const TorusPolynomial<TORUS>* sample, const TGswParams<TORUS>* params) {
+  TGswFunctions<TORUS>::TorusPolynomialDecompH(result, sample, params);
+}
 
 //TODO: Ilaria.Theoreme3.5
-EXPORT void tGswExternProduct(TLweSample* result, const TGswSample* a, const TLweSample* b, const TGswParams* params);
+template<typename TORUS>
+inline void tGswExternProduct(TLweSample<TORUS>* result, const TGswSample<TORUS>* a, const TLweSample<TORUS>* b, const TGswParams<TORUS>* params) {
+  TGswFunctions<TORUS>::ExternProduct(result, a, b, params);
+}
 
 // result=result+ (X^ai-1)*bi (ligne 5 de l'algo)
-EXPORT void tGswMulByXaiMinusOne(TGswSample* result, int ai, const TGswSample* bk, const TGswParams* params);
+template<typename TORUS>
+inline void tGswMulByXaiMinusOne(TGswSample<TORUS>* result, int ai, const TGswSample<TORUS>* bk, const TGswParams<TORUS>* params) {
+  TGswFunctions<TORUS>::MulByXaiMinusOne(result, ai, bk, params);
+}
 
 //ligne 5 algo,mult externe
-EXPORT void tGswExternMulToTLwe(TLweSample* accum, const TGswSample* sample,const TGswParams* params);
+template<typename TORUS>
+inline void tGswExternMulToTLwe(TLweSample<TORUS>* accum, const TGswSample<TORUS>* sample,const TGswParams<TORUS>* params) {
+  TGswFunctions<TORUS>::ExternMulToTLwe(accum, sample, params);
+}
 
 /** result = (0,mu) */
-EXPORT void tGswNoiselessTrivial(TGswSample* result, const IntPolynomial* mu, const TGswParams* params);
+template<typename TORUS>
+inline void tGswNoiselessTrivial(TGswSample<TORUS>* result, const IntPolynomial* mu, const TGswParams<TORUS>* params) {
+  TGswFunctions<TORUS>::NoiselessTrivial(result, mu, params);
+}
 
 /** result = result + sample */
-EXPORT void tGswAddTo(TGswSample* result, const TGswSample* sample, const TGswParams* params);
+template<typename TORUS>
+inline void tGswAddTo(TGswSample<TORUS>* result, const TGswSample<TORUS>* sample, const TGswParams<TORUS>* params) {
+  TGswFunctions<TORUS>::AddTo(result, sample, params);
+}
+
+
+template<typename TORUS>
+inline void tGswToFFTConvert(TGswSampleFFT<TORUS>* result, const TGswSample<TORUS>* source, const TGswParams<TORUS>* params) {
+  TGswFunctions<TORUS>::ToFFTConvert(result, source, params);
+}
+template<typename TORUS>
+inline void tGswFromFFTConvert(TGswSample<TORUS>* result, const TGswSampleFFT<TORUS>* source, const TGswParams<TORUS>* params) {
+  TGswFunctions<TORUS>::FromFFTConvert(result, source, params);
+}
+template<typename TORUS>
+inline void tGswFFTAddH(TGswSampleFFT<TORUS>* result, const TGswParams<TORUS>* params) {
+  TGswFunctions<TORUS>::FFTAddH(result, params);
+}
+template<typename TORUS>
+inline void tGswFFTClear(TGswSampleFFT<TORUS>* result, const TGswParams<TORUS>* params) {
+  TGswFunctions<TORUS>::FFTClear(result, params);
+}
+template<typename TORUS>
+inline void tGswFFTExternMulToTLwe(TLweSample<TORUS>* accum, const TGswSampleFFT<TORUS>* gsw, const TGswParams<TORUS>* params) {
+  TGswFunctions<TORUS>::FFTExternMulToTLwe(accum, gsw, params);
+}
+template<typename TORUS>
+inline void tGswFFTMulByXaiMinusOne(TGswSampleFFT<TORUS>* result, const int ai, const TGswSampleFFT<TORUS>* bki, const TGswParams<TORUS>* params) {
+  TGswFunctions<TORUS>::FFTMulByXaiMinusOne(result, ai, bki, params);
+}
+
 
 /** result = result - sample */
-//EXPORT void tGswSubTo(TLweSample* result, const TLweSample* sample, const TLweParams* params);
+//EXPORT void tGswSubTo(TLweSample<TORUS>* result, const TLweSample<TORUS>* sample, const TLweParams<TORUS>* params);
 /** result = result + p.sample */
-//EXPORT void tGswAddMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params);
+//EXPORT void tGswAddMulTo(TLweSample<TORUS>* result, int p, const TLweSample<TORUS>* sample, const TLweParams<TORUS>* params);
 /** result = result - p.sample */
-//EXPORT void tGswSubMulTo(TLweSample* result, int p, const TLweSample* sample, const TLweParams* params);
-
-
-EXPORT void tGswToFFTConvert(TGswSampleFFT* result, const TGswSample* source, const TGswParams* params);
-EXPORT void tGswFromFFTConvert(TGswSample* result, const TGswSampleFFT* source, const TGswParams* params);
-EXPORT void tGswFFTAddH(TGswSampleFFT* result, const TGswParams* params);
-EXPORT void tGswFFTClear(TGswSampleFFT* result, const TGswParams* params);
-EXPORT void tGswFFTExternMulToTLwe(TLweSample* accum, const TGswSampleFFT* gsw, const TGswParams* params);
-EXPORT void tGswFFTMulByXaiMinusOne(TGswSampleFFT* result, const int ai, const TGswSampleFFT* bki, const TGswParams* params);
-
-
-
-
-EXPORT void tfhe_blindRotate(TLweSample* accum, const TGswSample* bk, const int* bara, const int n, const TGswParams* bk_params);
-EXPORT void tfhe_blindRotateAndExtract(LweSample* result, const TorusPolynomial* v, const TGswSample* bk, const int barb, const int* bara, const int n, const TGswParams* bk_params);
-EXPORT void tfhe_bootstrap(LweSample* result, const LweBootstrappingKey* bk, Torus32 mu, const LweSample* x);
-EXPORT void tfhe_createLweBootstrappingKey(LweBootstrappingKey* bk, const LweKey* key_in, const TGswKey* rgsw_key);
-
-
-EXPORT void tfhe_blindRotate_FFT(TLweSample* accum, const TGswSampleFFT* bk, const int* bara, const int n, const TGswParams* bk_params);
-EXPORT void tfhe_blindRotateAndExtract_FFT(LweSample* result, const TorusPolynomial* v, const TGswSampleFFT* bk, const int barb, const int* bara, const int n, const TGswParams* bk_params);
-EXPORT void tfhe_bootstrap_FFT(LweSample* result, const LweBootstrappingKeyFFT* bk, Torus32 mu, const LweSample* x);
-// EXPORT void tfhe_bootstrapFFT(LweSample* result, const LweBootstrappingKeyFFT* bk, Torus32 mu1, Torus32 mu0, const LweSample* x);
-// EXPORT void tfhe_createLweBootstrappingKeyFFT(LweBootstrappingKeyFFT* bk, const LweKey* key_in, const TGswKey* rgsw_key);
-
-
-
+//EXPORT void tGswSubMulTo(TLweSample<TORUS>* result, int p, const TLweSample<TORUS>* sample, const TLweParams<TORUS>* params);
 
 
 #endif //TGSW_FUNCTIONS_H

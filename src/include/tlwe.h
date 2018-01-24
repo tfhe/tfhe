@@ -5,277 +5,221 @@
 ///@brief This file contains the declaration of tlwe structures
 
 #include "tfhe_core.h"
+#include "tfhe_alloc.h"
 #include "polynomials.h"
 #include "lweparams.h"
 
+template<typename TORUS>
 struct TLweParams {
-    const int N; ///< a power of 2: degree of the polynomials
-    const int k; ///< number of polynomials in the mask
-    const double alpha_min; ///< minimal noise s.t. the sample is secure
-    const double alpha_max; ///< maximal noise s.t. we can decrypt
-    const LweParams extracted_lweparams; ///< lwe params if one extracts
+  const int N; ///< a power of 2: degree of the polynomials
+  const int k; ///< number of polynomials in the mask
+  const double alpha_min; ///< minimal noise s.t. the sample is secure
+  const double alpha_max; ///< maximal noise s.t. we can decrypt
+  const LweParams<TORUS> extracted_lweparams; ///< lwe params if one extracts
 
-#ifdef __cplusplus
-    TLweParams(int N, int k, double alpha_min, double alpha_max);
-    ~TLweParams();
-    TLweParams(const TLweParams&) = delete;
-    void operator=(const TLweParams&) = delete;
-#endif
+  inline TLweParams(int N, int k, double alpha_min, double alpha_max)
+  : N(N),
+    k(k),
+    alpha_min(alpha_min),
+    alpha_max(alpha_max),
+    extracted_lweparams(N*k,alpha_min, alpha_max) { }
+
+  inline ~TLweParams() { }
+
+  TLweParams(const TLweParams<TORUS>&) = delete;
+  void operator=(const TLweParams<TORUS>&) = delete;
 };
 
+template<typename TORUS>
 struct TLweKey {
-    const TLweParams* params; ///< the parameters of the key
-    IntPolynomial* key; ///< the key (i.e k binary polynomials)
-#ifdef __cplusplus
-    TLweKey(const TLweParams* params);
-    ~TLweKey();
-    TLweKey(const TLweKey&) = delete;
-    void operator=(const TLweKey&) = delete;
-#endif
+  const TLweParams<TORUS>* params; ///< the parameters of the key
+  IntPolynomial* key; ///< the key (i.e k binary polynomials)
+
+  TLweKey(const TLweParams<TORUS>* params);
+  ~TLweKey();
+  TLweKey(const TLweKey<TORUS>&) = delete;
+  void operator=(const TLweKey<TORUS>&) = delete;
 };
 
-
+template<typename TORUS>
 struct TLweSample {
-    TorusPolynomial* a; ///< array of length k+1: mask + right term
-    TorusPolynomial* b; ///< alias of a[k] to get the right term
-    double current_variance; ///< avg variance of the sample
-    const int k; 
-#ifdef __cplusplus
-    TLweSample(const TLweParams* params);
-    ~TLweSample();
-    TLweSample(const TLweSample&) = delete;
-    void operator=(const TLweSample&) = delete;
-#endif
+  TorusPolynomial<TORUS>* a; ///< array of length k+1: mask + right term
+  TorusPolynomial<TORUS>* b; ///< alias of a[k] to get the right term
+  double current_variance; ///< avg variance of the sample
+  const int k;
+
+  TLweSample(const TLweParams<TORUS>* params);
+  ~TLweSample();
+  TLweSample(const TLweSample<TORUS>&) = delete;
+  void operator=(const TLweSample<TORUS>&) = delete;
 };
 
+template<typename TORUS>
 struct TLweSampleFFT {
-    LagrangeHalfCPolynomial* a; ///< array of length k+1: mask + right term
-    LagrangeHalfCPolynomial* b; ///< alias of a[k] to get the right term
-    double current_variance; ///< avg variance of the sample
-    const int k; //required during the destructor call...
-#ifdef __cplusplus
-    TLweSampleFFT(const TLweParams* params, LagrangeHalfCPolynomial* a, double current_variance);
-    ~TLweSampleFFT();
-    TLweSampleFFT(const TLweSampleFFT&) = delete;
-    void operator=(const TLweSampleFFT&) = delete;
-#endif
+  const int k; //required during the destructor call...
+  LagrangeHalfCPolynomial* a; ///< array of length k+1: mask + right term
+  LagrangeHalfCPolynomial* b; ///< alias of a[k] to get the right term
+  double current_variance; ///< avg variance of the sample
+
+  inline TLweSampleFFT(const TLweParams<TORUS>* params, LagrangeHalfCPolynomial* arr, double current_variance)
+  : k(params->k),
+    a(arr),
+    b(a+k),
+    current_variance(0) { }
+
+  inline ~TLweSampleFFT() { }
+
+  TLweSampleFFT(const TLweSampleFFT<TORUS>&) = delete;
+  void operator=(const TLweSampleFFT<TORUS>&) = delete;
+
+  static void init_obj(TLweSampleFFT<TORUS>* obj, const TLweParams<TORUS>* params);
+  static void destroy_obj(TLweSampleFFT<TORUS>* obj)  ;
 };
 
+template struct TLweParams<Torus32>;
+template struct TLweParams<Torus64>;
 
-//allocate memory space for a TLweParams
-EXPORT TLweParams* alloc_TLweParams();
-EXPORT TLweParams* alloc_TLweParams_array(int nbelts);
+template struct TLweKey<Torus32>;
+template struct TLweKey<Torus64>;
 
-//free memory space for a TLweParams
-EXPORT void free_TLweParams(TLweParams* ptr);
-EXPORT void free_TLweParams_array(int nbelts, TLweParams* ptr);
+template struct TLweSample<Torus32>;
+template struct TLweSample<Torus64>;
 
-//initialize the TLweParams structure
-//(equivalent of the C++ constructor)
-EXPORT void init_TLweParams(TLweParams* obj, int N, int k, double alpha_min, double alpha_max);
-EXPORT void init_TLweParams_array(int nbelts, TLweParams* obj, int N, int k, double alpha_min, double alpha_max);
+template struct TLweSampleFFT<Torus32>;
+template struct TLweSampleFFT<Torus64>;
 
-//destroys the TLweParams structure
-//(equivalent of the C++ destructor)
-EXPORT void destroy_TLweParams(TLweParams* obj);
-EXPORT void destroy_TLweParams_array(int nbelts, TLweParams* obj);
- 
+
 //allocates and initialize the TLweParams structure
 //(equivalent of the C++ new)
-EXPORT TLweParams* new_TLweParams(int N, int k, double alpha_min, double alpha_max);
-EXPORT TLweParams* new_TLweParams_array(int nbelts, int N, int k, double alpha_min, double alpha_max);
+template<typename TORUS>
+inline TLweParams<TORUS>* new_TLweParams(int N, int k, double alpha_min, double alpha_max) {
+  return new_obj<TLweParams<TORUS>>(N, k, alpha_min, alpha_max);
+}
+
+template<typename TORUS>
+inline TLweParams<TORUS>* new_TLweParams_array(int nbelts, int N, int k, double alpha_min, double alpha_max) {
+  return new_obj_array<TLweParams<TORUS>>(nbelts, N, k, alpha_min, alpha_max);
+}
 
 //destroys and frees the TLweParams structure
 //(equivalent of the C++ delete)
-EXPORT void delete_TLweParams(TLweParams* obj);
-EXPORT void delete_TLweParams_array(int nbelts, TLweParams* obj);
+template<typename TORUS>
+inline void delete_TLweParams(TLweParams<TORUS>* obj) {
+  del_obj<TLweParams<TORUS>>(obj);
+}
 
-//-----------------------------------------------------------------
-// autogenerated allocators/constructors/destructors declarations
-// use code_autogen.pl TLweKey TLweParams to regenerate
-//-----------------------------------------------------------------
+template<typename TORUS>
+inline void delete_TLweParams_array(int nbelts, TLweParams<TORUS>* obj) {
+  del_obj_array<TLweParams<TORUS>>(nbelts, obj);
+}
 
 
-/** allocate space for a single TLweKey */
-EXPORT TLweKey* alloc_TLweKey();
-/** allocate space for an array of TLweKey 
- * @param nbelts the number of elements */
-EXPORT TLweKey* alloc_TLweKey_array(int nbelts);
-
-/** free memory space for a single TLweKey 
- * @param ptr the pointer to release */
-EXPORT void free_TLweKey(TLweKey* ptr);
-/** free memory space for an array of TLweKey 
- * @param nbelts the number of elements 
- * @param ptr the pointer to release */
-EXPORT void free_TLweKey_array(int nbelts, TLweKey* ptr);
-
-/** initializes (constructor) a single TLweKey on an already allocated space 
- * @param ptr the pointer to the first element
+/** allocates and initializes (constructor) a single TLweKey
  * @param params the LWE parameters to use
  */
-EXPORT void init_TLweKey(TLweKey* ptr, const TLweParams* params);
+template<typename TORUS>
+inline TLweKey<TORUS>* new_TLweKey(const TLweParams<TORUS>* params) {
+  return new_obj<TLweKey<TORUS>>(params);
+}
 
-/** initializes (constructor) an array of TLweKeys on an already allocated space 
- * @param nbelts the number of elements to initialize 
- * @param ptr the pointer to the first element
+/** allocates and initializes (constructor) a single TLweKey
+ * @param nbelts the number of consecutive elements to create
  * @param params the LWE parameters to use
  */
-EXPORT void init_TLweKey_array(int nbelts, TLweKey* ptr, const TLweParams* params);
+template<typename TORUS>
+inline TLweKey<TORUS>* new_TLweKey_array(int nbelts, const TLweParams<TORUS>* params) {
+  return new_obj_array<TLweKey<TORUS>>(nbelts, params);
+}
 
-/** finalizes (destructor) a single TLweKey (before freeing the memory space) 
- * @param ptr the pointer to the first element
- */
-EXPORT void destroy_TLweKey(TLweKey* ptr);
-
-/** finalizes (destructor) an array of TLweKeys (before freeing the memory space) 
- * @param nbelts the number of elements to initialize 
- * @param ptr the pointer to the first element
- */
-EXPORT void destroy_TLweKey_array(int nbelts, TLweKey* ptr);
- 
-/** allocates and initializes (constructor) a single TLweKey 
- * @param params the LWE parameters to use
- */
-EXPORT TLweKey* new_TLweKey(const TLweParams* params);
-/** allocates and initializes (constructor) a single TLweKey 
- * @param nbelts the number of consecutive elements to create 
- * @param params the LWE parameters to use
- */
-EXPORT TLweKey* new_TLweKey_array(int nbelts, const TLweParams* params);
-
-/** destroy and frees memory space for a single TLweKey 
+/** destroy and frees memory space for a single TLweKey
  * @param ptr the pointer to release */
-EXPORT void delete_TLweKey(TLweKey* obj);
-/** destroys and free memory space for an array of TLweKey 
- * @param nbelts the number of elements 
+template<typename TORUS>
+inline void delete_TLweKey(TLweKey<TORUS>* obj) {
+  del_obj<TLweKey<TORUS>>(obj);
+}
+
+/** destroys and free memory space for an array of TLweKey
+ * @param nbelts the number of elements
  * @param ptr the pointer to release */
-EXPORT void delete_TLweKey_array(int nbelts, TLweKey* obj);
+template<typename TORUS>
+inline void delete_TLweKey_array(int nbelts, TLweKey<TORUS>* obj) {
+  del_obj_array<TLweKey<TORUS>>(nbelts, obj);
+}
 
 
-//-----------------------------------------------------------------
-// autogenerated allocators/constructors/destructors declarations
-// use code_autogen.pl TLweSample TLweParams to regenerate
-//-----------------------------------------------------------------
-
-
-/** allocate space for a single TLweSample */
-EXPORT TLweSample* alloc_TLweSample();
-/** allocate space for an array of TLweSample 
- * @param nbelts the number of elements */
-EXPORT TLweSample* alloc_TLweSample_array(int nbelts);
-
-/** free memory space for a single TLweSample 
- * @param ptr the pointer to release */
-EXPORT void free_TLweSample(TLweSample* ptr);
-/** free memory space for an array of TLweSample 
- * @param nbelts the number of elements 
- * @param ptr the pointer to release */
-EXPORT void free_TLweSample_array(int nbelts, TLweSample* ptr);
-
-/** initializes (constructor) a single TLweSample on an already allocated space 
- * @param ptr the pointer to the first element
+/** allocates and initializes (constructor) a single TLweSample
  * @param params the LWE parameters to use
  */
-EXPORT void init_TLweSample(TLweSample* ptr, const TLweParams* params);
+template<typename TORUS>
+inline TLweSample<TORUS>* new_TLweSample(const TLweParams<TORUS>* params) {
+  return new_obj<TLweSample<TORUS>>(params);
+}
 
-/** initializes (constructor) an array of TLweSamples on an already allocated space 
- * @param nbelts the number of elements to initialize 
- * @param ptr the pointer to the first element
+/** allocates and initializes (constructor) a single TLweSample
+ * @param nbelts the number of consecutive elements to create
  * @param params the LWE parameters to use
  */
-EXPORT void init_TLweSample_array(int nbelts, TLweSample* ptr, const TLweParams* params);
+template<typename TORUS>
+inline TLweSample<TORUS>* new_TLweSample_array(int nbelts, const TLweParams<TORUS>* params) {
+  return new_obj_array<TLweSample<TORUS>>(nbelts, params);
+}
 
-/** finalizes (destructor) a single TLweSample (before freeing the memory space) 
- * @param ptr the pointer to the first element
- */
-EXPORT void destroy_TLweSample(TLweSample* ptr);
-
-/** finalizes (destructor) an array of TLweSamples (before freeing the memory space) 
- * @param nbelts the number of elements to initialize 
- * @param ptr the pointer to the first element
- */
-EXPORT void destroy_TLweSample_array(int nbelts, TLweSample* ptr);
- 
-/** allocates and initializes (constructor) a single TLweSample 
- * @param params the LWE parameters to use
- */
-EXPORT TLweSample* new_TLweSample(const TLweParams* params);
-/** allocates and initializes (constructor) a single TLweSample 
- * @param nbelts the number of consecutive elements to create 
- * @param params the LWE parameters to use
- */
-EXPORT TLweSample* new_TLweSample_array(int nbelts, const TLweParams* params);
-
-/** destroy and frees memory space for a single TLweSample 
+/** destroy and frees memory space for a single TLweSample
  * @param ptr the pointer to release */
-EXPORT void delete_TLweSample(TLweSample* obj);
-/** destroys and free memory space for an array of TLweSample 
- * @param nbelts the number of elements 
+template<typename TORUS>
+inline void delete_TLweSample(TLweSample<TORUS>* obj) {
+  del_obj<TLweSample<TORUS>>(obj);
+}
+
+/** destroys and free memory space for an array of TLweSample
+ * @param nbelts the number of elements
  * @param ptr the pointer to release */
-EXPORT void delete_TLweSample_array(int nbelts, TLweSample* obj);
+template<typename TORUS>
+inline void delete_TLweSample_array(int nbelts, TLweSample<TORUS>* obj) {
+  del_obj<TLweSample<TORUS>>(nbelts, obj);
+}
 
 
-//-----------------------------------------------------------------
-// autogenerated allocators/constructors/destructors declarations
-// use code_autogen.pl TLweSampleFFT TLweParams to regenerate
-//-----------------------------------------------------------------
-
-
-/** allocate space for a single TLweSampleFFT */
-EXPORT TLweSampleFFT* alloc_TLweSampleFFT();
-/** allocate space for an array of TLweSampleFFT 
- * @param nbelts the number of elements */
-EXPORT TLweSampleFFT* alloc_TLweSampleFFT_array(int nbelts);
-
-/** free memory space for a single TLweSampleFFT 
- * @param ptr the pointer to release */
-EXPORT void free_TLweSampleFFT(TLweSampleFFT* ptr);
-/** free memory space for an array of TLweSampleFFT 
- * @param nbelts the number of elements 
- * @param ptr the pointer to release */
-EXPORT void free_TLweSampleFFT_array(int nbelts, TLweSampleFFT* ptr);
-
-/** initializes (constructor) a single TLweSampleFFT on an already allocated space 
- * @param ptr the pointer to the first element
+/** allocates and initializes (constructor) a single TLweSampleFFT
  * @param params the LWE parameters to use
  */
-EXPORT void init_TLweSampleFFT(TLweSampleFFT* ptr, const TLweParams* params);
+template<typename TORUS>
+inline TLweSampleFFT<TORUS>* new_TLweSampleFFT(const TLweParams<TORUS>* params) {
+  return new_obj<TLweSampleFFT<TORUS>>(params);
+}
 
-/** initializes (constructor) an array of TLweSampleFFTs on an already allocated space 
- * @param nbelts the number of elements to initialize 
- * @param ptr the pointer to the first element
+/** allocates and initializes (constructor) a single TLweSampleFFT
+ * @param nbelts the number of consecutive elements to create
  * @param params the LWE parameters to use
  */
-EXPORT void init_TLweSampleFFT_array(int nbelts, TLweSampleFFT* ptr, const TLweParams* params);
+template<typename TORUS>
+inline TLweSampleFFT<TORUS>* new_TLweSampleFFT_array(int nbelts, const TLweParams<TORUS>* params) {
+  return new_obj_array<TLweSampleFFT<TORUS>>(nbelts, params);
+}
 
-/** finalizes (destructor) a single TLweSampleFFT (before freeing the memory space) 
- * @param ptr the pointer to the first element
- */
-EXPORT void destroy_TLweSampleFFT(TLweSampleFFT* ptr);
-
-/** finalizes (destructor) an array of TLweSampleFFTs (before freeing the memory space) 
- * @param nbelts the number of elements to initialize 
- * @param ptr the pointer to the first element
- */
-EXPORT void destroy_TLweSampleFFT_array(int nbelts, TLweSampleFFT* ptr);
- 
-/** allocates and initializes (constructor) a single TLweSampleFFT 
- * @param params the LWE parameters to use
- */
-EXPORT TLweSampleFFT* new_TLweSampleFFT(const TLweParams* params);
-/** allocates and initializes (constructor) a single TLweSampleFFT 
- * @param nbelts the number of consecutive elements to create 
- * @param params the LWE parameters to use
- */
-EXPORT TLweSampleFFT* new_TLweSampleFFT_array(int nbelts, const TLweParams* params);
-
-/** destroy and frees memory space for a single TLweSampleFFT 
+/** destroy and frees memory space for a single TLweSampleFFT
  * @param ptr the pointer to release */
-EXPORT void delete_TLweSampleFFT(TLweSampleFFT* obj);
-/** destroys and free memory space for an array of TLweSampleFFT 
- * @param nbelts the number of elements 
+template<typename TORUS>
+inline void delete_TLweSampleFFT(TLweSampleFFT<TORUS>* obj) {
+  del_obj<TLweSampleFFT<TORUS>>(obj);
+}
+
+/** destroys and free memory space for an array of TLweSampleFFT
+ * @param nbelts the number of elements
  * @param ptr the pointer to release */
-EXPORT void delete_TLweSampleFFT_array(int nbelts, TLweSampleFFT* obj);
+template<typename TORUS>
+inline void delete_TLweSampleFFT_array(int nbelts, TLweSampleFFT<TORUS>* obj) {
+  del_obj<TLweSampleFFT<TORUS>>(nbelts, obj);
+}
+
+template<typename TORUS>
+void init_obj(TLweSampleFFT<TORUS>* obj, const TLweParams<TORUS>* params) {
+  TLweSampleFFT<TORUS>::init_obj(obj, params);
+}
+
+template<typename TORUS>
+void destroy_obj(TLweSampleFFT<TORUS>* obj) {
+  TLweSampleFFT<TORUS>::destroy_obj(obj);
+}
 
 #endif // RINGLWE_H

@@ -9,19 +9,263 @@
 #include "lwesamples.h"
 #include "tlwe.h"
 #include "tgsw.h"
-#include "tfhe.h" //TODO proprify dependencies
+#include "tfhe_gate.h" //TODO proprify dependencies
+#include <tfhe_generic_streams.h>
 
-#ifdef __cplusplus
 #include <cstdio>
 #include <iostream>
-#else
 #include <stdio.h>
-#endif
 
+template<typename TORUS>
+struct IOFunctions
+{
+  /* ****************************
+   * LWE params
+  **************************** */
+  /**
+   * This function prints a lweParams to a stream
+   */
+  static void write_lweParams(Ostream& out, const LweParams<TORUS>* lweparams);
+
+  /**
+   * This constructor function reads and creates a LWEParams from a stream. The result
+   * must be deleted with delete_lweParams();
+   */
+  static LweParams<TORUS>* read_new_lweParams(Istream& in);
+
+
+  /* ****************************
+   * LWE samples
+  **************************** */
+  /**
+   * This function prints the lwe sample to a stream
+   */
+  static void write_lweSample(Ostream& F, const LweSample<TORUS>* lwesample, const LweParams<TORUS>* params);
+
+  /**
+   * This function reads a LWESample from a stream in an
+   * already allocated lwesample.
+   */
+  static void read_lweSample(Istream& in, LweSample<TORUS>* lwesample, const LweParams<TORUS>* params);
+
+
+  /* ****************************
+   * LWE key
+  **************************** */
+  static void read_lweKey_content(Istream& F, LweKey<TORUS>* key);
+  static void write_lweKey_content(Ostream& F, const LweKey<TORUS>* key);
+
+  /**
+   * This function prints the lwe parameters to a stream
+   */
+  static void write_lweKey(Ostream& F, const LweKey<TORUS>* lwekey, bool output_params=true);
+
+  /**
+   * This constructor function reads and creates a LWEKey from a stream. The result
+   * must be deleted with delete_lweKey();
+   */
+  static LweKey<TORUS>* read_new_lweKey(Istream& F, const LweParams<TORUS>* params=0x0);
+
+
+  /* ****************************
+   * TLWE params
+  **************************** */
+  /**
+   * This constructor function reads and creates a TLWEParams from a File. The result
+   * must be deleted with delete_TLweParams();
+   */
+  static void write_tLweParams(Ostream& F, const TLweParams<TORUS>* tlweparams);
+
+  /**
+   * This constructor function reads and creates a TLWEParams from a stream. The result
+   * must be deleted with delete_TLweParams();
+   */
+  static TLweParams<TORUS>* read_new_tLweParams(Istream& in);
+
+
+  /* ****************************
+   * TLWE samples
+  **************************** */
+  /**
+   * This function prints the tlwe sample to a stream
+   */
+  static void write_tLweSample(Ostream& F, const TLweSample<TORUS>* tlwesample, const TLweParams<TORUS>* params);
+
+  /**
+   * This function reads a TLWESample from a stream in an
+   * already allocated tlwesample.
+   */
+  static void read_tLweSample(Istream& in, TLweSample<TORUS>* tlwesample, const TLweParams<TORUS>* params);
+
+
+  /* ****************************
+   * TLWE key
+  **************************** */
+  static void read_tLweKey_content(Istream& F, TLweKey<TORUS>* key);
+  static void write_tLweKey_content(Ostream& F, const TLweKey<TORUS>* key);
+
+  /**
+   * This function prints the tlwe parameters to a stream
+   */
+  static void write_tLweKey(Ostream& F, const TLweKey<TORUS>* tlwekey);
+
+  /**
+   * This constructor function reads and creates a TLWEKey from a stream. The result
+   * must be deleted with delete_tlweKey();
+   */
+  static TLweKey<TORUS>* read_new_tLweKey(Istream& F);
+
+
+  /* ****************************
+   * TGSW params
+  **************************** */
+  static void write_tGswParams_section(Ostream& F, const TGswParams<TORUS>* tgswparams);
+  static TGswParams<TORUS>* read_new_tGswParams_section(Istream& F, const TLweParams<TORUS>* tlwe_params);
+
+  /**
+   * This constructor function reads and creates a TGSWParams from a File. The result
+   * must be deleted with delete_TGswParams();
+   */
+  static void write_tGswParams(Ostream& F, const TGswParams<TORUS>* tgswparams);
+
+  /**
+   * This constructor function reads and creates a TGSWParams from a stream. The result
+   * must be deleted with delete_TGswParams();
+   */
+  static TGswParams<TORUS>* read_new_tGswParams(Istream& in);
+
+
+  /* ****************************
+   * TGSW samples
+  **************************** */
+  /**
+   * This function prints the tgsw sample to a stream
+   */
+  static void write_tGswSample(Ostream& F, const TGswSample<TORUS>* tgswsample, const TGswParams<TORUS>* params);
+
+  /**
+   * This function reads a TGSWSample from a stream in an
+   * already allocated tgswsample.
+   */
+  static void read_tGswSample(Istream& F, TGswSample<TORUS>* tgswsample, const TGswParams<TORUS>* params);
+
+
+  /* ****************************
+   * TGSW key
+  **************************** */
+  static void read_tGswKey_content(Istream& F, TGswKey<TORUS>* key);
+  static void write_tGswKey_content(Ostream& F, const TGswKey<TORUS>* key);
+
+  /**
+   * This function prints the tgsw parameters to a stream
+   */
+  static void write_tGswKey(Ostream& F, const TGswKey<TORUS>* tgswkey, bool output_params=true);
+
+  /**
+   * This constructor function reads and creates a TGSWKey from a stream. The result
+   * must be deleted with delete_tgswKey();
+   */
+  static TGswKey<TORUS>* read_new_tGswKey(Istream& F, const TGswParams<TORUS>* params=0x0);
+
+
+  /* ****************************
+   * Lwe Keyswitch key
+   **************************** */
+  struct LweKeySwitchParameters {
+    int n;
+    int t;
+    int basebit;
+  };
+
+  static void write_LweKeySwitchParameters_section(Ostream& F, const LweKeySwitchKey<TORUS>* ks);
+  static void read_lweKeySwitchParameters_section(Istream& F, LweKeySwitchParameters* reps);
+  static void write_LweKeySwitchKey_content(Ostream& F, const LweKeySwitchKey<TORUS>* ks);
+  static void read_lweKeySwitchKey_content(Istream& F, LweKeySwitchKey<TORUS>* ks);
+
+  /**
+   * This function exports a lwe keyswitch key (in binary) to a file
+   */
+  static void write_lweKeySwitchKey(Ostream& F, const LweKeySwitchKey<TORUS>* ks, bool output_LweParams=true);
+
+  /**
+   * This constructor function reads and creates a LweKeySwitchKey from a File. The result
+   * must be deleted with delete_LweKeySwitchKey();
+   */
+  static LweKeySwitchKey<TORUS>* read_new_lweKeySwitchKey(Istream& F, const LweParams<TORUS>* out_params=0);
+
+
+  /* ****************************
+   * Lwe Bootstrapping key
+   **************************** */
+  static void write_LweBootstrappingKey_content(Ostream& F, const LweBootstrappingKey<TORUS>* bk);
+  static void read_LweBootstrappingKey_content(Istream& F, LweBootstrappingKey<TORUS>* bk);
+
+  /**
+   * This function exports a lwe bootstrapping key (in binary) to a file
+   */
+  static void write_lweBootstrappingKey(Ostream& F, const LweBootstrappingKey<TORUS>* bk, bool write_inout_params=true, bool write_bk_params=true);
+
+  /**
+   * This constructor function reads and creates a LweBootstrappingKey from a File. The result
+   * must be deleted with delete_LweBootstrappingKey();
+   */
+  static LweBootstrappingKey<TORUS>* read_new_lweBootstrappingKey(Istream& F, const LweParams<TORUS>* in_out_params=0, const TGswParams<TORUS>* bk_params=0);
+
+
+  /* ****************************
+   * TFheGateBootstrappingParameterSet key
+   **************************** */
+  static void write_tfheGateBootstrappingProperParameters_section(Ostream& F, const TFheGateBootstrappingParameterSet<TORUS>* params);
+  static void read_tfheGateBootstrappingProperParameters_section(Istream& F, int& ks_t, int& ks_basebit);
+
+  /**
+   * This function prints the tfhe gate bootstrapping parameter set to a file
+   */
+  static void write_tfheGateBootstrappingParameters(Ostream& F, const TFheGateBootstrappingParameterSet<TORUS>* params);
+
+  /**
+   * This constructor function reads and creates a tfhe gate bootstrapping parameter set from a File. The result
+   * must be deleted with delete_tfheGateBootstrappingParameterSet();
+   */
+  static TFheGateBootstrappingParameterSet<TORUS>* read_new_tfheGateBootstrappingParameters(Istream& F);
+
+
+  /* ****************************
+   * TFheGateBootstrappingCloudKeySet
+   **************************** */
+  /**
+   * This function prints the tfhe gate bootstrapping cloud key to a file
+   */
+  static void write_tfheGateBootstrappingCloudKeySet(Ostream& F, const TFheGateBootstrappingCloudKeySet<TORUS>* params, bool output_gbparams=true);
+
+  /**
+   * This constructor function reads and creates a tfhe gate bootstrapping cloud key from a File. The result
+   * must be deleted with delete_tfheGateBootstrappingCloudKeySet();
+   */
+  static TFheGateBootstrappingCloudKeySet<TORUS>* read_new_tfheGateBootstrappingCloudKeySet(Istream& F, const TFheGateBootstrappingParameterSet<TORUS>* params=0);
+
+
+  /* ****************************
+   * TFheGateBootstrappingSecretKeySet
+   **************************** */
+  /**
+   * This function prints the tfhe gate bootstrapping secret key to a file
+   */
+  static void write_tfheGateBootstrappingSecretKeySet(Ostream& F, const TFheGateBootstrappingSecretKeySet<TORUS>* params, bool output_gbparams=true);
+
+  /**
+   * This constructor function reads and creates a TGSWKey from a stream. The result
+   * must be deleted with delete_tfheGateBootstrappingSecretKeySet();
+   */
+  static TFheGateBootstrappingSecretKeySet<TORUS>* read_new_tfheGateBootstrappingSecretKeySet(Istream& F, const TFheGateBootstrappingParameterSet<TORUS>* params=0);
+};
+
+template struct IOFunctions<Torus32>;
+template struct IOFunctions<Torus64>;
 
 
 /* ********************************************************
- * LWE 
+ * LWE
 ******************************************************** */
 
 /* ****************************
@@ -31,29 +275,36 @@
 /**
  * This function prints the lwe parameters to a file
  */
-EXPORT void export_lweParams_toFile(FILE* F, const LweParams* lweparams);
+template<typename TORUS>
+inline void export_lweParams_toFile(FILE* F, const LweParams<TORUS>* lweparams) {
+  IOFunctions<TORUS>::write_lweParams(to_Ostream(F));
+}
 
 /**
  * This constructor function reads and creates a LWEParams from a File. The result
  * must be deleted with delete_lweParams();
  */
-EXPORT LweParams* new_lweParams_fromFile(FILE* F);
-
-
-#ifdef __cplusplus
+template<typename TORUS>
+inline LweParams<TORUS>* new_lweParams_fromFile(FILE* F) {
+  IOFunctions<TORUS>::read_new_lweParams(to_Istream(F));
+}
 
 /**
  * This function prints a lweParams to a stream
  */
-EXPORT void export_lweParams_toStream(std::ostream& out, const LweParams* lweparams);
+template<typename TORUS>
+inline void export_lweParams_toStream(std::ostream& out, const LweParams<TORUS>* lweparams) {
+  IOFunctions<TORUS>::write_lweParams(to_Ostream(out));
+}
 
 /**
  * This constructor function reads and creates a LWEParams from a stream. The result
  * must be deleted with delete_lweParams();
  */
-EXPORT LweParams* new_lweParams_fromStream(std::istream& in);
-
-#endif
+template<typename TORUS>
+inline LweParams<TORUS>* new_lweParams_fromStream(std::istream& in) {
+  IOFunctions<TORUS>::read_new_lweParams(to_Istream(in));
+}
 
 /* ****************************
  * LWE sample
@@ -62,28 +313,36 @@ EXPORT LweParams* new_lweParams_fromStream(std::istream& in);
 /**
  * This function prints the lwe sample to a file
  */
-EXPORT void export_lweSample_toFile(FILE* F, const LweSample* lwesample, const LweParams* params);
+template<typename TORUS>
+inline void export_lweSample_toFile(FILE* F, const LweSample<TORUS>* lwesample, const LweParams<TORUS>* params) {
+  IOFunctions<TORUS>::write_lweSample(to_Ostream(F));
+}
 
 /**
  * This function reads a LWESample from a stream in an
  * already allocated lwesample.
  */
-EXPORT void import_lweSample_fromFile(FILE* F, LweSample* lwesample, const LweParams* params);
-
-#ifdef __cplusplus
+template<typename TORUS>
+inline void import_lweSample_fromFile(FILE* F, LweSample<TORUS>* lwesample, const LweParams<TORUS>* params) {
+  IOFunctions<TORUS>::read_lweSample(to_Istream(F));
+}
 
 /**
  * This function prints the lwe sample to a stream
  */
-EXPORT void export_lweSample_toStream(std::ostream& F, const LweSample* lwesample, const LweParams* params);
+template<typename TORUS>
+inline void export_lweSample_toStream(std::ostream& out, const LweSample<TORUS>* lwesample, const LweParams<TORUS>* params) {
+  IOFunctions<TORUS>::write_lweSample(to_Ostream(out));
+}
 
 /**
  * This function reads a LWESample from a stream in an
  * already allocated lwesample.
  */
-EXPORT void import_lweSample_fromStream(std::istream& in, LweSample* lwesample, const LweParams* params);
-
-#endif
+template<typename TORUS>
+inline void import_lweSample_fromStream(std::istream& in, LweSample<TORUS>* lwesample, const LweParams<TORUS>* params) {
+  IOFunctions<TORUS>::read_lweSample(to_Istream(in));
+}
 
 /* ****************************
  * LWE key
@@ -92,32 +351,39 @@ EXPORT void import_lweSample_fromStream(std::istream& in, LweSample* lwesample, 
 /**
  * This function prints the lwe parameters to a file
  */
-EXPORT void export_lweKey_toFile(FILE* F, const LweKey* lwekey);
+template<typename TORUS>
+inline void export_lweKey_toFile(FILE* F, const LweKey<TORUS>* lwekey) {
+  IOFunctions<TORUS>::write_lweKey(to_Ostream(F));
+}
 
 /**
  * This constructor function reads and creates a LWEKey from a File. The result
  * must be deleted with delete_lweKey();
  */
-EXPORT LweKey* new_lweKey_fromFile(FILE* F);
-
-#ifdef __cplusplus
+template<typename TORUS>
+inline LweKey<TORUS>* new_lweKey_fromFile(FILE* F) {
+  IOFunctions<TORUS>::read_new_lweKey(to_Istream(F));
+}
 
 /**
  * This function prints the lwe parameters to a stream
  */
-EXPORT void export_lweKey_toStream(std::ostream& F, const LweKey* lwekey);
+template<typename TORUS>
+inline void export_lweKey_toStream(std::ostream& out, const LweKey<TORUS>* lwekey) {
+  IOFunctions<TORUS>::write_lweKey(to_Ostream(out));
+}
 
 /**
  * This constructor function reads and creates a LWEKey from a stream. The result
  * must be deleted with delete_lweKey();
  */
-EXPORT LweKey* new_lweKey_fromStream(std::istream& in);
-
-#endif
-
+template<typename TORUS>
+inline LweKey<TORUS>* new_lweKey_fromStream(std::istream& in) {
+  IOFunctions<TORUS>::read_new_lweKey(to_Istream(in));
+}
 
 /* ********************************************************
- * TLWE 
+ * TLWE
 ******************************************************** */
 
 /* ****************************
@@ -127,30 +393,38 @@ EXPORT LweKey* new_lweKey_fromStream(std::istream& in);
 /**
  * This function prints the tLwe parameters to a file
  */
-EXPORT void export_tLweParams_toFile(FILE* F, const TLweParams* tlweparams);
+template<typename TORUS>
+inline void export_tLweParams_toFile(FILE* F, const TLweParams<TORUS>* tlweparams) {
+  IOFunctions<TORUS>::write_tLweParams(to_Ostream(F));
+}
 
 /**
  * This constructor function reads and creates a TLWEParams from a File. The result
  * must be deleted with delete_TLweParams();
  */
-EXPORT TLweParams* new_tLweParams_fromFile(FILE* F);
+template<typename TORUS>
+inline TLweParams<TORUS>* new_tLweParams_fromFile(FILE* F) {
+  IOFunctions<TORUS>::read_new_tLweParams(to_Istream(F));
+}
 
-#ifdef __cplusplus
 
 /**
  * This constructor function reads and creates a TLWEParams from a File. The result
  * must be deleted with delete_TLweParams();
  */
-EXPORT void export_tLweParams_toStream(std::ostream& F, const TLweParams* tlweparams);
+template<typename TORUS>
+inline void export_tLweParams_toStream(std::ostream& out, const TLweParams<TORUS>* tlweparams) {
+  IOFunctions<TORUS>::write_tLweParams(to_Ostream(out));
+}
 
 /**
  * This constructor function reads and creates a TLWEParams from a stream. The result
  * must be deleted with delete_TLweParams();
  */
-EXPORT TLweParams* new_tLweParams_fromStream(std::istream& in);
-
-#endif
-
+template<typename TORUS>
+inline TLweParams<TORUS>* new_tLweParams_fromStream(std::istream& in) {
+  IOFunctions<TORUS>::read_new_tLweParams(to_Istream(in));
+}
 
 /* ****************************
  * TLWE sample
@@ -159,28 +433,36 @@ EXPORT TLweParams* new_tLweParams_fromStream(std::istream& in);
 /**
  * This function prints the tlwe sample to a file
  */
-EXPORT void export_tlweSample_toFile(FILE* F, const TLweSample* tlwesample, const TLweParams* params);
+template<typename TORUS>
+inline void export_tlweSample_toFile(FILE* F, const TLweSample<TORUS>* tlwesample, const TLweParams<TORUS>* params) {
+  IOFunctions<TORUS>::write_tLweSample(to_Ostream(F));
+}
 
 /**
  * This function reads a TLWESample from a stream in an
  * already allocated tlwesample.
  */
-EXPORT void import_tlweSample_fromFile(FILE* F, TLweSample* tlwesample, const TLweParams* params);
-
-#ifdef __cplusplus
+template<typename TORUS>
+inline void import_tlweSample_fromFile(FILE* F, TLweSample<TORUS>* tlwesample, const TLweParams<TORUS>* params) {
+  IOFunctions<TORUS>::read_tLweSample(to_Istream(F));
+}
 
 /**
  * This function prints the tlwe sample to a stream
  */
-EXPORT void export_tlweSample_toStream(std::ostream& F, const TLweSample* tlwesample, const TLweParams* params);
+template<typename TORUS>
+inline void export_tlweSample_toStream(std::ostream& out, const TLweSample<TORUS>* tlwesample, const TLweParams<TORUS>* params) {
+  IOFunctions<TORUS>::write_tLweSample(to_Ostream(out));
+}
 
 /**
  * This function reads a TLWESample from a stream in an
  * already allocated tlwesample.
  */
-EXPORT void import_tlweSample_fromStream(std::istream& in, TLweSample* tlwesample, const TLweParams* params);
-
-#endif
+template<typename TORUS>
+inline void import_tlweSample_fromStream(std::istream& in, TLweSample<TORUS>* tlwesample, const TLweParams<TORUS>* params) {
+  IOFunctions<TORUS>::read_tLweSample(to_Istream(in));
+}
 
 /* ****************************
  * TLWE key
@@ -189,34 +471,39 @@ EXPORT void import_tlweSample_fromStream(std::istream& in, TLweSample* tlwesampl
 /**
  * This function prints the tlwe parameters to a file
  */
-EXPORT void export_tlweKey_toFile(FILE* F, const TLweKey* tlwekey);
+template<typename TORUS>
+inline void export_tlweKey_toFile(FILE* F, const TLweKey<TORUS>* tlwekey) {
+  IOFunctions<TORUS>::write_tLweKey(to_Ostream(F));
+}
 
 /**
  * This constructor function reads and creates a TLWEKey from a File. The result
  * must be deleted with delete_tlweKey();
  */
-EXPORT TLweKey* new_tlweKey_fromFile(FILE* F);
-
-#ifdef __cplusplus
+template<typename TORUS>
+inline TLweKey<TORUS>* new_tlweKey_fromFile(FILE* F) {
+  IOFunctions<TORUS>::read_new_tLweKey(to_Istream(F));
+}
 
 /**
  * This function prints the tlwe parameters to a stream
  */
-EXPORT void export_tlweKey_toStream(std::ostream& F, const TLweKey* tlwekey);
+template<typename TORUS>
+inline void export_tlweKey_toStream(std::ostream& out, const TLweKey<TORUS>* tlwekey) {
+  IOFunctions<TORUS>::write_tLweKey(to_Ostream(out));
+}
 
 /**
  * This constructor function reads and creates a TLWEKey from a stream. The result
  * must be deleted with delete_tlweKey();
  */
-EXPORT TLweKey* new_tlweKey_fromStream(std::istream& F);
-
-#endif
-
-
-
+template<typename TORUS>
+inline TLweKey<TORUS>* new_tlweKey_fromStream(std::istream& in) {
+  IOFunctions<TORUS>::read_new_tLweKey(to_Istream(in));
+}
 
 /* ********************************************************
- * TGSW 
+ * TGSW
 ******************************************************** */
 
 /* ****************************
@@ -226,33 +513,37 @@ EXPORT TLweKey* new_tlweKey_fromStream(std::istream& F);
 /**
  * This function prints the tLwe parameters to a file
  */
-EXPORT void export_tGswParams_toFile(FILE* F, const TGswParams* tgswparams);
+template<typename TORUS>
+inline void export_tGswParams_toFile(FILE* F, const TGswParams<TORUS>* tgswparams) {
+  IOFunctions<TORUS>::write_tGswParams(to_Ostream(F));
+}
 
 /**
  * This constructor function reads and creates a TGSWParams from a File. The result
  * must be deleted with delete_TGswParams();
  */
-EXPORT TGswParams* new_tGswParams_fromFile(FILE* F);
-
-
-
-#ifdef __cplusplus
+template<typename TORUS>
+inline TGswParams<TORUS>* new_tGswParams_fromFile(FILE* F) {
+  IOFunctions<TORUS>::read_new_tGswParams(to_Istream(F));
+}
 
 /**
  * This constructor function reads and creates a TGSWParams from a File. The result
  * must be deleted with delete_TGswParams();
  */
-EXPORT void export_tGswParams_toStream(std::ostream& F, const TGswParams* tgswparams);
+template<typename TORUS>
+inline void export_tGswParams_toStream(std::ostream& out, const TGswParams<TORUS>* tgswparams) {
+  IOFunctions<TORUS>::write_tGswParams(to_Ostream(out));
+}
 
 /**
  * This constructor function reads and creates a TGSWParams from a stream. The result
  * must be deleted with delete_TGswParams();
  */
-EXPORT TGswParams* new_tGswParams_fromStream(std::istream& in);
-
-
-#endif
-
+template<typename TORUS>
+inline TGswParams<TORUS>* new_tGswParams_fromStream(std::istream& in) {
+  IOFunctions<TORUS>::read_new_tGswParams(to_Istream(in));
+}
 
 /* ****************************
  * TGSW sample
@@ -261,28 +552,37 @@ EXPORT TGswParams* new_tGswParams_fromStream(std::istream& in);
 /**
  * This function prints the tgsw sample to a file
  */
-EXPORT void export_tgswSample_toFile(FILE* F, const TGswSample* tgswsample, const TGswParams* params);
+template<typename TORUS>
+inline void export_tgswSample_toFile(FILE* F, const TGswSample<TORUS>* tgswsample, const TGswParams<TORUS>* params) {
+  IOFunctions<TORUS>::write_tGswSample(to_Ostream(F));
+}
 
 /**
  * This function reads a TGSWSample from a stream in an
  * already allocated tgswsample.
  */
-EXPORT void import_tgswSample_fromFile(FILE* F, TGswSample* tgswsample, const TGswParams* params);
+template<typename TORUS>
+inline void import_tgswSample_fromFile(FILE* F, TGswSample<TORUS>* tgswsample, const TGswParams<TORUS>* params) {
+  IOFunctions<TORUS>::read_tGswSample(to_Istream(F));
+}
 
-#ifdef __cplusplus
 
 /**
  * This function prints the tgsw sample to a stream
  */
-EXPORT void export_tgswSample_toStream(std::ostream& F, const TGswSample* tgswsample, const TGswParams* params);
+template<typename TORUS>
+inline void export_tgswSample_toStream(std::ostream& out, const TGswSample<TORUS>* tgswsample, const TGswParams<TORUS>* params) {
+  IOFunctions<TORUS>::write_tGswSample(to_Ostream(out));
+}
 
 /**
  * This function reads a TGSWSample from a stream in an
  * already allocated tgswsample.
  */
-EXPORT void import_tgswSample_fromStream(std::istream& F, TGswSample* tgswsample, const TGswParams* params);
-
-#endif
+template<typename TORUS>
+inline void import_tgswSample_fromStream(std::istream& in, TGswSample<TORUS>* tgswsample, const TGswParams<TORUS>* params) {
+  IOFunctions<TORUS>::read_tGswSample(to_Istream(in));
+}
 
 /* ****************************
  * TGSW key
@@ -291,28 +591,36 @@ EXPORT void import_tgswSample_fromStream(std::istream& F, TGswSample* tgswsample
 /**
  * This function prints the tgsw parameters to a file
  */
-EXPORT void export_tgswKey_toFile(FILE* F, const TGswKey* tgswkey);
+template<typename TORUS>
+inline void export_tgswKey_toFile(FILE* F, const TGswKey<TORUS>* tgswkey) {
+  IOFunctions<TORUS>::write_tGswKey(to_Ostream(F));
+}
 
 /**
  * This constructor function reads and creates a TGSWKey from a File. The result
  * must be deleted with delete_tgswKey();
  */
-EXPORT TGswKey* new_tgswKey_fromFile(FILE* F);
-
-#ifdef __cplusplus
+template<typename TORUS>
+inline TGswKey<TORUS>* new_tgswKey_fromFile(FILE* F) {
+  IOFunctions<TORUS>::read_new_tGswKey(to_Istream(F));
+}
 
 /**
  * This function prints the tgsw parameters to a stream
  */
-EXPORT void export_tgswKey_toStream(std::ostream& F, const TGswKey* tgswkey);
+template<typename TORUS>
+inline void export_tgswKey_toStream(std::ostream& out, const TGswKey<TORUS>* tgswkey) {
+  IOFunctions<TORUS>::write_tGswKey(to_Ostream(out));
+}
 
 /**
  * This constructor function reads and creates a TGSWKey from a stream. The result
  * must be deleted with delete_tgswKey();
  */
-EXPORT TGswKey* new_tgswKey_fromStream(std::istream& F);
-
-#endif
+template<typename TORUS>
+inline TGswKey<TORUS>* new_tgswKey_fromStream(std::istream& in) {
+  IOFunctions<TORUS>::read_new_tGswKey(to_Istream(in));
+}
 
 /* ****************************
  * Lwe Keyswitch key
@@ -321,28 +629,36 @@ EXPORT TGswKey* new_tgswKey_fromStream(std::istream& F);
 /**
  * This function exports a lwe keyswitch key (in binary) to a file
  */
-EXPORT void export_lweKeySwitchKey_toFile(FILE* F, const LweKeySwitchKey* ks);
+template<typename TORUS>
+inline void export_lweKeySwitchKey_toFile(FILE* F, const LweKeySwitchKey<TORUS>* ks) {
+  IOFunctions<TORUS>::write_lweKeySwitchKey(to_Ostream(F));
+}
 
 /**
  * This constructor function reads and creates a LweKeySwitchKey from a File. The result
  * must be deleted with delete_LweKeySwitchKey();
  */
-EXPORT LweKeySwitchKey* new_lweKeySwitchKey_fromFile(FILE* F);
-
-#ifdef __cplusplus
+template<typename TORUS>
+inline LweKeySwitchKey<TORUS>* new_lweKeySwitchKey_fromFile(FILE* F) {
+  IOFunctions<TORUS>::read_new_lweKeySwitchKey(to_Istream(F));
+}
 
 /**
  * This function exports a lwe keyswitch key (in binary) to a file
  */
-EXPORT void export_lweKeySwitchKey_toStream(std::ostream& F, const LweKeySwitchKey* ks);
+template<typename TORUS>
+inline void export_lweKeySwitchKey_toStream(std::ostream& out, const LweKeySwitchKey<TORUS>* ks) {
+  IOFunctions<TORUS>::write_lweKeySwitchKey(to_Ostream(out));
+}
 
 /**
  * This constructor function reads and creates a LweKeySwitchKey from a File. The result
  * must be deleted with delete_LweKeySwitchKey();
  */
-EXPORT LweKeySwitchKey* new_lweKeySwitchKey_fromStream(std::istream& F);
-
-#endif
+template<typename TORUS>
+inline LweKeySwitchKey<TORUS>* new_lweKeySwitchKey_fromStream(std::istream& in) {
+  IOFunctions<TORUS>::read_new_lweKeySwitchKey(to_Istream(in));
+}
 
 /* ****************************
  * Lwe Bootstrapping key
@@ -351,28 +667,36 @@ EXPORT LweKeySwitchKey* new_lweKeySwitchKey_fromStream(std::istream& F);
 /**
  * This function exports a lwe bootstrapping key (in binary) to a file
  */
-EXPORT void export_lweBootstrappingKey_toFile(FILE* F, const LweBootstrappingKey* bk);
+template<typename TORUS>
+inline void export_lweBootstrappingKey_toFile(FILE* F, const LweBootstrappingKey<TORUS>* bk) {
+  IOFunctions<TORUS>::write_lweBootstrappingKey(to_Ostream(F));
+}
 
 /**
  * This constructor function reads and creates a LweBootstrappingKey from a File. The result
  * must be deleted with delete_LweBootstrappingKey();
  */
-EXPORT LweBootstrappingKey* new_lweBootstrappingKey_fromFile(FILE* F);
-
-#ifdef __cplusplus
+template<typename TORUS>
+inline LweBootstrappingKey<TORUS>* new_lweBootstrappingKey_fromFile(FILE* F) {
+  IOFunctions<TORUS>::read_new_lweBootstrappingKey(to_Istream(F));
+}
 
 /**
  * This function exports a lwe bootstrapping key (in binary) to a file
  */
-EXPORT void export_lweBootstrappingKey_toStream(std::ostream& F, const LweBootstrappingKey* bk);
+template<typename TORUS>
+inline void export_lweBootstrappingKey_toStream(std::ostream& out, const LweBootstrappingKey<TORUS>* bk) {
+  IOFunctions<TORUS>::write_lweBootstrappingKey(to_Ostream(out));
+}
 
 /**
  * This constructor function reads and creates a LweBootstrappingKey from a File. The result
  * must be deleted with delete_LweBootstrappingKey();
  */
-EXPORT LweBootstrappingKey* new_lweBootstrappingKey_fromStream(std::istream& F);
-
-#endif
+template<typename TORUS>
+inline LweBootstrappingKey<TORUS>* new_lweBootstrappingKey_fromStream(std::istream& in) {
+  IOFunctions<TORUS>::read_new_lweBootstrappingKey(to_Istream(in));
+}
 
 /* ****************************
  * TFheGateBootstrappingParameterSet key
@@ -381,28 +705,36 @@ EXPORT LweBootstrappingKey* new_lweBootstrappingKey_fromStream(std::istream& F);
 /**
  * This function prints the tfhe gate bootstrapping parameter set to a file
  */
-EXPORT void export_tfheGateBootstrappingParameterSet_toFile(FILE* F, const TFheGateBootstrappingParameterSet* params);
+template<typename TORUS>
+inline void export_tfheGateBootstrappingParameterSet_toFile(FILE* F, const TFheGateBootstrappingParameterSet<TORUS>* params) {
+  IOFunctions<TORUS>::write_tfheGateBootstrappingParameters(to_Ostream(F));
+}
 
 /**
  * This constructor function reads and creates a tfhe gate bootstrapping parameter set from a File. The result
  * must be deleted with delete_tfheGateBootstrappingParameterSet();
  */
-EXPORT TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_fromFile(FILE* F);
-
-#ifdef __cplusplus
+template<typename TORUS>
+inline TFheGateBootstrappingParameterSet<TORUS>* new_tfheGateBootstrappingParameterSet_fromFile(FILE* F) {
+  IOFunctions<TORUS>::read_new_tfheGateBootstrappingParameters(to_Istream(F));
+}
 
 /**
  * This function prints the tfhe gate bootstrapping parameter set to a file
  */
-EXPORT void export_tfheGateBootstrappingParameterSet_toStream(std::ostream& F, const TFheGateBootstrappingParameterSet* params);
+template<typename TORUS>
+inline void export_tfheGateBootstrappingParameterSet_toStream(std::ostream& out, const TFheGateBootstrappingParameterSet<TORUS>* params) {
+  IOFunctions<TORUS>::write_tfheGateBootstrappingParameters(to_Ostream(out));
+}
 
 /**
  * This constructor function reads and creates a tfhe gate bootstrapping parameter set from a File. The result
  * must be deleted with delete_tfheGateBootstrappingParameterSet();
  */
-EXPORT TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_fromStream(std::istream& F);
-
-#endif
+template<typename TORUS>
+inline TFheGateBootstrappingParameterSet<TORUS>* new_tfheGateBootstrappingParameterSet_fromStream(std::istream& in) {
+  IOFunctions<TORUS>::read_new_tfheGateBootstrappingParameters(to_Istream(in));
+}
 
 /* ****************************
  * TFheGateBootstrappingCloudKeySet
@@ -411,28 +743,36 @@ EXPORT TFheGateBootstrappingParameterSet* new_tfheGateBootstrappingParameterSet_
 /**
  * This function prints the tfhe gate bootstrapping cloud key to a file
  */
-EXPORT void export_tfheGateBootstrappingCloudKeySet_toFile(FILE* F, const TFheGateBootstrappingCloudKeySet* params);
+template<typename TORUS>
+inline void export_tfheGateBootstrappingCloudKeySet_toFile(FILE* F, const TFheGateBootstrappingCloudKeySet<TORUS>* params) {
+  IOFunctions<TORUS>::write_tfheGateBootstrappingCloudKeySet(to_Ostream(F));
+}
 
 /**
  * This constructor function reads and creates a tfhe gate bootstrapping cloud key from a File. The result
  * must be deleted with delete_tfheGateBootstrappingCloudKeySet();
  */
-EXPORT TFheGateBootstrappingCloudKeySet* new_tfheGateBootstrappingCloudKeySet_fromFile(FILE* F);
-
-#ifdef __cplusplus
+template<typename TORUS>
+inline TFheGateBootstrappingCloudKeySet<TORUS>* new_tfheGateBootstrappingCloudKeySet_fromFile(FILE* F) {
+  IOFunctions<TORUS>::read_new_tfheGateBootstrappingCloudKeySet(to_Istream(F));
+}
 
 /**
  * This function prints the tfhe gate bootstrapping cloud key to a file
  */
-EXPORT void export_tfheGateBootstrappingCloudKeySet_toStream(std::ostream& F, const TFheGateBootstrappingCloudKeySet* params);
+template<typename TORUS>
+inline void export_tfheGateBootstrappingCloudKeySet_toStream(std::ostream& out, const TFheGateBootstrappingCloudKeySet<TORUS>* params) {
+  IOFunctions<TORUS>::write_tfheGateBootstrappingCloudKeySet(to_Ostream(out));
+}
 
 /**
  * This constructor function reads and creates a tfhe gate bootstrapping cloud key from a File. The result
  * must be deleted with delete_tfheGateBootstrappingCloudKeySet();
  */
-EXPORT TFheGateBootstrappingCloudKeySet* new_tfheGateBootstrappingCloudKeySet_fromStream(std::istream& F);
-
-#endif
+template<typename TORUS>
+inline TFheGateBootstrappingCloudKeySet<TORUS>* new_tfheGateBootstrappingCloudKeySet_fromStream(std::istream& in) {
+  IOFunctions<TORUS>::read_new_tfheGateBootstrappingCloudKeySet(to_Istream(in));
+}
 
 /* ****************************
  * TFheGateBootstrappingSecretKeySet
@@ -441,28 +781,36 @@ EXPORT TFheGateBootstrappingCloudKeySet* new_tfheGateBootstrappingCloudKeySet_fr
 /**
  * This function prints the tfhe gate bootstrapping secret key to a file
  */
-EXPORT void export_tfheGateBootstrappingSecretKeySet_toFile(FILE* F, const TFheGateBootstrappingSecretKeySet* params);
+template<typename TORUS>
+inline void export_tfheGateBootstrappingSecretKeySet_toFile(FILE* F, const TFheGateBootstrappingSecretKeySet<TORUS>* params) {
+  IOFunctions<TORUS>::write_tfheGateBootstrappingSecretKeySet(to_Ostream(F));
+}
 
 /**
  * This constructor function reads and creates a tfhe gate bootstrapping secret key from a File. The result
  * must be deleted with delete_tfheGateBootstrappingSecretKeySet();
  */
-EXPORT TFheGateBootstrappingSecretKeySet* new_tfheGateBootstrappingSecretKeySet_fromFile(FILE* F);
-
-#ifdef __cplusplus
+template<typename TORUS>
+inline TFheGateBootstrappingSecretKeySet<TORUS>* new_tfheGateBootstrappingSecretKeySet_fromFile(FILE* F) {
+  IOFunctions<TORUS>::read_new_tfheGateBootstrappingSecretKeySet(to_Istream(F));
+}
 
 /**
  * This function prints the tfhe gate bootstrapping secret key to a file
  */
-EXPORT void export_tfheGateBootstrappingSecretKeySet_toStream(std::ostream& F, const TFheGateBootstrappingSecretKeySet* params);
+template<typename TORUS>
+inline void export_tfheGateBootstrappingSecretKeySet_toStream(std::ostream& out, const TFheGateBootstrappingSecretKeySet<TORUS>* params) {
+  IOFunctions<TORUS>::write_tfheGateBootstrappingSecretKeySet(to_Ostream(out));
+}
 
 /**
  * This constructor function reads and creates a TGSWKey from a stream. The result
  * must be deleted with delete_tfheGateBootstrappingSecretKeySet();
  */
-EXPORT TFheGateBootstrappingSecretKeySet* new_tfheGateBootstrappingSecretKeySet_fromStream(std::istream& F);
-
-#endif
+template<typename TORUS>
+inline TFheGateBootstrappingSecretKeySet<TORUS>* new_tfheGateBootstrappingSecretKeySet_fromStream(std::istream& in) {
+  IOFunctions<TORUS>::read_new_tfheGateBootstrappingSecretKeySet(to_Istream(in));
+}
 
 /* ****************************
  * TFheGateBootstrappingCiphertext
@@ -472,31 +820,37 @@ EXPORT TFheGateBootstrappingSecretKeySet* new_tfheGateBootstrappingSecretKeySet_
  * This function prints a gate bootstrapping ciphertext to a file
  * (wrapper to export LweSample)
  */
-EXPORT void export_gate_bootstrapping_ciphertext_toFile(FILE* F, const LweSample* sample, const TFheGateBootstrappingParameterSet* params);
+template<typename TORUS>
+inline void export_gate_bootstrapping_ciphertext_toFile(FILE* F, const LweSample<TORUS>* sample, const TFheGateBootstrappingParameterSet<TORUS>* params) {
+  IOFunctions<TORUS>::export_lweSample(to_Ostream(F),sample,params->in_out_params);
+}
 
 /**
  * This function reads a tfhe gate bootstrapping ciphertext from a File.
  * wrapper to import LweSample
  */
-EXPORT void import_gate_bootstrapping_ciphertext_fromFile(FILE* F, LweSample* sample, const TFheGateBootstrappingParameterSet* params);
-
-#ifdef __cplusplus
+template<typename TORUS>
+inline void import_gate_bootstrapping_ciphertext_fromFile(FILE* F, LweSample<TORUS>* sample, const TFheGateBootstrappingParameterSet<TORUS>* params) {
+  IOFunctions<TORUS>::import_lweSample(to_Istream(F),sample,params->in_out_params);
+}
 
 /**
  * This function prints a gate bootstrapping ciphertext to a file
  * (wrapper to export LweSample)
  */
-EXPORT void export_gate_bootstrapping_ciphertext_toStream(std::ostream& F, const LweSample* sample, const TFheGateBootstrappingParameterSet* params);
+template<typename TORUS>
+inline void export_gate_bootstrapping_ciphertext_toStream(std::ostream& out, const LweSample<TORUS>* sample, const TFheGateBootstrappingParameterSet<TORUS>* params) {
+  IOFunctions<TORUS>::export_lweSample(to_Ostream(out),sample,params->in_out_params);
+}
 
 /**
  * This function reads a tfhe gate bootstrapping ciphertext from a File.
  * wrapper to import LweSample
  */
-EXPORT void import_gate_bootstrapping_ciphertext_fromStream(std::istream& F, LweSample* sample, const TFheGateBootstrappingParameterSet* params);
-
-#endif
-
-
+template<typename TORUS>
+inline void import_gate_bootstrapping_ciphertext_fromStream(std::istream& in, LweSample<TORUS>* sample, const TFheGateBootstrappingParameterSet<TORUS>* params) {
+  IOFunctions<TORUS>::import_lweSample(to_Istream(in),sample,params->in_out_params);
+}
 
 #endif // TFHE_IO_H
 

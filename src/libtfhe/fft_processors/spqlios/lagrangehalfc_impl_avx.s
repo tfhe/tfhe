@@ -4,9 +4,9 @@
 	.text
 .LHOTB0:
 	.p2align 4,,15
-	.globl	LagrangeHalfCPolynomialMul
-	.type	LagrangeHalfCPolynomialMul, @function
-LagrangeHalfCPolynomialMul:
+	.globl	LagrangeHalfCPolynomialMul_asm
+	.type	LagrangeHalfCPolynomialMul_asm, @function
+LagrangeHalfCPolynomialMul_asm:
 .LFB7134:
 	.cfi_startproc
 	pushq	%r12
@@ -14,15 +14,15 @@ LagrangeHalfCPolynomialMul:
 	pushq	%r14
 	pushq	%r15
 
-	/* LagrangeHalfCPolynomialMul(HCP* r, HCP* a, HCP* b) */
+	/* LagrangeHalfCPolynomialMul_asm(HCP* r, HCP* a, HCP* b) */
 	movq	8(%rdi), %rax /* rax: proc */
 	movq	$0,%rcx
 	movl	8(%rax), %ecx /* ecx: Ns2 */
 	movq	(%rdi), %r8  /* r8: base of rre */
 	movq	(%rsi), %r10 /* r10: base of are */
 	movq	(%rdx), %r12 /* r12: base of bre */
-	leaq	(%r8,%rcx,8),%r9 /* r9: base of rim */ 
-	leaq	(%r10,%rcx,8),%r11 /* r11: base of aim */ 
+	leaq	(%r8,%rcx,8),%r9 /* r9: base of rim */
+	leaq	(%r10,%rcx,8),%r11 /* r11: base of aim */
 	leaq	(%r12,%rcx,8),%r13 /* r13: base of bim */
 	movq	%r9,%r14           /* r14: end of loop */
 .loopLHCmul:
@@ -65,7 +65,7 @@ LagrangeHalfCPolynomialMul:
 	rep ret
 	.cfi_endproc
 .LFE7134:
-	.size	LagrangeHalfCPolynomialMul, .-LagrangeHalfCPolynomialMul
+	.size	LagrangeHalfCPolynomialMul_asm, .-LagrangeHalfCPolynomialMul_asm
 	.section	.text.unlikely
 .LCOLDE0:
 	.text
@@ -75,9 +75,9 @@ LagrangeHalfCPolynomialMul:
 	.text
 .LHOTB1:
 	.p2align 4,,15
-	.globl	LagrangeHalfCPolynomialAddMul
-	.type	LagrangeHalfCPolynomialAddMul, @function
-LagrangeHalfCPolynomialAddMul:
+	.globl	LagrangeHalfCPolynomialAddMul_asm
+	.type	LagrangeHalfCPolynomialAddMul_asm, @function
+LagrangeHalfCPolynomialAddMul_asm:
 .LFB7135:
 	.cfi_startproc
 	pushq	%r12
@@ -85,15 +85,15 @@ LagrangeHalfCPolynomialAddMul:
 	pushq	%r14
 	pushq	%r15
 
-	/* LagrangeHalfCPolynomialAddMul(HCP* r, HCP* a, HCP* b) */
+	/* LagrangeHalfCPolynomialAddMul_asm(HCP* r, HCP* a, HCP* b) */
 	movq	8(%rdi), %rax /* rax: proc */
 	movq	$0,%rcx
 	movl	8(%rax), %ecx /* ecx: Ns2 */
 	movq	(%rdi), %r8  /* r8: base of rre */
 	movq	(%rsi), %r10 /* r10: base of are */
 	movq	(%rdx), %r12 /* r12: base of bre */
-	leaq	(%r8,%rcx,8),%r9 /* r9: base of rim */ 
-	leaq	(%r10,%rcx,8),%r11 /* r11: base of aim */ 
+	leaq	(%r8,%rcx,8),%r9 /* r9: base of rim */
+	leaq	(%r10,%rcx,8),%r11 /* r11: base of aim */
 	leaq	(%r12,%rcx,8),%r13 /* r13: base of bim */
 	movq	%r9,%r14           /* r14: end of loop */
 .loopLHCaddmul:
@@ -140,7 +140,7 @@ LagrangeHalfCPolynomialAddMul:
 	rep ret
 	.cfi_endproc
 .LFE7135:
-	.size	LagrangeHalfCPolynomialAddMul, .-LagrangeHalfCPolynomialAddMul
+	.size	LagrangeHalfCPolynomialAddMul_asm, .-LagrangeHalfCPolynomialAddMul_asm
 	.section	.text.unlikely
 .LCOLDE1:
 	.text
@@ -150,9 +150,9 @@ LagrangeHalfCPolynomialAddMul:
 	.text
 .LHOTB2:
 	.p2align 4,,15
-	.globl	LagrangeHalfCPolynomialSubMul
-	.type	LagrangeHalfCPolynomialSubMul, @function
-LagrangeHalfCPolynomialSubMul:
+	.globl	LagrangeHalfCPolynomialSubMul_asm
+	.type	LagrangeHalfCPolynomialSubMul_asm, @function
+LagrangeHalfCPolynomialSubMul_asm:
 .LFB7136:
 	.cfi_startproc
 	pushq	%r12
@@ -160,15 +160,15 @@ LagrangeHalfCPolynomialSubMul:
 	pushq	%r14
 	pushq	%r15
 
-	/* LagrangeHalfCPolynomialSubMul(HCP* r, HCP* a, HCP* b) */
+	/* LagrangeHalfCPolynomialSubMul_asm(HCP* r, HCP* a, HCP* b) */
 	movq	8(%rdi), %rax /* rax: proc */
 	movq	$0,%rcx
 	movl	8(%rax), %ecx /* ecx: Ns2 */
 	movq	(%rdi), %r8  /* r8: base of rre */
 	movq	(%rsi), %r10 /* r10: base of are */
 	movq	(%rdx), %r12 /* r12: base of bre */
-	leaq	(%r8,%rcx,8),%r9 /* r9: base of rim */ 
-	leaq	(%r10,%rcx,8),%r11 /* r11: base of aim */ 
+	leaq	(%r8,%rcx,8),%r9 /* r9: base of rim */
+	leaq	(%r10,%rcx,8),%r11 /* r11: base of aim */
 	leaq	(%r12,%rcx,8),%r13 /* r13: base of bim */
 	movq	%r9,%r14           /* r14: end of loop */
 .loopLHCsubmul:
@@ -215,7 +215,7 @@ LagrangeHalfCPolynomialSubMul:
 	rep ret
 	.cfi_endproc
 .LFE7136:
-	.size	LagrangeHalfCPolynomialSubMul, .-LagrangeHalfCPolynomialSubMul
+	.size	LagrangeHalfCPolynomialSubMul_asm, .-LagrangeHalfCPolynomialSubMul_asm
 	.section	.text.unlikely
 .LCOLDE2:
 	.text

@@ -1,69 +1,61 @@
 #include "tfhe_core.h"
+#include "tfhe_alloc.h"
 #include "tlwe.h"
 #include "polynomials.h"
 
-//struct TLweParams {
-//    const int k; //number of polynomials in the mask
-//    const int N; //a power of 2: degree of the polynomials
-//    const double alpha_min;
-//    const double alpha_max;
-//};
 
-TLweParams::TLweParams(int N, int k, double alpha_min, double alpha_max):
-    N(N),
-    k(k),
-    alpha_min(alpha_min),
-    alpha_max(alpha_max),
-    extracted_lweparams(N*k,alpha_min, alpha_max)
-{}
-
-TLweParams::~TLweParams() {}
-
-//struct TLweKey {
-//    const TLweParams* params;
-//    IntPolynomial* key;
-//};
-
-TLweKey::TLweKey(const TLweParams* params):
-    params(params)
+template<typename TORUS>
+TLweKey<TORUS>::TLweKey(const TLweParams<TORUS>* params)
+:
+  params(params)
 {
-    key = new_IntPolynomial_array(params->k,params->N);   
+  key = new_obj_array<IntPolynomial>(params->k,params->N);
 }
 
-TLweKey::~TLweKey() {
-    delete_IntPolynomial_array(params->k,key);
+template<typename TORUS>
+TLweKey<TORUS>::~TLweKey() {
+  del_obj_array(params->k,key);
 }
 
 
-//struct TLweSample {
-//    TorusPolynomial* a;
-//    TorusPolynomial* b;
-//    double current_variance;
-//};
-
-TLweSample::TLweSample(const TLweParams* params): k(params->k) {
-    //Small change here: 
-    //a is a table of k+1 polynomials, b is an alias for &a[k]
-    //like that, we can access all the coefficients as before:
-    //  &sample->a[0],...,&sample->a[k-1]  and &sample->b
-    //or we can also do it in a single for loop
-    //  &sample->a[0],...,&sample->a[k]
-    a = new_TorusPolynomial_array(k+1, params->N);
-    b = a+k;
-    current_variance = 0;
+template<typename TORUS>
+TLweSample<TORUS>::TLweSample(const TLweParams<TORUS>* params)
+:
+  k(params->k)
+{
+  //Small change here:
+  //a is a table of k+1 polynomials, b is an alias for &a[k]
+  //like that, we can access all the coefficients as before:
+  //  &sample->a[0],...,&sample->a[k-1]  and &sample->b
+  //or we can also do it in a single for loop
+  //  &sample->a[0],...,&sample->a[k]
+  a = new_obj_array<TorusPolynomial<TORUS>>(k+1, params->N);
+  b = a+k;
+  current_variance = 0;
 }
 
-TLweSample::~TLweSample() {
-    delete_TorusPolynomial_array(k+1, a);
+template<typename TORUS>
+TLweSample<TORUS>::~TLweSample() {
+  del_obj_array(k+1, a);
 }
 
-TLweSampleFFT::TLweSampleFFT(const TLweParams* params, LagrangeHalfCPolynomial* arr, double current_variance): k(params->k) {
-    //a is a table of k+1 polynomials, b is an alias for &a[k]
-    a = arr;
-    b = a+k;
-    current_variance = 0;
+
+
+template<typename TORUS>
+void TLweSampleFFT<TORUS>::init_obj(TLweSampleFFT<TORUS>* obj, const TLweParams<TORUS>* params)
+{
+  //a is a table of k+1 polynomials, b is an alias for &a[k]
+  const int k = params->k;
+  LagrangeHalfCPolynomial* a = new_obj_array<LagrangeHalfCPolynomial>(k+1, params->N);
+  double current_variance = 0;
+
+  // init_obj<TLweSampleFFT<TORUS>>(obj, params, a, current_variance);
+  new(obj) TLweSampleFFT<TORUS>(params, a, current_variance);
 }
 
-TLweSampleFFT::~TLweSampleFFT() {
+template<typename TORUS>
+void TLweSampleFFT<TORUS>::destroy_obj(TLweSampleFFT<TORUS>* obj) {
+  const int k = obj->k;
+  del_obj_array(k+1, obj->a);
+  obj->~TLweSampleFFT();
 }
-

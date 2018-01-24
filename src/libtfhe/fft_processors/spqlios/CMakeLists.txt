@@ -11,7 +11,7 @@ set(SRCS_AVX
     lagrangehalfc_impl.cpp
     lagrangehalfc_impl_avx.s
     )
-    
+
 set(SRCS_FMA
     spqlios-fft-impl.cpp
     spqlios-fft-fma.s
@@ -20,16 +20,16 @@ set(SRCS_FMA
     lagrangehalfc_impl.cpp
     lagrangehalfc_impl_fma.s
     )
-    
+
 set(HEADERS
     spqlios-fft.h
     lagrangehalfc_impl.h
     )
 
-if (ENABLE_SPQLIOS_AVX) 
+if (ENABLE_SPQLIOS_AVX)
     add_library(tfhe-fft-spqlios-avx OBJECT ${SRCS_AVX} ${HEADERS})
-endif (ENABLE_SPQLIOS_AVX) 
+endif (ENABLE_SPQLIOS_AVX)
 
-if (ENABLE_SPQLIOS_FMA) 
+if (ENABLE_SPQLIOS_FMA)
     add_library(tfhe-fft-spqlios-fma OBJECT ${SRCS_FMA} ${HEADERS})
-endif (ENABLE_SPQLIOS_FMA) 
+endif (ENABLE_SPQLIOS_FMA)

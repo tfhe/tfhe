@@ -1,20 +1,100 @@
-#ifndef Lwe_FUNCTIONS_H
-#define Lwe_FUNCTIONS_H
+#ifndef LWE_FUNCTIONS_H
+#define LWE_FUNCTIONS_H
 
 ///@file
 ///@brief This file contains the operations on Lwe samples
 
-#include "tfhe_core.h"
 #include "lwekey.h"
 #include "lweparams.h"
 #include "lwesamples.h"
+
+template<typename TORUS>
+struct LweFunctions
+{
+private:
+  static void CreateKeySwitchKey_fromArray(LweSample<TORUS>*** result,
+    const LweKey<TORUS>* out_key, const double out_alpha,
+    const int* in_key, const int n, const int t, const int basebit);
+
+  static void KeySwitchTranslate_fromArray(LweSample<TORUS>* result,
+    const LweSample<TORUS>*** ks, const LweParams<TORUS>* params,
+    const TORUS* ai,
+    const int n, const int t, const int basebit);
+
+public:
+  /**
+   * This function generates a random Lwe key for the given parameters.
+   * The Lwe key for the result must be allocated and initialized
+   * (this means that the parameters are already in the result)
+   */
+  static void KeyGen(LweKey<TORUS>* result);
+
+  /**
+   * This function encrypts message by using key, with stdev alpha
+   * The Lwe sample for the result must be allocated and initialized
+   * (this means that the parameters are already in the result)
+   */
+  static void SymEncrypt(LweSample<TORUS>* result, TORUS message, double alpha, const LweKey<TORUS>* key);
+
+  /**
+   * This function computes the phase of sample by using key : phi = b - a.s
+   */
+  static TORUS Phase(const LweSample<TORUS>* sample, const LweKey<TORUS>* key);
+
+  /**
+   * This function computes the decryption of sample by using key
+   * The constant Msize indicates the message space and is used to approximate the phase
+   */
+  static TORUS SymDecrypt(const LweSample<TORUS>* sample, const LweKey<TORUS>* key, const int Msize);
+
+  //Arithmetic operations on Lwe samples
+  /** result = (0,0) */
+  static void Clear(LweSample<TORUS>* result, const LweParams<TORUS>* params);
+
+  /** result = sample */
+  static void Copy(LweSample<TORUS>* result, const LweSample<TORUS>* sample, const LweParams<TORUS>* params);
+
+  /** result = -sample */
+  static void Negate(LweSample<TORUS>* result, const LweSample<TORUS>* sample, const LweParams<TORUS>* params);
+
+  /** result = (0,mu) */
+  static void NoiselessTrivial(LweSample<TORUS>* result, TORUS mu, const LweParams<TORUS>* params);
+
+  /** result = result + sample */
+  static void AddTo(LweSample<TORUS>* result, const LweSample<TORUS>* sample, const LweParams<TORUS>* params);
+
+  /** result = result - sample */
+  static void SubTo(LweSample<TORUS>* result, const LweSample<TORUS>* sample, const LweParams<TORUS>* params);
+
+  /** result = result + p.sample */
+  static void AddMulTo(LweSample<TORUS>* result, int p, const LweSample<TORUS>* sample, const LweParams<TORUS>* params);
+
+  /** result = result - p.sample */
+  static void SubMulTo(LweSample<TORUS>* result, int p, const LweSample<TORUS>* sample, const LweParams<TORUS>* params);
+
+  /**
+   * creates a Key Switching Key between the two keys
+   */
+  static void CreateKeySwitchKey(LweKeySwitchKey<TORUS>* result, const LweKey<TORUS>* in_key, const LweKey<TORUS>* out_key);
+
+  /**
+   * applies keySwitching
+   */
+  static void KeySwitch(LweSample<TORUS>* result, const LweKeySwitchKey<TORUS>* ks, const LweSample<TORUS>* sample);
+};
+
+template struct LweFunctions<Torus32>;
+template struct LweFunctions<Torus64>;
 
 /**
  * This function generates a random Lwe key for the given parameters.
  * The Lwe key for the result must be allocated and initialized
  * (this means that the parameters are already in the result)
  */
-EXPORT void lweKeyGen(LweKey* result);
+template<typename TORUS>
+inline void lweKeyGen(LweKey<TORUS>* result) {
+  LweFunctions<TORUS>::KeyGen(result);
+}
 
 
 /**
@@ -22,56 +102,94 @@ EXPORT void lweKeyGen(LweKey* result);
  * The Lwe sample for the result must be allocated and initialized
  * (this means that the parameters are already in the result)
  */
-EXPORT void lweSymEncrypt(LweSample* result, Torus32 message, double alpha, const LweKey* key);
+template<typename TORUS>
+inline void lweSymEncrypt(LweSample<TORUS>* result, TORUS message, double alpha, const LweKey<TORUS>* key) {
+  LweFunctions<TORUS>::SymEncrypt(result, message, alpha, key);
+}
 
 
 /**
  * This function computes the phase of sample by using key : phi = b - a.s
  */
-EXPORT Torus32 lwePhase(const LweSample* sample, const LweKey* key);
+template<typename TORUS>
+inline TORUS lwePhase(const LweSample<TORUS>* sample, const LweKey<TORUS>* key) {
+  return LweFunctions<TORUS>::Phase(sample, key);
+}
 
 
 /**
  * This function computes the decryption of sample by using key
  * The constant Msize indicates the message space and is used to approximate the phase
  */
-EXPORT Torus32 lweSymDecrypt(const LweSample* sample, const LweKey* key, const int Msize);
+template<typename TORUS>
+inline TORUS lweSymDecrypt(const LweSample<TORUS>* sample, const LweKey<TORUS>* key, const int Msize) {
+  return LweFunctions<TORUS>::SymDecrypt(sample, key, Msize);
+}
 
 
 //Arithmetic operations on Lwe samples
 /** result = (0,0) */
-EXPORT void lweClear(LweSample* result, const LweParams* params);
+template<typename TORUS>
+inline void lweClear(LweSample<TORUS>* result, const LweParams<TORUS>* params) {
+  LweFunctions<TORUS>::Clear(result, params);
+}
 
 /** result = sample */
-EXPORT void lweCopy(LweSample* result, const LweSample* sample, const LweParams* params);
+template<typename TORUS>
+inline void lweCopy(LweSample<TORUS>* result, const LweSample<TORUS>* sample, const LweParams<TORUS>* params) {
+  LweFunctions<TORUS>::Copy(result, sample, params);
+}
 
 /** result = -sample */
-EXPORT void lweNegate(LweSample* result, const LweSample* sample, const LweParams* params);
+template<typename TORUS>
+inline void lweNegate(LweSample<TORUS>* result, const LweSample<TORUS>* sample, const LweParams<TORUS>* params) {
+  LweFunctions<TORUS>::Negate(result, sample, params);
+}
 
 /** result = (0,mu) */
-EXPORT void lweNoiselessTrivial(LweSample* result, Torus32 mu, const LweParams* params);
+template<typename TORUS>
+inline void lweNoiselessTrivial(LweSample<TORUS>* result, TORUS mu, const LweParams<TORUS>* params) {
+  LweFunctions<TORUS>::NoiselessTrivial(result, mu, params);
+}
 
 /** result = result + sample */
-EXPORT void lweAddTo(LweSample* result, const LweSample* sample, const LweParams* params);
+template<typename TORUS>
+inline void lweAddTo(LweSample<TORUS>* result, const LweSample<TORUS>* sample, const LweParams<TORUS>* params) {
+  LweFunctions<TORUS>::AddTo(result, sample, params);
+}
 
 /** result = result - sample */
-EXPORT void lweSubTo(LweSample* result, const LweSample* sample, const LweParams* params);
+template<typename TORUS>
+inline void lweSubTo(LweSample<TORUS>* result, const LweSample<TORUS>* sample, const LweParams<TORUS>* params) {
+  LweFunctions<TORUS>::SubTo(result, sample, params);
+}
 
 /** result = result + p.sample */
-EXPORT void lweAddMulTo(LweSample* result, int p, const LweSample* sample, const LweParams* params);
+template<typename TORUS>
+inline void lweAddMulTo(LweSample<TORUS>* result, int p, const LweSample<TORUS>* sample, const LweParams<TORUS>* params) {
+  LweFunctions<TORUS>::AddMulTo(result, p, sample, params);
+}
 
 /** result = result - p.sample */
-EXPORT void lweSubMulTo(LweSample* result, int p, const LweSample* sample, const LweParams* params);
+template<typename TORUS>
+inline void lweSubMulTo(LweSample<TORUS>* result, int p, const LweSample<TORUS>* sample, const LweParams<TORUS>* params) {
+  LweFunctions<TORUS>::SubMulTo(result, p, sample, params);
+}
 
-/** 
+/**
  * creates a Key Switching Key between the two keys
  */
-EXPORT void lweCreateKeySwitchKey(LweKeySwitchKey* result, const LweKey* in_key, const LweKey* out_key);
-
+template<typename TORUS>
+inline void lweCreateKeySwitchKey(LweKeySwitchKey<TORUS>* result, const LweKey<TORUS>* in_key, const LweKey<TORUS>* out_key) {
+  LweFunctions<TORUS>::CreateKeySwitchKey(result, in_key, out_key);
+}
 
 /**
  * applies keySwitching
  */
-EXPORT void lweKeySwitch(LweSample* result, const LweKeySwitchKey* ks, const LweSample* sample);
+template<typename TORUS>
+inline void lweKeySwitch(LweSample<TORUS>* result, const LweKeySwitchKey<TORUS>* ks, const LweSample<TORUS>* sample) {
+  LweFunctions<TORUS>::KeySwitch(result, ks, sample);
+}
 
-#endif //Lwe_FUNCTIONS_H
+#endif //LWE_FUNCTIONS_H

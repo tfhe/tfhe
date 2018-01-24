@@ -1,4 +1,5 @@
-#ifndef TFHE_TEST_ENVIRONMENT 
+#ifndef TFHE_TEST_ENVIRONMENT
+
 #include <cstdlib>
 #include <iostream>
 #include <random>
@@ -11,7 +12,9 @@
 #include "lwekeyswitch.h"
 #include "lwe-functions.h"
 #include "lwebootstrappingkey.h"
-#include "tfhe.h"
+#include "tfhe_gate.h"
+#include "tfhe_gate_functions.h"
+#include "tfhe_functions.h"
 
 using namespace std;
 #else
@@ -30,23 +33,24 @@ using namespace std;
  * Takes in input 2 LWE samples (with message space [-1/8,1/8], noise<1/16)
  * Outputs a LWE bootstrapped sample (with message space [-1/8,1/8], noise<1/16)
 */
-EXPORT void bootsNAND(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) {
-	static const Torus32 MU = modSwitchToTorus32(1,8);
-	const LweParams* in_out_params = bk->params->in_out_params;
+template<typename TORUS>
+void TfheGateFunctions<TORUS>::NAND(LweSample<TORUS>* result, const LweSample<TORUS>* ca, const LweSample<TORUS>* cb, const TFheGateBootstrappingCloudKeySet<TORUS>* bk) {
+  static const TORUS MU = TorusUtils<TORUS>::modSwitchToTorus(1,8);
+  const LweParams<TORUS>* in_out_params = bk->params->in_out_params;
 
-	LweSample* temp_result = new_LweSample(in_out_params); 
+  LweSample<TORUS>* temp_result = new_LweSample<TORUS>(in_out_params);
 
-	//compute: (0,1/8) - ca - cb
-	static const Torus32 NandConst=modSwitchToTorus32(1,8);
-	lweNoiselessTrivial(temp_result, NandConst, in_out_params); 
-	lweSubTo(temp_result, ca, in_out_params);
-	lweSubTo(temp_result, cb, in_out_params);
+  //compute: (0,1/8) - ca - cb
+  static const TORUS NandConst=TorusUtils<TORUS>::modSwitchToTorus(1,8);
+  lweNoiselessTrivial(temp_result, NandConst, in_out_params);
+  lweSubTo(temp_result, ca, in_out_params);
+  lweSubTo(temp_result, cb, in_out_params);
 
-	//if the phase is positive, the result is 1/8
-	//if the phase is positive, else the result is -1/8
-	tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
+  //if the phase is positive, the result is 1/8
+  //if the phase is positive, else the result is -1/8
+  tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
 
-	delete_LweSample(temp_result);
+  delete_LweSample(temp_result);
 }
 
 
@@ -55,23 +59,24 @@ EXPORT void bootsNAND(LweSample* result, const LweSample* ca, const LweSample* c
  * Takes in input 2 LWE samples (with message space [-1/8,1/8], noise<1/16)
  * Outputs a LWE bootstrapped sample (with message space [-1/8,1/8], noise<1/16)
 */
-EXPORT void bootsOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) { 
-	static const Torus32 MU = modSwitchToTorus32(1,8);
-	const LweParams* in_out_params = bk->params->in_out_params;
+template<typename TORUS>
+void TfheGateFunctions<TORUS>::OR(LweSample<TORUS>* result, const LweSample<TORUS>* ca, const LweSample<TORUS>* cb, const TFheGateBootstrappingCloudKeySet<TORUS>* bk) {
+  static const TORUS MU = TorusUtils<TORUS>::modSwitchToTorus(1,8);
+  const LweParams<TORUS>* in_out_params = bk->params->in_out_params;
 
-	LweSample* temp_result = new_LweSample(in_out_params); 
+  LweSample<TORUS>* temp_result = new_LweSample<TORUS>(in_out_params);
 
-	//compute: (0,1/8) + ca + cb
-	static const Torus32 OrConst=modSwitchToTorus32(1,8);
-	lweNoiselessTrivial(temp_result, OrConst, in_out_params); 
-	lweAddTo(temp_result, ca, in_out_params);
-	lweAddTo(temp_result, cb, in_out_params);
+  //compute: (0,1/8) + ca + cb
+  static const TORUS OrConst=TorusUtils<TORUS>::modSwitchToTorus(1,8);
+  lweNoiselessTrivial(temp_result, OrConst, in_out_params);
+  lweAddTo(temp_result, ca, in_out_params);
+  lweAddTo(temp_result, cb, in_out_params);
 
-	//if the phase is positive, the result is 1/8
-	//if the phase is positive, else the result is -1/8
-	tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
+  //if the phase is positive, the result is 1/8
+  //if the phase is positive, else the result is -1/8
+  tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
 
-	delete_LweSample(temp_result);
+  delete_LweSample(temp_result);
 }
 
 
@@ -80,23 +85,24 @@ EXPORT void bootsOR(LweSample* result, const LweSample* ca, const LweSample* cb,
  * Takes in input 2 LWE samples (with message space [-1/8,1/8], noise<1/16)
  * Outputs a LWE bootstrapped sample (with message space [-1/8,1/8], noise<1/16)
 */
-EXPORT void bootsAND(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) { 
-	static const Torus32 MU = modSwitchToTorus32(1,8);
-	const LweParams* in_out_params = bk->params->in_out_params;
+template<typename TORUS>
+void TfheGateFunctions<TORUS>::AND(LweSample<TORUS>* result, const LweSample<TORUS>* ca, const LweSample<TORUS>* cb, const TFheGateBootstrappingCloudKeySet<TORUS>* bk) {
+  static const TORUS MU = TorusUtils<TORUS>::modSwitchToTorus(1,8);
+  const LweParams<TORUS>* in_out_params = bk->params->in_out_params;
 
-	LweSample* temp_result = new_LweSample(in_out_params); 
+  LweSample<TORUS>* temp_result = new_LweSample<TORUS>(in_out_params);
 
-	//compute: (0,-1/8) + ca + cb
-	static const Torus32 AndConst=modSwitchToTorus32(-1,8);
-	lweNoiselessTrivial(temp_result, AndConst, in_out_params); 
-	lweAddTo(temp_result, ca, in_out_params);
-	lweAddTo(temp_result, cb, in_out_params);
+  //compute: (0,-1/8) + ca + cb
+  static const TORUS AndConst=TorusUtils<TORUS>::modSwitchToTorus(-1,8);
+  lweNoiselessTrivial(temp_result, AndConst, in_out_params);
+  lweAddTo(temp_result, ca, in_out_params);
+  lweAddTo(temp_result, cb, in_out_params);
 
-	//if the phase is positive, the result is 1/8
-	//if the phase is positive, else the result is -1/8
-	tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
+  //if the phase is positive, the result is 1/8
+  //if the phase is positive, else the result is -1/8
+  tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
 
-	delete_LweSample(temp_result); 
+  delete_LweSample(temp_result);
 }
 
 
@@ -105,23 +111,24 @@ EXPORT void bootsAND(LweSample* result, const LweSample* ca, const LweSample* cb
  * Takes in input 2 LWE samples (with message space [-1/8,1/8], noise<1/16)
  * Outputs a LWE bootstrapped sample (with message space [-1/8,1/8], noise<1/16)
 */
-EXPORT void bootsXOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) { 
-	static const Torus32 MU = modSwitchToTorus32(1,8);
-	const LweParams* in_out_params = bk->params->in_out_params;
+template<typename TORUS>
+void TfheGateFunctions<TORUS>::XOR(LweSample<TORUS>* result, const LweSample<TORUS>* ca, const LweSample<TORUS>* cb, const TFheGateBootstrappingCloudKeySet<TORUS>* bk) {
+  static const TORUS MU = TorusUtils<TORUS>::modSwitchToTorus(1,8);
+  const LweParams<TORUS>* in_out_params = bk->params->in_out_params;
 
-	LweSample* temp_result = new_LweSample(in_out_params); 
+  LweSample<TORUS>* temp_result = new_LweSample<TORUS>(in_out_params);
 
-	//compute: (0,1/4) + 2*(ca + cb)
-	static const Torus32 XorConst=modSwitchToTorus32(1,4);
-	lweNoiselessTrivial(temp_result, XorConst, in_out_params); 
-	lweAddMulTo(temp_result, 2, ca, in_out_params);
-	lweAddMulTo(temp_result, 2, cb, in_out_params);
+  //compute: (0,1/4) + 2*(ca + cb)
+  static const TORUS XorConst=TorusUtils<TORUS>::modSwitchToTorus(1,4);
+  lweNoiselessTrivial(temp_result, XorConst, in_out_params);
+  lweAddMulTo(temp_result, 2, ca, in_out_params);
+  lweAddMulTo(temp_result, 2, cb, in_out_params);
 
-	//if the phase is positive, the result is 1/8
-	//if the phase is positive, else the result is -1/8
-	tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
+  //if the phase is positive, the result is 1/8
+  //if the phase is positive, else the result is -1/8
+  tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
 
-	delete_LweSample(temp_result); 
+  delete_LweSample(temp_result);
 }
 
 
@@ -130,23 +137,24 @@ EXPORT void bootsXOR(LweSample* result, const LweSample* ca, const LweSample* cb
  * Takes in input 2 LWE samples (with message space [-1/8,1/8], noise<1/16)
  * Outputs a LWE bootstrapped sample (with message space [-1/8,1/8], noise<1/16)
 */
-EXPORT void bootsXNOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) { 
-	static const Torus32 MU = modSwitchToTorus32(1,8);
-	const LweParams* in_out_params = bk->params->in_out_params;
+template<typename TORUS>
+void TfheGateFunctions<TORUS>::XNOR(LweSample<TORUS>* result, const LweSample<TORUS>* ca, const LweSample<TORUS>* cb, const TFheGateBootstrappingCloudKeySet<TORUS>* bk) {
+  static const TORUS MU = TorusUtils<TORUS>::modSwitchToTorus(1,8);
+  const LweParams<TORUS>* in_out_params = bk->params->in_out_params;
 
-	LweSample* temp_result = new_LweSample(in_out_params); 
+  LweSample<TORUS>* temp_result = new_LweSample<TORUS>(in_out_params);
 
-	//compute: (0,-1/4) + 2*(-ca-cb)
-	static const Torus32 XnorConst=modSwitchToTorus32(-1,4);
-	lweNoiselessTrivial(temp_result, XnorConst, in_out_params); 
-	lweSubMulTo(temp_result, 2, ca, in_out_params);
-	lweSubMulTo(temp_result, 2, cb, in_out_params);
+  //compute: (0,-1/4) + 2*(-ca-cb)
+  static const TORUS XnorConst=TorusUtils<TORUS>::modSwitchToTorus(-1,4);
+  lweNoiselessTrivial(temp_result, XnorConst, in_out_params);
+  lweSubMulTo(temp_result, 2, ca, in_out_params);
+  lweSubMulTo(temp_result, 2, cb, in_out_params);
 
-	//if the phase is positive, the result is 1/8
-	//if the phase is positive, else the result is -1/8
-	tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
+  //if the phase is positive, the result is 1/8
+  //if the phase is positive, else the result is -1/8
+  tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
 
-	delete_LweSample(temp_result); 
+  delete_LweSample(temp_result);
 }
 
 
@@ -155,9 +163,10 @@ EXPORT void bootsXNOR(LweSample* result, const LweSample* ca, const LweSample* c
  * Takes in input 1 LWE samples (with message space [-1/8,1/8], noise<1/16)
  * Outputs a LWE sample (with message space [-1/8,1/8], noise<1/16)
 */
-EXPORT void bootsNOT(LweSample* result, const LweSample* ca, const TFheGateBootstrappingCloudKeySet* bk) { 
-	const LweParams* in_out_params = bk->params->in_out_params;
-	lweNegate(result, ca, in_out_params);
+template<typename TORUS>
+void TfheGateFunctions<TORUS>::NOT(LweSample<TORUS>* result, const LweSample<TORUS>* ca, const TFheGateBootstrappingCloudKeySet<TORUS>* bk) {
+  const LweParams<TORUS>* in_out_params = bk->params->in_out_params;
+  lweNegate(result, ca, in_out_params);
 }
 
 
@@ -166,9 +175,10 @@ EXPORT void bootsNOT(LweSample* result, const LweSample* ca, const TFheGateBoots
  * Takes in input 1 LWE samples (with message space [-1/8,1/8], noise<1/16)
  * Outputs a LWE sample (with message space [-1/8,1/8], noise<1/16)
 */
-EXPORT void bootsCOPY(LweSample* result, const LweSample* ca, const TFheGateBootstrappingCloudKeySet* bk) { 
-	const LweParams* in_out_params = bk->params->in_out_params;
-	lweCopy(result, ca, in_out_params);
+template<typename TORUS>
+void TfheGateFunctions<TORUS>::COPY(LweSample<TORUS>* result, const LweSample<TORUS>* ca, const TFheGateBootstrappingCloudKeySet<TORUS>* bk) {
+  const LweParams<TORUS>* in_out_params = bk->params->in_out_params;
+  lweCopy(result, ca, in_out_params);
 }
 
 /*
@@ -176,10 +186,11 @@ EXPORT void bootsCOPY(LweSample* result, const LweSample* ca, const TFheGateBoot
  * Takes a boolean value)
  * Outputs a LWE sample (with message space [-1/8,1/8], noise<1/16)
 */
-EXPORT void bootsCONSTANT(LweSample* result, int value, const TFheGateBootstrappingCloudKeySet* bk) { 
-	const LweParams* in_out_params = bk->params->in_out_params;
-	static const Torus32 MU=modSwitchToTorus32(1,8);
-	lweNoiselessTrivial(result, value?MU:-MU, in_out_params);
+template<typename TORUS>
+void TfheGateFunctions<TORUS>::CONSTANT(LweSample<TORUS>* result, int value, const TFheGateBootstrappingCloudKeySet<TORUS>* bk) {
+  const LweParams<TORUS>* in_out_params = bk->params->in_out_params;
+  static const TORUS MU=TorusUtils<TORUS>::modSwitchToTorus(1,8);
+  lweNoiselessTrivial(result, value?MU:-MU, in_out_params);
 }
 
 
@@ -188,23 +199,24 @@ EXPORT void bootsCONSTANT(LweSample* result, int value, const TFheGateBootstrapp
  * Takes in input 2 LWE samples (with message space [-1/8,1/8], noise<1/16)
  * Outputs a LWE bootstrapped sample (with message space [-1/8,1/8], noise<1/16)
 */
-EXPORT void bootsNOR(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) { 
-	static const Torus32 MU = modSwitchToTorus32(1,8);
-	const LweParams* in_out_params = bk->params->in_out_params;
+template<typename TORUS>
+void TfheGateFunctions<TORUS>::NOR(LweSample<TORUS>* result, const LweSample<TORUS>* ca, const LweSample<TORUS>* cb, const TFheGateBootstrappingCloudKeySet<TORUS>* bk) {
+  static const TORUS MU = TorusUtils<TORUS>::modSwitchToTorus(1,8);
+  const LweParams<TORUS>* in_out_params = bk->params->in_out_params;
 
-	LweSample* temp_result = new_LweSample(in_out_params); 
+  LweSample<TORUS>* temp_result = new_LweSample<TORUS>(in_out_params);
 
-	//compute: (0,-1/8) - ca - cb
-	static const Torus32 NorConst=modSwitchToTorus32(-1,8);
-	lweNoiselessTrivial(temp_result, NorConst, in_out_params); 
-	lweSubTo(temp_result, ca, in_out_params);
-	lweSubTo(temp_result, cb, in_out_params);
+  //compute: (0,-1/8) - ca - cb
+  static const TORUS NorConst=TorusUtils<TORUS>::modSwitchToTorus(-1,8);
+  lweNoiselessTrivial(temp_result, NorConst, in_out_params);
+  lweSubTo(temp_result, ca, in_out_params);
+  lweSubTo(temp_result, cb, in_out_params);
 
-	//if the phase is positive, the result is 1/8
-	//if the phase is positive, else the result is -1/8
-	tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
+  //if the phase is positive, the result is 1/8
+  //if the phase is positive, else the result is -1/8
+  tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
 
-	delete_LweSample(temp_result);
+  delete_LweSample(temp_result);
 }
 
 
@@ -213,23 +225,24 @@ EXPORT void bootsNOR(LweSample* result, const LweSample* ca, const LweSample* cb
  * Takes in input 2 LWE samples (with message space [-1/8,1/8], noise<1/16)
  * Outputs a LWE bootstrapped sample (with message space [-1/8,1/8], noise<1/16)
 */
-EXPORT void bootsANDNY(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) { 
-	static const Torus32 MU = modSwitchToTorus32(1,8);
-	const LweParams* in_out_params = bk->params->in_out_params;
+template<typename TORUS>
+void TfheGateFunctions<TORUS>::ANDNY(LweSample<TORUS>* result, const LweSample<TORUS>* ca, const LweSample<TORUS>* cb, const TFheGateBootstrappingCloudKeySet<TORUS>* bk) {
+  static const TORUS MU = TorusUtils<TORUS>::modSwitchToTorus(1,8);
+  const LweParams<TORUS>* in_out_params = bk->params->in_out_params;
 
-	LweSample* temp_result = new_LweSample(in_out_params); 
+  LweSample<TORUS>* temp_result = new_LweSample<TORUS>(in_out_params);
 
-	//compute: (0,-1/8) - ca + cb
-	static const Torus32 AndNYConst=modSwitchToTorus32(-1,8);
-	lweNoiselessTrivial(temp_result, AndNYConst, in_out_params); 
-	lweSubTo(temp_result, ca, in_out_params);
-	lweAddTo(temp_result, cb, in_out_params);
+  //compute: (0,-1/8) - ca + cb
+  static const TORUS AndNYConst=TorusUtils<TORUS>::modSwitchToTorus(-1,8);
+  lweNoiselessTrivial(temp_result, AndNYConst, in_out_params);
+  lweSubTo(temp_result, ca, in_out_params);
+  lweAddTo(temp_result, cb, in_out_params);
 
-	//if the phase is positive, the result is 1/8
-	//if the phase is positive, else the result is -1/8
-	tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
+  //if the phase is positive, the result is 1/8
+  //if the phase is positive, else the result is -1/8
+  tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
 
-	delete_LweSample(temp_result); 
+  delete_LweSample(temp_result);
 }
 
 
@@ -238,23 +251,24 @@ EXPORT void bootsANDNY(LweSample* result, const LweSample* ca, const LweSample* 
  * Takes in input 2 LWE samples (with message space [-1/8,1/8], noise<1/16)
  * Outputs a LWE bootstrapped sample (with message space [-1/8,1/8], noise<1/16)
 */
-EXPORT void bootsANDYN(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) { 
-	static const Torus32 MU = modSwitchToTorus32(1,8);
-	const LweParams* in_out_params = bk->params->in_out_params;
+template<typename TORUS>
+void TfheGateFunctions<TORUS>::ANDYN(LweSample<TORUS>* result, const LweSample<TORUS>* ca, const LweSample<TORUS>* cb, const TFheGateBootstrappingCloudKeySet<TORUS>* bk) {
+  static const TORUS MU = TorusUtils<TORUS>::modSwitchToTorus(1,8);
+  const LweParams<TORUS>* in_out_params = bk->params->in_out_params;
 
-	LweSample* temp_result = new_LweSample(in_out_params); 
+  LweSample<TORUS>* temp_result = new_LweSample<TORUS>(in_out_params);
 
-	//compute: (0,-1/8) + ca - cb
-	static const Torus32 AndYNConst=modSwitchToTorus32(-1,8);
-	lweNoiselessTrivial(temp_result, AndYNConst, in_out_params); 
-	lweAddTo(temp_result, ca, in_out_params);
-	lweSubTo(temp_result, cb, in_out_params);
+  //compute: (0,-1/8) + ca - cb
+  static const TORUS AndYNConst=TorusUtils<TORUS>::modSwitchToTorus(-1,8);
+  lweNoiselessTrivial(temp_result, AndYNConst, in_out_params);
+  lweAddTo(temp_result, ca, in_out_params);
+  lweSubTo(temp_result, cb, in_out_params);
 
-	//if the phase is positive, the result is 1/8
-	//if the phase is positive, else the result is -1/8
-	tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
+  //if the phase is positive, the result is 1/8
+  //if the phase is positive, else the result is -1/8
+  tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
 
-	delete_LweSample(temp_result);
+  delete_LweSample(temp_result);
 }
 
 
@@ -262,24 +276,25 @@ EXPORT void bootsANDYN(LweSample* result, const LweSample* ca, const LweSample* 
  * Homomorphic bootstrapped OrNY Gate: not(a) or b
  * Takes in input 2 LWE samples (with message space [-1/8,1/8], noise<1/16)
  * Outputs a LWE bootstrapped sample (with message space [-1/8,1/8], noise<1/16)
-*/ 
-EXPORT void bootsORNY(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) { 
-	static const Torus32 MU = modSwitchToTorus32(1,8);
-	const LweParams* in_out_params = bk->params->in_out_params;
+*/
+template<typename TORUS>
+void TfheGateFunctions<TORUS>::ORNY(LweSample<TORUS>* result, const LweSample<TORUS>* ca, const LweSample<TORUS>* cb, const TFheGateBootstrappingCloudKeySet<TORUS>* bk) {
+  static const TORUS MU = TorusUtils<TORUS>::modSwitchToTorus(1,8);
+  const LweParams<TORUS>* in_out_params = bk->params->in_out_params;
 
-	LweSample* temp_result = new_LweSample(in_out_params); 
+  LweSample<TORUS>* temp_result = new_LweSample<TORUS>(in_out_params);
 
-	//compute: (0,1/8) - ca + cb
-	static const Torus32 OrNYConst=modSwitchToTorus32(1,8);
-	lweNoiselessTrivial(temp_result, OrNYConst, in_out_params); 
-	lweSubTo(temp_result, ca, in_out_params);
-	lweAddTo(temp_result, cb, in_out_params);
+  //compute: (0,1/8) - ca + cb
+  static const TORUS OrNYConst=TorusUtils<TORUS>::modSwitchToTorus(1,8);
+  lweNoiselessTrivial(temp_result, OrNYConst, in_out_params);
+  lweSubTo(temp_result, ca, in_out_params);
+  lweAddTo(temp_result, cb, in_out_params);
 
-	//if the phase is positive, the result is 1/8
-	//if the phase is positive, else the result is -1/8
-	tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
+  //if the phase is positive, the result is 1/8
+  //if the phase is positive, else the result is -1/8
+  tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
 
-	delete_LweSample(temp_result); 
+  delete_LweSample(temp_result);
 }
 
 
@@ -287,24 +302,25 @@ EXPORT void bootsORNY(LweSample* result, const LweSample* ca, const LweSample* c
  * Homomorphic bootstrapped OrYN Gate: a or not(b)
  * Takes in input 2 LWE samples (with message space [-1/8,1/8], noise<1/16)
  * Outputs a LWE bootstrapped sample (with message space [-1/8,1/8], noise<1/16)
-*/ 
-EXPORT void bootsORYN(LweSample* result, const LweSample* ca, const LweSample* cb, const TFheGateBootstrappingCloudKeySet* bk) { 
-	static const Torus32 MU = modSwitchToTorus32(1,8);
-	const LweParams* in_out_params = bk->params->in_out_params;
+*/
+template<typename TORUS>
+void TfheGateFunctions<TORUS>::ORYN(LweSample<TORUS>* result, const LweSample<TORUS>* ca, const LweSample<TORUS>* cb, const TFheGateBootstrappingCloudKeySet<TORUS>* bk) {
+  static const TORUS MU = TorusUtils<TORUS>::modSwitchToTorus(1,8);
+  const LweParams<TORUS>* in_out_params = bk->params->in_out_params;
 
-	LweSample* temp_result = new_LweSample(in_out_params); 
+  LweSample<TORUS>* temp_result = new_LweSample<TORUS>(in_out_params);
 
-	//compute: (0,1/8) + ca - cb
-	static const Torus32 OrYNConst=modSwitchToTorus32(1,8);
-	lweNoiselessTrivial(temp_result, OrYNConst, in_out_params); 
-	lweAddTo(temp_result, ca, in_out_params);
-	lweSubTo(temp_result, cb, in_out_params);
+  //compute: (0,1/8) + ca - cb
+  static const TORUS OrYNConst=TorusUtils<TORUS>::modSwitchToTorus(1,8);
+  lweNoiselessTrivial(temp_result, OrYNConst, in_out_params);
+  lweAddTo(temp_result, ca, in_out_params);
+  lweSubTo(temp_result, cb, in_out_params);
 
-	//if the phase is positive, the result is 1/8
-	//if the phase is positive, else the result is -1/8
-	tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
+  //if the phase is positive, the result is 1/8
+  //if the phase is positive, else the result is -1/8
+  tfhe_bootstrap_FFT(result, bk->bkFFT, MU, temp_result);
 
-	delete_LweSample(temp_result); 
+  delete_LweSample(temp_result);
 }
 
 
@@ -314,40 +330,41 @@ EXPORT void bootsORYN(LweSample* result, const LweSample* ca, const LweSample* c
  * Homomorphic bootstrapped Mux(a,b,c) = a?b:c = a*b + not(a)*c
  * Takes in input 3 LWE samples (with message space [-1/8,1/8], noise<1/16)
  * Outputs a LWE bootstrapped sample (with message space [-1/8,1/8], noise<1/16)
-*/ 
-EXPORT void bootsMUX(LweSample* result, const LweSample* a, const LweSample* b, const LweSample* c, const TFheGateBootstrappingCloudKeySet* bk) { 
-	static const Torus32 MU = modSwitchToTorus32(1,8);
-	const LweParams* in_out_params = bk->params->in_out_params;
-	const LweParams* extracted_params = &bk->params->tgsw_params->tlwe_params->extracted_lweparams;
+*/
+template<typename TORUS>
+void TfheGateFunctions<TORUS>::MUX(LweSample<TORUS>* result, const LweSample<TORUS>* a, const LweSample<TORUS>* b, const LweSample<TORUS>* c, const TFheGateBootstrappingCloudKeySet<TORUS>* bk) {
+  static const TORUS MU = TorusUtils<TORUS>::modSwitchToTorus(1,8);
+  const LweParams<TORUS>* in_out_params = bk->params->in_out_params;
+  const LweParams<TORUS>* extracted_params = &bk->params->tgsw_params->tlwe_params->extracted_lweparams;
 
-	LweSample* temp_result = new_LweSample(in_out_params); 
-	LweSample* temp_result1 = new_LweSample(extracted_params); 
-	LweSample* u1 = new_LweSample(extracted_params); 
-	LweSample* u2 = new_LweSample(extracted_params); 
+  LweSample<TORUS>* temp_result = new_LweSample<TORUS>(in_out_params);
+  LweSample<TORUS>* temp_result1 = new_LweSample<TORUS>(extracted_params);
+  LweSample<TORUS>* u1 = new_LweSample<TORUS>(extracted_params);
+  LweSample<TORUS>* u2 = new_LweSample<TORUS>(extracted_params);
 
 
-	//compute "AND(a,b)": (0,-1/8) + a + b
-	static const Torus32 AndConst=modSwitchToTorus32(-1,8);
-	lweNoiselessTrivial(temp_result, AndConst, in_out_params); 
-	lweAddTo(temp_result, a, in_out_params);
-	lweAddTo(temp_result, b, in_out_params);
-	// Bootstrap without KeySwitch
-	tfhe_bootstrap_woKS_FFT(u1, bk->bkFFT, MU, temp_result);
-    
+  //compute "AND(a,b)": (0,-1/8) + a + b
+  static const TORUS AndConst=TorusUtils<TORUS>::modSwitchToTorus(-1,8);
+  lweNoiselessTrivial(temp_result, AndConst, in_out_params);
+  lweAddTo(temp_result, a, in_out_params);
+  lweAddTo(temp_result, b, in_out_params);
+  // Bootstrap without KeySwitch
+  tfhe_bootstrap_woKS_FFT(u1, bk->bkFFT, MU, temp_result);
 
-	//compute "AND(not(a),c)": (0,-1/8) - a + c
-	lweNoiselessTrivial(temp_result, AndConst, in_out_params); 
-	lweSubTo(temp_result, a, in_out_params);
-	lweAddTo(temp_result, c, in_out_params);
-	// Bootstrap without KeySwitch
-	tfhe_bootstrap_woKS_FFT(u2, bk->bkFFT, MU, temp_result);
 
-	// Add u1=u1+u2
-	static const Torus32 MuxConst=modSwitchToTorus32(1,8);
-	lweNoiselessTrivial(temp_result1, MuxConst, extracted_params);
-	lweAddTo(temp_result1, u1, extracted_params);
-	lweAddTo(temp_result1, u2, extracted_params);
-	// Key switching
+  //compute "AND(not(a),c)": (0,-1/8) - a + c
+  lweNoiselessTrivial(temp_result, AndConst, in_out_params);
+  lweSubTo(temp_result, a, in_out_params);
+  lweAddTo(temp_result, c, in_out_params);
+  // Bootstrap without KeySwitch
+  tfhe_bootstrap_woKS_FFT(u2, bk->bkFFT, MU, temp_result);
+
+  // Add u1=u1+u2
+  static const TORUS MuxConst=TorusUtils<TORUS>::modSwitchToTorus(1,8);
+  lweNoiselessTrivial(temp_result1, MuxConst, extracted_params);
+  lweAddTo(temp_result1, u1, extracted_params);
+  lweAddTo(temp_result1, u2, extracted_params);
+  // Key switching
     lweKeySwitch(result, bk->bkFFT->ks, temp_result1);
 
 

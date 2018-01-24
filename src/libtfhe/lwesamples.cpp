@@ -3,13 +3,15 @@
 
 using namespace std;
 
-LweSample::LweSample(const LweParams* params) 
+template<typename TORUS>
+LweSample<TORUS>::LweSample(const LweParams<TORUS>* params)
 {
-	this->a = new Torus32[params->n];
-    this->b = 0;
-    this->current_variance = 0.;
+	a = new TORUS[params->n];
+  b = TORUS(0);
+  current_variance = 0.;
 }
 
-LweSample::~LweSample() {
-    delete[] a;
+template<typename TORUS>
+LweSample<TORUS>::~LweSample() {
+  delete[] a;
 }

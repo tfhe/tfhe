@@ -4,12 +4,14 @@
 
 using namespace std;
 
-LweKey::LweKey(const LweParams* params) {
-    this->params = params;
-    this->key = new int[params->n];
+template<typename TORUS>
+LweKey<TORUS>::LweKey(const LweParams<TORUS>* params) {
+  this->params = params;
+  this->key = new int[params->n];
 }
 
-LweKey::~LweKey() {
-    delete[] key;
+template<typename TORUS>
+LweKey<TORUS>::~LweKey() {
+  delete[] key;
 }
 
