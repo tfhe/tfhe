@@ -1,0 +1,4 @@
+callgrind.*
+.*.swp
+*.o
+doc
