@@ -1,17 +1,11 @@
 cmake_minimum_required(VERSION 3.0)
 
 # include the fft processors in the build process
-# add_subdirectory(fft_processors)
-
-set(SRCS
-    #list all .cpp and .h files here, one file per file
-    tfhe-core.cpp
-    )
-
+add_subdirectory(core)
 
 #add_library(tfhe-core OBJECT ${SRCS})
-add_library(tfhe-core ${SRCS})
-set_property(TARGET tfhe-core PROPERTY POSITION_INDEPENDENT_CODE ON)
+add_library(tfhe SHARED $<TARGET_OBJECTS:tfhe-core>)
+#set_property(TARGET tfhe PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 # foreach (FFT_PROCESSOR IN LISTS FFT_PROCESSORS) 
 #     add_library(tfhe-${FFT_PROCESSOR} SHARED

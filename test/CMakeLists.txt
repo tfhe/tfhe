@@ -16,7 +16,7 @@ set(GOOGLETEST_SOURCES
 
 #the unittests are compiled with the google test framework
 add_executable(unittests ${GOOGLETEST_SOURCES})
-target_link_libraries(unittests tfhe-core gtest gtest_main -lpthread)
+target_link_libraries(unittests tfhe gtest gtest_main -lpthread)
 add_test(unittests unittests)
 
 # # We build a specific unit and integration test for each fft processor
