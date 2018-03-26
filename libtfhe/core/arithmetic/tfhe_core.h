@@ -19,7 +19,7 @@ typedef int32_t Torus32; //before uint32_t
 typedef int64_t Torus64; //before uint64_t
 
 template<typename TORUS>
-class TLweParams;git 
+class TLweParams;
 
 template<typename TORUS>
 class TLwePublicParams;
@@ -28,7 +28,7 @@ template<typename TORUS>
 struct TLweKey;
 
 template<typename TORUS>
-struct TLweKey;
+struct TLwePublicKey;
 
 template<typename TORUS>
 struct TLweSample;
