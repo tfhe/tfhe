@@ -27,6 +27,7 @@ void LweFunctions<TORUS>::KeyGen(LweKey<TORUS>* result) {
 }
 
 
+
 /**
  * This function encrypts message by using key, with stdev alpha
  * The Lwe sample for the result must be allocated and initialized
@@ -45,6 +46,58 @@ void LweFunctions<TORUS>::SymEncrypt(LweSample<TORUS>* result, TORUS message, do
 
   result->current_variance = alpha*alpha;
 }
+
+
+
+
+/**
+ * This function generates a random Lwe public key for the given parameters.
+ * The Lwe public key for the result must be allocated and initialized
+ * (this means that the parameters are already in the result)
+ */
+template<typename TORUS>
+void LweFunctions<TORUS>::KeyGenPublic(LwePublicKey<TORUS>* result, LweKey<TORUS>* sk) {
+    const int m = result->publicParams->m;
+    const double alpha = result->publicParams->params->alpha_min;
+
+    for (int i=0; i<m; i++)
+        LweFunctions<TORUS>::SymEncrypt(&result->key[i], TORUS(0), alpha, sk);
+}
+
+
+
+/**
+ * This function encrypts message by using the public key, with stdev alpha
+ * The Lwe sample for the result must be allocated and initialized
+ * (this means that the parameters are already in the result)
+ */
+template<typename TORUS>
+void LweFunctions<TORUS>::AsymEncrypt(LweSample<TORUS>* result, TORUS message, double alpha, const LwePublicKey<TORUS>* pubkey){
+    const int m = pubkey->publicParams->m;
+    const int n = pubkey->publicParams->params->n;
+    const double alpha_min = pubkey->publicParams->params->alpha_min;
+
+    result->b = RandomGenTorus<TORUS>::gaussian(message, alpha);
+    // initialize the mask at 0
+    for (int j = 0; j < n; ++j) {
+        result->a[j] = 0;
+    }
+
+    for (int i = 0; i < m; ++i) {
+        // randomly add elements of the public key
+        int r = RandomGen::uniform_bool();
+        if (r == 1) {
+            result->b += pubkey->key[i].b;
+            for (int j = 0; j < n; ++j) {
+                result->a[j] += pubkey->key[i].a[j];
+            }
+        }
+    }
+
+    result->current_variance = alpha*alpha + m*alpha_min*alpha_min;
+}
+
+
 
 
 

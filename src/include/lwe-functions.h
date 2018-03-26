@@ -36,9 +36,26 @@ public:
    */
   static void SymEncrypt(LweSample<TORUS>* result, TORUS message, double alpha, const LweKey<TORUS>* key);
 
+
   /**
-   * This function computes the phase of sample by using key : phi = b - a.s
+   * This function generates a random Lwe public key for the given parameters.
+   * The Lwe public key for the result must be allocated and initialized
+   * (this means that the parameters are already in the result)
    */
+  static void KeyGenPublic(LwePublicKey<TORUS>* result, LweKey<TORUS>* sk);
+
+
+  /**
+   * This function encrypts message by using the public key, with stdev alpha
+   * The Lwe sample for the result must be allocated and initialized
+   * (this means that the parameters are already in the result)
+   */
+  static void AsymEncrypt(LweSample<TORUS>* result, TORUS message, double alpha, const LwePublicKey<TORUS>* pubkey);
+
+
+        /**
+         * This function computes the phase of sample by using key : phi = b - a.s
+         */
   static TORUS Phase(const LweSample<TORUS>* sample, const LweKey<TORUS>* key);
 
   /**

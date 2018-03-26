@@ -56,4 +56,58 @@ inline void delete_LweParams_array(int nbelts, LweParams<TORUS>* obj) {
   del_obj_array<LweParams<TORUS>>(nbelts, obj);
 }
 
+
+
+
+
+
+
+/**
+ * Lwe public key parameters
+ */
+
+template<typename TORUS>
+struct LwePublicParams {
+    const int m; // public key elements (encryption of 0)
+    const LweParams<TORUS>* params; // LWE params
+
+    //since all members are declared constant, a constructor is
+    //required in the structure.
+    inline LwePublicParams(int m, LweParams<TORUS>* params)
+            : m(m),
+              params(params) { }
+
+    inline ~LwePublicParams() { }
+
+    LwePublicParams(const LwePublicParams<TORUS>&) = delete; //forbidden
+    LwePublicParams<TORUS>& operator=(const LwePublicParams<TORUS>& ) = delete; //forbidden
+};
+
+template struct LwePublicParams<Torus32>;
+template struct LwePublicParams<Torus64>;
+
+
+//allocates and initialize the LweParams structure
+//(equivalent of the C++ new)
+template<typename TORUS>
+inline LwePublicParams<TORUS>* new_LwePublicParams(int m, LweParams<TORUS>* params) {
+  return new_obj<LwePublicParams<TORUS>>(m, params);
+}
+template<typename TORUS>
+inline LwePublicParams<TORUS>* new_LwePublicParams_array(int nbelts, LwePublicParams<TORUS>* params) {
+  return new_obj_array<LwePublicParams<TORUS>>(nbelts, params);
+}
+
+//destroys and frees the LwePublicParams structure
+//(equivalent of the C++ delete)
+template<typename TORUS>
+inline void delete_LwePublicParams(LwePublicParams<TORUS>* obj) {
+  del_obj<LwePublicParams<TORUS>>(obj);
+}
+template<typename TORUS>
+inline void delete_LwePublicParams_array(int nbelts, LwePublicParams<TORUS>* obj) {
+  del_obj_array<LwePublicParams<TORUS>>(nbelts, obj);
+}
+
+
 #endif //LWEPARAMS_H

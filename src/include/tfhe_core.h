@@ -22,10 +22,19 @@ template<typename TORUS>
 class LweParams;
 
 template<typename TORUS>
+class LwePublicParams;
+
+template<typename TORUS>
 struct LweKey;
 
 template<typename TORUS>
+struct LwePublicKey;
+
+template<typename TORUS>
 struct LweSample;
+
+template<typename TORUS>
+struct LweSample_array;
 
 template<typename TORUS>
 struct LweKeySwitchKey;
@@ -67,9 +76,9 @@ struct TorusPolynomial;
 
 struct LagrangeHalfCPolynomial;
 
-// **** Ilaria (Platinum)
-struct SemiTGswParams;
-struct SemiTGswKey;
-struct SemiTGswSample;
+// **** Platinum
+//struct SemiTGswParams;
+//struct SemiTGswKey;
+//struct SemiTGswSample;
 
 #endif //TFHE_CORE_H
