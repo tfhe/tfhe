@@ -131,7 +131,7 @@ void LweFunctions<TORUS>::AddTo(LweSample<TORUS>* result, const LweSample<TORUS>
 
 #ifdef __AVX2__
 /** r -= a  using avx instructions (of size n, not necessarily multiple of 8) */
-EXPORT void __attribute__ ((noinline)) intVecSubTo_avx(int* r, const int* a, long n) {
+extern "C" void __attribute__ ((noinline)) intVecSubTo_avx(int* r, const int* a, long n) {
   __asm__ __volatile__ (
 	  //"pushq %%r8\n"         //save clobbered regs
 	  //"pushq %%r9\n"

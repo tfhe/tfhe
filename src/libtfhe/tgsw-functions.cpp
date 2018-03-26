@@ -318,7 +318,7 @@ void TGswFunctions<TORUS>::TorusPolynomialDecompH(IntPolynomial* result, const T
 #ifdef __AVX2__
 
 template<>
-void TGswFunctions<Torys32>::TorusPolynomialDecompH(IntPolynomial* result, const TorusPolynomial<Torys32>* sample, const TGswParams<Torys32>* params){
+void TGswFunctions<Torus32>::TorusPolynomialDecompH(IntPolynomial* result, const TorusPolynomial<Torus32>* sample, const TGswParams<Torus32>* params){
   const int N = params->tlwe_params->N;
   const int l = params->l;
   const int Bgbit = params->Bgbit;
