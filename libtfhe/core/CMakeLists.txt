@@ -15,7 +15,16 @@ set(CORE_SRCS
         arithmetic/tfhe_core.h
         arithmetic/torus.h
         arithmetic/toruspolynomial-functions.cpp
-        )
+        tfhe-core.cpp
+        allocator/allocator.h
+        allocator/MallocAllocator.cpp
+        allocator/MallocAllocator.h
+        allocator/StrictMallocAllocator.cpp
+        allocator/StrictMallocAllocator.h
+        allocator/StackAllocator.cpp
+        allocator/StackAllocator.h
+        allocator/FirstStackAllocator.cpp
+        allocator/FirstStackAllocator.h)
 
 add_library(tfhe-core OBJECT ${CORE_SRCS})
 set_property(TARGET tfhe-core PROPERTY POSITION_INDEPENDENT_CODE ON)

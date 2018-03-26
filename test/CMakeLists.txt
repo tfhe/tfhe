@@ -6,7 +6,7 @@ include_directories(${GTEST_INCLUDE_DIRS} ../libtfhe)
 
 set(GOOGLETEST_SOURCES
     tfhe.cpp
-        )
+        test_allocator.cpp)
 
 # set(CPP_ITESTS 
 #        )
