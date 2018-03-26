@@ -4,6 +4,10 @@
 
 #include "allocator.h"
 
+/**
+ * This class represents a Stack allocator, on a pre-allocated memory region.
+ * allocate just moves the begin address, and deallocate does not do anything.
+ */
 class StackAllocator : public AllocatorImpl {
     size_t beginAddr;
     const size_t endAddr;

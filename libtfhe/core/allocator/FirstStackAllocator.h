@@ -5,6 +5,11 @@
 #include "allocator.h"
 #include "StackAllocator.h"
 
+/**
+ * This class represents a Stack allocator which is the first child of a MallocAllocator.
+ * The memory region is allocated on his parent, with the predefined byte_size.
+ * When the allocator gets out of scope, it frees the region on his parent automatically.
+ */
 class FirstStackAllocator : public StackAllocator {
     AllocatorImpl *const father;
     void *const initialAddress;
