@@ -1,11 +1,22 @@
 #ifndef TFHE_ALLOCATOR_H
 #define TFHE_ALLOCATOR_H
 
+/**
+ * @file allocator interface description
+ * @brief allocator interface description
+ */
+
 #include <cstddef>
 #include <memory>
 
+/**
+ * All allocators implementation must derive from this class
+ */
 class AllocatorImpl;
 
+/**
+ * From a user perspective, an allocator is just a shared pointer to its implementation.
+ */
 typedef std::shared_ptr<AllocatorImpl> Allocator;
 
 /**

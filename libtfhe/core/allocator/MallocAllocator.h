@@ -4,6 +4,10 @@
 
 #include "allocator.h"
 
+/**
+ * This class represents a Malloc allocator.
+ * allocate calls aligned_alloc, and deallocate calls free.
+ */
 class MallocAllocator : public AllocatorImpl {
 public:
     void *allocate(size_t byte_size, size_t alignment) override;
