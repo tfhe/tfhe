@@ -2,7 +2,7 @@
 #include <core/allocator/allocator.h>
 #include <cmath>
 #include <core/allocator/MallocAllocator.h>
-#include <core/allocator/StrictMallocAllocator.h>
+#include <core/allocator/ValgrindAllocator.h>
 
 using namespace std;
 
@@ -34,7 +34,7 @@ TEST(ALLOCATOR, stack) {
 
 
 TEST(ALLOCATOR, strict) {
-    Allocator a(new StrictMallocAllocator());
+    Allocator a(new ValgrindAllocator());
     crazyrec(0, a->createStackChildAllocator(800));
 }
 
@@ -45,7 +45,7 @@ struct Toto {
 };
 
 TEST(ALLOCATOR, array) {
-    Allocator a(new StrictMallocAllocator());
+    Allocator a(new ValgrindAllocator());
     Toto *t43 = a->newArray<Toto>(17, 43);
     Toto *t42 = a->newArrayAligned<Toto>(100, 32, 42);
     for (int i = 0; i < 100; i++) {

@@ -79,34 +79,34 @@ public:
         return ptr;
     };
 
-/**
- * Allocates and constructs a new object of type T, aligned with the default alignment for the type T,
- * and call the constructor using args
- * @param args arguments to pass to the constructor
- */
+    /**
+     * Allocates and constructs a new object of type T, aligned with the default alignment for the type T,
+     * and call the constructor using args
+     * @param args arguments to pass to the constructor
+     */
     template<typename T, typename... ARGS>
     T *newObject(ARGS... args) {
         return newObjectAligned<T, ARGS...>(alignof(T), args...);
     };
 
-/**
- * Destroys and deallocates an object allocated with newObject
- * @param ptr the previously created object
- */
+    /**
+     * Destroys and deallocates an object allocated with newObject
+     * @param ptr the previously created object
+     */
     template<typename T>
     void deleteObject(T *ptr) {
         ptr->~T();
         deallocate(ptr);
     };
 
-/**
- * Allocates and constructs a contiguous array of elements of type T,
- * The array is aligned with the specified alignment,
- * each element is contructed using args
- * @param n the number of elements to create
- * @param alignment the alignment (power of 2)
- * @param args arguments to pass to the constructor
- */
+    /**
+     * Allocates and constructs a contiguous array of elements of type T,
+     * The array is aligned with the specified alignment,
+     * each element is contructed using args
+     * @param n the number of elements to create
+     * @param alignment the alignment (power of 2)
+     * @param args arguments to pass to the constructor
+     */
     template<typename T, typename... ARGS>
     T *newArrayAligned(size_t n, size_t alignment, ARGS... args) {
         T *ptr = (T *) allocate(ceilalign(n * sizeof(T), alignment), alignment);
@@ -115,22 +115,22 @@ public:
         return ptr;
     };
 
-/**
- * Allocates and constructs a contiguous array of elements of type T,
- * The array is aligned with the default alignment for type T,
- * each element is contructed using args
- * @param n the number of elements to create
- * @param args arguments to pass to the constructor
- */
+    /**
+     * Allocates and constructs a contiguous array of elements of type T,
+     * The array is aligned with the default alignment for type T,
+     * each element is contructed using args
+     * @param n the number of elements to create
+     * @param args arguments to pass to the constructor
+     */
     template<typename T, typename... ARGS>
     inline T *newArray(size_t n, ARGS... args) {
         return newArrayAligned<T, ARGS...>(n, alignof(T), args...);
     };
 
-/**
- * Destroys and deallocates an array allocated with newArray or newAlignedArray
- * @param ptr the previously created array
- */
+    /**
+     * Destroys and deallocates an array allocated with newArray or newAlignedArray
+     * @param ptr the previously created array
+     */
     template<typename T>
     void deleteArray(size_t n, T *ptr) {
         for (size_t i = 0; i < n; i++)
