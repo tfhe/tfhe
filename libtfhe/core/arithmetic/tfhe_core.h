@@ -5,7 +5,7 @@
 ///@brief This file declares only the structures names
 #include <stdint.h>
 
-void die_dramatically(const char* message);
+void die_dramatically(const char *message);
 
 
 // Idea:
