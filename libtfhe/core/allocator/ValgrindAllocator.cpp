@@ -1,5 +1,5 @@
 #include <iostream>
-#include "StrictMallocAllocator.h"
+#include "ValgrindAllocator.h"
 
 using namespace std;
 
@@ -12,7 +12,7 @@ static void REQUIRE_DRAMATICALLY(bool condition, string error_message) {
 }
 
 
-void *StrictMallocAllocator::allocate(size_t byte_size, size_t alignment) {
+void *ValgrindAllocator::allocate(size_t byte_size, size_t alignment) {
     REQUIRE_DRAMATICALLY(!has_child,
                          "trying to allocate an address on a parent allocator that has a child");
     void *addr = aligned_alloc(alignment, byte_size);
@@ -20,7 +20,7 @@ void *StrictMallocAllocator::allocate(size_t byte_size, size_t alignment) {
     return addr;
 }
 
-void StrictMallocAllocator::deallocate(void *ptr) {
+void ValgrindAllocator::deallocate(void *ptr) {
     REQUIRE_DRAMATICALLY(!has_child,
                          "trying to free an address on a parent allocator that has a child");
     REQUIRE_DRAMATICALLY(this->addresses.erase(ptr) == 1,
@@ -29,17 +29,17 @@ void StrictMallocAllocator::deallocate(void *ptr) {
 }
 
 
-StrictMallocAllocator::~StrictMallocAllocator() {
+ValgrindAllocator::~ValgrindAllocator() {
+    REQUIRE_DRAMATICALLY(addresses.empty(),
+                         "some allocated addresses were not freed");
     if (father != nullptr) father->has_child = false;
 }
 
-StrictMallocAllocator::StrictMallocAllocator(StrictMallocAllocator *father) :
+ValgrindAllocator::ValgrindAllocator(ValgrindAllocator *father) :
         father(father), has_child(false) {
 }
 
-Allocator StrictMallocAllocator::createStackChildAllocator(const size_t expected_size) {
-    StrictMallocAllocator *cfather = dynamic_cast<StrictMallocAllocator *> (this);
-    REQUIRE_DRAMATICALLY(cfather != nullptr,
-                         "A strict Malloc Allocator can only generate Strict Malloc Allocators");
-    return Allocator(new StrictMallocAllocator(cfather));
+Allocator ValgrindAllocator::createStackChildAllocator(const size_t expected_size) {
+    ValgrindAllocator *cfather = dynamic_cast<ValgrindAllocator *> (this);
+    return Allocator(new ValgrindAllocator(cfather));
 }

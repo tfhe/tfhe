@@ -19,8 +19,8 @@ set(CORE_SRCS
         allocator/allocator.h
         allocator/MallocAllocator.cpp
         allocator/MallocAllocator.h
-        allocator/StrictMallocAllocator.cpp
-        allocator/StrictMallocAllocator.h
+        allocator/ValgrindAllocator.cpp
+        allocator/ValgrindAllocator.h
         allocator/StackAllocator.cpp
         allocator/StackAllocator.h
         allocator/FirstStackAllocator.cpp

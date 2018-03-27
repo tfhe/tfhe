@@ -5,8 +5,8 @@
 #include <set>
 #include "allocator.h"
 
-class StrictMallocAllocator : public AllocatorImpl {
-    StrictMallocAllocator *const father;
+class ValgrindAllocator : public AllocatorImpl {
+    ValgrindAllocator *const father;
     std::set<void *> addresses;
     bool has_child;
 public:
@@ -14,9 +14,9 @@ public:
 
     void deallocate(void *ptr) override;
 
-    StrictMallocAllocator(StrictMallocAllocator *father = nullptr);
+    ValgrindAllocator(ValgrindAllocator *father = nullptr);
 
-    ~StrictMallocAllocator() override;
+    ~ValgrindAllocator() override;
 
     Allocator createStackChildAllocator(const size_t expected_size) override;
 };
