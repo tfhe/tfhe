@@ -12,7 +12,7 @@ class StackAllocator : public AllocatorImpl {
     size_t beginAddr;
     const size_t endAddr;
 public:
-    virtual void *allocate(size_t byte_size, size_t alignment) override;
+    virtual void *allocate(size_t alignment, size_t byte_size) override;
 
     virtual void deallocate(void *ptr) override;
 

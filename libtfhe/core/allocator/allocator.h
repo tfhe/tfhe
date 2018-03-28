@@ -37,7 +37,7 @@ public:
      * @param byte_size minimum size to allocate (must be a multiple of alignment, consider using ceilalign if not sure)
      * @param alignment alignment of the begin and end area.
      */
-    virtual void *allocate(size_t byte_size, size_t alignment = 1)=0;
+    virtual void *allocate(size_t alignment, size_t byte_size)=0;
 
     /**
      * de-allocates a ptr that was previously allocated by this allocator
@@ -74,7 +74,7 @@ public:
      */
     template<typename T, typename... ARGS>
     inline T *newObjectAligned(const size_t alignment, ARGS... args) {
-        T *ptr = (T *) allocate(ceilalign(sizeof(T), alignment), alignment);
+        T *ptr = (T *) allocate(alignment, ceilalign(sizeof(T), alignment));
         new(ptr) T(args...);
         return ptr;
     };
@@ -109,7 +109,7 @@ public:
      */
     template<typename T, typename... ARGS>
     T *newArrayAligned(size_t n, size_t alignment, ARGS... args) {
-        T *ptr = (T *) allocate(ceilalign(n * sizeof(T), alignment), alignment);
+        T *ptr = (T *) allocate(alignment, ceilalign(n * sizeof(T), alignment));
         for (size_t i = 0; i < n; i++)
             new(ptr + i) T(args...);
         return ptr;

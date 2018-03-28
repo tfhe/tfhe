@@ -1,6 +1,6 @@
 #include "StackAllocator.h"
 
-void *StackAllocator::allocate(size_t byte_size, size_t alignment) {
+void *StackAllocator::allocate(size_t alignment, size_t byte_size) {
     size_t newBegin = ceilalign(beginAddr, alignment);
     beginAddr = ceilalign(newBegin + byte_size, alignment);
     if (beginAddr > endAddr) abort(); //the predefined zone was too small!
