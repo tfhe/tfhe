@@ -6,13 +6,14 @@ set(CORE_SRCS
         arithmetic/lagrangehalfc_impl.cpp
         arithmetic/lagrangehalfc_impl.h
         arithmetic/multiplication.cpp
-        arithmetic/numeric_functions.h
+        arithmetic/numeric_utils.h
         arithmetic/polynomials.cpp
         arithmetic/polynomials.h
         arithmetic/polynomials_arithmetic.h
         arithmetic/random_gen.cpp
         arithmetic/random_gen.h
         arithmetic/tfhe_core.h
+        arithmetic/torus.h
         arithmetic/toruspolynomial-functions.cpp
         )
 
