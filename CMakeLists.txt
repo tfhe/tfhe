@@ -14,6 +14,9 @@ set(ENABLE_TESTS ON CACHE BOOL "Build the tests (requires googletest)")
 
 project(tfhe)
 
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "AppleClang")
   # https://stackoverflow.com/a/16229679
   set(CLANG_FLAGS "-stdlib=libc++")
@@ -22,13 +25,13 @@ endif()
 # -std=c99 seems to be required in Travis tests for whatever reason
 set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -std=c99")
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CLANG_FLAGS} -std=gnu++11 -g3 -O0 -Wall -Werror")
+set(CMAKE_CXX_FLAGS_DEBUG "${CLANG_FLAGS} -g3 -O0 -Wall -Werror")
 set(CMAKE_C_FLAGS_DEBUG "-g3 -O0 -Wall -Werror")
 
-set(CMAKE_CXX_FLAGS_OPTIM "${CLANG_FLAGS} -std=gnu++11 -g3 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_CXX_FLAGS_OPTIM "${CLANG_FLAGS} -g3 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
 set(CMAKE_C_FLAGS_OPTIM "-g3 -march=native -O3 -DNDEBUG -funroll-loops -Wall -Werror")
 
-set(CMAKE_CXX_FLAGS_RELEASE "${CLANG_FLAGS} -std=gnu++11 -g0 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_CXX_FLAGS_RELEASE "${CLANG_FLAGS} -g0 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
 set(CMAKE_C_FLAGS_RELEASE "-g0 -march=native -O3 -DNDEBUG -funroll-loops -Wall -Werror")
 
 #if (ENABLE_NAYUKI_PORTABLE)
