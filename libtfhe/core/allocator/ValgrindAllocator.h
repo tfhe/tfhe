@@ -10,7 +10,7 @@ class ValgrindAllocator : public AllocatorImpl {
     std::set<void *> addresses;
     bool has_child;
 public:
-    void *allocate(size_t byte_size, size_t alignment) override;
+    void *allocate(size_t alignment, size_t byte_size) override;
 
     void deallocate(void *ptr) override;
 

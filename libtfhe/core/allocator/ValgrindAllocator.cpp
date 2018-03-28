@@ -12,7 +12,7 @@ static void REQUIRE_DRAMATICALLY(bool condition, string error_message) {
 }
 
 
-void *ValgrindAllocator::allocate(size_t byte_size, size_t alignment) {
+void *ValgrindAllocator::allocate(size_t alignment, size_t byte_size) {
     REQUIRE_DRAMATICALLY(!has_child,
                          "trying to allocate an address on a parent allocator that has a child");
     void *addr = aligned_alloc(alignment, byte_size);
