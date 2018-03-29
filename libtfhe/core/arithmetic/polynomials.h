@@ -30,9 +30,13 @@ public:
 
 
     // constructor
-    IntPolynomial(const PolynomialParameters* params, TfheThreadContext &context, Allocator &alloc);
+    IntPolynomial(const PolynomialParameters* params,
+                  TfheThreadContext &context,
+                  Allocator &alloc);
 
-    void destroy(const PolynomialParameters* params, TfheThreadContext &context, Allocator &alloc);
+    void destroy(const PolynomialParameters* params,
+                 TfheThreadContext &context,
+                 Allocator &alloc);
 
     // destructors
     IntPolynomial(const IntPolynomial &) = delete;
@@ -49,14 +53,18 @@ public:
 template<typename TORUS>
 class TorusPolynomial {
 public:
-    const int N;
     TORUS *coefsT;
-    Allocator &alloc;
-    TfheThreadContext &context;
 
 
     // constructor
-    TorusPolynomial(const int N);
+    TorusPolynomial(const PolynomialParameters* params,
+                  TfheThreadContext &context,
+                  Allocator &alloc);
+
+    void destroy(const PolynomialParameters* params,
+                 TfheThreadContext &context,
+                 Allocator &alloc);
+
 
     // destructors
     TorusPolynomial(const TorusPolynomial<TORUS> &) = delete;

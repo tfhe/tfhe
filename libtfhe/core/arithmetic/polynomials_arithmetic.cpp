@@ -15,8 +15,11 @@ using namespace std;
 
 // TorusPolynomial = 0
 template<typename TORUS>
-void TorusPolyFunctions<TORUS>::Clear(TorusPolynomial<TORUS> *result) {
-    const int N = result->N;
+void TorusPolyFunctions<TORUS>::Clear(TorusPolynomial<TORUS> *result,
+                                      const PolynomialParameters *params,
+                                      TfheThreadContext &context,
+                                      Allocator &alloc) {
+    const int N = params->N;
 
     for (int i = 0; i < N; ++i)
         result->coefsT[i] = 0;
@@ -24,8 +27,11 @@ void TorusPolyFunctions<TORUS>::Clear(TorusPolynomial<TORUS> *result) {
 
 // TorusPolynomial = random
 template<typename TORUS>
-void TorusPolyFunctions<TORUS>::Uniform(TorusPolynomial<TORUS> *result) {
-    const int N = result->N;
+void TorusPolyFunctions<TORUS>::Uniform(TorusPolynomial<TORUS> *result,
+                                        const PolynomialParameters *params,
+                                        TfheThreadContext &context,
+                                        Allocator &alloc) {
+    const int N = params->N;
     TORUS *x = result->coefsT;
 
     for (int i = 0; i < N; ++i)
@@ -35,9 +41,12 @@ void TorusPolyFunctions<TORUS>::Uniform(TorusPolynomial<TORUS> *result) {
 // TorusPolynomial = TorusPolynomial
 template<typename TORUS>
 void TorusPolyFunctions<TORUS>::Copy(TorusPolynomial<TORUS> *result,
-                                     const TorusPolynomial<TORUS> *sample) {
+                                     const TorusPolynomial<TORUS> *sample,
+                                     const PolynomialParameters *params,
+                                     TfheThreadContext &context,
+                                     Allocator &alloc) {
     assert(result != sample);
-    const int N = result->N;
+    const int N = params->N;
     const TORUS *s = sample->coefsT;
     TORUS *r = result->coefsT;
 
@@ -49,8 +58,11 @@ void TorusPolyFunctions<TORUS>::Copy(TorusPolynomial<TORUS> *result,
 template<typename TORUS>
 void TorusPolyFunctions<TORUS>::Add(TorusPolynomial<TORUS> *result,
                                     const TorusPolynomial<TORUS> *poly1,
-                                    const TorusPolynomial<TORUS> *poly2) {
-    const int N = poly1->N;
+                                    const TorusPolynomial<TORUS> *poly2,
+                                    const PolynomialParameters *params,
+                                    TfheThreadContext &context,
+                                    Allocator &alloc) {
+    const int N = params->N;
     assert(result != poly1); //if it fails here, please use addTo
     assert(result != poly2); //if it fails here, please use addTo
     TORUS *r = result->coefsT;
@@ -64,8 +76,11 @@ void TorusPolyFunctions<TORUS>::Add(TorusPolynomial<TORUS> *result,
 // TorusPolynomial += TorusPolynomial
 template<typename TORUS>
 void TorusPolyFunctions<TORUS>::AddTo(TorusPolynomial<TORUS> *result,
-                                      const TorusPolynomial<TORUS> *poly2) {
-    const int N = poly2->N;
+                                      const TorusPolynomial<TORUS> *poly2,
+                                      const PolynomialParameters *params,
+                                      TfheThreadContext &context,
+                                      Allocator &alloc) {
+    const int N = params->N;
     TORUS *r = result->coefsT;
     const TORUS *b = poly2->coefsT;
 
@@ -78,8 +93,11 @@ void TorusPolyFunctions<TORUS>::AddTo(TorusPolynomial<TORUS> *result,
 template<typename TORUS>
 void TorusPolyFunctions<TORUS>::Sub(TorusPolynomial<TORUS> *result,
                                     const TorusPolynomial<TORUS> *poly1,
-                                    const TorusPolynomial<TORUS> *poly2) {
-    const int N = poly1->N;
+                                    const TorusPolynomial<TORUS> *poly2,
+                                    const PolynomialParameters *params,
+                                    TfheThreadContext &context,
+                                    Allocator &alloc) {
+    const int N = params->N;
     assert(result != poly1); //if it fails here, please use subTo
     assert(result != poly2); //if it fails here, please use subTo
     TORUS *r = result->coefsT;
@@ -93,8 +111,11 @@ void TorusPolyFunctions<TORUS>::Sub(TorusPolynomial<TORUS> *result,
 // TorusPolynomial -= TorusPolynomial
 template<typename TORUS>
 void TorusPolyFunctions<TORUS>::SubTo(TorusPolynomial<TORUS> *result,
-                                      const TorusPolynomial<TORUS> *poly2) {
-    const int N = poly2->N;
+                                      const TorusPolynomial<TORUS> *poly2,
+                                      const PolynomialParameters *params,
+                                      TfheThreadContext &context,
+                                      Allocator &alloc) {
+    const int N = params->N;
     TORUS *r = result->coefsT;
     const TORUS *b = poly2->coefsT;
 
@@ -107,8 +128,11 @@ template<typename TORUS>
 void TorusPolyFunctions<TORUS>::AddMulZ(TorusPolynomial<TORUS> *result,
                                         const TorusPolynomial<TORUS> *poly1,
                                         int p,
-                                        const TorusPolynomial<TORUS> *poly2) {
-    const int N = poly1->N;
+                                        const TorusPolynomial<TORUS> *poly2,
+                                        const PolynomialParameters *params,
+                                        TfheThreadContext &context,
+                                        Allocator &alloc) {
+    const int N = params->N;
     assert(result != poly1); //if it fails here, please use AddMulZTo
     TORUS *r = result->coefsT;
     const TORUS *a = poly1->coefsT;
@@ -123,8 +147,11 @@ template<typename TORUS>
 void
 TorusPolyFunctions<TORUS>::AddMulZTo(TorusPolynomial<TORUS> *result,
                                      const int p,
-                                     const TorusPolynomial<TORUS> *poly2) {
-    const int N = poly2->N;
+                                     const TorusPolynomial<TORUS> *poly2,
+                                     const PolynomialParameters *params,
+                                     TfheThreadContext &context,
+                                     Allocator &alloc) {
+    const int N = params->N;
     TORUS *r = result->coefsT;
     const TORUS *b = poly2->coefsT;
 
@@ -138,8 +165,11 @@ void
 TorusPolyFunctions<TORUS>::SubMulZ(TorusPolynomial<TORUS> *result,
                                    const TorusPolynomial<TORUS> *poly1,
                                    const int p,
-                                   const TorusPolynomial<TORUS> *poly2) {
-    const int N = poly1->N;
+                                   const TorusPolynomial<TORUS> *poly2,
+                                   const PolynomialParameters *params,
+                                   TfheThreadContext &context,
+                                   Allocator &alloc) {
+    const int N = params->N;
     assert(result != poly1); //if it fails here, please use SubMulZTo
     TORUS *r = result->coefsT;
     const TORUS *a = poly1->coefsT;
@@ -153,8 +183,11 @@ TorusPolyFunctions<TORUS>::SubMulZ(TorusPolynomial<TORUS> *result,
 template<typename TORUS>
 void TorusPolyFunctions<TORUS>::SubMulZTo(TorusPolynomial<TORUS> *result,
                                           int p,
-                                          const TorusPolynomial<TORUS> *poly2) {
-    const int N = poly2->N;
+                                          const TorusPolynomial<TORUS> *poly2,
+                                          const PolynomialParameters *params,
+                                          TfheThreadContext &context,
+                                          Allocator &alloc) {
+    const int N = params->N;
     TORUS *r = result->coefsT;
     const TORUS *b = poly2->coefsT;
 
@@ -166,8 +199,11 @@ void TorusPolyFunctions<TORUS>::SubMulZTo(TorusPolynomial<TORUS> *result,
 template<typename TORUS>
 void TorusPolyFunctions<TORUS>::MulByXaiMinusOne(TorusPolynomial<TORUS> *result,
                                                  int a,
-                                                 const TorusPolynomial<TORUS> *source) {
-    const int N = source->N;
+                                                 const TorusPolynomial<TORUS> *source,
+                                                 const PolynomialParameters *params,
+                                                 TfheThreadContext &context,
+                                                 Allocator &alloc) {
+    const int N = params->N;
     TORUS *out = result->coefsT;
     TORUS *in = source->coefsT;
 
@@ -192,8 +228,11 @@ void TorusPolyFunctions<TORUS>::MulByXaiMinusOne(TorusPolynomial<TORUS> *result,
 template<typename TORUS>
 void TorusPolyFunctions<TORUS>::MulByXai(TorusPolynomial<TORUS> *result,
                                          int a,
-                                         const TorusPolynomial<TORUS> *source) {
-    const int N = source->N;
+                                         const TorusPolynomial<TORUS> *source,
+                                         const PolynomialParameters *params,
+                                         TfheThreadContext &context,
+                                         Allocator &alloc) {
+    const int N = params->N;
     TORUS *out = result->coefsT;
     TORUS *in = source->coefsT;
 
@@ -218,8 +257,11 @@ void TorusPolyFunctions<TORUS>::MulByXai(TorusPolynomial<TORUS> *result,
 // Infinity norm of the distance between two TorusPolynomial
 template<typename TORUS>
 double TorusPolyFunctions<TORUS>::NormInftyDist(const TorusPolynomial<TORUS> *poly1,
-                                                const TorusPolynomial<TORUS> *poly2) {
-    const int N = poly1->N;
+                                                const TorusPolynomial<TORUS> *poly2,
+                                                const PolynomialParameters *params,
+                                                TfheThreadContext &context,
+                                                Allocator &alloc) {
+    const int N = params->N;
     double norm = 0;
 
     // Max between the coefficients of abs(poly1-poly2)
@@ -240,16 +282,22 @@ double TorusPolyFunctions<TORUS>::NormInftyDist(const TorusPolynomial<TORUS> *po
 
 
 // Sets to zero
-void IntPolyFunctions::Clear(IntPolynomial *poly) {
-    const int N = poly->N;
+void IntPolyFunctions::Clear(IntPolynomial *poly,
+                             const PolynomialParameters *params,
+                             TfheThreadContext &context,
+                             Allocator &alloc) {
+    const int N = params->N;
     for (int i = 0; i < N; ++i)
         poly->coefs[i] = 0;
 }
 
 // Sets to zero
 void IntPolyFunctions::Copy(IntPolynomial *result,
-                            const IntPolynomial *source) {
-    const int N = source->N;
+                            const IntPolynomial *source,
+                            const PolynomialParameters *params,
+                            TfheThreadContext &context,
+                            Allocator &alloc) {
+    const int N = params->N;
     assert(result != source);
 
     for (int i = 0; i < N; ++i)
@@ -258,8 +306,11 @@ void IntPolyFunctions::Copy(IntPolynomial *result,
 
 // accum += source
 void IntPolyFunctions::AddTo(IntPolynomial *accum,
-                             const IntPolynomial *source) {
-    const int N = source->N;
+                             const IntPolynomial *source,
+                             const PolynomialParameters *params,
+                             TfheThreadContext &context,
+                             Allocator &alloc) {
+    const int N = params->N;
 
     for (int i = 0; i < N; ++i)
         accum->coefs[i] += source->coefs[i];
@@ -268,8 +319,11 @@ void IntPolyFunctions::AddTo(IntPolynomial *accum,
 // result = (X^ai-1) * source
 void IntPolyFunctions::MulByXaiMinusOne(IntPolynomial *result,
                                         int ai,
-                                        const IntPolynomial *source) {
-    const int N = source->N;
+                                        const IntPolynomial *source,
+                                        const PolynomialParameters *params,
+                                        TfheThreadContext &context,
+                                        Allocator &alloc) {
+    const int N = params->N;
     int *out = result->coefs;
     int *in = source->coefs;
 
@@ -290,8 +344,11 @@ void IntPolyFunctions::MulByXaiMinusOne(IntPolynomial *result,
 }
 
 // Euclidean norm of an IntPolynomial
-double IntPolyFunctions::Norm2sq(const IntPolynomial *poly) {
-    const int N = poly->N;
+double IntPolyFunctions::Norm2sq(const IntPolynomial *poly,
+                                 const PolynomialParameters *params,
+                                 TfheThreadContext &context,
+                                 Allocator &alloc) {
+    const int N = params->N;
     double norm = 0;
 
     for (int i = 0; i < N; ++i) {
@@ -303,8 +360,11 @@ double IntPolyFunctions::Norm2sq(const IntPolynomial *poly) {
 
 // Infinity norm of the distance between two IntPolynomial
 double IntPolyFunctions::NormInftyDist(const IntPolynomial *poly1,
-                                       const IntPolynomial *poly2) {
-    const int N = poly1->N;
+                                       const IntPolynomial *poly2,
+                                       const PolynomialParameters *params,
+                                       TfheThreadContext &context,
+                                       Allocator &alloc) {
+    const int N = params->N;
     double norm = 0;
 
     // Max between the coefficients of abs(poly1-poly2)
