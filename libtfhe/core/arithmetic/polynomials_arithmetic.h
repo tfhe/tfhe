@@ -145,10 +145,12 @@ struct TorusPolyFunctions<Torus32>;
 template
 struct TorusPolyFunctions<Torus64>;
 
-struct IntPolyFunctions {
-    /**  Norme Euclidienne d'un IntPolynomial */
-    static double NormSq2(const IntPolynomial *poly);
 
+
+
+
+
+struct IntPolyFunctions {
     /**  IntPolynomial = 0 */
     static void Clear(IntPolynomial *result);
 
@@ -172,6 +174,15 @@ struct IntPolyFunctions {
     static double NormInftyDist(const IntPolynomial *poly1,
                                 const IntPolynomial *poly2);
 };
+
+
+
+
+
+
+
+
+
 
 
 /**  TorusPolynomial = 0 */

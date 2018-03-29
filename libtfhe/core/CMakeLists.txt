@@ -2,17 +2,17 @@ cmake_minimum_required(VERSION 3.0)
 
 set(CORE_SRCS
         #list all .cpp and .h files here, one file per file
-        arithmetic/multiplication.cpp
         arithmetic/numeric_utils.h
         arithmetic/polynomials.cpp
         arithmetic/polynomials.h
+        arithmetic/polynomials_arithmetic.cpp
         arithmetic/polynomials_arithmetic.h
+        arithmetic/polynomials_multiplication.cpp
         arithmetic/random_gen.cpp
         arithmetic/random_gen.h
         arithmetic/tfhe_core.h
         arithmetic/torus.h
         arithmetic/threadcontext.h
-        arithmetic/toruspolynomial-functions.cpp
         tfhe-core.cpp
         allocator/allocator.h
         allocator/MallocAllocator.cpp

@@ -2,11 +2,11 @@
 #define NUMERIC_UTILS_H
 
 #include "torus.h"
-
 #include <limits>
 #include <type_traits>
 #include <cstdint>
 #include <cmath>
+
 
 /**
  * Numeric utils for Torus data types
@@ -52,7 +52,7 @@ public:
      * @return approximated torus value
      */
     static TORUS approxPhase(TORUS phase, int32_t Msize) {
-        UTORUS half_interv = ((UTORUS(1) << (bit_cnt - 1)) / Msize); // half width of each interval
+        UTORUS half_interv = ((UTORUS(1) << (bit_cnt - 1)) / UTORUS(Msize)); // half width of each interval
         UTORUS interv = half_interv << 1; // width of each interval
         UTORUS phase_temp = UTORUS(phase) + half_interv;
         phase_temp -= phase_temp % interv;
@@ -67,7 +67,7 @@ public:
      * @return discrete space value
      */
     static int32_t modSwitchFromTorus(TORUS phase, int32_t Msize) {
-        UTORUS half_interv = ((UTORUS(1) << (bit_cnt - 1)) / Msize);
+        UTORUS half_interv = ((UTORUS(1) << (bit_cnt - 1)) / UTORUS(Msize));
         UTORUS interv = half_interv << 1; // width of each interval
         UTORUS phase_temp = UTORUS(phase) + half_interv;
         return TORUS(phase_temp / interv);
@@ -81,8 +81,8 @@ public:
      * @return torus value
      */
     static TORUS modSwitchToTorus(int32_t mu, int32_t Msize) {
-        UTORUS half_interv = ((UTORUS(1) << (bit_cnt - 1)) / Msize);
-        UTORUS phase_temp = ((mu % Msize) * 2) * half_interv;
+        UTORUS half_interv = ((UTORUS(1) << (bit_cnt - 1)) / UTORUS(Msize));
+        UTORUS phase_temp = UTORUS((mu % Msize) * 2) * half_interv;
         return phase_temp;
     }
 };
