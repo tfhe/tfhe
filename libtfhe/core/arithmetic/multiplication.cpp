@@ -1,10 +1,7 @@
 #include <iostream>
-#include <cstdlib>
-#include <cmath>
 #include <cassert>
 #include "polynomials.h"
 #include "polynomials_arithmetic.h"
-#include "lagrangehalfc_arithmetic.h"
 
 
 using namespace std;
@@ -181,50 +178,4 @@ void TorusPolyFunctions<TORUS>::SubMulRKaratsuba(TorusPolynomial<TORUS> *result,
     delete[] buf;
 }
 
-
-/** multiplication via direct FFT (it must know the implem of LagrangeHalfCPolynomial because of the tmp+1 notation */
-template<typename TORUS>
-void TorusPolyFunctions<TORUS>::MultFFT(TorusPolynomial<TORUS> *result,
-                                        const IntPolynomial *poly1,
-                                        const TorusPolynomial<TORUS> *poly2) {
-    const int N = poly1->N;
-    LagrangeHalfCPolynomial *tmp = new_LagrangeHalfCPolynomial_array(3, N);
-    IntPolynomial_ifft(tmp + 0, poly1);
-    TorusPolynomial_ifft(tmp + 1, poly2);
-    LagrangeHalfCPolynomialMul(tmp + 2, tmp + 0, tmp + 1);
-    TorusPolynomial_fft(result, tmp + 2);
-    delete_LagrangeHalfCPolynomial_array(3, tmp);
-}
-
-template<typename TORUS>
-void TorusPolyFunctions<TORUS>::AddMulRFFT(TorusPolynomial<TORUS> *result,
-                                           const IntPolynomial *poly1,
-                                           const TorusPolynomial<TORUS> *poly2) {
-    const int N = poly1->N;
-    LagrangeHalfCPolynomial *tmp = new_LagrangeHalfCPolynomial_array(3, N);
-    TorusPolynomial<TORUS> *tmpr = new_TorusPolynomial<TORUS>(N);
-    IntPolynomial_ifft(tmp + 0, poly1);
-    TorusPolynomial_ifft(tmp + 1, poly2);
-    LagrangeHalfCPolynomialMul(tmp + 2, tmp + 0, tmp + 1);
-    TorusPolynomial_fft(tmpr, tmp + 2);
-    torusPolynomialAddTo(result, tmpr);
-    delete_TorusPolynomial(tmpr);
-    delete_LagrangeHalfCPolynomial_array(3, tmp);
-}
-
-template<typename TORUS>
-void TorusPolyFunctions<TORUS>::SubMulRFFT(TorusPolynomial<TORUS> *result,
-                                           const IntPolynomial *poly1,
-                                           const TorusPolynomial<TORUS> *poly2) {
-    const int N = poly1->N;
-    LagrangeHalfCPolynomial *tmp = new_LagrangeHalfCPolynomial_array(3, N);
-    TorusPolynomial<TORUS> *tmpr = new_TorusPolynomial<TORUS>(N);
-    IntPolynomial_ifft(tmp + 0, poly1);
-    TorusPolynomial_ifft(tmp + 1, poly2);
-    LagrangeHalfCPolynomialMul(tmp + 2, tmp + 0, tmp + 1);
-    TorusPolynomial_fft(tmpr, tmp + 2);
-    torusPolynomialSubTo(result, tmpr);
-    delete_TorusPolynomial(tmpr);
-    delete_LagrangeHalfCPolynomial_array(3, tmp);
-}
 

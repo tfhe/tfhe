@@ -8,6 +8,7 @@
 
 #include <cstddef>
 #include <memory>
+#include "../arithmetic/polynomials.h"
 
 /**
  * All allocators implementation must derive from this class

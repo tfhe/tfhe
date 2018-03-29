@@ -1,7 +1,6 @@
 #include <cassert>
 #include <cmath>
 #include "tfhe_core.h"
-#include "numeric_functions.h"
 #include "polynomials.h"
 #include "polynomials_arithmetic.h"
 #include "random_gen.h"

@@ -138,20 +138,6 @@ public:
                      const IntPolynomial *poly1,
                      const TorusPolynomial<TORUS> *poly2);
 
-    static void
-    MultFFT(TorusPolynomial<TORUS> *result,
-            const IntPolynomial *poly1,
-            const TorusPolynomial<TORUS> *poly2);
-
-    static void
-    AddMulRFFT(TorusPolynomial<TORUS> *result,
-               const IntPolynomial *poly1,
-               const TorusPolynomial<TORUS> *poly2);
-
-    static void
-    SubMulRFFT(TorusPolynomial<TORUS> *result,
-               const IntPolynomial *poly1,
-               const TorusPolynomial<TORUS> *poly2);
 };
 
 template
@@ -383,37 +369,6 @@ inline void torusPolynomialSubMulRKaratsuba(TorusPolynomial<TORUS> *result,
     TorusPolyFunctions<TORUS>::SubMulRKaratsuba(result, poly1, poly2);
 }
 
-
-template<typename TORUS>
-inline void torusPolynomialMultFFT(TorusPolynomial<TORUS> *result,
-                                   const IntPolynomial *poly1,
-                                   const TorusPolynomial<TORUS> *poly2) {
-    TorusPolyFunctions<TORUS>::MultFFT(result, poly1, poly2);
-}
-
-template<typename TORUS>
-inline void torusPolynomialAddMulRFFT(TorusPolynomial<TORUS> *result,
-                                      const IntPolynomial *poly1,
-                                      const TorusPolynomial<TORUS> *poly2) {
-    TorusPolyFunctions<TORUS>::AddMulRFFT(result, poly1, poly2);
-}
-
-template<typename TORUS>
-inline void torusPolynomialSubMulRFFT(TorusPolynomial<TORUS> *result,
-                                      const IntPolynomial *poly1,
-                                      const TorusPolynomial<TORUS> *poly2) {
-    TorusPolyFunctions<TORUS>::SubMulRFFT(result, poly1, poly2);
-}
-
-
-
-//#define torusPolynomialMul torusPolynomialMultKaratsuba
-//#define torusPolynomialAddMulR torusPolynomialAddMulRKaratsuba
-//#define torusPolynomialSubMulR torusPolynomialSubMulRKaratsuba
-
-#define torusPolynomialMul torusPolynomialMultFFT
-#define torusPolynomialAddMulR torusPolynomialAddMulRFFT
-#define torusPolynomialSubMulR torusPolynomialSubMulRFFT
 
 
 #endif //POLYNOMIALS_ARITHMETIC_H
