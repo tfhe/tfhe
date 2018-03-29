@@ -8,7 +8,6 @@
 
 #include <cstddef>
 #include <memory>
-#include "../arithmetic/polynomials.h"
 
 /**
  * All allocators implementation must derive from this class
@@ -94,9 +93,10 @@ public:
      * Destroys and deallocates an object allocated with newObject
      * @param ptr the previously created object
      */
-    template<typename T>
-    void deleteObject(T *ptr) {
-        ptr->~T();
+    template<typename T, typename ...ARGS>
+    void deleteObject(T *ptr, ARGS... args) {
+        //ptr->~T();
+        ptr->destroy(args...);
         deallocate(ptr);
     };
 
@@ -132,10 +132,12 @@ public:
      * Destroys and deallocates an array allocated with newArray or newAlignedArray
      * @param ptr the previously created array
      */
-    template<typename T>
-    void deleteArray(size_t n, T *ptr) {
-        for (size_t i = 0; i < n; i++)
-            (ptr + i)->~T();
+    template<typename T, typename... ARGS>
+    void deleteArray(size_t n, T *ptr, ARGS... args) {
+        for (size_t i = 0; i < n; i++) {
+            //(ptr + i)->~T();
+            (ptr + i)->destroy(args...);
+        }
         deallocate(ptr);
     };
 

@@ -15,20 +15,24 @@
 /**
  * CLASSES
  */
+class PolynomialParameters {
+public:
+    int N;
+};
+
 
 /**
  * Class of integer polynomials modulo X^N+1
  */
 class IntPolynomial {
 public:
-    const int N;
     int *coefs;
-    Allocator& alloc;
-    TfheThreadContext& context;
 
 
     // constructor
-    IntPolynomial(const int N);
+    IntPolynomial(const PolynomialParameters* params, TfheThreadContext &context, Allocator &alloc);
+
+    void destroy(const PolynomialParameters* params, TfheThreadContext &context, Allocator &alloc);
 
     // destructors
     IntPolynomial(const IntPolynomial &) = delete;
@@ -47,8 +51,8 @@ class TorusPolynomial {
 public:
     const int N;
     TORUS *coefsT;
-    Allocator& alloc;
-    TfheThreadContext& context;
+    Allocator &alloc;
+    TfheThreadContext &context;
 
 
     // constructor
@@ -80,8 +84,8 @@ struct TorusPolynomial<Torus64>;
  * Allocates an integer polynomial
  */
 inline IntPolynomial *new_IntPolynomial(const int N,
-                                        TfheThreadContext& context,
-                                        Allocator& alloc) {
+                                        TfheThreadContext &context,
+                                        Allocator &alloc) {
     return alloc->newObject<IntPolynomial>(N);
 }
 
@@ -90,30 +94,10 @@ inline IntPolynomial *new_IntPolynomial(const int N,
  */
 inline IntPolynomial *new_IntPolynomial_array(size_t nbelts,
                                               const int N,
-                                              TfheThreadContext& context,
-                                              Allocator& alloc) {
+                                              TfheThreadContext &context,
+                                              Allocator &alloc) {
     return alloc->newArray<IntPolynomial>(nbelts, N);
 }
-
-/**
- * Deletes an integer polynomial
- */
-inline void delete_IntPolynomial(IntPolynomial obj,
-                                 TfheThreadContext& context,
-                                 Allocator& alloc) {
-    alloc->deleteObject<IntPolynomial>(&obj);
-}
-
-/**
- * Deletes an array of integer polynomials
- */
-inline void delete_IntPolynomial_array(size_t nbelts,
-                                       IntPolynomial *obj,
-                                       TfheThreadContext& context,
-                                       Allocator& alloc) {
-    alloc->deleteArray<IntPolynomial>(nbelts, obj);
-}
-
 
 
 /**
@@ -125,8 +109,8 @@ inline void delete_IntPolynomial_array(size_t nbelts,
  */
 template<typename TORUS>
 inline TorusPolynomial<TORUS> *new_TorusPolynomial(const int N,
-                                                   TfheThreadContext& context,
-                                                   Allocator& alloc) {
+                                                   TfheThreadContext &context,
+                                                   Allocator &alloc) {
     return alloc->newObject<TorusPolynomial<TORUS>>(N);
 }
 
@@ -136,8 +120,8 @@ inline TorusPolynomial<TORUS> *new_TorusPolynomial(const int N,
 template<typename TORUS>
 inline TorusPolynomial<TORUS> *new_TorusPolynomial_array(size_t nbelts,
                                                          const int N,
-                                                         TfheThreadContext& context,
-                                                         Allocator& alloc) {
+                                                         TfheThreadContext &context,
+                                                         Allocator &alloc) {
     return alloc->newArray<TorusPolynomial<TORUS>>(nbelts, N);
 }
 
@@ -146,8 +130,8 @@ inline TorusPolynomial<TORUS> *new_TorusPolynomial_array(size_t nbelts,
  */
 template<typename TORUS>
 inline void delete_TorusPolynomial(TorusPolynomial<TORUS> obj,
-                                   TfheThreadContext& context,
-                                   Allocator& alloc) {
+                                   TfheThreadContext &context,
+                                   Allocator &alloc) {
     alloc->deleteObject<TorusPolynomial<TORUS>>(&obj);
 }
 
@@ -157,8 +141,8 @@ inline void delete_TorusPolynomial(TorusPolynomial<TORUS> obj,
 template<typename TORUS>
 inline void delete_TorusPolynomial_array(size_t nbelts,
                                          TorusPolynomial<TORUS> *obj,
-                                         TfheThreadContext& context,
-                                         Allocator& alloc) {
+                                         TfheThreadContext &context,
+                                         Allocator &alloc) {
     alloc->deleteArray<TorusPolynomial<TORUS>>(nbelts, obj);
 }
 

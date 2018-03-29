@@ -7,14 +7,19 @@ using namespace std;
 // IntPolynomial
 //
 
-// constructor
-IntPolynomial::IntPolynomial(const int N) : N(N) {
-    this->coefs = new int[N];
+
+IntPolynomial::IntPolynomial(const PolynomialParameters *params, TfheThreadContext &context, Allocator &alloc) {
+    coefs = alloc->newArray<int>(params->N);
+
+}
+
+void IntPolynomial::destroy(const PolynomialParameters *params, TfheThreadContext &context, Allocator &alloc) {
+    alloc->deleteArray<int>(params->N, coefs);
 }
 
 
 
-
+/*
 //
 // TorusPolynomial
 //
@@ -27,6 +32,5 @@ TorusPolynomial<TORUS>::TorusPolynomial(const int N) : N(N) {
 
 
 
-
-
+*/
 
