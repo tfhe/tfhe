@@ -101,6 +101,15 @@ public:
     };
 
     /**
+     * Destroys and deallocates arithmetic types allocated with newObject or newAlignedObject
+     * @param ptr the previously created array
+     */
+    template<typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value>>
+    void deleteObject(T *ptr) {
+        deallocate(ptr);
+    };
+
+    /**
      * Allocates and constructs a contiguous array of elements of type T,
      * The array is aligned with the specified alignment,
      * each element is contructed using args
@@ -138,6 +147,15 @@ public:
             //(ptr + i)->~T();
             (ptr + i)->destroy(args...);
         }
+        deallocate(ptr);
+    };
+
+    /**
+     * Destroys and deallocates an array of arithmetic types allocated with newArray or newAlignedArray
+     * @param ptr the previously created array
+     */
+    template<typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value>>
+    void deleteArray(size_t n, T *ptr) {
         deallocate(ptr);
     };
 
