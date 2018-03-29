@@ -15,14 +15,11 @@ set(CORE_SRCS
         arithmetic/threadcontext.h
         tfhe-core.cpp
         allocator/allocator.h
-        allocator/MallocAllocator.cpp
-        allocator/MallocAllocator.h
         allocator/ValgrindAllocator.cpp
         allocator/ValgrindAllocator.h
-        allocator/StackAllocator.cpp
-        allocator/StackAllocator.h
-        allocator/FirstStackAllocator.cpp
-        allocator/FirstStackAllocator.h)
+        allocator/TFHEAllocator.cpp
+        allocator/TFHEAllocator.h
+        )
 
 add_library(tfhe-core OBJECT ${CORE_SRCS})
 set_property(TARGET tfhe-core PROPERTY POSITION_INDEPENDENT_CODE ON)

@@ -178,4 +178,3 @@ void TorusPolyFunctions<TORUS>::SubMulRKaratsuba(TorusPolynomial<TORUS> *result,
     delete[] buf;
 }
 
-
