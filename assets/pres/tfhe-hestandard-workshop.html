@@ -1,0 +1,559 @@
+<!doctype html>
+<html>
+    <head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+	<title>TFHE: past, present, future</title>
+
+	<link rel="stylesheet" href="css/reveal.css">
+	<link rel="stylesheet" href="css/theme/white.css">
+
+	<!-- Theme used for syntax highlighting of code -->
+	<link rel="stylesheet" href="lib/css/zenburn.css">
+
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+	<!-- Printing and PDF exports -->
+	<script>
+var link = document.createElement( 'link' );
+link.rel = 'stylesheet';
+link.type = 'text/css';
+link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+document.getElementsByTagName( 'head' )[0].appendChild( link );
+	</script>
+    </head>
+    <body>
+	<div class="reveal">
+	    <div class="slides">
+		<!-- *********************************************************
+                                  The title page (drawn manually)
+	             ********************************************************* -->
+		<section data-transition="fade-out">
+                    <table id="affiliationsTable">
+<style type="text/css">
+#affiliationsTable { border-width: 0px; width: 70%; }
+#affiliationsTable td { width: 20%; border-width: 0px; }
+#affiliationsTableLogos td { vertical-align: middle; }
+#affiliationsTable img {
+    max-width: 100%; max-height: 100%; display: block; margin: auto;
+    border-width: 0px; box-shadow: none;
+}
+#affiliationsTableAuthors td { font-size: 15pt; text-align: center; }
+</style>
+			<tr id="affiliationsTableLogos">
+                            <td colspan="6">
+                                <img src="figs/static/logo-tfhe.png"
+                                style="padding-bottom: 100px;">
+                            </td>
+                        </tr>
+                        <tr>
+			    <td>
+                                <img src="figs/static/logo-uvsq.png"
+                                style="position: relative; top: -20px">
+                            </td>
+                            <td>
+                                <img src="figs/static/logo-inpher.png">
+                            </td>
+                            <td>
+                                <img src="figs/static/logo-gemalto.png"
+                                style="position: relative; top: -20px">
+                            </td>
+                            <td>
+                                <img src="figs/static/logo-cea-list.png"
+                                style="position: relative; top: -30px">
+                            </td>
+                            <td>
+                                <img
+                                src="figs/static/logo-cryptocomp.png"
+                                style="position: relative; top: -20px">
+                            </td>
+			</tr>
+			<!-- <tr id="affiliationsTableAuthors">
+                            <td style="font-weight: bold">N.&nbsp;Gama</td>
+                        </tr> -->
+		    </table>
+		</section>
+		<section data-markdown data-separator="^\n---\n$" data-separator-vertical="^\n--\n$">
+		    <script type="text/template">
+<!-- *********************************************************************************************
+                                        INTRODUCTION SECTION
+     ********************************************************************************************* -->
+
+<!-- .slide: data-transition="appear" -->
+## The origins of TFHE
+
+<anim style="width: 900px; height: 650px;">
+<object data="figs/svga/output/tfhe-origins-f1.svg"></object>
+</anim>
+
+---
+
+<!-- .slide: class="sectiontitle" data-transition="zoom-in convex-out" -->
+## Introduction
+
+---
+
+## The TFHE library
+
+> <!-- .element class="green" -->
+> ## TFHE
+> * General purpose fully homomorphic encryption library
+> * Meant for combinatorial functions on few inputs
+> * API designed for the end user<br>*not the library creator's own use*
+
+<!-- --> 
+
+> <!-- .element class="fragment" -->
+> * Fastest bootstrapping techniques<br>Achieving Gentry's original vision of FHE
+
+---
+
+## TFHE is known for...
+
+<object data="figs/svga/output/gate-boots-standalone-f1.svg" style="width:900px"></object>
+
+> <!-- .element class="green" -->
+> ## gate bootstrapping
+> * evaluate boolean circuits
+> * time proportional to number of gates
+> * depth does not matter <br>*no need to optimize it*
+> * very low latency for single function evaluations
+
+---
+
+## TFHE Public API v1.0
+
+> <!-- .element class="blue" -->
+> ## Public API v1.0
+> * **create,load,save** secret and cloud keysets
+> * **encrypt,decrypt** with secret keyset
+> * **boots. gates**: Cst, And, Or, Xor, Not, Mux, ... 
+
+---
+
+<!-- .slide: class="sectiontitle" data-transition="zoom-in convex-out" -->
+## TFHE is much more!
+
+---
+
+## The vintage ring model
+
+> ## By hearing "homomorphic encryption", we imagine:
+> * A ring
+> * A \\( + \\) and a \\( \times \\)
+
+---
+
+## The native TFHE plaintext model
+
+<object data="figs/svga/output/plaintext-spaces-a-f1.svg"
+style="width:600px"></object> 
+
+---
+
+## Behind the scene (Backend API)
+
+> ## Powerful abstraction
+> * **Rich plaintext space**<br>(Torus, integers, polynomials, and external products)
+> * **Torus, density, lipschitz functions**<br>(rather than arithmetic with errors modulo scale)
+> * \\( \Omega \\)**-space logic**<br>(rather than decryption logic)
+
+<object data="figs/svga/output/LWE_enc_dec-full.svg" style="width: 66%"></object>
+
+---
+
+## Levels of noise, CMux (Middle API?)
+
+<anim style="width:90%; height:600px;">
+<object data="figs/svga/output/base-gates-f1.svg" data-onlyin="[1,2]"></object>
+<object data="figs/svga/output/base-gates-f2.svg" data-onlyin="[2]"></object>
+<object data="figs/svga/output/base-gates-f3.svg" data-onlyin="[1]"></object>
+<span class="fragment">
+</anim>
+
+---
+
+## Efficient computational models (Frontend API?)
+
+&nbsp; 
+
+<anim style="width:400px; height:200px; left: 10%">
+<object data="figs/static/abaco.jpeg" style="width: 50%; left: -50%"></object>
+<object data="figs/svga/output/max-f1.svg"></object>
+<object data="figs/svga/output/max-f2.svg"></object>
+<object data="figs/svga/output/max-f3.svg"></object>
+<object data="figs/svga/output/max-f4.svg"></object>
+<object data="figs/svga/output/max-f5.svg"></object>
+<object data="figs/svga/output/max-f6.svg"></object>
+<object data="figs/svga/output/max-f7.svg"></object>
+<object data="figs/svga/output/max-f8.svg"></object>
+<!--<object data="figs/svga/output/max-f9.svg"></object>-->
+</anim>
+
+> <!-- .element class="green" -->
+> ## Computational models supported
+> * **Packing, unpacking, linear maps**<br>*Public and private functional keyswitchs with small keys.*
+> * **Weighted Automata**<br>*good for tropical algebra (max, +) and arithmetic circuits*
+> * **LUT with Vertical Packing**<br>*Rapidly evaluates complex circuits*
+> * **Boolean circuits** via gate bootstrapping<br>*good for everything else (general circuits, non-det automata, ...)*
+
+---
+
+## Other Functionality
+
+> ## Other goodies (internal or external to TFHE)
+> * **Proof of correct decryption: PVCT**<br>*(e.g. e-voting, alternative to zk-snarg)*
+> * **Compiled circuits**<br>*(using i.e. CEA's Cingulata compiler v2.0)*
+> * **Scheme switching**<br>*(TFHE's General abstraction unifies almost all schemes including NTRU and AGCD-based FHE)*
+
+---
+
+<!-- .slide: class="sectiontitle" data-transition="zoom-in convex-out" -->
+## Sum up &amp; Perspective
+
+---
+
+## Each library has its own strength
+
+> <!-- .element data-onlyin="[1]" -->
+> ## Strength of HE libraries
+> * **BGV/Helib**: massively parallel, finite field arithmetic 
+> * **B/FV, Seal**: massively parallel, small depth polynomials
+> * **HEAAN**: massively parallel, floating point arithmetic<br>&nbsp;
+> * **TFHE**:  single evaluation, boolean logic, comparison, threshold, complex circuits, PVCT
+> * etc...
+
+<object data="figs/svga/output/two-products-bgv-gsw-f1.svg"
+        style="width:85%" data-onlyin="[2]"></object>
+
+> <!-- .element class="green fragment" -->
+> * How to get all the benefits without the limitations?
+
+---
+
+<!-- .slide: data-transition="zoom-in" -->
+## Chimera!
+
+> ## The Chimera Idea
+> * Switch between ciphertext representations
+> * Implement bridges between TFHE and other libraries
+<!-- > * Also switch between FHE and MPC (Sharing, GMW, Garbled) -->
+
+<video src="figs/videos/chimera-3d.mp4" style="width:700px; height:340px"
+                                        loop data-autoplay></video>
+
+---
+
+<!-- .slide: data-transition="zoom-in convex-out" -->
+## Chimera Project status
+
+<img src="figs/static/baby-chimera.jpg" style="width:320px; height:240px">
+
+> <!-- .element class="purple" -->
+> ## Baby Chimera: just born!
+> * POC in progress on certain bridges
+
+<!-- -->
+
+> ## Objectives
+> * Project built on top of existing libraries.<br>*requires more stable API (this workshop)*
+> * Open source framework open to world-wide contribution.<br>*e.g. Apache 2.0?*
+> * User and use-cases driven API
+
+---
+
+<!-- .slide: class="sectiontitle" data-transition="zoom-in convex-out" -->
+## THANK YOU!
+
+                    </script>
+		</section>
+	    </div>
+	</div>
+	<script src="lib/js/head.min.js"></script>
+	<script src="js/reveal.js"></script>
+	<script>
+// More info https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+    history: true,
+    width: 1024,
+    height: 768,
+    parallaxBackgroundImage: 'figs/static/background.jpg',
+    parallaxBackgroundSize: '100% 100%',
+    parallaxBackgroundHorizontal: 0,
+    parallaxBackgroundVertical: 0,
+
+
+    math: {
+        mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js',
+        config: 'TeX-AMS_SVG-full',  // See http://docs.mathjax.org/en/latest/config-files.html
+    },
+
+    // More info https://github.com/hakimel/reveal.js#dependencies
+    dependencies: [
+    { src: 'plugin/markdown/marked.js' },
+    { src: 'plugin/markdown/markdown.js' },
+    { src: 'plugin/notes/notes.js', async: true },
+    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+    { src: 'plugin/math/math.js', async: true },
+    ]
+
+});
+
+function processAnimsOnSlide() {
+    var state = Reveal.getState();
+    var indexf = state.indexf+2;
+    var currentSlide = $(Reveal.getCurrentSlide());
+    if (indexf===undefined) return;
+    currentSlide.find('[data-showin]').each(processUncover);
+    currentSlide.find('[data-onlyin]').each(processOnly);
+
+    function processUncover() {
+	var img = $(this);
+	var dset = img.data('showin');
+	var found = false;
+	for (var i=0; i<dset.length; i++) {
+	    if (dset[i]==indexf) {found=true; break;}
+	    if (dset[i]>indexf) {found=false; break;}
+	}
+	if (found) {
+	    img.css('visibility','visible');
+	} else {
+	    img.css('visibility','hidden');
+	}
+    }
+    function processOnly() {
+	var img = $(this);
+	var dset = img.data('onlyin');
+	var found = false;
+	for (var i=0; i<dset.length; i++) {
+	    if (dset[i]==indexf) {found=true; break;}
+	    if (dset[i]>indexf) {found=false; break;}
+	}
+	if (found) {
+	    img.show();
+	} else {
+	    img.hide();
+	}
+    }
+}
+
+Reveal.addEventListener( 'fragmentshown', function( event ) {
+    //console.log(event.fragment)
+    processAnimsOnSlide();
+} );
+Reveal.addEventListener( 'fragmenthidden', function( event ) {
+    //console.log(event.fragment)
+    processAnimsOnSlide();
+} );
+Reveal.addEventListener( 'slidechanged', function( event ) {
+    //console.log(event.currentSlide)
+    processAnimsOnSlide();
+} );
+
+Reveal.propagateMessage=function(id,message) {
+    var opener = window.parent.opener;
+    if (opener!=null)
+	opener.postMessage(JSON.stringify({ method: 'propagateMessage', args: [id,message] }), '*');
+    return $(id).each(doit);
+
+    function doit() {
+	if (this.contentWindow)
+	    this.contentWindow.postMessage(message,'*');
+    }
+}
+Reveal.propagateFunction=function(toexec) {
+    var opener = window.parent.opener;
+    if (opener!=null)
+	opener.postMessage(JSON.stringify({ method: 'propagateFunction', args: [toexec] }), '*');
+    eval(toexec);
+}
+//window.addEventListener('message',function(event) {
+//    console.log('index.html received',event.data);
+//});
+
+function wheelAnimSetup() {
+    document.querySelector('#wheelAnimIframe').contentWindow.postMessage('Setup','*');
+    $('#wheelAnimTblSet').css({color: 'red'});
+    $('#wheelAnimTblPR,#wheelAnimTblER,#wheelAnimTblEx').css({color: 'black'});
+}
+function wheelAnimPlainRotate() {
+    document.querySelector('#wheelAnimIframe').contentWindow.postMessage('PlainRotate','*');
+    $('#wheelAnimTblPR').css({color: 'red'});
+    $('#wheelAnimTblSet,#wheelAnimTblER,#wheelAnimTblEx').css({color: 'black'});
+}
+function wheelAnimEncRotate() {
+    document.querySelector('#wheelAnimIframe').contentWindow.postMessage('EncRotate','*');
+    $('#wheelAnimTblER').css({color: 'red'});
+    $('#wheelAnimTblSet,#wheelAnimTblPR,#wheelAnimTblEx').css({color: 'black'});
+}
+function wheelAnimExtract() {
+    document.querySelector('#wheelAnimIframe').contentWindow.postMessage('Extract','*');
+    $('#wheelAnimTblEx').css({color: 'red'});
+    $('#wheelAnimTblSet,#wheelAnimTblPR,#wheelAnimTblER').css({color: 'black'});
+}
+
+
+function mpcRevealAnimate() {
+    $('#layerimg2').animate({left:'220px'},2000)
+    $('#layerimg1').animate({left:'220px'},2000)
+}
+
+function mpcShareAnimate() {
+    $('#layerimg2').animate({left:'0px'},2000)
+    $('#layerimg1').animate({left:'440px'},2000)
+}
+
+	</script>
+<style type="text/css">
+/* slides full screen */
+.reveal.slide .slides > section, .reveal.slide .slides > section > section,
+.reveal.none .slides > section, .reveal.none .slides > section > section
+{
+  min-height: 95% !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  position: absolute !important;
+  top: 0 !important;
+  align-items: center !important;
+  border: thin blue inset;
+  border-radius: 10px;
+  background-color: #fff;
+  /* background-color: rgba(255,255,255,0.87); */
+  padding-top: 45px;
+  padding-bottom: 2px;
+}
+
+/* slide title */
+section > h1, section > h2 {
+  position: absolute !important;
+  top: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+  text-align: center !important;
+  color: #336 !important;
+  font-family: "Source Sans Pro", Helvetica, sans-serif !important;
+  text-transform: none !important;
+}
+.print-pdf .reveal.slide .slides > section, .print-pdf .reveal.slide .slides > section > section {
+  min-height: 770px !important;
+  position: relative !important;
+}
+
+section > p {
+    width: 100%;
+    margin: 0px !important;
+}
+
+section > p > img, section > p > object, section > object  {
+    width: 100%;
+    border: none !important;
+    box-shadow: none !important;
+    background-color: #fff;
+}
+
+anim {
+    /* border: thin green outset; */ 
+    position: relative;
+    padding: 0px;
+    margin: 0px;
+    background-color: #fff;
+}
+
+anim>img,anim>video,anim>object {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    box-shadow: none !important;
+    max-width: 100% !important;
+    padding: 0px !important;
+    margin: 0px !important;
+    /* border: thin red outset !important; */
+}
+
+/* blocs beamer */
+.reveal blockquote {
+    border: thin black outset;
+    box-sizing: border-box;
+    background-color: #f8f8ff;
+    width: 900px;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: left;
+    font-style: normal;
+    font-size: 22pt;
+    box-shadow: 3px 3px 8px 0px rgba(0,0,0,0.75);
+    margin-bottom: 7px;
+    margin-top: 7px;
+}
+.reveal blockquote>pre {
+    margin: -10px auto 0px auto;
+}
+.reveal blockquote>h2:first-child {
+    background-color: #006688;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    box-sizing: border-box;
+    color: #fff;
+    width: 900px;
+    font-size: 24pt;
+    font-style: normal;
+    position: relative;
+    top: -10px;
+    left: -10px;
+    margin-bottom: 10px;
+    padding: 0px 10px;
+    text-transform: none;
+}
+.reveal blockquote.green {
+    background-color: #f8fff8;
+}
+.reveal blockquote.green>h2:first-child {
+    background-color: #008844;
+}
+.reveal blockquote.red {
+    background-color: #fff8f8;
+}
+.reveal blockquote.red>h2:first-child {
+    background-color: #880000;
+}
+.reveal blockquote.purple {
+    background-color: #fff8fa;
+}
+.reveal blockquote.purple>h2:first-child {
+    background-color: #880066;
+}
+.reveal blockquote.gray {
+    background-color: #fdfdfd;
+}
+.reveal blockquote.gray>h2:first-child {
+    background-color: #888888;
+}
+.reveal blockquote>p {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+
+section.sectiontitle > h1, section.sectiontitle > h2 {
+  position: static !important;
+  top: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  left: 0 !important;
+  right: 0 !important;
+  text-align: center !important;
+  border: thin #366 outset;
+  border-radius: 30px;
+  padding: 40px;
+  background: #eef;
+  box-shadow: 3px 3px 8px 0px rgba(0,0,0,0.75);
+}
+
+</style>
+
+    </body>
+</html>

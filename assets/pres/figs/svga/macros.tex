@@ -1,0 +1,261 @@
+% NOTES
+\usepackage{amsmath}
+\usepackage{amssymb}
+\newcommand{\PHONG}[1]{{\color{red}\textbf{PHONG:} \framebox{#1}}}
+\newcommand{\NICOLAS}[1]{{\color{blue}\textbf{NICOLAS:} {#1}}}
+\definecolor{malikascolor}{rgb}{0,0.7,0.1}
+\newcommand{\MALIKA}[1]{{\color{malikascolor}\textbf{MALIKA:} {#1}}}
+\newcommand{\eprint}[1]{}
+\newcommand{\todo}[1]{{\color{red}\textbf{TODO} \framebox{#1}}}
+
+\newcommand{\fs}[1]{\scriptsize{#1}}
+\newcommand{\Phase}{\mathtt{Phase}}
+\newcommand{\Noise}{\mathtt{Noise}}
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\calB}{\mathcal{B}}
+\newcommand{\calC}{\mathcal{C}}
+\newcommand{\calD}{\mathcal{D}}
+\newcommand{\calM}{\mathcal{M}}
+\newcommand{\cM}{\mathcal{M}}
+\newcommand{\calP}{\mathcal{P}}
+\newcommand{\bbR}{\mathbb{R}}
+\newcommand{\mR}{\mathbb{R}}
+\newcommand{\mN}{\mathbb{N}}
+\newcommand{\bbZ}{\mathbb{Z}}
+\newcommand{\mZ}{\mathbb{Z}}
+\newcommand{\sets}{\leftarrow}
+\newcommand{\Babai}{\text{\texttt{Babai}}}
+\newcommand{\Collision}{\text{\texttt{Collision}}}
+\newcommand{\Hyb}{\mathsf{Hyb}}
+\newcommand{\dM}{\mathcal{DM}}
+\newcommand{\DM}{\mathcal{DM}}
+\newcommand{\poly}{\mathop{\mathrm{poly}}}
+\newcommand{\rank}{\mathop{\mathrm{rank}}}
+\newcommand{\bit}{\mathop{\mathrm{bit}}}
+\newcommand{\negl}{\mathop{\mathrm{negl}}}
+\newcommand{\bbT}{\mathbb{T}}
+\newcommand{\rmod}{\mathrel{\mathop{ mod }}}
+\newcommand{\dotp}[2]{\left\langle #1,#2\right\rangle }
+\newcommand{\cycgroup}[1]{\left\langle #1\right\rangle }
+\newcommand{\eps}{\varepsilon}
+\newcommand{\vol}{\mathop{\mathrm{vol}}}
+\newcommand{\norm}[1]{\left\Vert #1\right\Vert }
+\newcommand{\normsq}[1]{\left\Vert #1\right\Vert ^{2}}
+\newcommand{\DGauss}[2]{\mathop{\mathrm{DGauss}}_{#1}(#2)}
+\newcommand{\lcm}{\mathop{\mathrm{lcm}}}
+\newcommand{\exponent}{\mathop{\mathrm{exponent}}}
+\newcommand{\GSIS}{\mathop{\mathrm{GSIS}}}
+\newcommand{\GapSVP}{\mathop{\mathrm{GapSVP}}}
+\newcommand{\PGSIS}{\mathop{\mathrm{Primitive\text{-}GSIS}}}
+\newcommand{\GGSIS}{\mathop{\mathrm{GCD\text{-}GSIS}}}
+\newcommand{\GLWE}{\mathop{\mathrm{GLWE}}}
+\newcommand{\DGLWE}{\mathop{\mathrm{DGLWE}}}
+\newcommand{\SIS}{\mathop{\mathrm{SIS}}}
+\newcommand{\BDD}{\mathop{\mathrm{BDD}}}
+\newcommand{\INCIvd}[1]{\mathop{\mathrm{INCIvd}}_{#1}}
+\newcommand{\cL}{\mathcal{L}}
+\newcommand{\ApproxSVP}{\mathop{\mathrm{ApproxSVP}}}
+\newcommand{\ApproxSIVP}{\mathop{\mathrm{ApproxSIVP}}}
+\newcommand{\IncIVD}{\mathop{\mathrm{IncIVD}}}
+\newcommand{\IncSIVP}{\mathop{\mathrm{IncSIVP}}}
+\newcommand{\gs}{\mathop{\mathrm{gs}}}
+\newcommand{\bl}{\mathop{\mathrm{bl}}}
+\newcommand{\id}{\mathop{\mathrm{id}}}
+\newcommand{\vect}{\mathop{\mathrm{span}}}
+\newcommand{\diag}{\mathop{\mathrm{diag}}}
+\newcommand{\eqdef}{\underset{\mathop{\mathrm{def}}}{=}}
+\newcommand{\cdefect}[2]{\delta_{#1}(#2)}
+\newcommand{\Diag}{\mathop{\mathrm{Diag}}}
+\newcommand{\sigmaprime}{\sigma}
+\newcommand{\qover}{\!\textrm{/}\!}
+\newcommand{\gaussr}{\raisebox{0.5ex}{$\rho$}}
+\newcommand{\gauss}{\cD}
+
+\newcommand{\Ball}{\mathop{\mathrm{Ball}}}
+\newcommand{\Cone}{\mathop{\mathrm{Cone}}}
+\newcommand{\Sbb}{\beta_\infty,\beta}
+\newcommand{\Sbbt}{S_{\beta_\infty,\beta}}
+\newcommand{\Ker}{\mathop{\mathrm{Ker}}}
+\newcommand{\Img}{\mathop{\mathrm{Im}}}
+\renewcommand{\rank}[1]{\mathop{\mathrm{rank}}\left(#1\right)}
+
+
+\newcommand{\LWE}{\mathsf{LWE}}
+\newcommand{\pk}{\mathsf{pk}}
+\newcommand{\sk}{\mathsf{sk}}
+\newcommand{\BB}{\mathsf{BB}}
+\newcommand{\BK}{\mathsf{BK}}
+\newcommand{\usk}{\mathsf{usk}}
+\newcommand{\upk}{\mathsf{upk}}
+
+
+%% PHONG
+
+
+\newcommand{\from}{\leftarrow_\approx}
+\global\long\def\fR{\mathfrak{R}}
+\global\long\def\fM{\mathfrak{M}}
+\global\long\def\bE{\mathbb{E}}
+\global\long\def\mA{\mathbb{A}}
+\global\long\def\mB{\mathbb{B}}
+\global\long\def\mC{\mathbb{C}}
+\global\long\def\mD{\mathbb{D}}
+\global\long\def\mE{\mathbb{E}}
+\global\long\def\mF{\mathbb{F}}
+\global\long\def\mFP{\mathbb{FP}}
+\global\long\def\mG{\mathbb{G}}
+\global\long\def\mH{\mathbb{H}}
+\global\long\def\mI{\mathbb{I}}
+\global\long\def\mJ{\mathbb{J}}
+\global\long\def\mK{\mathbb{K}}
+\global\long\def\mL{\mathbb{L}}
+\global\long\def\mM{\mathbb{M}}
+\global\long\def\mN{\mathbb{N}}
+\global\long\def\mO{\mathbb{O}}
+\global\long\def\mP{\mathbb{P}}
+\global\long\def\mQ{\mathbb{Q}}
+\global\long\def\mR{\mathbb{R}}
+\global\long\def\mS{\mathbb{S}}
+\global\long\def\mT{\mathbb{T}}
+\global\long\def\mU{\mathbb{U}}
+\global\long\def\mV{\mathbb{V}}
+\global\long\def\mW{\mathbb{W}}
+\global\long\def\mX{\mathbb{X}}
+\global\long\def\mY{\mathbb{Y}}
+\global\long\def\mZ{\mathbb{Z}}
+\global\long\def\cA{\mathcal{A}}
+\global\long\def\cB{\mathcal{B}}
+\global\long\def\cC{\mathcal{C}}
+\global\long\def\cD{\mathcal{D}}
+\global\long\def\cE{\mathcal{E}}
+\global\long\def\cF{\mathcal{F}}
+\global\long\def\cG{\mathcal{G}}
+\global\long\def\cH{\mathcal{H}}
+\global\long\def\cI{\mathcal{I}}
+\global\long\def\cJ{\mathcal{J}}
+\global\long\def\cK{\mathcal{K}}
+\global\long\def\cL{\mathcal{L}}
+\global\long\def\cM{\mathcal{M}}
+\global\long\def\cN{\mathcal{N}}
+\global\long\def\cO{\mathcal{O}}
+\global\long\def\cP{\mathcal{P}}
+\global\long\def\cQ{\mathcal{Q}}
+\global\long\def\cR{\mathcal{R}}
+\global\long\def\cS{\mathcal{S}}
+\global\long\def\cT{\mathcal{T}}
+\global\long\def\cU{\mathcal{U}}
+\global\long\def\cV{\mathcal{V}}
+\global\long\def\cW{\mathcal{W}}
+\global\long\def\cX{\mathcal{X}}
+\global\long\def\cY{\mathcal{Y}}
+\global\long\def\cZ{\mathcal{Z}}
+\let\vec\mathbf
+
+\newcommand{\ps}[2]{\langle#1,#2\rangle} % Produit Scalaire
+\newcommand{\qmod}[1]{\: (\mbox{mod}\: #1)}
+\newcommand{\Star}[1]{\vec{#1}^*}
+
+\newcommand{\morph}[2]{\left[#1\mapsto #2\right]}
+
+
+\newcommand{\size}{\mathrm{size}}
+
+%\renewcommand{\vec}[1]{\mathbf{#1}}
+\newcommand{\lspan}[1]{\mathrm{span}(#1)}
+
+% LLL
+
+\newcommand{\ELLL}{\eps_{\!\raisebox{-0.5ex}{\tiny LLL}}}
+\newcommand{\CLLL}{(1+\ELLL)\sqrt{4/3}}
+
+
+\newcommand{\qed}{\hfill $\square$}
+
+\newcommand{\fab}{\frac{1}{2}}
+\newcommand{\fad}{\frac{1}{4}}
+\newcommand{\faN}{\frac{1}{N}}
+\newcommand{\faL}{\frac{1}{L}}
+\newcommand{\fnaN}{\frac{n_1}{N}}
+\newcommand{\fnbN}{\frac{n_2}{N}}
+\newcommand{\fncN}{\frac{n_3}{N}}
+\newcommand{\fnnN}{\frac{n_n}{N}}
+\newcommand{\fnaL}{\frac{n_1}{L}}
+\newcommand{\fnbL}{\frac{n_2}{L}}
+\newcommand{\fncL}{\frac{n_3}{L}}
+\newcommand{\fnlL}{\frac{n_\ell}{L}}
+
+\newcommand{\frontkey}{$\vec{s}^{(f)}$}
+\newcommand{\middlekey}{$\vec{s}^{(m)}$}
+\newcommand{\mainkey}{$\vec{s}$ and $R$}
+
+\newcommand{\preimVote}{$\frac{1}{2}\vec{v}_1$}
+\newcommand{\preimVoteb}{$\frac{1}{2}\vec{v}_i$}
+\newcommand{\preimVoteEg}{eg: $(\frac{1}{2},\frac{1}{2},0)$}
+\newcommand{\preimVoteEgb}{eg: $(\frac{1}{2},0,\frac{1}{2})$}
+\newcommand{\preimVoteNoise}{noise: $\frac{1}{4}$}
+
+\newcommand{\initVote}{$\frac{1}{2}\vec{v}_1$}
+\newcommand{\initVoteb}{$\frac{1}{2}\vec{v}_i$}
+\newcommand{\initVoteEg}{eg: $(\frac{1}{2},\frac{1}{2},0)$}
+\newcommand{\initVoteEgb}{eg: $(\frac{1}{2},0,\frac{1}{2})$}
+\newcommand{\initVoteNoise}{noise: $\frac{1}{4}$}
+
+\newcommand{\prebVote}{$\frac{1}{4}\vec{v}_1$}
+\newcommand{\prebVoteb}{$\frac{1}{4}\vec{v}_i$}
+\newcommand{\prebVoteEg}{eg: $(\frac{1}{4},\frac{1}{4},0)$}
+\newcommand{\prebVoteEgb}{eg: $(\frac{1}{4},0,\frac{1}{4})$}
+\newcommand{\prebVoteNoise}{noise: $\frac{1}{16}$}
+
+\newcommand{\expVote}{$\frac{1}{4}\vec{w}_1$}
+\newcommand{\expVoteb}{$\frac{1}{4}\vec{w}_i$}
+\newcommand{\expVoteEg}{eg: $(0,0,0,\frac{1}{4},0,0,0,0)$}
+\newcommand{\expVoteEgb}{eg: $(0,0,0,0,0,\frac{1}{4},0,0)$}
+\newcommand{\expVoteNoise}{noise: $\frac{1}{16}$}
+
+\newcommand{\finalVote}{$\frac{1}{L}\vec{w}_1$}
+\newcommand{\finalVoteb}{$\frac{1}{L}\vec{w}_i$}
+\newcommand{\finalVoteEg}{eg: $(0,0,0,\frac{1}{L},0,0,0,0)$}
+\newcommand{\finalVoteEgb}{eg: $(0,0,0,0,0,\frac{1}{L},0,0)$}
+\newcommand{\finalVoteNoise}{noise: $O(\frac{1}{L^{1.5}})$}
+
+\newcommand{\encRes}{$\frac{1}{L}\vec{r}$}
+\newcommand{\encResEg}{$(\frac{n_0}{L},\frac{n_1}{L},\dots,\frac{n_{\ell-1}}{L})$}
+\newcommand{\encResNoise}{noise: $\frac{1}{4L}$}
+
+\newcommand{\ciphTraps}{$\Pi_{1,0},\dots,\Pi_{t,\ell-1}$}
+
+\newcommand{\plainRes}{$(\frac{n_0}{L},\frac{n_1}{L},\dots,\frac{n_{\ell-1}}{L})$}
+
+\newcommand{\signed}{\footnotesize{signed}}
+
+\definecolor{dgreen}{rgb}{0,0.7,0}
+\definecolor{purple}{rgb}{0.5,0.0,0.5}
+\newcommand{\green}[1]{{\color{dgreen} #1}}
+\newcommand{\red}[1]{{\color{red} #1}}
+\newcommand{\blue}[1]{{\color{blue} #1}}
+\newcommand{\purple}[1]{{\color{purple} #1}}
+
+\newcommand{\TnX}{\mT_{\!\scriptscriptstyle{N}}\![X]}
+
+\newcommand{\DecompH}{\textrm{Decomp}_{\vec{h}}}
+\newcommand{\TLWE}{\texttt{TLWE}}
+\newcommand{\TGSW}{\texttt{TGSW}}
+\newcommand{\phase}{\varphi}
+\newcommand{\phases}{\varphi_{\vec{s}}}
+\newcommand{\hg}[1]{\scalebox{3}{#1}}
+\newcommand{\lrg}[1]{\scalebox{1.5}{#1}}
+\newcommand{\matrixh}{%
+    	\vec{h} = \scalebox{0.8}{$\left( \begin{array}{c|c|c}
+	    1/2      &   \ldots &  0  \\
+		1/2^2      &   \ldots &  0  \\
+		\vdots   &   \ddots &  \vdots  \\
+		1/2^\ell &   \ldots &  0  \\
+		\hline
+		\vdots  &   \ddots &  \vdots  \\
+		\hline
+		0      &   \ldots &  1/2  \\
+		0      &   \ldots &  1/2^2  \\
+		\vdots   &   \ddots &  \vdots  \\
+		0 &   \ldots &  1/2^\ell  \\
+	\end{array}\right)$}% 
+}
