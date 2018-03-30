@@ -11,7 +11,6 @@
 #include "threadcontext.h"
 
 
-
 /**
  * CLASSES
  */
@@ -30,11 +29,11 @@ public:
 
 
     // constructor
-    IntPolynomial(const PolynomialParameters* params,
+    IntPolynomial(const PolynomialParameters *params,
                   TfheThreadContext *context,
                   Allocator *alloc);
 
-    void destroy(const PolynomialParameters* params,
+    void destroy(const PolynomialParameters *params,
                  TfheThreadContext *context,
                  Allocator *alloc);
 
@@ -57,11 +56,11 @@ public:
 
 
     // constructor
-    TorusPolynomial(const PolynomialParameters* params,
-                  TfheThreadContext *context,
-                  Allocator *alloc);
+    TorusPolynomial(const PolynomialParameters *params,
+                    TfheThreadContext *context,
+                    Allocator *alloc);
 
-    void destroy(const PolynomialParameters* params,
+    void destroy(const PolynomialParameters *params,
                  TfheThreadContext *context,
                  Allocator *alloc);
 
@@ -78,7 +77,6 @@ template
 struct TorusPolynomial<Torus32>;
 template
 struct TorusPolynomial<Torus64>;
-
 
 
 #endif //POLYNOMIALS_H

@@ -17,8 +17,8 @@ using namespace std;
 template<typename TORUS>
 void TorusPolyFunctions<TORUS>::Clear(TorusPolynomial<TORUS> *result,
                                       const PolynomialParameters *params,
-                                      TfheThreadContext &context,
-                                      Allocator &alloc) {
+                                      TfheThreadContext *context,
+                                      Allocator alloc) {
     const int N = params->N;
 
     for (int i = 0; i < N; ++i)
@@ -29,8 +29,8 @@ void TorusPolyFunctions<TORUS>::Clear(TorusPolynomial<TORUS> *result,
 template<typename TORUS>
 void TorusPolyFunctions<TORUS>::Uniform(TorusPolynomial<TORUS> *result,
                                         const PolynomialParameters *params,
-                                        TfheThreadContext &context,
-                                        Allocator &alloc) {
+                                        TfheThreadContext *context,
+                                        Allocator alloc) {
     const int N = params->N;
     TORUS *x = result->coefsT;
 
@@ -43,8 +43,8 @@ template<typename TORUS>
 void TorusPolyFunctions<TORUS>::Copy(TorusPolynomial<TORUS> *result,
                                      const TorusPolynomial<TORUS> *sample,
                                      const PolynomialParameters *params,
-                                     TfheThreadContext &context,
-                                     Allocator &alloc) {
+                                     TfheThreadContext *context,
+                                     Allocator alloc) {
     assert(result != sample);
     const int N = params->N;
     const TORUS *s = sample->coefsT;
@@ -60,8 +60,8 @@ void TorusPolyFunctions<TORUS>::Add(TorusPolynomial<TORUS> *result,
                                     const TorusPolynomial<TORUS> *poly1,
                                     const TorusPolynomial<TORUS> *poly2,
                                     const PolynomialParameters *params,
-                                    TfheThreadContext &context,
-                                    Allocator &alloc) {
+                                    TfheThreadContext *context,
+                                    Allocator alloc) {
     const int N = params->N;
     assert(result != poly1); //if it fails here, please use addTo
     assert(result != poly2); //if it fails here, please use addTo
@@ -78,8 +78,8 @@ template<typename TORUS>
 void TorusPolyFunctions<TORUS>::AddTo(TorusPolynomial<TORUS> *result,
                                       const TorusPolynomial<TORUS> *poly2,
                                       const PolynomialParameters *params,
-                                      TfheThreadContext &context,
-                                      Allocator &alloc) {
+                                      TfheThreadContext *context,
+                                      Allocator alloc) {
     const int N = params->N;
     TORUS *r = result->coefsT;
     const TORUS *b = poly2->coefsT;
@@ -95,8 +95,8 @@ void TorusPolyFunctions<TORUS>::Sub(TorusPolynomial<TORUS> *result,
                                     const TorusPolynomial<TORUS> *poly1,
                                     const TorusPolynomial<TORUS> *poly2,
                                     const PolynomialParameters *params,
-                                    TfheThreadContext &context,
-                                    Allocator &alloc) {
+                                    TfheThreadContext *context,
+                                    Allocator alloc) {
     const int N = params->N;
     assert(result != poly1); //if it fails here, please use subTo
     assert(result != poly2); //if it fails here, please use subTo
@@ -113,8 +113,8 @@ template<typename TORUS>
 void TorusPolyFunctions<TORUS>::SubTo(TorusPolynomial<TORUS> *result,
                                       const TorusPolynomial<TORUS> *poly2,
                                       const PolynomialParameters *params,
-                                      TfheThreadContext &context,
-                                      Allocator &alloc) {
+                                      TfheThreadContext *context,
+                                      Allocator alloc) {
     const int N = params->N;
     TORUS *r = result->coefsT;
     const TORUS *b = poly2->coefsT;
@@ -130,8 +130,8 @@ void TorusPolyFunctions<TORUS>::AddMulZ(TorusPolynomial<TORUS> *result,
                                         int p,
                                         const TorusPolynomial<TORUS> *poly2,
                                         const PolynomialParameters *params,
-                                        TfheThreadContext &context,
-                                        Allocator &alloc) {
+                                        TfheThreadContext *context,
+                                        Allocator alloc) {
     const int N = params->N;
     assert(result != poly1); //if it fails here, please use AddMulZTo
     TORUS *r = result->coefsT;
@@ -149,8 +149,8 @@ TorusPolyFunctions<TORUS>::AddMulZTo(TorusPolynomial<TORUS> *result,
                                      const int p,
                                      const TorusPolynomial<TORUS> *poly2,
                                      const PolynomialParameters *params,
-                                     TfheThreadContext &context,
-                                     Allocator &alloc) {
+                                     TfheThreadContext *context,
+                                     Allocator alloc) {
     const int N = params->N;
     TORUS *r = result->coefsT;
     const TORUS *b = poly2->coefsT;
@@ -167,8 +167,8 @@ TorusPolyFunctions<TORUS>::SubMulZ(TorusPolynomial<TORUS> *result,
                                    const int p,
                                    const TorusPolynomial<TORUS> *poly2,
                                    const PolynomialParameters *params,
-                                   TfheThreadContext &context,
-                                   Allocator &alloc) {
+                                   TfheThreadContext *context,
+                                   Allocator alloc) {
     const int N = params->N;
     assert(result != poly1); //if it fails here, please use SubMulZTo
     TORUS *r = result->coefsT;
@@ -185,8 +185,8 @@ void TorusPolyFunctions<TORUS>::SubMulZTo(TorusPolynomial<TORUS> *result,
                                           int p,
                                           const TorusPolynomial<TORUS> *poly2,
                                           const PolynomialParameters *params,
-                                          TfheThreadContext &context,
-                                          Allocator &alloc) {
+                                          TfheThreadContext *context,
+                                          Allocator alloc) {
     const int N = params->N;
     TORUS *r = result->coefsT;
     const TORUS *b = poly2->coefsT;
@@ -201,8 +201,8 @@ void TorusPolyFunctions<TORUS>::MulByXaiMinusOne(TorusPolynomial<TORUS> *result,
                                                  int a,
                                                  const TorusPolynomial<TORUS> *source,
                                                  const PolynomialParameters *params,
-                                                 TfheThreadContext &context,
-                                                 Allocator &alloc) {
+                                                 TfheThreadContext *context,
+                                                 Allocator alloc) {
     const int N = params->N;
     TORUS *out = result->coefsT;
     TORUS *in = source->coefsT;
@@ -230,8 +230,8 @@ void TorusPolyFunctions<TORUS>::MulByXai(TorusPolynomial<TORUS> *result,
                                          int a,
                                          const TorusPolynomial<TORUS> *source,
                                          const PolynomialParameters *params,
-                                         TfheThreadContext &context,
-                                         Allocator &alloc) {
+                                         TfheThreadContext *context,
+                                         Allocator alloc) {
     const int N = params->N;
     TORUS *out = result->coefsT;
     TORUS *in = source->coefsT;
@@ -259,8 +259,8 @@ template<typename TORUS>
 double TorusPolyFunctions<TORUS>::NormInftyDist(const TorusPolynomial<TORUS> *poly1,
                                                 const TorusPolynomial<TORUS> *poly2,
                                                 const PolynomialParameters *params,
-                                                TfheThreadContext &context,
-                                                Allocator &alloc) {
+                                                TfheThreadContext *context,
+                                                Allocator alloc) {
     const int N = params->N;
     double norm = 0;
 
@@ -284,8 +284,8 @@ double TorusPolyFunctions<TORUS>::NormInftyDist(const TorusPolynomial<TORUS> *po
 // Sets to zero
 void IntPolyFunctions::Clear(IntPolynomial *poly,
                              const PolynomialParameters *params,
-                             TfheThreadContext &context,
-                             Allocator &alloc) {
+                             TfheThreadContext *context,
+                             Allocator alloc) {
     const int N = params->N;
     for (int i = 0; i < N; ++i)
         poly->coefs[i] = 0;
@@ -295,8 +295,8 @@ void IntPolyFunctions::Clear(IntPolynomial *poly,
 void IntPolyFunctions::Copy(IntPolynomial *result,
                             const IntPolynomial *source,
                             const PolynomialParameters *params,
-                            TfheThreadContext &context,
-                            Allocator &alloc) {
+                            TfheThreadContext *context,
+                            Allocator alloc) {
     const int N = params->N;
     assert(result != source);
 
@@ -308,8 +308,8 @@ void IntPolyFunctions::Copy(IntPolynomial *result,
 void IntPolyFunctions::AddTo(IntPolynomial *accum,
                              const IntPolynomial *source,
                              const PolynomialParameters *params,
-                             TfheThreadContext &context,
-                             Allocator &alloc) {
+                             TfheThreadContext *context,
+                             Allocator alloc) {
     const int N = params->N;
 
     for (int i = 0; i < N; ++i)
@@ -321,8 +321,8 @@ void IntPolyFunctions::MulByXaiMinusOne(IntPolynomial *result,
                                         int ai,
                                         const IntPolynomial *source,
                                         const PolynomialParameters *params,
-                                        TfheThreadContext &context,
-                                        Allocator &alloc) {
+                                        TfheThreadContext *context,
+                                        Allocator alloc) {
     const int N = params->N;
     int *out = result->coefs;
     int *in = source->coefs;
@@ -346,8 +346,8 @@ void IntPolyFunctions::MulByXaiMinusOne(IntPolynomial *result,
 // Euclidean norm of an IntPolynomial
 double IntPolyFunctions::Norm2sq(const IntPolynomial *poly,
                                  const PolynomialParameters *params,
-                                 TfheThreadContext &context,
-                                 Allocator &alloc) {
+                                 TfheThreadContext *context,
+                                 Allocator alloc) {
     const int N = params->N;
     double norm = 0;
 
@@ -362,8 +362,8 @@ double IntPolyFunctions::Norm2sq(const IntPolynomial *poly,
 double IntPolyFunctions::NormInftyDist(const IntPolynomial *poly1,
                                        const IntPolynomial *poly2,
                                        const PolynomialParameters *params,
-                                       TfheThreadContext &context,
-                                       Allocator &alloc) {
+                                       TfheThreadContext *context,
+                                       Allocator alloc) {
     const int N = params->N;
     double norm = 0;
 

@@ -10,7 +10,9 @@ template<typename TORUS>
 void TorusPolyFunctions<TORUS>::MultNaive_plain_aux(TORUS *__restrict result,
                                                     const int *__restrict poly1,
                                                     const TORUS *__restrict poly2,
-                                                    const int N) {
+                                                    const int N,
+                                                    TfheThreadContext *context,
+                                                    Allocator alloc) {
     const int _2Nm1 = 2 * N - 1;
     TORUS ri;
     for (int i = 0; i < N; i++) {
@@ -33,7 +35,9 @@ template<typename TORUS>
 void TorusPolyFunctions<TORUS>::MultNaive_aux(TORUS *__restrict result,
                                               const int *__restrict poly1,
                                               const TORUS *__restrict poly2,
-                                              const int N) {
+                                              const int N,
+                                              TfheThreadContext *context,
+                                              Allocator alloc) {
     TORUS ri;
     for (int i = 0; i < N; i++) {
         ri = 0;
@@ -55,11 +59,15 @@ void TorusPolyFunctions<TORUS>::MultNaive_aux(TORUS *__restrict result,
 template<typename TORUS>
 void TorusPolyFunctions<TORUS>::MultNaive(TorusPolynomial<TORUS> *result,
                                           const IntPolynomial *poly1,
-                                          const TorusPolynomial<TORUS> *poly2) {
-    const int N = poly1->N;
+                                          const TorusPolynomial<TORUS> *poly2,
+                                          const PolynomialParameters *params,
+                                          TfheThreadContext *context,
+                                          Allocator alloc) {
+    const int N = params->N;
     assert(result != poly2);
-    assert(poly2->N == N && result->N == N);
-    TorusPolyFunctions<TORUS>::MultNaive_aux(result->coefsT, poly1->coefs, poly2->coefsT, N);
+    TorusPolyFunctions<TORUS>::MultNaive_aux(result->coefsT, poly1->coefs,
+                                             poly2->coefsT, N,
+                                             context, alloc);
 }
 
 
@@ -77,14 +85,16 @@ template<typename TORUS>
 void TorusPolyFunctions<TORUS>::Karatsuba_aux(TORUS *R, const int *A,
                                               const TORUS *B,
                                               const int size,
-                                              const char *buf) {
+                                              const char *buf,
+                                              TfheThreadContext *context,
+                                              Allocator alloc) {
     const int h = size / 2;
     const int sm1 = size - 1;
 
     //we stop the karatsuba recursion at h=4, because on my machine,
     //it seems to be optimal
     if (h <= 4) {
-        TorusPolyFunctions<TORUS>::MultNaive_plain_aux(R, A, B, size);
+        TorusPolyFunctions<TORUS>::MultNaive_plain_aux(R, A, B, size, context, alloc);
         return;
     }
 
@@ -103,9 +113,10 @@ void TorusPolyFunctions<TORUS>::Karatsuba_aux(TORUS *R, const int *A,
         Btemp[i] = B[i] + B[h + i];
 
     // Karatsuba recursivly
-    Karatsuba_aux(R, A, B, h, buf); // (R[0],R[2*h-2]), (A[0],A[h-1]), (B[0],B[h-1])
-    Karatsuba_aux(R + size, A + h, B + h, h, buf); // (R[2*h],R[4*h-2]), (A[h],A[2*h-1]), (B[h],B[2*h-1])
-    Karatsuba_aux(Rtemp, Atemp, Btemp, h, buf);
+    Karatsuba_aux(R, A, B, h, buf, context, alloc); // (R[0],R[2*h-2]), (A[0],A[h-1]), (B[0],B[h-1])
+    Karatsuba_aux(R + size, A + h, B + h, h, buf, context,
+                  alloc); // (R[2*h],R[4*h-2]), (A[h],A[2*h-1]), (B[h],B[2*h-1])
+    Karatsuba_aux(Rtemp, Atemp, Btemp, h, buf, context, alloc);
     R[sm1] = 0; //this one needs to be set manually
     for (int i = 0; i < sm1; ++i)
         Rtemp[i] -= R[i] + R[size + i];
@@ -118,14 +129,17 @@ void TorusPolyFunctions<TORUS>::Karatsuba_aux(TORUS *R, const int *A,
 template<typename TORUS>
 void TorusPolyFunctions<TORUS>::MultKaratsuba(TorusPolynomial<TORUS> *result,
                                               const IntPolynomial *poly1,
-                                              const TorusPolynomial<TORUS> *poly2) {
-    const int N = poly1->N;
+                                              const TorusPolynomial<TORUS> *poly2,
+                                              const PolynomialParameters *params,
+                                              TfheThreadContext *context,
+                                              Allocator alloc) {
+    const int N = params->N;
     TORUS *R = new TORUS[2 * N - 1];
     char *buf = new char[4 * N *
                          sizeof(TORUS)]; //that's large enough to store every tmp variables (2*2*N*4) TODO: see if there is unused memory (before generic torus byte cnt was 16*N)
 
     // Karatsuba
-    Karatsuba_aux(R, poly1->coefs, poly2->coefsT, N, buf);
+    Karatsuba_aux(R, poly1->coefs, poly2->coefsT, N, buf, context, alloc);
 
     // reduction mod X^N+1
     for (int i = 0; i < N - 1; ++i)
@@ -140,13 +154,16 @@ void TorusPolyFunctions<TORUS>::MultKaratsuba(TorusPolynomial<TORUS> *result,
 template<typename TORUS>
 void TorusPolyFunctions<TORUS>::AddMulRKaratsuba(TorusPolynomial<TORUS> *result,
                                                  const IntPolynomial *poly1,
-                                                 const TorusPolynomial<TORUS> *poly2) {
-    const int N = poly1->N;
+                                                 const TorusPolynomial<TORUS> *poly2,
+                                                 const PolynomialParameters *params,
+                                                 TfheThreadContext *context,
+                                                 Allocator alloc) {
+    const int N = params->N;
     TORUS *R = new TORUS[2 * N - 1];
     char *buf = new char[16 * N]; //that's large enough to store every tmp variables (2*2*N*4)
 
     // Karatsuba
-    Karatsuba_aux(R, poly1->coefs, poly2->coefsT, N, buf);
+    Karatsuba_aux(R, poly1->coefs, poly2->coefsT, N, buf, context, alloc);
 
     // reduction mod X^N+1
     for (int i = 0; i < N - 1; ++i)
@@ -161,13 +178,16 @@ void TorusPolyFunctions<TORUS>::AddMulRKaratsuba(TorusPolynomial<TORUS> *result,
 template<typename TORUS>
 void TorusPolyFunctions<TORUS>::SubMulRKaratsuba(TorusPolynomial<TORUS> *result,
                                                  const IntPolynomial *poly1,
-                                                 const TorusPolynomial<TORUS> *poly2) {
-    const int N = poly1->N;
+                                                 const TorusPolynomial<TORUS> *poly2,
+                                                 const PolynomialParameters *params,
+                                                 TfheThreadContext *context,
+                                                 Allocator alloc) {
+    const int N = params->N;
     TORUS *R = new TORUS[2 * N - 1];
     char *buf = new char[16 * N]; //that's large enough to store every tmp variables (2*2*N*4)
 
     // Karatsuba
-    Karatsuba_aux(R, poly1->coefs, poly2->coefsT, N, buf);
+    Karatsuba_aux(R, poly1->coefs, poly2->coefsT, N, buf, context, alloc);
 
     // reduction mod X^N+1
     for (int i = 0; i < N - 1; ++i)
