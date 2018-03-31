@@ -10,6 +10,12 @@
 template<typename TORUS>
 struct TorusPolyFunctions {
 private:
+
+    /**
+     * This function multiplies two polynomials in Z[X] and T[X] of degree < N
+     * The result is a polynomial of T[X] of degree < 2N-1
+     * poly2 and result must point to different memory areas
+     */
     static void
     MultNaive_plain_aux(TORUS *__restrict result,
                         const int *__restrict poly1,
@@ -18,6 +24,12 @@ private:
                         TfheThreadContext *context,
                         Allocator alloc);
 
+    /**
+     * This function multiplies two polynomials in Z[X] and T[X] of degree < N
+     * and round the result modulo X^N+1
+     * The result is a polynomial of T[X] of degree < N
+     * poly2 and result must point to different memory areas
+     */
     static void
     MultNaive_aux(TORUS *__restrict result,
                   const int *__restrict poly1,
@@ -26,6 +38,11 @@ private:
                   TfheThreadContext *context,
                   Allocator alloc);
 
+    /**
+     *  This function multiplies two polynomials in Z[X] and T[X] of degree < N
+     *  The result is a polynomial of T[X] of degree < 2N-1
+     *  @param buf a memory area of length at least 4*N*sizeof(TORUS)
+     */
     static void
     Karatsuba_aux(TORUS *R,
                   const int *A,
@@ -37,19 +54,19 @@ private:
 
 public:
 
-    /**  TorusPolynomial = 0 */
+    /**  @brief TorusPolynomial := 0 */
     static void Clear(TorusPolynomial<TORUS> *result,
                       const PolynomialParameters *params,
                       TfheThreadContext *context,
                       Allocator alloc);
 
-    /**  TorusPolynomial = random */
+    /**  @brief TorusPolynomial = random */
     static void Uniform(TorusPolynomial<TORUS> *result,
                         const PolynomialParameters *params,
                         TfheThreadContext *context,
                         Allocator alloc);
 
-    /**  TorusPolynomial = TorusPolynomial */
+    /**  @brief TorusPolynomial = TorusPolynomial */
     static void Copy(TorusPolynomial<TORUS> *result,
                      const TorusPolynomial<TORUS> *sample,
                      const PolynomialParameters *params,
