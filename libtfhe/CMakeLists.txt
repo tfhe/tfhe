@@ -5,6 +5,7 @@ add_subdirectory(core)
 
 #add_library(tfhe-core OBJECT ${SRCS})
 add_library(tfhe SHARED $<TARGET_OBJECTS:tfhe-core>)
+target_link_libraries(tfhe -lgmp)
 #set_property(TARGET tfhe PROPERTY POSITION_INDEPENDENT_CODE ON)
 
 # foreach (FFT_PROCESSOR IN LISTS FFT_PROCESSORS) 

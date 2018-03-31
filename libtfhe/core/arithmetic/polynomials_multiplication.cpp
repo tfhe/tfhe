@@ -117,7 +117,7 @@ void TorusPolyFunctions<TORUS>::Karatsuba_aux(TORUS *R, const int *A,
     Karatsuba_aux(R + size, A + h, B + h, h, buf, context,
                   alloc); // (R[2*h],R[4*h-2]), (A[h],A[2*h-1]), (B[h],B[2*h-1])
     Karatsuba_aux(Rtemp, Atemp, Btemp, h, buf, context, alloc);
-    R[sm1] = 0; //this one needs to be set manually
+    R[sm1] = 0; //this one needs to be copy manually
     for (int i = 0; i < sm1; ++i)
         Rtemp[i] -= R[i] + R[size + i];
     for (int i = 0; i < sm1; ++i)
