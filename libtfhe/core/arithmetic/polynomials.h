@@ -73,10 +73,6 @@ public:
     ~TorusPolynomial() = delete;
 };
 
-template
-struct TorusPolynomial<Torus32>;
-template
-struct TorusPolynomial<Torus64>;
-
+TORUS_CLASS_IMPL_ALL(TorusPolynomial);
 
 #endif //POLYNOMIALS_H

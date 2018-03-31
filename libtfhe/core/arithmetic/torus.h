@@ -13,4 +13,23 @@
 typedef int32_t Torus32;
 typedef int64_t Torus64;
 
+/**
+ * @brief Macro for instantiating a template class with one parameter
+ */
+#define TORUS_CLASS_IMPL_1(TC,T)\
+    template class TC<T>;
+
+/**
+ * @brief Macro for instantiating a template class with two parameters
+ */
+#define TORUS_CLASS_IMPL_2(TC,T1,T2)\
+    template class TC<T1,T2>;
+
+/**
+ * @brief Macro for instantiating a template class with all available torus types
+ */
+#define TORUS_CLASS_IMPL_ALL(T)\
+    TORUS_CLASS_IMPL_1(T, Torus32);\
+    TORUS_CLASS_IMPL_1(T, Torus64);
+
 #endif

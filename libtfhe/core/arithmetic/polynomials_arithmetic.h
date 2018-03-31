@@ -200,14 +200,7 @@ public:
 
 };
 
-template
-struct TorusPolyFunctions<Torus32>;
-template
-struct TorusPolyFunctions<Torus64>;
-
-
-
-
+TORUS_CLASS_IMPL_ALL(TorusPolyFunctions);
 
 
 struct IntPolyFunctions {
