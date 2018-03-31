@@ -1,13 +1,9 @@
 #ifndef TFHE_BIGINT_H
 #define TFHE_BIGINT_H
 
-#define PREVENT_STACK_COPY(TYPENAME) \
-    TYPENAME(const TYPENAME&) = delete; \
-    void operator=(const TYPENAME &)= delete; \
-    ~TYPENAME() = delete
-
 #include <cstdint>
 #include <gmp.h>
+#include "tfhe_core.h"
 #include "../allocator/allocator.h"
 
 /**

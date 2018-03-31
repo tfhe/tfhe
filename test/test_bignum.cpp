@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <core/arithmetic/BigInt.h>
 #include <core/allocator/allocator.h>
+#include <core/arithmetic/BigTorus.h>
 
 #include "gmpxx.h"
 
@@ -170,5 +171,15 @@ TEST(BigNum, BigIntNeg) {
     ASSERT_EQ(mpz_class(a->data), tval);
 
     alloc.deleteObject(a);
+    alloc.deleteObject(params);
+}
+
+TEST(BigTorus, FromDouble) {
+    Allocator alloc;
+    BigIntParams* params = alloc.newObject<BigIntParams>(2);
+    BigTorus* a = alloc.newObject<BigTorus>(params, &alloc);
+    from_double(a, pow(2., 52), params);
+    from_double(a, pow(2., -140), params);
+    alloc.deleteObject(a, params, &alloc);
     alloc.deleteObject(params);
 }
