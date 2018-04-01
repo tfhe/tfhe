@@ -2,6 +2,7 @@
 #include <core/arithmetic/BigInt.h>
 #include <core/allocator/allocator.h>
 #include <core/arithmetic/BigTorus.h>
+#include <gmp.h>
 
 #include "gmpxx.h"
 
@@ -174,11 +175,28 @@ TEST(BigNum, BigIntNeg) {
     alloc.deleteObject(params);
 }
 
+//quick and dirty function to convert a bigTorus to a gmp float
+mpf_class fval(const BigTorus* x, const BigIntParams* params) {
+    __mpz_struct tmp;
+    tmp._mp_d = x->data;
+    tmp._mp_size = params->max_nbLimbs;
+    tmp._mp_alloc = params->max_nbLimbs;
+    return mpf_class(mpz_class(&tmp))/pow(2.,params->p);
+}
+
 TEST(BigTorus, FromDouble) {
     Allocator alloc;
     BigIntParams* params = alloc.newObject<BigIntParams>(2);
     BigTorus* a = alloc.newObject<BigTorus>(params, &alloc);
-    from_double(a, pow(2., 52), params);
+    for (int i=0; i<50; i++) {
+        double tval = 2.*(rand()/double(RAND_MAX)-0.5);
+        tval *= pow(2.,-(i/3));
+        from_double(a, tval, params);
+        mpf_class atrans = fval(a, params);
+        //cout << "test val " << tval << " vs " << atrans << endl;
+        mpf_class diff = atrans - tval;
+        ASSERT_EQ(diff - floor(diff+0.5), 0.);
+    }
     from_double(a, pow(2., -140), params);
     alloc.deleteObject(a, params, &alloc);
     alloc.deleteObject(params);

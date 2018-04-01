@@ -25,28 +25,38 @@ public:
 };
 
 /**
- * @brief res = a + b (truncated mod 2^p)
+ * @brief res = 0
+ */
+void zero(BigTorus *res, const BigIntParams *params);
+
+/**
+ * @brief res = 2^-k
+ */
+void setPowHalf(BigTorus *res, const int k, const BigIntParams *params);
+
+/**
+ * @brief res = a + b
  */
 void add(BigTorus *res, const BigTorus *a, const BigTorus *b, const BigIntParams *params);
 
 /**
- * @brief res = a - b (truncated mod 2^p)
+ * @brief res = a - b
  */
 void sub(BigTorus *res, const BigTorus *a, const BigTorus *b, const BigIntParams *params);
 
 /**
- * @brief res = a * b (truncated mod 2^p)
+ * @brief res = a * b
  */
 void mul(BigTorus *res, int64_t a, const BigTorus *b, const BigIntParams *params);
 
 /**
- * @brief res = a * b (truncated mod 2^p)
+ * @brief res = a * b
  * WARNING: for this function, res and b must not overlap.
  */
 void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const BigIntParams *params);
 
 /**
- * @brief res = -a (truncated mod 2^p)
+ * @brief res = -a
  */
 void neg(BigTorus *res, BigTorus *a, const BigIntParams *params);
 
@@ -71,7 +81,7 @@ double to_double(const BigTorus *a, const BigIntParams *b);
  * @param Msize discrete space size
  * @return approximated torus value
  */
-void approxPhase(BigTorus *res, BigTorus *phase, uint64_t Msize, BigIntParams *params);
+void approxPhase(BigTorus *res, const BigTorus *phase, uint64_t Msize, BigIntParams *params, Allocator alloc);
 
 /**
  * @brief Mod-Rescale from the torus to Z/Msize.Z
@@ -80,7 +90,7 @@ void approxPhase(BigTorus *res, BigTorus *phase, uint64_t Msize, BigIntParams *p
  * @param Msize discrete space size
  * @return discrete space value in [0, MSize[
  */
-int64_t modSwitchFromTorus(const BigTorus *phase, int64_t Msize, BigIntParams *params);
+uint64_t modSwitchFromTorus(const BigTorus *phase, uint64_t Msize, BigIntParams *params, Allocator alloc);
 
 /**
  * @brief Converts discrete message space to torus
@@ -89,7 +99,7 @@ int64_t modSwitchFromTorus(const BigTorus *phase, int64_t Msize, BigIntParams *p
  * @param Msize discrete space size
  * @return torus value
  */
-void modSwitchToTorus(BigTorus *res, uint64_t mu, uint64_t Msize, BigIntParams *params);
+void modSwitchToTorus(BigTorus *res, const uint64_t mu, const uint64_t Msize, BigIntParams *params, Allocator alloc);
 
 
 #endif //TFHE_BIGTORUS_H
