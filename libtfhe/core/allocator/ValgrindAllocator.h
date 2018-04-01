@@ -25,7 +25,7 @@ public:
 
     ~ValgrindAllocator();
 
-    Allocator createStackChildAllocator(const size_t expected_size);
+    Allocator createStackChildAllocator(const size_t expected_size = default_stack_size);
 };
 
 

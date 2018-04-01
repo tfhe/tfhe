@@ -53,7 +53,7 @@ void mul(BigTorus *res, int64_t a, const BigTorus *b, const BigIntParams *params
  * @brief res = a * b
  * WARNING: for this function, res and b must not overlap.
  */
-void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const BigIntParams *params);
+void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const BigIntParams *params, Allocator alloc);
 
 /**
  * @brief res = -a
@@ -62,14 +62,14 @@ void neg(BigTorus *res, BigTorus *a, const BigIntParams *params);
 
 
 /**
- * @brief Converts real number to torus (mainly for printing)
+ * @brief Converts real number to torus. This function preserves the 53bits of mantissa (whenever applicable)
  * @param d real to convert
  * @return torus value
  */
 void from_double(BigTorus *reps, const double d, const BigIntParams *params);
 
 /**
- * @brief Converts torus to real number (mainly for printing)
+ * @brief Converts torus to real number (mainly for printing).
  * @param x torus element to convert
  * @return real number
 */

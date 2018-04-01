@@ -26,13 +26,13 @@ void mul(BigTorus *res, int64_t a, const BigTorus *b, const BigIntParams *params
     }
 }
 
-void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const BigIntParams *params) {
+static void mul_no_overlap(BigTorus *res, const BigInt *a, const BigTorus *b, const BigIntParams *params) {
     assert(res != b);
     if (a->data->_mp_size > 0) { //positive
         const int m = a->data->_mp_size;
         mpn_mul_1(res->data, b->data, params->max_nbLimbs, a->data->_mp_d[0]);
         for (int i = 1; i < m; i++) {
-            mpn_addmul_1(res->data + i, b->data, params->max_nbLimbs, a->data->_mp_d[i]);
+            mpn_addmul_1(res->data + i, b->data, params->max_nbLimbs - i, a->data->_mp_d[i]);
         }
     } else { //negative case
         const int m = -a->data->_mp_size;
@@ -44,8 +44,19 @@ void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const BigIntParams *
     }
 }
 
+void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const BigIntParams *params, Allocator alloc) {
+    if (res!=b) {
+        mul_no_overlap(res, a, b, params);
+    } else {
+        BigTorus* tmp = alloc.newObject<BigTorus>(params, &alloc);
+        mpn_copyi(tmp->data, b->data, params->max_nbLimbs);
+        mul_no_overlap(res, a, tmp, params);
+        alloc.deleteObject(tmp, params, &alloc);
+    }
+}
+
 void neg(BigTorus *res, BigTorus *a, const BigIntParams *params) {
-    mpn_neg(res->data, res->data, params->max_nbLimbs);
+    mpn_neg(res->data, a->data, params->max_nbLimbs);
 }
 
 void from_double(BigTorus *reps, const double d, const BigIntParams *params) {
@@ -96,8 +107,7 @@ void from_double(BigTorus *reps, const double d, const BigIntParams *params) {
 }
 
 void zero(BigTorus *res, const BigIntParams *params) {
-    for (int i = 0; i < params->max_nbLimbs; i++)
-        res->data[i] = 0;
+    mpn_zero(res->data, params->max_nbLimbs);
 }
 
 void setPowHalf(BigTorus *res, const int k, const BigIntParams *params) {
@@ -120,7 +130,7 @@ namespace {
     class TorusMsgSpace {
     public:
         const int nbLimbs; ///< number of limbs in all BigTorus
-        const int Msize;   ///< Message space size
+        const uint64_t Msize;   ///< Message space size
         Allocator *const alloc;    ///< allocator pointer (for auto-delete)
         mp_limb_t *const hinterv;  ///< represents 1/2Msize mod 1
         mp_limb_t *const interv;   ///< represents 1/Msize mod 1
@@ -155,7 +165,7 @@ namespace {
         uint64_t decrypt(const BigTorus *phase) {
             // message = floor((phase + 1/2Msize mod 1)*Msize)
             mpn_add_n(buf, phase->data, hinterv, nbLimbs);
-            return mpn_mul_1(buf, interv, nbLimbs, Msize);
+            return mpn_mul_1(buf, buf, nbLimbs, Msize);
         }
 
         /**
@@ -201,4 +211,9 @@ void modSwitchToTorus(BigTorus *res, const uint64_t message, const uint64_t Msiz
     const uint64_t mu = ((message % Msize)+Msize)%Msize; //between 0 and Msize-1
     TorusMsgSpace msgSpace(Msize, params, &alloc);
     msgSpace.encryptTrivial(res, mu);
+}
+
+double to_double(const BigTorus *a, const BigIntParams *params) {
+    // quick and dirty
+    return double(int64_t(a->data[params->max_nbLimbs-1]))*pow(0.5,64);
 }
