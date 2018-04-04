@@ -108,7 +108,7 @@ public:
     /**  TorusPolynomial + p*TorusPolynomial */
     static void AddMulZ(TorusPolynomial<TORUS> *result,
                         const TorusPolynomial<TORUS> *poly1,
-                        int p,
+                        const int32_t p,
                         const TorusPolynomial<TORUS> *poly2,
                         const PolynomialParameters *params,
                         TfheThreadContext *context,
@@ -116,7 +116,7 @@ public:
 
     /**  TorusPolynomial += p*TorusPolynomial */
     static void AddMulZTo(TorusPolynomial<TORUS> *result,
-                          const int p,
+                          const int32_t p,
                           const TorusPolynomial<TORUS> *poly2,
                           const PolynomialParameters *params,
                           TfheThreadContext *context,
@@ -125,7 +125,7 @@ public:
     /**  TorusPolynomial - p*TorusPolynomial */
     static void SubMulZ(TorusPolynomial<TORUS> *result,
                         const TorusPolynomial<TORUS> *poly1,
-                        const int p,
+                        const int32_t p,
                         const TorusPolynomial<TORUS> *poly2,
                         const PolynomialParameters *params,
                         TfheThreadContext *context,
@@ -133,7 +133,7 @@ public:
 
     /**  TorusPolynomial -= p*TorusPolynomial */
     static void SubMulZTo(TorusPolynomial<TORUS> *result,
-                          int p,
+                          const int32_t p,
                           const TorusPolynomial<TORUS> *poly2,
                           const PolynomialParameters *params,
                           TfheThreadContext *context,
@@ -141,7 +141,7 @@ public:
 
     /**  TorusPolynomial = (X^a-1)* TorusPolynomial */
     static void MulByXaiMinusOne(TorusPolynomial<TORUS> *result,
-                                 int a,
+                                 const int32_t a,
                                  const TorusPolynomial<TORUS> *source,
                                  const PolynomialParameters *params,
                                  TfheThreadContext *context,
@@ -149,7 +149,7 @@ public:
 
     /** result= X^{a}*source */
     static void MulByXai(TorusPolynomial<TORUS> *result,
-                         int a,
+                         const int32_t a,
                          const TorusPolynomial<TORUS> *source,
                          const PolynomialParameters *params,
                          TfheThreadContext *context,
@@ -243,7 +243,7 @@ struct IntPolyFunctions {
 
     /**  result = (X^ai-1) * source */
     static void MulByXaiMinusOne(IntPolynomial *result,
-                                 int ai,
+                                 const int32_t ai,
                                  const IntPolynomial *source,
                                  const PolynomialParameters *params,
                                  TfheThreadContext *context,
@@ -347,7 +347,7 @@ inline void torusPolynomialSubTo(TorusPolynomial<TORUS> *result,
 template<typename TORUS>
 inline void torusPolynomialAddMulZ(TorusPolynomial<TORUS> *result,
                                    const TorusPolynomial<TORUS> *poly1,
-                                   int p,
+                                   const int32_t p,
                                    const TorusPolynomial<TORUS> *poly2,
                                    const PolynomialParameters *params,
                                    TfheThreadContext *context,
@@ -358,7 +358,7 @@ inline void torusPolynomialAddMulZ(TorusPolynomial<TORUS> *result,
 /**  TorusPolynomial += p*TorusPolynomial */
 template<typename TORUS>
 inline void torusPolynomialAddMulZTo(TorusPolynomial<TORUS> *result,
-                                     const int p,
+                                     const int32_t p,
                                      const TorusPolynomial<TORUS> *poly2,
                                      const PolynomialParameters *params,
                                      TfheThreadContext *context,
@@ -370,7 +370,7 @@ inline void torusPolynomialAddMulZTo(TorusPolynomial<TORUS> *result,
 template<typename TORUS>
 inline void torusPolynomialSubMulZ(TorusPolynomial<TORUS> *result,
                                    const TorusPolynomial<TORUS> *poly1,
-                                   const int p,
+                                   const int32_t p,
                                    const TorusPolynomial<TORUS> *poly2,
                                    const PolynomialParameters *params,
                                    TfheThreadContext *context,
@@ -381,7 +381,7 @@ inline void torusPolynomialSubMulZ(TorusPolynomial<TORUS> *result,
 /**  TorusPolynomial -= p*TorusPolynomial */
 template<typename TORUS>
 inline void torusPolynomialSubMulZTo(TorusPolynomial<TORUS> *result,
-                                     int p,
+                                     const int32_t p,
                                      const TorusPolynomial<TORUS> *poly2,
                                      const PolynomialParameters *params,
                                      TfheThreadContext *context,
@@ -393,7 +393,7 @@ inline void torusPolynomialSubMulZTo(TorusPolynomial<TORUS> *result,
 template<typename TORUS>
 inline void
 torusPolynomialMulByXaiMinusOne(TorusPolynomial<TORUS> *result,
-                                int a,
+                                const int32_t a,
                                 const TorusPolynomial<TORUS> *source,
                                 const PolynomialParameters *params,
                                 TfheThreadContext *context,
@@ -404,7 +404,7 @@ torusPolynomialMulByXaiMinusOne(TorusPolynomial<TORUS> *result,
 /** result= X^{a}*source */
 template<typename TORUS>
 inline void torusPolynomialMulByXai(TorusPolynomial<TORUS> *result,
-                                    int a,
+                                    const int32_t a,
                                     const TorusPolynomial<TORUS> *source,
                                     const PolynomialParameters *params,
                                     TfheThreadContext *context,
@@ -448,7 +448,7 @@ inline void intPolynomialAddTo(IntPolynomial *result,
 
 /**  result = (X^ai-1) * source */
 inline void intPolynomialMulByXaiMinusOne(IntPolynomial *result,
-                                          int ai,
+                                          const int32_t ai,
                                           const IntPolynomial *source,
                                           const PolynomialParameters *params,
                                           TfheThreadContext *context,

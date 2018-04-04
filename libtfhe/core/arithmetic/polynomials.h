@@ -16,7 +16,7 @@
  */
 class PolynomialParameters {
 public:
-    int N;
+    int32_t N;
 };
 
 
@@ -25,7 +25,7 @@ public:
  */
 class IntPolynomial {
 public:
-    int *coefs;
+    int32_t *coefs;
 
 
     // constructor
@@ -73,6 +73,6 @@ public:
     ~TorusPolynomial() = delete;
 };
 
-TORUS_CLASS_IMPL_ALL(TorusPolynomial);
+//TORUS_CLASS_IMPL_ALL(TorusPolynomial);
 
 #endif //POLYNOMIALS_H
