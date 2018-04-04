@@ -64,7 +64,8 @@ void from_double(BigTorus *reps, const double d, const BigIntParams *params) {
     static constexpr uint64_t mantissa_msb = (uint64_t(1) << 52);
     static constexpr uint64_t mantissa_mask = mantissa_msb - 1;
     static constexpr uint64_t expo_mask = (uint64_t(1) << 11) - 1;
-    uint64_t di = *((uint64_t *) &d); //get the bits of d
+    uint64_t* dip = (uint64_t *)&d;  //get the bits of d
+    uint64_t di = *dip;
     uint64_t mantissa = (di & mantissa_mask) | mantissa_msb;
     uint64_t expo = (di >> 52) & expo_mask;
     uint64_t sign = (di >> 63);
