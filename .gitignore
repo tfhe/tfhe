@@ -2,3 +2,4 @@ callgrind.*
 .*.swp
 *.o
 doc
+.idea
