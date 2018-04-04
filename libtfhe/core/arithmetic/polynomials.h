@@ -16,7 +16,7 @@
  */
 class PolynomialParameters {
 public:
-    int N;
+    int32_t N;
 };
 
 
@@ -25,7 +25,7 @@ public:
  */
 class IntPolynomial {
 public:
-    int *coefs;
+    int32_t *coefs;
 
 
     // constructor
@@ -33,8 +33,7 @@ public:
                   TfheThreadContext *context,
                   Allocator *alloc);
 
-    void destroy(IntPolynomial *poly,
-                 const PolynomialParameters *params,
+    void destroy(const PolynomialParameters *params,
                  TfheThreadContext *context,
                  Allocator *alloc);
 
@@ -61,8 +60,7 @@ public:
                     TfheThreadContext *context,
                     Allocator *alloc);
 
-    void destroy(TorusPolynomial<TORUS> *polyT,
-                 const PolynomialParameters *params,
+    void destroy(const PolynomialParameters *params,
                  TfheThreadContext *context,
                  Allocator *alloc);
 

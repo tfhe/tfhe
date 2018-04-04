@@ -10,20 +10,18 @@ using namespace std;
 IntPolynomial::IntPolynomial(const PolynomialParameters *params,
                              TfheThreadContext *context,
                              Allocator *alloc) {
-    IntPolynomial *poly = alloc->newObject<IntPolynomial>(params, context, alloc);
-    poly->coefs = new int[params->N];
-    //poly->coefs = alloc->newObject<int>(params, context, alloc);
 
+    this->coefs = alloc->newArray<int32_t>(params->N);
 }
 
-/*
-void IntPolynomial::destroy(IntPolynomial *poly,
-                            const PolynomialParameters *params,
+
+void IntPolynomial::destroy(const PolynomialParameters *params,
                             TfheThreadContext *context,
                             Allocator *alloc) {
-    alloc->deleteObject<IntPolynomial>(poly, params, context, alloc);
+
+    alloc->deleteArray<int32_t>(params->N, coefs);
 }
-*/
+
 
 
 
@@ -36,18 +34,16 @@ template<typename TORUS>
 TorusPolynomial<TORUS>::TorusPolynomial(const PolynomialParameters *params,
                                         TfheThreadContext *context,
                                         Allocator *alloc) {
-    TorusPolynomial<TORUS> *polyT = alloc->newObject<TorusPolynomial<TORUS>>(params, context, alloc);
-    polyT->coefsT = new TORUS[params->N];
-    //polyT->coefsT = alloc->newObject<TORUS>(params, context, alloc);
+
+    this->coefsT = alloc->newArray<TORUS>(params->N);
 }
 
 template<typename TORUS>
-void TorusPolynomial<TORUS>::destroy(TorusPolynomial<TORUS> *polyT,
-                                     const PolynomialParameters *params,
+void TorusPolynomial<TORUS>::destroy(const PolynomialParameters *params,
                                      TfheThreadContext *context,
                                      Allocator *alloc) {
 
-    alloc->deleteObject<TorusPolynomial<TORUS>>(polyT, params, context, alloc);
+    alloc->deleteArray<TORUS>(params->N, coefsT);
 }
 
 
