@@ -1,8 +1,6 @@
 #include <gtest/gtest.h>
 #include <core/allocator/allocator.h>
 #include <cmath>
-#include <core/allocator/MallocAllocator.h>
-#include <core/allocator/ValgrindAllocator.h>
 
 using namespace std;
 
@@ -20,34 +18,31 @@ TEST(ALLOCATOR, ceilalign) {
 // crazy recursive function: every allocated object is destroyed
 void crazyrec(int i, Allocator alloc) {
     if (i == 100) return;
-    size_t *r = alloc->newObject<size_t>();
+    size_t *r = alloc.newObject<size_t>();
     *r = i;
-    crazyrec(i + 1, alloc->createStackChildAllocator());
+    crazyrec(i + 1, alloc.createStackChildAllocator(0));
     ASSERT_EQ(*r, i);
-    alloc->deleteObject(r);
+    alloc.deleteObject(r);
 }
 
 TEST(ALLOCATOR, stack) {
-    Allocator a(new MallocAllocator());
-    crazyrec(0, a->createStackChildAllocator(800));
+    Allocator a;
+    crazyrec(0, a.createStackChildAllocator(1000));
 }
 
-
-TEST(ALLOCATOR, strict) {
-    Allocator a(new ValgrindAllocator());
-    crazyrec(0, a->createStackChildAllocator(800));
-}
 
 struct Toto {
     int p;
 
     Toto(int p) : p(p) {}
+
+    void destroy() {}
 };
 
 TEST(ALLOCATOR, array) {
-    Allocator a(new ValgrindAllocator());
-    Toto *t43 = a->newArray<Toto>(17, 43);
-    Toto *t42 = a->newArrayAligned<Toto>(100, 32, 42);
+    Allocator a;
+    Toto *t43 = a.newArray<Toto>(17, 43);
+    Toto *t42 = a.newArrayAligned<Toto>(100, 32, 42);
     for (int i = 0; i < 100; i++) {
         ASSERT_EQ(t42[i].p, 42);
     }
@@ -55,6 +50,6 @@ TEST(ALLOCATOR, array) {
         ASSERT_EQ(t43[i].p, 43);
     }
     ASSERT_EQ(size_t(t42)%32, 0);
-    a->deleteArray(100, t42);
-    a->deleteArray(17, t43);
+    a.deleteArray(100, t42);
+    a.deleteArray(17, t43);
 }

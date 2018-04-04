@@ -9,15 +9,23 @@
 #include <cstddef>
 #include <memory>
 
-/**
- * All allocators implementation must derive from this class
- */
-class AllocatorImpl;
+const size_t default_stack_size = 50000000;
 
-/**
- * From a user perspective, an allocator is just a shared pointer to its implementation.
- */
-typedef std::shared_ptr<AllocatorImpl> Allocator;
+class Allocator;
+
+#ifdef USE_TFHE_ALLOCATOR
+
+#include "TFHEAllocator.h"
+
+typedef TFHEAllocator AllocatorImpl;
+
+#else
+
+#include "ValgrindAllocator.h"
+
+typedef ValgrindAllocator AllocatorImpl;
+
+#endif
 
 /**
  * returns the smallest multiple of alignment larger or equal to size
@@ -29,23 +37,23 @@ inline size_t ceilalign(const size_t size, const size_t alignment) {
     return (size + alignment - 1) & (-alignment);
 }
 
-class AllocatorImpl {
+class Allocator : public AllocatorImpl {
 public:
-    /**
+    /*
      * allocates at least byte_size bytes of contiguous memory,
      * whose start and end addresses are multiples of alignment
      * @param byte_size minimum size to allocate (must be a multiple of alignment, consider using ceilalign if not sure)
      * @param alignment alignment of the begin and end area.
      */
-    virtual void *allocate(size_t alignment, size_t byte_size)=0;
+    //void *allocate(size_t alignment, size_t byte_size)=0;
 
-    /**
+    /*
      * de-allocates a ptr that was previously allocated by this allocator
      * @param ptr a previously allocated address
      */
-    virtual void deallocate(void *ptr)=0;
+    //void deallocate(void *ptr)=0;
 
-    /**
+    /*
      * returns a child allocator, following the stack model:
      *  - An allocator can have only one (direct) child at any given point in time
      *  - During the lifespan of the child, no memory can be allocated or de-allocated by the father.
@@ -54,17 +62,18 @@ public:
      *        Depending on the implementation, this expectation can be loose or strict
      * @return the child allocator
      */
-    virtual Allocator createStackChildAllocator(const size_t expected_size = 0)=0;
+    //Allocator createStackChildAllocator(const size_t expected_size = 0)=0;
 
     /**
      * default constructor
      */
-    AllocatorImpl() {}
+    template<typename ...ARGS>
+    Allocator(ARGS... args):AllocatorImpl(args...) {}
 
     /**
      * destructor
      */
-    virtual ~AllocatorImpl() {}
+    ~Allocator() {}
 
     /**
      * Allocates and constructs a new object of type T, aligned with the specified alignment,
@@ -93,9 +102,19 @@ public:
      * Destroys and deallocates an object allocated with newObject
      * @param ptr the previously created object
      */
-    template<typename T>
+    template<typename T, typename ...ARGS>
+    void deleteObject(T *ptr, ARGS... args) {
+        //ptr->~T();
+        ptr->destroy(args...);
+        deallocate(ptr);
+    };
+
+    /**
+     * Destroys and deallocates arithmetic types allocated with newObject or newAlignedObject
+     * @param ptr the previously created array
+     */
+    template<typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value>>
     void deleteObject(T *ptr) {
-        ptr->~T();
         deallocate(ptr);
     };
 
@@ -131,13 +150,26 @@ public:
      * Destroys and deallocates an array allocated with newArray or newAlignedArray
      * @param ptr the previously created array
      */
-    template<typename T>
+    template<typename T, typename... ARGS>
+    void deleteArray(size_t n, T *ptr, ARGS... args) {
+        for (size_t i = 0; i < n; i++) {
+            //(ptr + i)->~T();
+            (ptr + i)->destroy(args...);
+        }
+        deallocate(ptr);
+    };
+
+    /**
+     * Destroys and deallocates an array of arithmetic types allocated with newArray or newAlignedArray
+     * @param ptr the previously created array
+     */
+    template<typename T, typename = std::enable_if_t<std::is_arithmetic<T>::value>>
     void deleteArray(size_t n, T *ptr) {
-        for (size_t i = 0; i < n; i++)
-            (ptr + i)->~T();
         deallocate(ptr);
     };
 
 };
+
+//static_assert(sizeof(Allocator)==16);
 
 #endif //TFHE_ALLOCATOR_H

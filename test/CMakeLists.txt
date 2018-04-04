@@ -5,8 +5,9 @@ add_subdirectory(googletest EXCLUDE_FROM_ALL)
 include_directories(${GTEST_INCLUDE_DIRS} ../libtfhe)
 
 set(GOOGLETEST_SOURCES
-    tfhe.cpp
-        test_allocator.cpp)
+        tfhe.cpp
+        test_allocator.cpp
+        test_bignum.cpp)
 
 # set(CPP_ITESTS 
 #        )
@@ -16,7 +17,7 @@ set(GOOGLETEST_SOURCES
 
 #the unittests are compiled with the google test framework
 add_executable(unittests ${GOOGLETEST_SOURCES})
-target_link_libraries(unittests tfhe gtest gtest_main -lpthread)
+target_link_libraries(unittests tfhe gtest gtest_main -lgmpxx -lpthread)
 add_test(unittests unittests)
 
 # # We build a specific unit and integration test for each fft processor
