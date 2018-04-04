@@ -9,6 +9,8 @@
 #include <cstddef>
 #include <memory>
 
+const size_t default_stack_size = 50000000;
+
 class Allocator;
 
 #ifdef USE_TFHE_ALLOCATOR

@@ -19,7 +19,10 @@ set(CORE_SRCS
         allocator/ValgrindAllocator.h
         allocator/TFHEAllocator.cpp
         allocator/TFHEAllocator.h
-        )
+        arithmetic/BigInt.cpp
+        arithmetic/BigInt.h
+        arithmetic/BigTorus.cpp
+        arithmetic/BigTorus.h)
 
 add_library(tfhe-core OBJECT ${CORE_SRCS})
 set_property(TARGET tfhe-core PROPERTY POSITION_INDEPENDENT_CODE ON)

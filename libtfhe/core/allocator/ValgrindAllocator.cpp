@@ -1,8 +1,8 @@
 #ifndef USE_TFHE_ALLOCATOR
 
 #include <iostream>
-#include "ValgrindAllocator.h"
 #include "allocator.h"
+#include "ValgrindAllocator.h"
 
 using namespace std;
 

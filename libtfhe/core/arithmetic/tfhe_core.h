@@ -7,6 +7,10 @@
 
 void die_dramatically(const char *message);
 
+#define PREVENT_STACK_COPY(TYPENAME) \
+    TYPENAME(const TYPENAME&) = delete; \
+    void operator=(const TYPENAME &)= delete; \
+    ~TYPENAME() = delete
 
 template<typename TORUS>
 class TLweParams;
