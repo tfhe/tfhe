@@ -33,7 +33,8 @@ public:
                   TfheThreadContext *context,
                   Allocator *alloc);
 
-    void destroy(const PolynomialParameters *params,
+    void destroy(IntPolynomial *poly,
+                 const PolynomialParameters *params,
                  TfheThreadContext *context,
                  Allocator *alloc);
 
@@ -60,7 +61,8 @@ public:
                     TfheThreadContext *context,
                     Allocator *alloc);
 
-    void destroy(const PolynomialParameters *params,
+    void destroy(TorusPolynomial<TORUS> *polyT,
+                 const PolynomialParameters *params,
                  TfheThreadContext *context,
                  Allocator *alloc);
 
@@ -73,6 +75,6 @@ public:
     ~TorusPolynomial() = delete;
 };
 
-TORUS_CLASS_IMPL_ALL(TorusPolynomial);
+//TORUS_CLASS_IMPL_ALL(TorusPolynomial);
 
 #endif //POLYNOMIALS_H
