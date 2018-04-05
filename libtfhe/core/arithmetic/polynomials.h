@@ -10,69 +10,65 @@
 #include "../allocator/allocator.h"
 #include "threadcontext.h"
 
-
 /**
- * CLASSES
+ * @brief Polynomial parameters class
  */
 class PolynomialParameters {
 public:
     int32_t N;
 };
 
-
 /**
- * Class of integer polynomials modulo X^N+1
+ * @brief Generic polynomial class
+ * 
+ * @tparam COEF_TYPE type of coefficients
+ * @tparam tag dummy tag to differentiate between different polynomial types
  */
-class IntPolynomial {
+template<typename COEF_TYPE, int tag>
+class Polynomial
+{
 public:
-    int32_t *coefs;
+    COEF_TYPE *coefs;
 
+    /**
+     * @brief Constructs a polynomial with given parameters
+     * 
+     * @param params polynomial parameters
+     * @param context thread execution context
+     * @param alloc allocator to use
+     */
+    Polynomial(const PolynomialParameters *params,
+        TfheThreadContext *context,
+        Allocator *alloc);
 
-    // constructor
-    IntPolynomial(const PolynomialParameters *params,
-                  TfheThreadContext *context,
-                  Allocator *alloc);
-
+    /**
+     * @brief Destroys inner data of polynomial
+     * 
+     * @param params polynomial parameters used for construction
+     * @param context thread execution context
+     * @param alloc allocator to use
+     */
     void destroy(const PolynomialParameters *params,
-                 TfheThreadContext *context,
-                 Allocator *alloc);
+        TfheThreadContext *context,
+        Allocator *alloc);
 
-    // destructors
-    IntPolynomial(const IntPolynomial &) = delete;
-
-    IntPolynomial *operator=(const IntPolynomial &) = delete;
-
-    ~IntPolynomial() = delete;
+    PREVENT_STACK_COPY(Polynomial);
 };
 
+/**
+ * Polynomial with integer coefficients
+ */
+template<typename INT_TYPE>
+using IntPolynomial = Polynomial<INT_TYPE, 0>;
 
 /**
- * Class of torus polynomials modulo X^N+1
+ * Polynomial with torus coefficients
  */
-template<typename TORUS>
-class TorusPolynomial {
-public:
-    TORUS *coefsT;
+template<typename TORUS_TYPE>
+using TorusPolynomial = Polynomial<TORUS_TYPE, 1>;
 
+INT_CLASS_IMPL_ALL(Polynomial, 0);
 
-    // constructor
-    TorusPolynomial(const PolynomialParameters *params,
-                    TfheThreadContext *context,
-                    Allocator *alloc);
-
-    void destroy(const PolynomialParameters *params,
-                 TfheThreadContext *context,
-                 Allocator *alloc);
-
-
-    // destructors
-    TorusPolynomial(const TorusPolynomial<TORUS> &) = delete;
-
-    TorusPolynomial<TORUS> *operator=(const TorusPolynomial<TORUS> &) = delete;
-
-    ~TorusPolynomial() = delete;
-};
-
-//TORUS_CLASS_IMPL_ALL(TorusPolynomial);
+TORUS_CLASS_IMPL_ALL(Polynomial, 1);
 
 #endif //POLYNOMIALS_H

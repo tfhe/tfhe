@@ -17,6 +17,8 @@ class TorusUtils {
 public:
     typedef typename std::make_unsigned<TORUS>::type UTORUS; ///< unsigned version of the torus
     typedef typename std::make_signed<TORUS>::type STORUS;   ///< signed version of the torus
+    typedef typename std::make_signed<TORUS>::type INT_TYPE;
+
     static const TORUS min_val = std::numeric_limits<TORUS>::min();
     static const TORUS max_val = std::numeric_limits<TORUS>::max();
     static const uint32_t bit_cnt = sizeof(TORUS);           ///< bit size of the Torus
