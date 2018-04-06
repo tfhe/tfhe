@@ -61,6 +61,12 @@ struct TLweBootstrappingKey;
 template<typename TORUS>
 struct TLweBootstrappingKeyFFT;
 
+template<typename INT_TYPE>
+struct IntPolynomial;
+
+template<typename TORUS>
+struct TorusPolynomial;
+
 struct LagrangeHalfCPolynomial;
 
 // **** Platinum

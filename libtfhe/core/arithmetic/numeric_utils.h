@@ -40,7 +40,7 @@ public:
      * @param d real to convert
      * @return torus value
      */
-    static TORUS from_double(double d) {
+    static TORUS from_double(const double d) {
         static double intpart; //this value is unused, so it can be static
         double temp = modf(d, &intpart) / 2.0; //divide by 2 in order to avoid overflow in next line
         return TORUS(temp * dtot_factor) << 1;
@@ -51,7 +51,7 @@ public:
      * @param x torus element to convert
      * @return real number
     */
-    static double to_double(TORUS x) {
+    static double to_double(const TORUS x) {
         return double(x) / dtot_factor;
     }
 
@@ -61,7 +61,7 @@ public:
      * @param Msize discrete space size
      * @return approximated torus value
      */
-    static TORUS approxPhase(TORUS phase, int32_t Msize) {
+    static TORUS approxPhase(const TORUS phase, const int32_t Msize) {
         UTORUS half_interv = (half_utorus / UTORUS(Msize)); // half width of each interval
         UTORUS interv = half_interv << 1; // width of each interval
         UTORUS phase_temp = UTORUS(phase) + half_interv;
@@ -76,7 +76,7 @@ public:
      * @param Msize discrete space size
      * @return discrete space value in [0, MSize[
      */
-    static int32_t modSwitchFromTorus(TORUS phase, int32_t Msize) {
+    static int32_t modSwitchFromTorus(const TORUS phase, const int32_t Msize) {
         UTORUS half_interv = (half_utorus / UTORUS(Msize));
         UTORUS interv = half_interv << 1; // width of each interval
         UTORUS phase_temp = UTORUS(phase) + half_interv;
@@ -90,7 +90,7 @@ public:
      * @param Msize discrete space size
      * @return torus value
      */
-    static TORUS modSwitchToTorus(int32_t mu, int32_t Msize) {
+    static TORUS modSwitchToTorus(const int32_t mu, const int32_t Msize) {
         UTORUS half_interv = (half_utorus / UTORUS(Msize));
         UTORUS phase_temp = UTORUS((mu % Msize) * 2) * half_interv;
         return phase_temp;
