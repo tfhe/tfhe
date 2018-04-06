@@ -12,7 +12,7 @@ TEST(BigNum, BigIntAllocSet) {
     // here, we test a few constructors with or without value
     // we also test the copyvalue functions
     Allocator alloc;
-    BigIntParams *params = alloc.newObject<BigIntParams>(2);
+    ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(2);
     BigInt *a = alloc.newObject<BigInt>();
     BigInt *b = alloc.newObject<BigInt>(42);
     BigInt *c = alloc.newObject<BigInt>(std::numeric_limits<int64_t>::max());
@@ -36,7 +36,7 @@ TEST(BigNum, BigIntAdd) {
     // here, we do a small random walk, performing a few additions and comparing with a reference
     // mpz_class implementation
     Allocator alloc;
-    BigIntParams *params = alloc.newObject<BigIntParams>(2);
+    ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(2);
     int64_t tval = std::numeric_limits<int64_t>::max() / 3;
     mpz_class aref = tval;
     BigInt *a = alloc.newObject<BigInt>(tval);
@@ -66,7 +66,7 @@ TEST(BigNum, BigIntSub) {
     // here, we do a small random walk, performing a few multiplications and comparing with a reference
     // mpz_class implementation
     Allocator alloc;
-    BigIntParams *params = alloc.newObject<BigIntParams>(2);
+    ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(2);
     int64_t tval = std::numeric_limits<int64_t>::max() / 3;
     int64_t tval2 = std::numeric_limits<int64_t>::max() / 5;
     mpz_class aref = tval;
@@ -101,7 +101,7 @@ TEST(BigNum, BigIntMul) {
     // here, we do a small random walk, performing a few multiplications and comparing with a reference
     // mpz_class implementation
     Allocator alloc;
-    BigIntParams *params = alloc.newObject<BigIntParams>(2);
+    ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(2);
     //everything is modulo p
     mpz_class p;
     mpz_ui_pow_ui(p.get_mpz_t(), 2, params->p);
@@ -143,7 +143,7 @@ TEST(BigNum, BigIntNeg) {
     // here, we do a few negations and comparing with a reference
     // mpz_class implementation
     Allocator alloc;
-    BigIntParams *params = alloc.newObject<BigIntParams>(2);
+    ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(2);
     //everything is modulo p
     mpz_class p;
     mpz_ui_pow_ui(p.get_mpz_t(), 2, params->p);
@@ -176,7 +176,7 @@ TEST(BigNum, BigIntNeg) {
 }
 
 //quick and dirty function to convert a bigTorus to a gmp float
-mpf_class fval(const BigTorus *x, const BigIntParams *params) {
+mpf_class fval(const BigTorus *x, const ZModuleParams<BigTorus> *params) {
     __mpz_struct tmp;
     tmp._mp_d = x->data;
     tmp._mp_size = params->max_nbLimbs;
@@ -185,7 +185,7 @@ mpf_class fval(const BigTorus *x, const BigIntParams *params) {
 }
 
 //quick and dirty function to convert a bigTorus to a gmp integer
-mpz_class zval(const BigTorus *x, const BigIntParams *params) {
+mpz_class zval(const BigTorus *x, const ZModuleParams<BigTorus> *params) {
     int K;
     for (K = params->max_nbLimbs; K > 0; K--) {
         if (x->data[K - 1] != 0) {
@@ -200,19 +200,19 @@ mpz_class zval(const BigTorus *x, const BigIntParams *params) {
 }
 
 //quick and dirty function to convert a bigTorus modulus to 2^p
-mpz_class zmodu(const BigIntParams *params) {
+mpz_class zmodu(const ZModuleParams<BigTorus> *params) {
     return mpz_class(1) << params->p;
 }
 
 //quick and dirty function to fill a bigtorus with random
-void randomBigTorus(BigTorus *res, const BigIntParams *params) {
+void randomBigTorus(BigTorus *res, const ZModuleParams<BigTorus> *params) {
     for (int i = 0; i < params->max_nbLimbs; i++) {
         res->data[i] = rand();
     }
 }
 
 //quick and dirty function to fill a bigtorus with random
-void randomBigInt(BigInt *res, const BigIntParams *params) {
+void randomBigInt(BigInt *res, const ZModuleParams<BigTorus> *params) {
     setvalue(res, rand() - RAND_MAX / 2, params);
     for (int i = 1; i < 2 * params->max_nbLimbs; i++) {
         mul(res, res, rand(), params);
@@ -221,7 +221,7 @@ void randomBigInt(BigInt *res, const BigIntParams *params) {
 
 TEST(BigTorus, FromDouble) {
     Allocator alloc;
-    BigIntParams *params = alloc.newObject<BigIntParams>(2);
+    ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(2);
     BigTorus *a = alloc.newObject<BigTorus>(params, &alloc);
     randomBigTorus(a, params);
     for (int i = 0; i < 100; i++) {
@@ -240,7 +240,7 @@ TEST(BigTorus, FromDouble) {
 
 TEST(BigTorus, toDouble) {
     Allocator alloc;
-    BigIntParams *params = alloc.newObject<BigIntParams>(2);
+    ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(2);
     BigTorus *a = alloc.newObject<BigTorus>(params, &alloc);
     for (int i = 0; i < 100; i++) {
         double tval = 2. * (rand() / double(RAND_MAX) - 0.5);
@@ -257,11 +257,11 @@ TEST(BigTorus, toDouble) {
 /*
  * @brief res = 0
  */
-//void zero(BigTorus *res, const BigIntParams *params);
+//void zero(BigTorus *res, const ZModuleParams *params);
 TEST(BigTorus, zero) {
     Allocator alloc;
     for (int K = 1; K < 10; K++) {
-        BigIntParams *params = alloc.newObject<BigIntParams>(K);
+        ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(K);
         BigTorus *a = alloc.newObject<BigTorus>(params, &alloc);
         randomBigTorus(a, params);
         zero(a, params);
@@ -271,7 +271,7 @@ TEST(BigTorus, zero) {
     }
 }
 
-void testPow2(const BigTorus *a, const int k, const BigIntParams *params) {
+void testPow2(const BigTorus *a, const int k, const ZModuleParams<BigTorus> *params) {
     int blocpos = k / 64;
     int inpos = k % 64;
     for (int i = 0; i < params->max_nbLimbs; i++) {
@@ -286,11 +286,11 @@ void testPow2(const BigTorus *a, const int k, const BigIntParams *params) {
 /*
  * @brief res = 2^-k
  */
-//void setPowHalf(BigTorus *res, const int k, const BigIntParams *params);
+//void setPowHalf(BigTorus *res, const int k, const ZModuleParams *params);
 TEST(BigTorus, setPowHalf) {
     Allocator alloc;
     for (int K: set<int>{2, 5, 10}) {
-        BigIntParams *params = alloc.newObject<BigIntParams>(K);
+        ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(K);
         BigTorus *a = alloc.newObject<BigTorus>(params, &alloc);
         {
             //k negative
@@ -319,12 +319,12 @@ TEST(BigTorus, setPowHalf) {
 }
 
 void testBinaryOperation(
-        void(*BigTorusOp)(BigTorus *res, const BigTorus *a, const BigTorus *b, const BigIntParams *params),
-        mpz_class(*testOp)(mpz_class a, mpz_class b, const BigIntParams *params)
+        void(*BigTorusOp)(BigTorus *res, const BigTorus *a, const BigTorus *b, const ZModuleParams<BigTorus> *params),
+        mpz_class(*testOp)(mpz_class a, mpz_class b, const ZModuleParams<BigTorus> *params)
 ) {
     Allocator alloc;
     for (int K: set<int>{2, 5, 10}) {
-        BigIntParams *params = alloc.newObject<BigIntParams>(K);
+        ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(K);
         BigTorus *a = alloc.newObject<BigTorus>(params, &alloc);
         BigTorus *b = alloc.newObject<BigTorus>(params, &alloc);
         BigTorus *c = alloc.newObject<BigTorus>(params, &alloc);
@@ -383,26 +383,26 @@ void testBinaryOperation(
 }
 
 
-mpz_class testBigTAdd(mpz_class aa, mpz_class bb, const BigIntParams *params) {
+mpz_class testBigTAdd(mpz_class aa, mpz_class bb, const ZModuleParams<BigTorus> *params) {
     return (aa + bb) % zmodu(params);
 }
 
 /*
  * @brief res = a + b
  */
-//void add(BigTorus *res, const BigTorus *a, const BigTorus *b, const BigIntParams *params);
+//void add(BigTorus *res, const BigTorus *a, const BigTorus *b, const ZModuleParams *params);
 TEST(BigTorus, addition) {
     testBinaryOperation(add, testBigTAdd);
 }
 
-mpz_class testBigTSub(mpz_class aa, mpz_class bb, const BigIntParams *params) {
+mpz_class testBigTSub(mpz_class aa, mpz_class bb, const ZModuleParams<BigTorus> *params) {
     return (aa - bb + zmodu(params)) % zmodu(params);
 }
 
 /*
  * @brief res = a - b
  */
-//void sub(BigTorus *res, const BigTorus *a, const BigTorus *b, const BigIntParams *params);
+//void sub(BigTorus *res, const BigTorus *a, const BigTorus *b, const ZModuleParams *params);
 TEST(BigTorus, subtraction) {
     testBinaryOperation(sub, testBigTSub);
 }
@@ -412,11 +412,11 @@ mpz_class posmod(mpz_class a, mpz_class b) { return ((a % b) + b) % b; }
 /*
  * @brief res = a * b
  */
-//void mul(BigTorus *res, int64_t a, const BigTorus *b, const BigIntParams *params);
+//void mul(BigTorus *res, int64_t a, const BigTorus *b, const ZModuleParams *params);
 TEST(BigTorus, multInt) {
     Allocator alloc;
     for (int K: set<int>{2, 5, 10}) {
-        BigIntParams *params = alloc.newObject<BigIntParams>(K);
+        ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(K);
         BigTorus *a = alloc.newObject<BigTorus>(params, &alloc);
         BigTorus *b = alloc.newObject<BigTorus>(params, &alloc);
         for (int trials = 0; trials < 5; trials++) {
@@ -451,11 +451,11 @@ TEST(BigTorus, multInt) {
  * @brief res = a * b
  * WARNING: for this function, res and b must not overlap.
  */
-//void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const BigIntParams *params);
+//void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams *params);
 TEST(BigTorus, multBigInt) {
     Allocator alloc;
     for (int K: set<int>{2, 5, 10}) {
-        BigIntParams *params = alloc.newObject<BigIntParams>(K);
+        ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(K);
         BigTorus *a = alloc.newObject<BigTorus>(params, &alloc);
         BigInt *x = alloc.newObject<BigInt>();
         BigTorus *b = alloc.newObject<BigTorus>(params, &alloc);
@@ -490,11 +490,11 @@ TEST(BigTorus, multBigInt) {
 /*
  * @brief res = -a
  */
-//void neg(BigTorus *res, BigTorus *a, const BigIntParams *params);
+//void neg(BigTorus *res, BigTorus *a, const ZModuleParams *params);
 TEST(BigTorus, negate) {
     Allocator alloc;
     for (int K: set<int>{2, 5, 10}) {
-        BigIntParams *params = alloc.newObject<BigIntParams>(K);
+        ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(K);
         BigTorus *a = alloc.newObject<BigTorus>(params, &alloc);
         BigTorus *b = alloc.newObject<BigTorus>(params, &alloc);
         for (int trials = 0; trials < 5; trials++) {
@@ -528,7 +528,7 @@ TEST(BigTorus, negate) {
  * @param Msize discrete space size
  * @return approximated torus value
  */
-//void approxPhase(BigTorus *res, const BigTorus *phase, uint64_t Msize, BigIntParams *params, Allocator alloc);
+//void approxPhase(BigTorus *res, const BigTorus *phase, uint64_t Msize, ZModuleParams *params, Allocator alloc);
 
 /*
  * @brief Mod-Rescale from the torus to Z/Msize.Z
@@ -537,11 +537,11 @@ TEST(BigTorus, negate) {
  * @param Msize discrete space size
  * @return discrete space value in [0, MSize[
  */
-//uint64_t modSwitchFromTorus(const BigTorus *phase, uint64_t Msize, BigIntParams *params, Allocator alloc);
+//uint64_t modSwitchFromTorus(const BigTorus *phase, uint64_t Msize, ZModuleParams *params, Allocator alloc);
 TEST(BigTorus, modSwitchFromTorus) {
     Allocator alloc;
     for (int K: set<int>{2, 5, 10}) {
-        BigIntParams *params = alloc.newObject<BigIntParams>(K);
+        ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(K);
         BigTorus *a = alloc.newObject<BigTorus>(params, &alloc);
         for (int trials = 0; trials < 10; trials++) {
             //pick a random phase and a random message space
@@ -564,11 +564,11 @@ TEST(BigTorus, modSwitchFromTorus) {
  * @param Msize discrete space size
  * @return torus value
  */
-//void modSwitchToTorus(BigTorus *res, const uint64_t mu, const uint64_t Msize, BigIntParams *params, Allocator alloc);
+//void modSwitchToTorus(BigTorus *res, const uint64_t mu, const uint64_t Msize, ZModuleParams *params, Allocator alloc);
 TEST(BigTorus, modSwitchToTorus) {
     Allocator alloc;
     for (int K: set<int>{2, 5, 10}) {
-        BigIntParams *params = alloc.newObject<BigIntParams>(K);
+        ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(K);
         BigTorus *a = alloc.newObject<BigTorus>(params, &alloc);
         for (int trials = 0; trials < 10; trials++) {
             //pick a random phase and a random message space

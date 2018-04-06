@@ -5,23 +5,12 @@
 #include <gmp.h>
 #include "tfhe_core.h"
 #include "../allocator/allocator.h"
+#include "zmodule_param.h"
 
 /**
- * @brief params of the BigInt
- * Namely, the maximum number of limbs, and the number of bits p of the modulus.
- * (every operation is modulo 2^p)
+ * forward declare big torus class
  */
-class BigIntParams {
-public:
-    const int max_nbLimbs;
-    const int p;
-
-    BigIntParams(const int max_nbLimbs);
-
-    void destroy();
-
-    PREVENT_STACK_COPY(BigIntParams);
-};
+class BigTorus;
 
 /**
  * @brief This class represents big integers modulo 2^p where p is a multiple of 64 bits.
@@ -46,71 +35,71 @@ public:
  * @param res the bigint to truncate
  * @param params bigint parameters
  */
-void clamp2p(BigInt *res, const BigIntParams *params);
+void clamp2p(BigInt *res, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = a + b (truncated mod 2^p)
  */
-void add(BigInt *res, const BigInt *a, const BigInt *b, const BigIntParams *params);
+void add(BigInt *res, const BigInt *a, const BigInt *b, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = a + b (truncated mod 2^p)
  */
-void add(BigInt *res, const BigInt *a, int64_t b, const BigIntParams *params);
+void add(BigInt *res, const BigInt *a, int64_t b, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = a + b (truncated mod 2^p)
  */
-void add(BigInt *res, int64_t a, const BigInt *b, const BigIntParams *params);
+void add(BigInt *res, int64_t a, const BigInt *b, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = a - b (truncated mod 2^p)
  */
-void sub(BigInt *res, const BigInt *a, const BigInt *b, const BigIntParams *params);
+void sub(BigInt *res, const BigInt *a, const BigInt *b, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = a - b (truncated mod 2^p)
  */
-void sub(BigInt *res, const BigInt *a, int64_t b, const BigIntParams *params);
+void sub(BigInt *res, const BigInt *a, int64_t b, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = a - b (truncated mod 2^p)
  */
-void sub(BigInt *res, int64_t a, const BigInt *b, const BigIntParams *params);
+void sub(BigInt *res, int64_t a, const BigInt *b, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = a * b (truncated mod 2^p)
  */
-void mul(BigInt *res, const BigInt *a, const BigInt *b, const BigIntParams *params);
+void mul(BigInt *res, const BigInt *a, const BigInt *b, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = a * b (truncated mod 2^p)
  */
-void mul(BigInt *res, int64_t a, const BigInt *b, const BigIntParams *params);
+void mul(BigInt *res, int64_t a, const BigInt *b, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = a * b (truncated mod 2^p)
  */
-void mul(BigInt *res, const BigInt *a, int64_t b, const BigIntParams *params);
+void mul(BigInt *res, const BigInt *a, int64_t b, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = -a (truncated mod 2^p)
  */
-void neg(BigInt *res, BigInt *a, const BigIntParams *params);
+void neg(BigInt *res, BigInt *a, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = -a (truncated mod 2^p)
  */
-void neg(BigInt *res, int64_t a, const BigIntParams *params);
+void neg(BigInt *res, int64_t a, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = a (truncated mod 2^p)
  */
-void setvalue(BigInt *res, BigInt *a, const BigIntParams *params);
+void setvalue(BigInt *res, BigInt *a, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = a (truncated mod 2^p)
  */
-void setvalue(BigInt *res, int64_t a, const BigIntParams *params);
+void setvalue(BigInt *res, int64_t a, const ZModuleParams<BigTorus> *params);
 
 #endif //TFHE_BIGINT_H

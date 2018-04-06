@@ -1,7 +1,7 @@
 #ifndef TORUS_H
 #define TORUS_H
 
-#include "numeric_utils.h"
+#include "torus_utils.h"
 
 #include <cstdint>
 

@@ -67,6 +67,10 @@ struct IntPolynomial;
 template<typename TORUS>
 struct TorusPolynomial;
 
+class BigInt;
+class BigTorus;
+
+
 struct LagrangeHalfCPolynomial;
 
 // **** Platinum

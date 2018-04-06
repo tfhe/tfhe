@@ -2,12 +2,17 @@ cmake_minimum_required(VERSION 3.0)
 
 set(CORE_SRCS
         #list all .cpp and .h files here, one file per file
-        arithmetic/numeric_utils.h
+        arithmetic/torus_utils.h
+        arithmetic/torus_utils_big.h
         arithmetic/polynomial_param.h
         arithmetic/polynomial_int.h
         arithmetic/polynomial_int.cpp
+        arithmetic/polynomial_int_big.h
+        arithmetic/polynomial_int_big.cpp
         arithmetic/polynomial_torus.h
         arithmetic/polynomial_torus.cpp
+        arithmetic/polynomial_torus_big.h
+        arithmetic/polynomial_torus_big.cpp
         arithmetic/random_gen.cpp
         arithmetic/random_gen.h
         arithmetic/tfhe_core.h
@@ -23,6 +28,8 @@ set(CORE_SRCS
         arithmetic/BigInt.h
         arithmetic/BigTorus.cpp
         arithmetic/BigTorus.h
+        arithmetic/zmodule_param.h
+        arithmetic/zmodule_param.cpp
 )
 
 add_library(tfhe-core OBJECT ${CORE_SRCS})

@@ -2,22 +2,22 @@
 #include <cassert>
 #include "BigTorus.h"
 
-BigTorus::BigTorus(const BigIntParams *params, Allocator *alloc) :
+BigTorus::BigTorus(const ZModuleParams<BigTorus> *params, Allocator *alloc) :
         data(alloc->newArray<mp_limb_t>(params->max_nbLimbs)) {}
 
-void BigTorus::destroy(const BigIntParams *params, Allocator *alloc) {
+void BigTorus::destroy(const ZModuleParams<BigTorus> *params, Allocator *alloc) {
     alloc->deleteArray(params->max_nbLimbs, data);
 }
 
-void add(BigTorus *res, const BigTorus *a, const BigTorus *b, const BigIntParams *params) {
+void add(BigTorus *res, const BigTorus *a, const BigTorus *b, const ZModuleParams<BigTorus> *params) {
     mpn_add_n(res->data, a->data, b->data, params->max_nbLimbs);
 }
 
-void sub(BigTorus *res, const BigTorus *a, const BigTorus *b, const BigIntParams *params) {
+void sub(BigTorus *res, const BigTorus *a, const BigTorus *b, const ZModuleParams<BigTorus> *params) {
     mpn_sub_n(res->data, a->data, b->data, params->max_nbLimbs);
 }
 
-void mul(BigTorus *res, int64_t a, const BigTorus *b, const BigIntParams *params) {
+void mul(BigTorus *res, int64_t a, const BigTorus *b, const ZModuleParams<BigTorus> *params) {
     if (a >= 0) {
         mpn_mul_1(res->data, b->data, params->max_nbLimbs, uint64_t(a));
     } else {
@@ -26,7 +26,7 @@ void mul(BigTorus *res, int64_t a, const BigTorus *b, const BigIntParams *params
     }
 }
 
-static void mul_no_overlap(BigTorus *res, const BigInt *a, const BigTorus *b, const BigIntParams *params) {
+static void mul_no_overlap(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<BigTorus> *params) {
     assert(res != b);
     if (a->data->_mp_size > 0) { //positive
         const int m = a->data->_mp_size;
@@ -44,7 +44,7 @@ static void mul_no_overlap(BigTorus *res, const BigInt *a, const BigTorus *b, co
     }
 }
 
-void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const BigIntParams *params, Allocator alloc) {
+void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<BigTorus> *params, Allocator alloc) {
     if (res!=b) {
         mul_no_overlap(res, a, b, params);
     } else {
@@ -55,11 +55,11 @@ void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const BigIntParams *
     }
 }
 
-void neg(BigTorus *res, BigTorus *a, const BigIntParams *params) {
+void neg(BigTorus *res, BigTorus *a, const ZModuleParams<BigTorus> *params) {
     mpn_neg(res->data, a->data, params->max_nbLimbs);
 }
 
-void from_double(BigTorus *reps, const double d, const BigIntParams *params) {
+void from_double(BigTorus *reps, const double d, const ZModuleParams<BigTorus> *params) {
     //dissect the input double: extract sign, exponent, mantissa
     static constexpr uint64_t mantissa_msb = (uint64_t(1) << 52);
     static constexpr uint64_t mantissa_mask = mantissa_msb - 1;
@@ -107,11 +107,11 @@ void from_double(BigTorus *reps, const double d, const BigIntParams *params) {
     }
 }
 
-void zero(BigTorus *res, const BigIntParams *params) {
+void zero(BigTorus *res, const ZModuleParams<BigTorus> *params) {
     mpn_zero(res->data, params->max_nbLimbs);
 }
 
-void setPowHalf(BigTorus *res, const int k, const BigIntParams *params) {
+void setPowHalf(BigTorus *res, const int k, const ZModuleParams<BigTorus> *params) {
     zero(res, params);
     int idx = params->p - k;
     if (k <= 0 || idx < 0) return;
@@ -143,7 +143,7 @@ namespace {
          * @param params BigTorus parameters
          * @param alloc current allocator
          */
-        TorusMsgSpace(const uint64_t Msize, const BigIntParams *params, Allocator *alloc) :
+        TorusMsgSpace(const uint64_t Msize, const ZModuleParams<BigTorus> *params, Allocator *alloc) :
                 nbLimbs(params->max_nbLimbs),
                 Msize(Msize),
                 alloc(alloc),
@@ -198,23 +198,23 @@ namespace {
     };
 }
 
-void approxPhase(BigTorus *res, const BigTorus *phase, uint64_t Msize, BigIntParams *params, Allocator alloc) {
+void approxPhase(BigTorus *res, const BigTorus *phase, uint64_t Msize, ZModuleParams<BigTorus> *params, Allocator alloc) {
     TorusMsgSpace msgSpace(Msize, params, &alloc);
     msgSpace.roundPhase(res, phase);
 }
 
-uint64_t modSwitchFromTorus(const BigTorus *phase, uint64_t Msize, BigIntParams *params, Allocator alloc) {
+uint64_t modSwitchFromTorus(const BigTorus *phase, uint64_t Msize, ZModuleParams<BigTorus> *params, Allocator alloc) {
     TorusMsgSpace msgSpace(Msize, params, &alloc);
     return msgSpace.decrypt(phase);
 }
 
-void modSwitchToTorus(BigTorus *res, const uint64_t message, const uint64_t Msize, BigIntParams *params, Allocator alloc) {
+void modSwitchToTorus(BigTorus *res, const uint64_t message, const uint64_t Msize, ZModuleParams<BigTorus> *params, Allocator alloc) {
     const uint64_t mu = ((message % Msize)+Msize)%Msize; //between 0 and Msize-1
     TorusMsgSpace msgSpace(Msize, params, &alloc);
     msgSpace.encryptTrivial(res, mu);
 }
 
-double to_double(const BigTorus *a, const BigIntParams *params) {
+double to_double(const BigTorus *a, const ZModuleParams<BigTorus> *params) {
     // quick and dirty
     return double(int64_t(a->data[params->max_nbLimbs-1]))*pow(0.5,64);
 }
