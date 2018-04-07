@@ -1,8 +1,8 @@
 #ifndef POLYNOMIAL_PARAM_H
 #define POLYNOMIAL_PARAM_H
 
-#include "BigInt.h"
-#include "BigTorus.h"
+#include "big_int.h"
+#include "big_torus.h"
 #include "zmodule_param.h"
 
 #include <cstdint>

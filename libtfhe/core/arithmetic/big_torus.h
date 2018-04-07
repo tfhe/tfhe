@@ -3,7 +3,7 @@
 
 #include <cmath>
 #include "gmp.h"
-#include "BigInt.h"
+#include "big_int.h"
 
 /**
  * @brief big torus with fixed precision > 64 bits

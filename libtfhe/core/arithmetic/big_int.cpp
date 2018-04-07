@@ -1,4 +1,4 @@
-#include "BigInt.h"
+#include "big_int.h"
 
 BigInt::BigInt(int64_t value) {
     mpz_init_set_si(data, value);

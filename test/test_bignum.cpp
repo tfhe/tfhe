@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
-#include <core/arithmetic/BigInt.h>
+#include <core/arithmetic/big_int.h>
+#include <core/arithmetic/big_torus.h>
 #include <core/allocator/allocator.h>
-#include <core/arithmetic/BigTorus.h>
 #include <gmp.h>
 
 #include "gmpxx.h"

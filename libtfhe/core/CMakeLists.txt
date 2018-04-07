@@ -25,10 +25,10 @@ set(CORE_SRCS
         allocator/ValgrindAllocator.h
         allocator/TFHEAllocator.cpp
         allocator/TFHEAllocator.h
-        arithmetic/BigInt.cpp
-        arithmetic/BigInt.h
-        arithmetic/BigTorus.cpp
-        arithmetic/BigTorus.h
+        arithmetic/big_int.cpp
+        arithmetic/big_int.h
+        arithmetic/big_torus.cpp
+        arithmetic/big_torus.h
         arithmetic/zmodule_param.h
         arithmetic/zmodule_param.cpp
 )

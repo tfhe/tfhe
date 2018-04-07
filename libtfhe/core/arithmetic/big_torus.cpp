@@ -1,6 +1,6 @@
 #include <gmp.h>
 #include <cassert>
-#include "BigTorus.h"
+#include "big_torus.h"
 
 BigTorus::BigTorus(const ZModuleParams<BigTorus> *params, Allocator *alloc) :
         data(alloc->newArray<mp_limb_t>(params->max_nbLimbs)) {}

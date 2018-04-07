@@ -1,8 +1,8 @@
 #ifndef TORUS_UTILS_BIG_H
 #define TORUS_UTILS_BIG_H
 
-#include "BigInt.h"
-#include "BigTorus.h"
+#include "big_int.h"
+#include "big_torus.h"
 
 template<>
 class TorusUtils<BigTorus> {
