@@ -1,8 +1,7 @@
 #include "polynomial_torus.h"
-
-// #include <iostream>
-#include <cassert>
 #include "random_gen.h"
+
+#include <cassert>
 
 using namespace std;
 
@@ -10,40 +9,6 @@ using namespace std;
  * Instantiate TorusPolynomial class for available torus types
  */
 TORUS_CLASS_IMPL_ALL(TorusPolynomial);
-
-
-template<typename TORUS>
-TorusPolynomial<TORUS>::TorusPolynomial(
-    const PolynomialParams<TORUS> *params,
-    TfheThreadContext *context,
-    Allocator *alloc)
-{
-    coefs = alloc->newArray<TORUS>(params->N);
-}
-
-template<typename TORUS>
-void TorusPolynomial<TORUS>::destroy(
-    const PolynomialParams<TORUS> *params,
-    TfheThreadContext *context,
-    Allocator *alloc)
-{
-    alloc->deleteArray<TORUS>(params->N, coefs);
-}
-
-
-// TorusPolynomial = 0
-template<typename TORUS>
-void TorusPolynomial<TORUS>::Clear(
-    TorusPolynomial<TORUS> *result,
-    const PolynomialParams<TORUS> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
-    const int32_t N = params->N;
-
-    for (int32_t i = 0; i < N; ++i)
-        result->coefs[i] = 0;
-}
 
 // TorusPolynomial = random
 template<typename TORUS>
@@ -58,101 +23,6 @@ void TorusPolynomial<TORUS>::Uniform(
 
     for (int32_t i = 0; i < N; ++i)
         x[i] = RandomGenTorus<TORUS>::uniform();
-}
-
-// TorusPolynomial = TorusPolynomial
-template<typename TORUS>
-void TorusPolynomial<TORUS>::Copy(
-    TorusPolynomial<TORUS> *result,
-    const TorusPolynomial<TORUS> *sample,
-    const PolynomialParams<TORUS> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
-    assert(result != sample);
-    const int32_t N = params->N;
-    const TORUS *s = sample->coefs;
-    TORUS *r = result->coefs;
-
-    for (int32_t i = 0; i < N; ++i)
-        r[i] = s[i];
-}
-
-// TorusPolynomial + TorusPolynomial
-template<typename TORUS>
-void TorusPolynomial<TORUS>::Add(
-    TorusPolynomial<TORUS> *result,
-    const TorusPolynomial<TORUS> *poly1,
-    const TorusPolynomial<TORUS> *poly2,
-    const PolynomialParams<TORUS> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
-    const int32_t N = params->N;
-    assert(result != poly1); //if it fails here, please use addTo
-    assert(result != poly2); //if it fails here, please use addTo
-    TORUS *r = result->coefs;
-    const TORUS *a = poly1->coefs;
-    const TORUS *b = poly2->coefs;
-
-    for (int32_t i = 0; i < N; ++i)
-        r[i] = a[i] + b[i];
-}
-
-// TorusPolynomial += TorusPolynomial
-template<typename TORUS>
-void TorusPolynomial<TORUS>::AddTo(
-    TorusPolynomial<TORUS> *result,
-    const TorusPolynomial<TORUS> *poly2,
-    const PolynomialParams<TORUS> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
-    const int32_t N = params->N;
-    TORUS *r = result->coefs;
-    const TORUS *b = poly2->coefs;
-
-    for (int32_t i = 0; i < N; ++i)
-        r[i] += b[i];
-}
-
-
-// TorusPolynomial - TorusPolynomial
-template<typename TORUS>
-void TorusPolynomial<TORUS>::Sub(
-    TorusPolynomial<TORUS> *result,
-    const TorusPolynomial<TORUS> *poly1,
-    const TorusPolynomial<TORUS> *poly2,
-    const PolynomialParams<TORUS> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
-    const int32_t N = params->N;
-    assert(result != poly1); //if it fails here, please use subTo
-    assert(result != poly2); //if it fails here, please use subTo
-    TORUS *r = result->coefs;
-    const TORUS *a = poly1->coefs;
-    const TORUS *b = poly2->coefs;
-
-    for (int32_t i = 0; i < N; ++i)
-        r[i] = a[i] - b[i];
-}
-
-// TorusPolynomial -= TorusPolynomial
-template<typename TORUS>
-void TorusPolynomial<TORUS>::SubTo(
-    TorusPolynomial<TORUS> *result,
-    const TorusPolynomial<TORUS> *poly2,
-    const PolynomialParams<TORUS> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
-    const int32_t N = params->N;
-    TORUS *r = result->coefs;
-    const TORUS *b = poly2->coefs;
-
-    for (int32_t i = 0; i < N; ++i)
-        r[i] -= b[i];
 }
 
 // TorusPolynomial + p*TorusPolynomial
@@ -233,68 +103,6 @@ void TorusPolynomial<TORUS>::SubMulZTo(
         r[i] -= *p * b[i];
 }
 
-//result = (X^{a}-1)*source
-template<typename TORUS>
-void TorusPolynomial<TORUS>::MulByXaiMinusOne(
-    TorusPolynomial<TORUS> *result,
-    const int32_t a,
-    const TorusPolynomial<TORUS> *source,
-    const PolynomialParams<TORUS> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
-    const int32_t N = params->N;
-    TORUS *out = result->coefs;
-    const TORUS *in = source->coefs;
-
-    assert(a >= 0 && a < 2 * N);
-
-    if (a < N) {
-        for (int32_t i = 0; i < a; i++) // i-a < 0
-            out[i] = -in[i - a + N] - in[i];
-        for (int32_t i = a; i < N; i++) // N > i-a >= 0
-            out[i] = in[i - a] - in[i];
-    } else {
-        const int32_t aa = a - N;
-        for (int32_t i = 0; i < aa; i++)//sur que i-a<0
-            out[i] = in[i - aa + N] - in[i];
-        for (int32_t i = aa; i < N; i++)//sur que N>i-a>=0
-            out[i] = -in[i - aa] - in[i];
-    }
-}
-
-
-//result= X^{a}*source
-template<typename TORUS>
-void TorusPolynomial<TORUS>::MulByXai(
-    TorusPolynomial<TORUS> *result,
-    const int32_t a,
-    const TorusPolynomial<TORUS> *source,
-    const PolynomialParams<TORUS> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
-    const int32_t N = params->N;
-    TORUS *out = result->coefs;
-    TORUS *in = source->coefs;
-
-    assert(a >= 0 && a < 2 * N);
-    assert(result != source);
-
-    if (a < N) {
-        for (int32_t i = 0; i < a; i++)//sur que i-a<0
-            out[i] = -in[i - a + N];
-        for (int32_t i = a; i < N; i++)//sur que N>i-a>=0
-            out[i] = in[i - a];
-    } else {
-        const int32_t aa = a - N;
-        for (int32_t i = 0; i < aa; i++)//sur que i-a<0
-            out[i] = in[i - aa + N];
-        for (int32_t i = aa; i < N; i++)//sur que N>i-a>=0
-            out[i] = -in[i - aa];
-    }
-}
-
 
 // Infinity norm of the distance between two TorusPolynomial
 template<typename TORUS>
@@ -337,7 +145,7 @@ void TorusPolynomial<TORUS>::MultNaive_plain_aux(
         }
         result[i] = ri;
     }
-    
+
     for (int32_t i = N; i < _2Nm1; i++) {
         ri = 0;
         for (int32_t j = i - N + 1; j < N; j++) {
@@ -386,10 +194,10 @@ void TorusPolynomial<TORUS>::MultNaive(
     Allocator alloc)
 {
     assert(result != poly2);
-    
+
     const int32_t N = params->N;
 
-    TorusPolynomial<TORUS>::MultNaive_aux(result->coefs, poly1->coefs, 
+    TorusPolynomial<TORUS>::MultNaive_aux(result->coefs, poly1->coefs,
         poly2->coefs, N, params->zmodule_params, context, alloc);
 }
 

@@ -1,14 +1,57 @@
-#include "polynomial_common.h"
-#include "polynomial_torus.h"
-#include "polynomial_int.h"
+#include "polynomial.h"
+
+/**
+ * Instantiate Polynomial class for big torus and int types
+ */
+template struct Polynomial<BigTorus>;
+template struct Polynomial<BigInt>;
 
 
-template struct PolynomialCommon<BigInt, IntPolynomial>;
-template struct PolynomialCommon<BigTorus, TorusPolynomial>;
+/**
+ * Constructor/destructor specialization for BigTorus type
+ */
+template<>
+Polynomial<BigTorus>::Polynomial(
+    const PolynomialParams<BigTorus> *params,
+    TfheThreadContext *context,
+    Allocator *alloc)
+{
+    coefs = alloc->newArray<BigTorus>(params->N, params->zmodule_params, alloc);
+}
+
+template<>
+void Polynomial<BigTorus>::destroy(
+    const PolynomialParams<BigTorus> *params,
+    TfheThreadContext *context,
+    Allocator *alloc)
+{
+    alloc->deleteArray<BigTorus>(params->N, coefs, params->zmodule_params, alloc);
+}
+
+/**
+ * Constructor/destructor specialization for BigInt type
+ */
+template<>
+Polynomial<BigInt>::Polynomial(
+    const PolynomialParams<BigInt> *params,
+    TfheThreadContext *context,
+    Allocator *alloc)
+{
+    coefs = alloc->newArray<BigInt>(params->N);
+}
+
+template<>
+void Polynomial<BigInt>::destroy(
+    const PolynomialParams<BigInt> *params,
+    TfheThreadContext *context,
+    Allocator *alloc)
+{
+    alloc->deleteArray<BigInt>(params->N, coefs);
+}
 
 
-template<typename TYPE, template<typename> class Polynomial>
-void PolynomialCommon<TYPE,Polynomial>::Clear(
+template<typename TYPE>
+void Polynomial<TYPE>::Clear(
     Polynomial<TYPE> *result,
     const PolynomialParams<TYPE> *params,
     TfheThreadContext *context,
@@ -19,8 +62,8 @@ void PolynomialCommon<TYPE,Polynomial>::Clear(
         zero(result->coefs + i, params->zmodule_params);
 }
 
-template<typename TYPE, template<typename> class Polynomial>
-void PolynomialCommon<TYPE,Polynomial>::Copy(
+template<typename TYPE>
+void Polynomial<TYPE>::Copy(
     Polynomial<TYPE> *result,
     const Polynomial<TYPE> *source,
     const PolynomialParams<TYPE> *params,
@@ -37,8 +80,8 @@ void PolynomialCommon<TYPE,Polynomial>::Copy(
         copy(r+i, s+i, params->zmodule_params);
 }
 
-template<typename TYPE, template<typename> class Polynomial>
-void PolynomialCommon<TYPE,Polynomial>::Add(
+template<typename TYPE>
+void Polynomial<TYPE>::Add(
     Polynomial<TYPE> *result,
     const Polynomial<TYPE> *poly1,
     const Polynomial<TYPE> *poly2,
@@ -58,8 +101,8 @@ void PolynomialCommon<TYPE,Polynomial>::Add(
         add(r+i, a+i, b+i, params->zmodule_params);
 }
 
-template<typename TYPE, template<typename> class Polynomial>
-void PolynomialCommon<TYPE,Polynomial>::AddTo(
+template<typename TYPE>
+void Polynomial<TYPE>::AddTo(
     Polynomial<TYPE> *result,
     const Polynomial<TYPE> *poly,
     const PolynomialParams<TYPE> *params,
@@ -76,8 +119,8 @@ void PolynomialCommon<TYPE,Polynomial>::AddTo(
         add(r+i, r+i, s+i, params->zmodule_params);
 }
 
-template<typename TYPE, template<typename> class Polynomial>
-void PolynomialCommon<TYPE,Polynomial>::Sub(
+template<typename TYPE>
+void Polynomial<TYPE>::Sub(
     Polynomial<TYPE> *result,
     const Polynomial<TYPE> *poly1,
     const Polynomial<TYPE> *poly2,
@@ -97,8 +140,8 @@ void PolynomialCommon<TYPE,Polynomial>::Sub(
         sub(r+i, a+i, b+i, params->zmodule_params);
 }
 
-template<typename TYPE, template<typename> class Polynomial>
-void PolynomialCommon<TYPE,Polynomial>::SubTo(
+template<typename TYPE>
+void Polynomial<TYPE>::SubTo(
     Polynomial<TYPE> *result,
     const Polynomial<TYPE> *poly,
     const PolynomialParams<TYPE> *params,
@@ -115,8 +158,8 @@ void PolynomialCommon<TYPE,Polynomial>::SubTo(
         sub(r+i, r+i, s+i, params->zmodule_params);
 }
 
-template<typename TYPE, template<typename> class Polynomial>
-void PolynomialCommon<TYPE,Polynomial>::MulByXaiMinusOne(
+template<typename TYPE>
+void Polynomial<TYPE>::MulByXaiMinusOne(
     Polynomial<TYPE> *result,
     const int32_t a,
     const Polynomial<TYPE> *source,
@@ -127,7 +170,7 @@ void PolynomialCommon<TYPE,Polynomial>::MulByXaiMinusOne(
     const int32_t N = params->N;
     TYPE *out = result->coefs;
     const TYPE *in = source->coefs;
-    const auto *zparams = 
+    const auto *zparams =
         params->zmodule_params;
 
     assert(a >= 0 && a < 2 * N);
@@ -161,11 +204,11 @@ void PolynomialCommon<TYPE,Polynomial>::MulByXaiMinusOne(
             neg(out+i, out+i, zparams);
             sub(out+i, out+i, in+i, zparams);
         }
-    } 
+    }
 }
 
-template<typename TYPE, template<typename> class Polynomial>
-void PolynomialCommon<TYPE, Polynomial>::MulByXai(
+template<typename TYPE>
+void Polynomial<TYPE>::MulByXai(
     Polynomial<TYPE> *result,
     const int32_t a,
     const Polynomial<TYPE> *source,
@@ -176,7 +219,7 @@ void PolynomialCommon<TYPE, Polynomial>::MulByXai(
     const int32_t N = params->N;
     TYPE *out = result->coefs;
     const TYPE *in = source->coefs;
-    const auto *zparams = 
+    const auto *zparams =
         params->zmodule_params;
 
     assert(a >= 0 && a < 2 * N);

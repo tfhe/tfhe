@@ -3,13 +3,14 @@
 
 #include "BigInt.h"
 #include "BigTorus.h"
+#include "zmodule_param.h"
 
 #include <cstdint>
 #include <type_traits>
 
 /**
  * @brief Polynomial parameters class
- * 
+ *
  * @tparam COEF_TYPE polynomial coefficient type
  */
 template<typename COEF_TYPE>

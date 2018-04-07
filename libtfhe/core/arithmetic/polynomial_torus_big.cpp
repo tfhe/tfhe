@@ -1,44 +1,11 @@
 #include "polynomial_torus.h"
-#include "polynomial_common.h"
 
 #include <cassert>
-
 
 /**
  * Instantiate TorusPolynomial class for big torus type
  */
-template class TorusPolynomial<BigTorus>;
-
-template<>
-TorusPolynomial<BigTorus>::TorusPolynomial(
-    const PolynomialParams<BigTorus> *params,
-    TfheThreadContext *context,
-    Allocator *alloc)
-{
-    coefs = alloc->newArray<BigTorus>(params->N, params->zmodule_params, alloc);
-}
-
-template<>
-void TorusPolynomial<BigTorus>::destroy(
-    const PolynomialParams<BigTorus> *params,
-    TfheThreadContext *context,
-    Allocator *alloc)
-{
-    alloc->deleteArray<BigTorus>(params->N, coefs, params->zmodule_params, alloc);
-}
-
-
-// TorusPolynomial = 0
-template<>
-void TorusPolynomial<BigTorus>::Clear(
-    TorusPolynomial<BigTorus> *result,
-    const PolynomialParams<BigTorus> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
-    PolynomialCommon<BigTorus, TorusPolynomial>::Clear(
-        result, params, context, alloc);
-}
+template struct TorusPolynomial<BigTorus>;
 
 // TorusPolynomial = random
 template<>
@@ -53,74 +20,6 @@ void TorusPolynomial<BigTorus>::Uniform(
 
     // for (int32_t i = 0; i < N; ++i)
     //     x[i] = RandomGenTorus<BigTorus>::uniform();
-}
-
-// TorusPolynomial = TorusPolynomial
-template<>
-void TorusPolynomial<BigTorus>::Copy(
-    TorusPolynomial<BigTorus> *result,
-    const TorusPolynomial<BigTorus> *source,
-    const PolynomialParams<BigTorus> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
-    PolynomialCommon<BigTorus, TorusPolynomial>::Copy(
-        result, source, params, context, alloc);
-}
-
-// TorusPolynomial + TorusPolynomial
-template<>
-void TorusPolynomial<BigTorus>::Add(
-    TorusPolynomial<BigTorus> *result,
-    const TorusPolynomial<BigTorus> *poly1,
-    const TorusPolynomial<BigTorus> *poly2,
-    const PolynomialParams<BigTorus> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
-    PolynomialCommon<BigTorus, TorusPolynomial>::Add(
-        result, poly1, poly2, params, context, alloc);
-}
-
-// TorusPolynomial += TorusPolynomial
-template<>
-void TorusPolynomial<BigTorus>::AddTo(
-    TorusPolynomial<BigTorus> *result,
-    const TorusPolynomial<BigTorus> *poly,
-    const PolynomialParams<BigTorus> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
-    PolynomialCommon<BigTorus, TorusPolynomial>::AddTo(
-        result, poly, params, context, alloc);
-}
-
-
-// TorusPolynomial - TorusPolynomial
-template<>
-void TorusPolynomial<BigTorus>::Sub(
-    TorusPolynomial<BigTorus> *result,
-    const TorusPolynomial<BigTorus> *poly1,
-    const TorusPolynomial<BigTorus> *poly2,
-    const PolynomialParams<BigTorus> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
-    PolynomialCommon<BigTorus, TorusPolynomial>::Sub(
-        result, poly1, poly2, params, context, alloc);
-}
-
-// TorusPolynomial -= TorusPolynomial
-template<>
-void TorusPolynomial<BigTorus>::SubTo(
-    TorusPolynomial<BigTorus> *result,
-    const TorusPolynomial<BigTorus> *poly,
-    const PolynomialParams<BigTorus> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
-    PolynomialCommon<BigTorus, TorusPolynomial>::SubTo(
-        result, poly, params, context, alloc);
 }
 
 // TorusPolynomial + p*TorusPolynomial
@@ -139,7 +38,7 @@ void TorusPolynomial<BigTorus>::AddMulZ(
     BigTorus *r = result->coefs;
     const BigTorus *a = poly1->coefs;
     const BigTorus *b = poly2->coefs;
-    const ZModuleParams<BigTorus> *zparams = 
+    const ZModuleParams<BigTorus> *zparams =
         params->zmodule_params;
 
     BigTorus *t = alloc.newObject<BigTorus>(zparams, &alloc);
@@ -179,7 +78,7 @@ void TorusPolynomial<BigTorus>::SubMulZ(
     BigTorus *r = result->coefs;
     const BigTorus *a = poly1->coefs;
     const BigTorus *b = poly2->coefs;
-    const ZModuleParams<BigTorus> *zparams = 
+    const ZModuleParams<BigTorus> *zparams =
         params->zmodule_params;
 
     BigTorus *t = alloc.newObject<BigTorus>(zparams, &alloc);
@@ -202,36 +101,6 @@ void TorusPolynomial<BigTorus>::SubMulZTo(
 {
     TorusPolynomial<BigTorus>::SubMulZ(result, result, p, poly2, params, context, alloc);
 }
-
-//result = (X^{a}-1)*source
-template<>
-void TorusPolynomial<BigTorus>::MulByXaiMinusOne(
-    TorusPolynomial<BigTorus> *result,
-    const int32_t a,
-    const TorusPolynomial<BigTorus> *source,
-    const PolynomialParams<BigTorus> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
-    PolynomialCommon<BigTorus, TorusPolynomial>::MulByXaiMinusOne(
-        result, a, source, params, context, alloc);
-}
-
-
-//result= X^{a}*source
-template<>
-void TorusPolynomial<BigTorus>::MulByXai(
-    TorusPolynomial<BigTorus> *result,
-    const int32_t a,
-    const TorusPolynomial<BigTorus> *source,
-    const PolynomialParams<BigTorus> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
-    PolynomialCommon<BigTorus, TorusPolynomial>::MulByXai(
-        result, a, source, params, context, alloc);
-}
-
 
 // Infinity norm of the distance between two TorusPolynomial
 template<>
@@ -276,7 +145,7 @@ void TorusPolynomial<BigTorus>::MultNaive_plain_aux(
             add(ri, ri, ti, zparams);
         }
     }
-    
+
     for (int32_t i = N; i < _2Nm1; i++) {
         BigTorus *ri = result+i;
         zero(ri, zparams);
@@ -329,13 +198,13 @@ void TorusPolynomial<BigTorus>::MultNaive(
     Allocator alloc)
 {
     assert(result != poly2);
-    
+
     const int32_t N = params->N;
 
-    TorusPolynomial<BigTorus>::MultNaive_aux(result->coefs, poly1->coefs, 
+    TorusPolynomial<BigTorus>::MultNaive_aux(result->coefs, poly1->coefs,
         poly2->coefs, N, params->zmodule_params, context, alloc);
 }
-// 
+//
 /**
  * This function multiplies 2 polynomials (an integer poly and a torus poly) by using Karatsuba
  * The karatsuba function is torusPolynomialMultKaratsuba: it takes in input two polynomials and multiplies them

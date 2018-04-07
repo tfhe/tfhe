@@ -5,8 +5,9 @@ set(CORE_SRCS
         arithmetic/torus_utils.h
         arithmetic/torus_utils_big.h
         arithmetic/polynomial_param.h
-        arithmetic/polynomial_common.h
-        arithmetic/polynomial_common_big.cpp
+        arithmetic/polynomial.h
+        arithmetic/polynomial.cpp
+        arithmetic/polynomial_big.cpp
         arithmetic/polynomial_int.h
         arithmetic/polynomial_int.cpp
         arithmetic/polynomial_int_big.cpp
