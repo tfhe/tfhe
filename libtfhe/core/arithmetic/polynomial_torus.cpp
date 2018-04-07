@@ -6,9 +6,15 @@
 
 using namespace std;
 
+/**
+ * Instantiate TorusPolynomial class for available torus types
+ */
+TORUS_CLASS_IMPL_ALL(TorusPolynomial);
+
+
 template<typename TORUS>
 TorusPolynomial<TORUS>::TorusPolynomial(
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator *alloc)
 {
@@ -17,7 +23,7 @@ TorusPolynomial<TORUS>::TorusPolynomial(
 
 template<typename TORUS>
 void TorusPolynomial<TORUS>::destroy(
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator *alloc)
 {
@@ -29,7 +35,7 @@ void TorusPolynomial<TORUS>::destroy(
 template<typename TORUS>
 void TorusPolynomial<TORUS>::Clear(
     TorusPolynomial<TORUS> *result,
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -43,7 +49,7 @@ void TorusPolynomial<TORUS>::Clear(
 template<typename TORUS>
 void TorusPolynomial<TORUS>::Uniform(
     TorusPolynomial<TORUS> *result,
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -59,7 +65,7 @@ template<typename TORUS>
 void TorusPolynomial<TORUS>::Copy(
     TorusPolynomial<TORUS> *result,
     const TorusPolynomial<TORUS> *sample,
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -78,7 +84,7 @@ void TorusPolynomial<TORUS>::Add(
     TorusPolynomial<TORUS> *result,
     const TorusPolynomial<TORUS> *poly1,
     const TorusPolynomial<TORUS> *poly2,
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -98,7 +104,7 @@ template<typename TORUS>
 void TorusPolynomial<TORUS>::AddTo(
     TorusPolynomial<TORUS> *result,
     const TorusPolynomial<TORUS> *poly2,
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -117,7 +123,7 @@ void TorusPolynomial<TORUS>::Sub(
     TorusPolynomial<TORUS> *result,
     const TorusPolynomial<TORUS> *poly1,
     const TorusPolynomial<TORUS> *poly2,
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -137,7 +143,7 @@ template<typename TORUS>
 void TorusPolynomial<TORUS>::SubTo(
     TorusPolynomial<TORUS> *result,
     const TorusPolynomial<TORUS> *poly2,
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -154,9 +160,9 @@ template<typename TORUS>
 void TorusPolynomial<TORUS>::AddMulZ(
     TorusPolynomial<TORUS> *result,
     const TorusPolynomial<TORUS> *poly1,
-    const INT_TYPE p,
+    const INT_TYPE *p,
     const TorusPolynomial<TORUS> *poly2,
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -167,16 +173,16 @@ void TorusPolynomial<TORUS>::AddMulZ(
     const TORUS *b = poly2->coefs;
 
     for (int32_t i = 0; i < N; ++i)
-        r[i] = a[i] + p * b[i];
+        r[i] = a[i] + *p * b[i];
 }
 
 // TorusPolynomial += p*TorusPolynomial
 template<typename TORUS>
 void TorusPolynomial<TORUS>::AddMulZTo(
     TorusPolynomial<TORUS> *result,
-    const INT_TYPE p,
+    const INT_TYPE *p,
     const TorusPolynomial<TORUS> *poly2,
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -185,7 +191,7 @@ void TorusPolynomial<TORUS>::AddMulZTo(
     const TORUS *b = poly2->coefs;
 
     for (int32_t i = 0; i < N; ++i)
-        r[i] += p * b[i];
+        r[i] += *p * b[i];
 }
 
 // TorusPolynomial - p*TorusPolynomial
@@ -193,9 +199,9 @@ template<typename TORUS>
 void TorusPolynomial<TORUS>::SubMulZ(
     TorusPolynomial<TORUS> *result,
     const TorusPolynomial<TORUS> *poly1,
-    const INT_TYPE p,
+    const INT_TYPE *p,
     const TorusPolynomial<TORUS> *poly2,
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -206,16 +212,16 @@ void TorusPolynomial<TORUS>::SubMulZ(
     const TORUS *b = poly2->coefs;
 
     for (int32_t i = 0; i < N; ++i)
-        r[i] = a[i] - p * b[i];
+        r[i] = a[i] - *p * b[i];
 }
 
 // TorusPolynomial -= p*TorusPolynomial
 template<typename TORUS>
 void TorusPolynomial<TORUS>::SubMulZTo(
     TorusPolynomial<TORUS> *result,
-    const INT_TYPE p,
+    const INT_TYPE *p,
     const TorusPolynomial<TORUS> *poly2,
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -224,22 +230,22 @@ void TorusPolynomial<TORUS>::SubMulZTo(
     const TORUS *b = poly2->coefs;
 
     for (int32_t i = 0; i < N; ++i)
-        r[i] -= p * b[i];
+        r[i] -= *p * b[i];
 }
 
 //result = (X^{a}-1)*source
 template<typename TORUS>
 void TorusPolynomial<TORUS>::MulByXaiMinusOne(
     TorusPolynomial<TORUS> *result,
-    const INT_TYPE a,
+    const int32_t a,
     const TorusPolynomial<TORUS> *source,
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
     const int32_t N = params->N;
     TORUS *out = result->coefs;
-    TORUS *in = source->coefs;
+    const TORUS *in = source->coefs;
 
     assert(a >= 0 && a < 2 * N);
 
@@ -262,9 +268,9 @@ void TorusPolynomial<TORUS>::MulByXaiMinusOne(
 template<typename TORUS>
 void TorusPolynomial<TORUS>::MulByXai(
     TorusPolynomial<TORUS> *result,
-    const INT_TYPE a,
+    const int32_t a,
     const TorusPolynomial<TORUS> *source,
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -295,7 +301,7 @@ template<typename TORUS>
 double TorusPolynomial<TORUS>::NormInftyDist(
     const TorusPolynomial<TORUS> *poly1,
     const TorusPolynomial<TORUS> *poly2,
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -317,6 +323,7 @@ void TorusPolynomial<TORUS>::MultNaive_plain_aux(
     const INT_TYPE *__restrict poly1,
     const TORUS *__restrict poly2,
     const int32_t N,
+    const ZModuleParams<TORUS> *zparams,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -346,6 +353,7 @@ void TorusPolynomial<TORUS>::MultNaive_aux(
     const INT_TYPE *__restrict poly1,
     const TORUS *__restrict poly2,
     const int32_t N,
+    const ZModuleParams<TORUS> *zparams,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -373,7 +381,7 @@ void TorusPolynomial<TORUS>::MultNaive(
     TorusPolynomial<TORUS> *result,
     const IntPolynomial<INT_TYPE> *poly1,
     const TorusPolynomial<TORUS> *poly2,
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -382,7 +390,7 @@ void TorusPolynomial<TORUS>::MultNaive(
     const int32_t N = params->N;
 
     TorusPolynomial<TORUS>::MultNaive_aux(result->coefs, poly1->coefs, 
-        poly2->coefs, N, context, alloc);
+        poly2->coefs, N, params->zmodule_params, context, alloc);
 }
 
 /**
@@ -401,6 +409,7 @@ void TorusPolynomial<TORUS>::Karatsuba_aux(
     const TORUS *B,
     const int32_t size,
     const char *buf,
+    const ZModuleParams<TORUS> *zparams,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -411,7 +420,7 @@ void TorusPolynomial<TORUS>::Karatsuba_aux(
     //it seems to be optimal
     if (h <= 4)
     {
-        TorusPolynomial<TORUS>::MultNaive_plain_aux(R, A, B, size, context, alloc);
+        TorusPolynomial<TORUS>::MultNaive_plain_aux(R, A, B, size, zparams, context, alloc);
         return;
     }
 
@@ -430,10 +439,10 @@ void TorusPolynomial<TORUS>::Karatsuba_aux(
         Btemp[i] = B[i] + B[h + i];
 
     // Karatsuba recursivly
-    Karatsuba_aux(R, A, B, h, buf, context, alloc); // (R[0],R[2*h-2]), (A[0],A[h-1]), (B[0],B[h-1])
-    Karatsuba_aux(R + size, A + h, B + h, h, buf, context,
+    Karatsuba_aux(R, A, B, h, buf, zparams, context, alloc); // (R[0],R[2*h-2]), (A[0],A[h-1]), (B[0],B[h-1])
+    Karatsuba_aux(R + size, A + h, B + h, h, buf, zparams, context,
                   alloc); // (R[2*h],R[4*h-2]), (A[h],A[2*h-1]), (B[h],B[2*h-1])
-    Karatsuba_aux(Rtemp, Atemp, Btemp, h, buf, context, alloc);
+    Karatsuba_aux(Rtemp, Atemp, Btemp, h, buf, zparams, context, alloc);
     R[sm1] = 0; //this one needs to be copy manually
     for (int32_t i = 0; i < sm1; ++i)
         Rtemp[i] -= R[i] + R[size + i];
@@ -448,7 +457,7 @@ void TorusPolynomial<TORUS>::MultKaratsuba(
     TorusPolynomial<TORUS> *result,
     const IntPolynomial<INT_TYPE> *poly1,
     const TorusPolynomial<TORUS> *poly2,
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -457,7 +466,7 @@ void TorusPolynomial<TORUS>::MultKaratsuba(
     char *buf = new char[4 * N * sizeof(TORUS)]; //that's large enough to store every tmp variables (2*2*N*4) TODO: see if there is unused memory (before generic torus byte cnt was 16*N)
 
     // Karatsuba
-    Karatsuba_aux(R, poly1->coefs, poly2->coefs, N, buf, context, alloc);
+    Karatsuba_aux(R, poly1->coefs, poly2->coefs, N, buf, params->zmodule_params, context, alloc);
 
     // reduction mod X^N+1
     for (int32_t i = 0; i < N - 1; ++i)
@@ -474,7 +483,7 @@ void TorusPolynomial<TORUS>::AddMulRKaratsuba(
     TorusPolynomial<TORUS> *result,
     const IntPolynomial<INT_TYPE> *poly1,
     const TorusPolynomial<TORUS> *poly2,
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -483,7 +492,7 @@ void TorusPolynomial<TORUS>::AddMulRKaratsuba(
     char *buf = new char[16 * N]; //that's large enough to store every tmp variables (2*2*N*4)
 
     // Karatsuba
-    Karatsuba_aux(R, poly1->coefs, poly2->coefs, N, buf, context, alloc);
+    Karatsuba_aux(R, poly1->coefs, poly2->coefs, N, buf, params->zmodule_params, context, alloc);
 
     // reduction mod X^N+1
     for (int32_t i = 0; i < N - 1; ++i)
@@ -500,7 +509,7 @@ void TorusPolynomial<TORUS>::SubMulRKaratsuba(
     TorusPolynomial<TORUS> *result,
     const IntPolynomial<INT_TYPE> *poly1,
     const TorusPolynomial<TORUS> *poly2,
-    const PolynomialParameters<TORUS> *params,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -509,7 +518,7 @@ void TorusPolynomial<TORUS>::SubMulRKaratsuba(
     char *buf = new char[16 * N]; //that's large enough to store every tmp variables (2*2*N*4)
 
     // Karatsuba
-    Karatsuba_aux(R, poly1->coefs, poly2->coefs, N, buf, context, alloc);
+    Karatsuba_aux(R, poly1->coefs, poly2->coefs, N, buf, params->zmodule_params, context, alloc);
 
     // reduction mod X^N+1
     for (int32_t i = 0; i < N - 1; ++i)
@@ -519,4 +528,3 @@ void TorusPolynomial<TORUS>::SubMulRKaratsuba(
     delete[] R;
     delete[] buf;
 }
-

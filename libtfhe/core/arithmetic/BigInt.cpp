@@ -18,6 +18,14 @@ void clamp2p(BigInt *res, const ZModuleParams<BigTorus> *params) {
     }
 }
 
+void zero(BigInt *res, const ZModuleParams<BigTorus> *params) {
+    setvalue(res, (int64_t)0, params);
+}
+
+void copy(BigInt *res, const BigInt* src, const ZModuleParams<BigTorus> *params) {
+    setvalue(res, src, params);
+}
+
 void add(BigInt *res, const BigInt *a, const BigInt *b, const ZModuleParams<BigTorus> *params) {
     mpz_add(res->data, a->data, b->data);
     clamp2p(res, params);
@@ -79,10 +87,10 @@ void neg(BigInt *res, int64_t a, const ZModuleParams<BigTorus> *params) {
     mpz_set_si(res->data, -a);
 }
 
-void setvalue(BigInt *res, BigInt *a, const ZModuleParams<BigTorus> *params) {
+void setvalue(BigInt *res, const BigInt *a, const ZModuleParams<BigTorus> *params) {
     mpz_set(res->data, a->data);
 }
 
-void setvalue(BigInt *res, int64_t a, const ZModuleParams<BigTorus> *params) {
+void setvalue(BigInt *res, const int64_t a, const ZModuleParams<BigTorus> *params) {
     mpz_set_si(res->data, a);
 }

@@ -1,106 +1,102 @@
-#include "polynomial_int_big.h"
+#include "polynomial_int.h"
+#include "polynomial_common.h"
 
+#include <cassert>
+
+/**
+ * Instantiate IntPolynomial class for big int type
+ */
+template class IntPolynomial<BigInt>;
 
 template<>
 IntPolynomial<BigInt>::IntPolynomial(
-    const PolynomialParameters<BigInt> *params,
+    const PolynomialParams<BigInt> *params,
     TfheThreadContext *context,
     Allocator *alloc)
 {
-    // coefs = alloc->newArray<BigInt>(params->N);
+    coefs = alloc->newArray<BigInt>(params->N);
 }
 
 template<>
 void IntPolynomial<BigInt>::destroy(
-    const PolynomialParameters<BigInt> *params,
+    const PolynomialParams<BigInt> *params,
     TfheThreadContext *context,
     Allocator *alloc)
 {
-    // alloc->deleteArray<BigInt>(params->N, coefs);
+    alloc->deleteArray<BigInt>(params->N, coefs);
 }
-
 
 // Sets to zero
 template<>
 void IntPolynomial<BigInt>::Clear(
-    IntPolynomial<BigInt> *poly,
-    const PolynomialParameters<BigInt> *params,
+    IntPolynomial<BigInt> *result,
+    const PolynomialParams<BigInt> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
-    // const int32_t N = params->N;
-    // for (int32_t i = 0; i < N; ++i)
-    //     poly->coefs[i] = 0;
+    PolynomialCommon<BigInt, IntPolynomial>::Clear(
+        result, params, context, alloc);
 }
-
-
 
 // copy
 template<>
 void IntPolynomial<BigInt>::Copy(
     IntPolynomial<BigInt> *result,
     const IntPolynomial<BigInt> *source,
-    const PolynomialParameters<BigInt> *params,
+    const PolynomialParams<BigInt> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
-    // const int32_t N = params->N;
-    // assert(result != source);
-
-    // for (int32_t i = 0; i < N; ++i)
-    //     result->coefs[i] = source->coefs[i];
+    PolynomialCommon<BigInt, IntPolynomial>::Copy(
+        result, source, params, context, alloc);
 }
 
-// accum += source
+// result += poly
 template<>
 void IntPolynomial<BigInt>::AddTo(
-    IntPolynomial<BigInt> *accum,
-    const IntPolynomial<BigInt> *source,
-    const PolynomialParameters<BigInt> *params,
+    IntPolynomial<BigInt> *result,
+    const IntPolynomial<BigInt> *poly,
+    const PolynomialParams<BigInt> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
-    // const int32_t N = params->N;
-
-    // for (int32_t i = 0; i < N; ++i)
-    //     accum->coefs[i] += source->coefs[i];
+    PolynomialCommon<BigInt, IntPolynomial>::AddTo(
+        result, poly, params, context, alloc);
 }
 
 // result = (X^ai-1) * source
 template<>
 void IntPolynomial<BigInt>::MulByXaiMinusOne(
     IntPolynomial<BigInt> *result,
-    const BigInt ai,
+    const int32_t a,
     const IntPolynomial<BigInt> *source,
-    const PolynomialParameters<BigInt> *params,
+    const PolynomialParams<BigInt> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
-    // const int32_t N = params->N;
-    // BigInt *out = result->coefs;
-    // BigInt *in = source->coefs;
+    PolynomialCommon<BigInt, IntPolynomial>::MulByXaiMinusOne(
+        result, a, source, params, context, alloc);
+}
 
-    // assert(ai >= 0 && ai < 2 * N);
-
-    // if (ai < N) {
-    //     for (int32_t i = 0; i < ai; i++)//sur que i-a<0
-    //         out[i] = -in[i - ai + N] - in[i];
-    //     for (int32_t i = ai; i < N; i++)//sur que N>i-a>=0
-    //         out[i] = in[i - ai] - in[i];
-    // } else {
-    //     const int32_t aa = ai - N;
-    //     for (int32_t i = 0; i < aa; i++)//sur que i-a<0
-    //         out[i] = in[i - aa + N] - in[i];
-    //     for (int32_t i = aa; i < N; i++)//sur que N>i-a>=0
-    //         out[i] = -in[i - aa] - in[i];
-    // }
+// result = (X^ai) * source
+template<>
+void IntPolynomial<BigInt>::MulByXai(
+    IntPolynomial<BigInt> *result,
+    const int32_t a,
+    const IntPolynomial<BigInt> *source,
+    const PolynomialParams<BigInt> *params,
+    TfheThreadContext *context,
+    Allocator alloc)
+{
+    PolynomialCommon<BigInt, IntPolynomial>::MulByXai(
+        result, a, source, params, context, alloc);
 }
 
 // Euclidean norm of an IntPolynomial
 template<>
 double IntPolynomial<BigInt>::Norm2sq(
     const IntPolynomial<BigInt> *poly,
-    const PolynomialParameters<BigInt> *params,
+    const PolynomialParams<BigInt> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -120,7 +116,7 @@ template<>
 double IntPolynomial<BigInt>::NormInftyDist(
     const IntPolynomial<BigInt> *poly1,
     const IntPolynomial<BigInt> *poly2,
-    const PolynomialParameters<BigInt> *params,
+    const PolynomialParams<BigInt> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -135,5 +131,3 @@ double IntPolynomial<BigInt>::NormInftyDist(
     // return norm;
     return 0;
 }
-
-

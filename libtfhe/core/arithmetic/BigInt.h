@@ -38,6 +38,16 @@ public:
 void clamp2p(BigInt *res, const ZModuleParams<BigTorus> *params);
 
 /**
+ * @brief res = 0
+ */
+void zero(BigInt *res, const ZModuleParams<BigTorus> *params);
+
+/**
+ * @brief res = src
+ */
+void copy(BigInt *res, const BigInt* src, const ZModuleParams<BigTorus> *params);
+
+/**
  * @brief res = a + b (truncated mod 2^p)
  */
 void add(BigInt *res, const BigInt *a, const BigInt *b, const ZModuleParams<BigTorus> *params);
@@ -95,11 +105,11 @@ void neg(BigInt *res, int64_t a, const ZModuleParams<BigTorus> *params);
 /**
  * @brief res = a (truncated mod 2^p)
  */
-void setvalue(BigInt *res, BigInt *a, const ZModuleParams<BigTorus> *params);
+void setvalue(BigInt *res, const BigInt *a, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = a (truncated mod 2^p)
  */
-void setvalue(BigInt *res, int64_t a, const ZModuleParams<BigTorus> *params);
+void setvalue(BigInt *res, const int64_t a, const ZModuleParams<BigTorus> *params);
 
 #endif //TFHE_BIGINT_H

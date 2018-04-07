@@ -49,13 +49,13 @@ void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<
         mul_no_overlap(res, a, b, params);
     } else {
         BigTorus* tmp = alloc.newObject<BigTorus>(params, &alloc);
-        mpn_copyi(tmp->data, b->data, params->max_nbLimbs);
+        copy(tmp, b, params);
         mul_no_overlap(res, a, tmp, params);
         alloc.deleteObject(tmp, params, &alloc);
     }
 }
 
-void neg(BigTorus *res, BigTorus *a, const ZModuleParams<BigTorus> *params) {
+void neg(BigTorus *res, const BigTorus *a, const ZModuleParams<BigTorus> *params) {
     mpn_neg(res->data, a->data, params->max_nbLimbs);
 }
 
@@ -109,6 +109,10 @@ void from_double(BigTorus *reps, const double d, const ZModuleParams<BigTorus> *
 
 void zero(BigTorus *res, const ZModuleParams<BigTorus> *params) {
     mpn_zero(res->data, params->max_nbLimbs);
+}
+
+void copy(BigTorus *res, const BigTorus* src, const ZModuleParams<BigTorus> *params) {
+    mpn_copyi(res->data, src->data, params->max_nbLimbs);
 }
 
 void setPowHalf(BigTorus *res, const int k, const ZModuleParams<BigTorus> *params) {
@@ -218,3 +222,4 @@ double to_double(const BigTorus *a, const ZModuleParams<BigTorus> *params) {
     // quick and dirty
     return double(int64_t(a->data[params->max_nbLimbs-1]))*pow(0.5,64);
 }
+

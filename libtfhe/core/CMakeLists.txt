@@ -5,13 +5,13 @@ set(CORE_SRCS
         arithmetic/torus_utils.h
         arithmetic/torus_utils_big.h
         arithmetic/polynomial_param.h
+        arithmetic/polynomial_common.h
+        arithmetic/polynomial_common_big.cpp
         arithmetic/polynomial_int.h
         arithmetic/polynomial_int.cpp
-        arithmetic/polynomial_int_big.h
         arithmetic/polynomial_int_big.cpp
         arithmetic/polynomial_torus.h
         arithmetic/polynomial_torus.cpp
-        arithmetic/polynomial_torus_big.h
         arithmetic/polynomial_torus_big.cpp
         arithmetic/random_gen.cpp
         arithmetic/random_gen.h

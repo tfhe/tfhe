@@ -27,7 +27,7 @@ public:
      * @param context thread execution context
      * @param alloc allocator to use
      */
-    IntPolynomial(const PolynomialParameters<INT_TYPE> *params,
+    IntPolynomial(const PolynomialParams<INT_TYPE> *params,
         TfheThreadContext *context,
         Allocator *alloc);
 
@@ -38,7 +38,7 @@ public:
      * @param context thread execution context
      * @param alloc allocator to use
      */
-    void destroy(const PolynomialParameters<INT_TYPE> *params,
+    void destroy(const PolynomialParams<INT_TYPE> *params,
         TfheThreadContext *context,
         Allocator *alloc);
 
@@ -50,49 +50,52 @@ public:
 public:
 
     static void Clear(IntPolynomial<INT_TYPE> *result,
-        const PolynomialParameters<INT_TYPE> *params,
+        const PolynomialParams<INT_TYPE> *params,
         TfheThreadContext *context,
         Allocator alloc);
 
     /**  result = source */
     static void Copy(IntPolynomial<INT_TYPE> *result,
         const IntPolynomial<INT_TYPE> *source,
-        const PolynomialParameters<INT_TYPE> *params,
+        const PolynomialParams<INT_TYPE> *params,
         TfheThreadContext *context,
         Allocator alloc);
 
     /**  result += poly1 */
     static void AddTo(IntPolynomial<INT_TYPE> *result,
         const IntPolynomial<INT_TYPE> *poly1,
-        const PolynomialParameters<INT_TYPE> *params,
+        const PolynomialParams<INT_TYPE> *params,
         TfheThreadContext *context,
         Allocator alloc);
 
     /**  result = (X^ai-1) * source */
     static void MulByXaiMinusOne(IntPolynomial<INT_TYPE> *result,
-        const INT_TYPE ai,
+        const int32_t ai,
         const IntPolynomial<INT_TYPE> *source,
-        const PolynomialParameters<INT_TYPE> *params,
+        const PolynomialParams<INT_TYPE> *params,
+        TfheThreadContext *context,
+        Allocator alloc);
+
+    /**  result = (X^ai) * source */
+    static void MulByXai(IntPolynomial<INT_TYPE> *result,
+        const int32_t ai,
+        const IntPolynomial<INT_TYPE> *source,
+        const PolynomialParams<INT_TYPE> *params,
         TfheThreadContext *context,
         Allocator alloc);
 
     /** Euclidean norm of an Integer Polynomial */
     static double Norm2sq(const IntPolynomial<INT_TYPE> *poly,
-        const PolynomialParameters<INT_TYPE> *params,
+        const PolynomialParams<INT_TYPE> *params,
         TfheThreadContext *context,
         Allocator alloc);
 
     /** Infinity norm of the distance between two integer polynomials */
     static double NormInftyDist(const IntPolynomial<INT_TYPE> *poly1,
         const IntPolynomial<INT_TYPE> *poly2,
-        const PolynomialParameters<INT_TYPE> *params,
+        const PolynomialParams<INT_TYPE> *params,
         TfheThreadContext *context,
         Allocator alloc);
 };
-
-/**
- * Instantiate IntPolynomial class for available int types
- */
-INT_CLASS_IMPL_ALL(IntPolynomial);
 
 #endif // POLYNOMIAL_INT_H

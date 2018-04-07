@@ -30,6 +30,11 @@ public:
 void zero(BigTorus *res, const ZModuleParams<BigTorus> *params);
 
 /**
+ * @brief res = src
+ */
+void copy(BigTorus *res, const BigTorus* src, const ZModuleParams<BigTorus> *params);
+
+/**
  * @brief res = 2^-k
  */
 void setPowHalf(BigTorus *res, const int k, const ZModuleParams<BigTorus> *params);
@@ -58,7 +63,7 @@ void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<
 /**
  * @brief res = -a
  */
-void neg(BigTorus *res, BigTorus *a, const ZModuleParams<BigTorus> *params);
+void neg(BigTorus *res, const BigTorus *a, const ZModuleParams<BigTorus> *params);
 
 
 /**
