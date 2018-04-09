@@ -18,21 +18,21 @@ typedef int64_t Torus64;
 /**
  * @brief Macro for instantiating a template class with at least one parameter
  */
-#define CLASS_IMPL(C,T,...)\
+#define EXPLICIT_INSTANTIATE_CLASS(C,T,...)\
     template class C<T,##__VA_ARGS__>;
 
 /**
  * @brief Macro for instantiating a template class for all available torus types
  */
-#define TORUS_CLASS_IMPL_ALL(C,...)\
-    CLASS_IMPL(C, Torus32, ##__VA_ARGS__);\
-    CLASS_IMPL(C, Torus64, ##__VA_ARGS__);
+#define EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(C,...)\
+    EXPLICIT_INSTANTIATE_CLASS(C, Torus32, ##__VA_ARGS__);\
+    EXPLICIT_INSTANTIATE_CLASS(C, Torus64, ##__VA_ARGS__);
 
 /**
  * @brief Macro for instantiating a template class for all available torus types integer equivalents
  */
-#define INT_CLASS_IMPL_ALL(C,...)\
-    CLASS_IMPL(C, TorusUtils<Torus32>::INT_TYPE, ##__VA_ARGS__);\
-    CLASS_IMPL(C, TorusUtils<Torus64>::INT_TYPE, ##__VA_ARGS__);
+#define EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_INT(C,...)\
+    EXPLICIT_INSTANTIATE_CLASS(C, TorusUtils<Torus32>::INT_TYPE, ##__VA_ARGS__);\
+    EXPLICIT_INSTANTIATE_CLASS(C, TorusUtils<Torus64>::INT_TYPE, ##__VA_ARGS__);
 
 #endif

@@ -61,6 +61,17 @@ public:
     static void modSwitchToTorus(TORUS *res, const uint64_t mu, const uint64_t Msize, const ZModuleParams<TORUS> *params, Allocator alloc) {
         modSwitchToTorus(res, mu, Msize, params, alloc);
     }
+
+    /**
+     * @brief Return infinity norm between 2 torus elements
+     *
+     * @param t1 first torus element
+     * @param t2 second torus element
+     * @return double value of the infinity norm
+     */
+    static double normInftyDist(const TORUS *t1, const TORUS *t2, const ZModuleParams<TORUS> *params) {
+        return abs(TorusUtils<TORUS>::to_double(t1, params)-TorusUtils<TORUS>::to_double(t2, params)); // quick and dirty :P
+    }
 };
 
 #endif // TORUS_UTILS_BIG_H

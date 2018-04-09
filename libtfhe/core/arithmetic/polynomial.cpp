@@ -4,8 +4,8 @@
 /**
  * Instantiate Polynomial class for native torus and int types
  */
-TORUS_CLASS_IMPL_ALL(Polynomial);
-// INT_CLASS_IMPL_ALL(Polynomial); // native torus and int types are the same => don't need both
+EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(Polynomial);
+// EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_INT(Polynomial); // native torus and int types are the same => don't need both
 
 template<typename TYPE>
 Polynomial<TYPE>::Polynomial(
@@ -84,8 +84,6 @@ void Polynomial<TYPE>::AddTo(
     TfheThreadContext *context,
     Allocator alloc)
 {
-    assert(result != poly);
-
     const int32_t N = params->N;
     const TYPE *s = poly->coefs;
     TYPE *r = result->coefs;
@@ -143,12 +141,11 @@ void Polynomial<TYPE>::MulByXaiMinusOne(
     Allocator alloc)
 {
     assert(result != source);
+    assert(a >= 0 && a < 2 * N);
 
     const int32_t N = params->N;
     TYPE *out = result->coefs;
     const TYPE *in = source->coefs;
-
-    assert(a >= 0 && a < 2 * N);
 
     if (a < N) {
         for (int32_t i = 0; i < a; i++) // i-a < 0
@@ -174,12 +171,11 @@ void Polynomial<TYPE>::MulByXai(
     Allocator alloc)
 {
     assert(result != source);
+    assert(a >= 0 && a < 2 * N);
 
     const int32_t N = params->N;
     TYPE *out = result->coefs;
     const TYPE *in = source->coefs;
-
-    assert(a >= 0 && a < 2 * N);
 
     if (a < N) {
         for (int32_t i = 0; i < a; i++)//sur que i-a<0
@@ -194,5 +190,3 @@ void Polynomial<TYPE>::MulByXai(
             out[i] = -in[i - aa];
     }
 }
-
-

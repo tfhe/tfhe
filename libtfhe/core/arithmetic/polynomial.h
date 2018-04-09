@@ -8,8 +8,12 @@
 #include <cassert>
 
 template<typename TYPE>
-struct Polynomial
+class Polynomial
 {
+protected:
+    using ZModuleType = typename PolynomialParams<TYPE>::ZModuleType;
+
+public:
     TYPE *coefs;
 
     /**

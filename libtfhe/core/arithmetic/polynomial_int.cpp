@@ -5,7 +5,7 @@
 /**
  * Instantiate IntPolynomial class for available int types
  */
-INT_CLASS_IMPL_ALL(IntPolynomial);
+EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_INT(IntPolynomial);
 
 
 /**

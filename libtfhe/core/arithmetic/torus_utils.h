@@ -16,6 +16,9 @@
  */
 template<typename TORUS>
 class TorusUtils {
+    static_assert(std::is_integral<TORUS>::value and std::is_signed<TORUS>::value,
+        "TorusUtils<T> defined only for native signed integer types");
+
 public:
     typedef typename std::make_signed<TORUS>::type INT_TYPE;
     static const TORUS min_val = std::numeric_limits<TORUS>::min();
@@ -43,10 +46,19 @@ public:
      * @param d real to convert
      * @return torus value
      */
-    static void from_double(TORUS &reps, const double d, const ZModuleParams<TORUS> *params) {
+    static TORUS from_double(const double d, const ZModuleParams<TORUS> *params) {
         static double intpart; //this value is unused, so it can be static
         double temp = modf(d, &intpart) / 2.0; //divide by 2 in order to avoid overflow in next line
-        reps = TORUS(temp * dtot_factor) << 1;
+        return TORUS(temp * dtot_factor) << 1;
+    }
+
+    /**
+     * @brief Converts real number to torus (mainly for printing)
+     * @param d real to convert
+     * @param reps torus value
+     */
+    static void from_double(TORUS &reps, const double d, const ZModuleParams<TORUS> *params) {
+        reps = from_double(d, params);
     }
 
     /**
@@ -54,7 +66,7 @@ public:
      * @param x torus element to convert
      * @return real number
     */
-    static double to_double(const TORUS &x, const ZModuleParams<TORUS> *params) {
+    static double to_double(const TORUS x, const ZModuleParams<TORUS> *params) {
         return double(x) / dtot_factor;
     }
 
@@ -97,6 +109,17 @@ public:
         UTORUS half_interv = (half_utorus / UTORUS(Msize));
         UTORUS phase_temp = UTORUS((mu % Msize) * 2) * half_interv;
         res = (TORUS)phase_temp;
+    }
+
+    /**
+     * @brief Return infinity norm between 2 torus elements
+     *
+     * @param t1 first torus element
+     * @param t2 second torus element
+     * @return double value of the infinity norm
+     */
+    static double normInftyDist(const TORUS t1, const TORUS t2, const ZModuleParams<TORUS> *params) {
+        return abs(TorusUtils<TORUS>::to_double(t1 - t2, params));
     }
 };
 

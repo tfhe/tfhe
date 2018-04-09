@@ -20,7 +20,9 @@ private:
 
 public:
     int32_t N;
-    ZModuleParams<TORUS>* zmodule_params;
+
+    typedef ZModuleParams<TORUS> ZModuleType;
+    ZModuleType* zmodule_params;
 };
 
 #endif //POLYNOMIAL_PARAM_H

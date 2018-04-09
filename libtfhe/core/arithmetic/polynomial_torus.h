@@ -12,6 +12,7 @@ template<typename TORUS_TYPE>
 class TorusPolynomial : public Polynomial<TORUS_TYPE>
 {
     using INT_TYPE = typename TorusUtils<TORUS_TYPE>::INT_TYPE;
+    using ZModuleType = typename Polynomial<TORUS_TYPE>::ZModuleType;
 
 public:
     /**
@@ -55,7 +56,7 @@ private:
         const INT_TYPE *__restrict poly1,
         const TORUS_TYPE *__restrict poly2,
         const int32_t N,
-        const ZModuleParams<TORUS_TYPE> *zparams,
+        const ZModuleType *const zparams,
         TfheThreadContext *context,
         Allocator alloc);
 
@@ -69,7 +70,7 @@ private:
         const INT_TYPE *__restrict poly1,
         const TORUS_TYPE *__restrict poly2,
         const int32_t N,
-        const ZModuleParams<TORUS_TYPE> *zparams,
+        const ZModuleType *const zparams,
         TfheThreadContext *context,
         Allocator alloc);
 
@@ -83,7 +84,7 @@ private:
         const TORUS_TYPE *B,
         const int32_t size,
         const char *buf,
-        const ZModuleParams<TORUS_TYPE> *zparams,
+        const ZModuleType *const zparams,
         TfheThreadContext *context,
         Allocator alloc);
 

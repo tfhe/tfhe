@@ -8,7 +8,7 @@ using namespace std;
 /**
  * Instantiate TorusPolynomial class for available torus types
  */
-TORUS_CLASS_IMPL_ALL(TorusPolynomial);
+EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(TorusPolynomial);
 
 // TorusPolynomial = random
 template<typename TORUS>
@@ -115,10 +115,12 @@ double TorusPolynomial<TORUS>::NormInftyDist(
 {
     const int32_t N = params->N;
     double norm = 0;
+    const typename PolynomialParams<TORUS>::ZModuleType *const zparams =
+        params->zmodule_params;
 
     // Max between the coefficients of abs(poly1-poly2)
     for (int32_t i = 0; i < N; ++i) {
-        double r = abs(TorusUtils<TORUS>::to_double(poly1->coefs[i] - poly2->coefs[i], params->zmodule_params));
+        double r = TorusUtils<TORUS>::normInftyDist(poly1->coefs[i], poly2->coefs[i], zparams);
         if (r > norm) { norm = r; }
     }
     return norm;
@@ -131,7 +133,7 @@ void TorusPolynomial<TORUS>::MultNaive_plain_aux(
     const INT_TYPE *__restrict poly1,
     const TORUS *__restrict poly2,
     const int32_t N,
-    const ZModuleParams<TORUS> *zparams,
+    const ZModuleType *const zparams,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -161,7 +163,7 @@ void TorusPolynomial<TORUS>::MultNaive_aux(
     const INT_TYPE *__restrict poly1,
     const TORUS *__restrict poly2,
     const int32_t N,
-    const ZModuleParams<TORUS> *zparams,
+    const ZModuleType *const zparams,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -196,9 +198,11 @@ void TorusPolynomial<TORUS>::MultNaive(
     assert(result != poly2);
 
     const int32_t N = params->N;
+    const typename PolynomialParams<TORUS>::ZModuleType *const zparams =
+        params->zmodule_params;
 
     TorusPolynomial<TORUS>::MultNaive_aux(result->coefs, poly1->coefs,
-        poly2->coefs, N, params->zmodule_params, context, alloc);
+        poly2->coefs, N, zparams, context, alloc);
 }
 
 /**
@@ -217,7 +221,7 @@ void TorusPolynomial<TORUS>::Karatsuba_aux(
     const TORUS *B,
     const int32_t size,
     const char *buf,
-    const ZModuleParams<TORUS> *zparams,
+    const ZModuleType *const zparams,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -272,9 +276,11 @@ void TorusPolynomial<TORUS>::MultKaratsuba(
     const int32_t N = params->N;
     TORUS *R = new TORUS[2 * N - 1];
     char *buf = new char[4 * N * sizeof(TORUS)]; //that's large enough to store every tmp variables (2*2*N*4) TODO: see if there is unused memory (before generic torus byte cnt was 16*N)
+    const typename PolynomialParams<TORUS>::ZModuleType *const zparams =
+        params->zmodule_params;
 
     // Karatsuba
-    Karatsuba_aux(R, poly1->coefs, poly2->coefs, N, buf, params->zmodule_params, context, alloc);
+    Karatsuba_aux(R, poly1->coefs, poly2->coefs, N, buf, zparams, context, alloc);
 
     // reduction mod X^N+1
     for (int32_t i = 0; i < N - 1; ++i)
@@ -298,9 +304,11 @@ void TorusPolynomial<TORUS>::AddMulRKaratsuba(
     const int32_t N = params->N;
     TORUS *R = new TORUS[2 * N - 1];
     char *buf = new char[16 * N]; //that's large enough to store every tmp variables (2*2*N*4)
+    const typename PolynomialParams<TORUS>::ZModuleType *const zparams =
+        params->zmodule_params;
 
     // Karatsuba
-    Karatsuba_aux(R, poly1->coefs, poly2->coefs, N, buf, params->zmodule_params, context, alloc);
+    Karatsuba_aux(R, poly1->coefs, poly2->coefs, N, buf, zparams, context, alloc);
 
     // reduction mod X^N+1
     for (int32_t i = 0; i < N - 1; ++i)
@@ -324,9 +332,11 @@ void TorusPolynomial<TORUS>::SubMulRKaratsuba(
     const int32_t N = params->N;
     TORUS *R = new TORUS[2 * N - 1];
     char *buf = new char[16 * N]; //that's large enough to store every tmp variables (2*2*N*4)
+    const typename PolynomialParams<TORUS>::ZModuleType *const zparams =
+        params->zmodule_params;
 
     // Karatsuba
-    Karatsuba_aux(R, poly1->coefs, poly2->coefs, N, buf, params->zmodule_params, context, alloc);
+    Karatsuba_aux(R, poly1->coefs, poly2->coefs, N, buf, zparams, context, alloc);
 
     // reduction mod X^N+1
     for (int32_t i = 0; i < N - 1; ++i)

@@ -13,6 +13,10 @@
 template<typename INT_TYPE>
 class IntPolynomial : public Polynomial<INT_TYPE>
 {
+    static_assert(std::is_same<INT_TYPE, BigInt>::value or
+        (std::is_integral<INT_TYPE>::value and std::is_signed<INT_TYPE>::value),
+        "IntPolynomial<T> defined only for native signed integer types and BigInt");
+
 public:
     /**
      * @brief Constructs a polynomial with given parameters
