@@ -1,6 +1,7 @@
 #include "polynomial_torus.h"
 
 #include <cassert>
+#include "big_torus.h"
 
 /**
  * Instantiate TorusPolynomial class for big torus type
@@ -224,7 +225,68 @@ void TorusPolynomial<BigTorus>::Karatsuba_aux(
     TfheThreadContext *context,
     Allocator alloc)
 {
-    abort(); //not implemented yet
+
+    const int32_t h = size/2;
+    const int32_t sm1 = size-1;
+    // temp value
+    BigTorus *temp = alloc.newObject<BigTorus>(zparams, &alloc);
+
+    // h<=4 experimentally chosen
+    if (h <= 4){
+        TorusPolynomial<BigTorus>::MultNaive_aux(R, A, B, size,
+                                                 zparams, context,
+                                                 alloc.createStackChildAllocator());
+        return; // the algorithm finishes
+    }
+
+    // We split the polynomials in 2
+    // A = A0 + A1*X^h
+    INT_TYPE *Atemp = (INT_TYPE *) buf;
+    buf += h * sizeof(INT_TYPE);
+    // B = B0 + B1*X^h
+    BigTorus *Btemp = (BigTorus *) buf;
+    buf += h * sizeof(BigTorus);
+    // R
+    BigTorus *Rtemp = (BigTorus *) buf;
+    buf += size * sizeof(BigTorus);
+    // Note: in the above line, I have put size instead of sm1 so
+    // that buf remains aligned on a power of 2
+
+    // Atemp = A0 + A1
+    for (int32_t i = 0; i < h; ++i){
+        add(Atemp + i, A + i, A + (h + i), zparams);
+    }
+    // Btemp = B0 + B1
+    for (int32_t i = 0; i < h; ++i){
+        add(Btemp + i, B + i, B + (h + i), zparams);
+    }
+
+
+    // Karatsuba recursively
+    // R0 = A0 * B0
+    // (R[0],R[2*h-2]), (A[0],A[h-1]), (B[0],B[h-1])
+    Karatsuba_aux(R, A, B, h, buf, zparams, context, alloc);
+    // R[2*h-1] = 0
+    zero(R + sm1, zparams);
+    // R1 = A1 * B1
+    // (R[2*h],R[4*h-2]), (A[h],A[2*h-1]), (B[h],B[2*h-1])
+    Karatsuba_aux(R + size, A + h, B + h, h, buf, zparams, context, alloc);
+    // Rtemp = Atemp * Btemp = (A0 + A1)*(B0 + B1)
+    Karatsuba_aux(Rtemp, Atemp, Btemp, h, buf, zparams, context, alloc);
+
+    // R = R0 + Rtemp * X^h + R1 * X^size
+    // with Rtemp = Rtemp - R0 - R1
+    for (int32_t i = 0; i < sm1; ++i){
+        add(temp, R + i, R + (size + i), zparams);
+        sub(Rtemp + i, Rtemp + i, temp, zparams);
+    }
+    for (int32_t i = 0; i < sm1; ++i){
+        add(R + (h + i), R + (h + i), Rtemp + i, zparams);
+    }
+
+
+    // delete
+    alloc.deleteObject<BigTorus>(temp, zparams, &alloc);
 }
 
 // poly1, poly2 and result are polynomials mod X^N+1
@@ -237,7 +299,27 @@ void TorusPolynomial<BigTorus>::MultKaratsuba(
     TfheThreadContext *context,
     Allocator alloc)
 {
-    abort(); //not implemented yet
+    const int32_t N = params->N;
+
+    // result in Karatsuba_aux
+    BigTorus *R = alloc.newArray<BigTorus>(2*N-1, params, &alloc);
+    // Buffer: that's large enough to store every tmp variables (2*2*N*4)
+    char *buf = new char[4 * N * sizeof(BigTorus)];
+    // zmodule_params
+    const typename PolynomialParams<BigTorus>::ZModuleType *const zparams = params->zmodule_params;
+
+    // Karatsuba
+    Karatsuba_aux(R, poly1->coefs, poly2->coefs, N, buf, zparams, context, alloc);
+
+    // Reduction mod X^N+1
+    for (int32_t i = 0; i < N - 1; ++i){
+        sub(result->coefs + i, R + i, R + (N + i), zparams);
+    }
+    copy(result->coefs + (N - 1), R + (N - 1),zparams);
+
+    // delete
+    delete[] buf;
+    alloc.deleteArray<BigTorus>(2*N-1, R, params, &alloc);
 }
 
 // poly1, poly2 and result are polynomials mod X^N+1
