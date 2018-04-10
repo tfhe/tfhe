@@ -140,10 +140,10 @@ void Polynomial<TYPE>::MulByXaiMinusOne(
     TfheThreadContext *context,
     Allocator alloc)
 {
+    const int32_t N = params->N;
     assert(result != source);
     assert(a >= 0 && a < 2 * N);
 
-    const int32_t N = params->N;
     TYPE *out = result->coefs;
     const TYPE *in = source->coefs;
 
@@ -170,10 +170,10 @@ void Polynomial<TYPE>::MulByXai(
     TfheThreadContext *context,
     Allocator alloc)
 {
+    const int32_t N = params->N;
     assert(result != source);
     assert(a >= 0 && a < 2 * N);
 
-    const int32_t N = params->N;
     TYPE *out = result->coefs;
     const TYPE *in = source->coefs;
 
