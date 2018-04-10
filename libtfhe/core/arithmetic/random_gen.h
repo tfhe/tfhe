@@ -1,7 +1,7 @@
 #ifndef RANDOM_GEN_H
 #define RANDOM_GEN_H
 
-#include "numeric_utils.h"
+#include "torus_utils.h"
 
 #include <random>
 
@@ -84,5 +84,9 @@ public:
 template<typename TORUS>
 std::uniform_int_distribution <TORUS> RandomGenTorus<TORUS>::uniform_distrib =
         std::uniform_int_distribution<TORUS>(TorusUtils<TORUS>::min_val, TorusUtils<TORUS>::max_val);
+
+template<>
+class RandomGenTorus<BigTorus> : public RandomGen {
+};
 
 #endif //RANDOM_GEN_H
