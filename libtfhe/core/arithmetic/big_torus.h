@@ -54,6 +54,8 @@ void sub(BigTorus *res, const BigTorus *a, const BigTorus *b, const ZModuleParam
  */
 void mul(BigTorus *res, int64_t a, const BigTorus *b, const ZModuleParams<BigTorus> *params);
 
+void mul_no_overlap(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<BigTorus> *params);
+
 /**
  * @brief res = a * b
  * WARNING: for this function, res and b must not overlap.

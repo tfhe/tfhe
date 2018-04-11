@@ -26,7 +26,7 @@ void mul(BigTorus *res, int64_t a, const BigTorus *b, const ZModuleParams<BigTor
     }
 }
 
-static void mul_no_overlap(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<BigTorus> *params) {
+void mul_no_overlap(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<BigTorus> *params) {
     assert(res != b);
     if (a->data->_mp_size > 0) { //positive
         const int m = a->data->_mp_size;
