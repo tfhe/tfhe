@@ -15,11 +15,10 @@ EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_INT(IntPolynomial);
 // Euclidean norm of an IntPolynomial
 template<typename INT_TYPE>
 double IntPolynomial<INT_TYPE>::Norm2sq(
-    const IntPolynomial<INT_TYPE> *poly,
-    const PolynomialParams<INT_TYPE> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
+        const IntPolynomial<INT_TYPE> *poly,
+        const PolynomialParams<INT_TYPE> *params,
+        TfheThreadContext *context,
+        Allocator alloc) {
     const int32_t N = params->N;
     double norm = 0;
 
@@ -33,12 +32,11 @@ double IntPolynomial<INT_TYPE>::Norm2sq(
 // Infinity norm of the distance between two IntPolynomial
 template<typename INT_TYPE>
 double IntPolynomial<INT_TYPE>::NormInftyDist(
-    const IntPolynomial<INT_TYPE> *poly1,
-    const IntPolynomial<INT_TYPE> *poly2,
-    const PolynomialParams<INT_TYPE> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
+        const IntPolynomial<INT_TYPE> *poly1,
+        const IntPolynomial<INT_TYPE> *poly2,
+        const PolynomialParams<INT_TYPE> *params,
+        TfheThreadContext *context,
+        Allocator alloc) {
     const int32_t N = params->N;
     double norm = 0;
 
