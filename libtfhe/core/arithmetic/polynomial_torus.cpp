@@ -115,7 +115,7 @@ double TorusPolynomial<TORUS>::NormInftyDist(
 {
     const int32_t N = params->N;
     double norm = 0;
-    const typename PolynomialParams<TORUS>::ZModuleType *const zparams =
+    const ZModuleParams<TORUS> *const zparams =
         params->zmodule_params;
 
     // Max between the coefficients of abs(poly1-poly2)
@@ -133,7 +133,7 @@ void TorusPolynomial<TORUS>::MultNaive_plain_aux(
     const INT_TYPE *__restrict poly1,
     const TORUS *__restrict poly2,
     const int32_t N,
-    const ZModuleType *const zparams,
+    const ZModuleParams<TORUS> *const zparams,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -163,7 +163,7 @@ void TorusPolynomial<TORUS>::MultNaive_aux(
     const INT_TYPE *__restrict poly1,
     const TORUS *__restrict poly2,
     const int32_t N,
-    const ZModuleType *const zparams,
+    const ZModuleParams<TORUS> *const zparams,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -189,7 +189,7 @@ void TorusPolynomial<TORUS>::MultNaive_aux(
 template<typename TORUS>
 void TorusPolynomial<TORUS>::MultNaive(
     TorusPolynomial<TORUS> *result,
-    const IntPolynomial<INT_TYPE> *poly1,
+    const IntPolynomial<TORUS> *poly1,
     const TorusPolynomial<TORUS> *poly2,
     const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
@@ -198,7 +198,7 @@ void TorusPolynomial<TORUS>::MultNaive(
     assert(result != poly2);
 
     const int32_t N = params->N;
-    const typename PolynomialParams<TORUS>::ZModuleType *const zparams =
+    const ZModuleParams<TORUS> *const zparams =
         params->zmodule_params;
 
     TorusPolynomial<TORUS>::MultNaive_aux(result->coefs, poly1->coefs,
@@ -221,7 +221,7 @@ void TorusPolynomial<TORUS>::Karatsuba_aux(
     const TORUS *B,
     const int32_t size,
     const char *buf,
-    const ZModuleType *const zparams,
+    const ZModuleParams<TORUS> *const zparams,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -267,7 +267,7 @@ void TorusPolynomial<TORUS>::Karatsuba_aux(
 template<typename TORUS>
 void TorusPolynomial<TORUS>::MultKaratsuba(
     TorusPolynomial<TORUS> *result,
-    const IntPolynomial<INT_TYPE> *poly1,
+    const IntPolynomial<TORUS> *poly1,
     const TorusPolynomial<TORUS> *poly2,
     const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
@@ -276,7 +276,7 @@ void TorusPolynomial<TORUS>::MultKaratsuba(
     const int32_t N = params->N;
     TORUS *R = new TORUS[2 * N - 1];
     char *buf = new char[4 * N * sizeof(TORUS)]; //that's large enough to store every tmp variables (2*2*N*4) TODO: see if there is unused memory (before generic torus byte cnt was 16*N)
-    const typename PolynomialParams<TORUS>::ZModuleType *const zparams =
+    const ZModuleParams<TORUS> *const zparams =
         params->zmodule_params;
 
     // Karatsuba
@@ -295,7 +295,7 @@ void TorusPolynomial<TORUS>::MultKaratsuba(
 template<typename TORUS>
 void TorusPolynomial<TORUS>::AddMulRKaratsuba(
     TorusPolynomial<TORUS> *result,
-    const IntPolynomial<INT_TYPE> *poly1,
+    const IntPolynomial<TORUS> *poly1,
     const TorusPolynomial<TORUS> *poly2,
     const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
@@ -304,7 +304,7 @@ void TorusPolynomial<TORUS>::AddMulRKaratsuba(
     const int32_t N = params->N;
     TORUS *R = new TORUS[2 * N - 1];
     char *buf = new char[16 * N]; //that's large enough to store every tmp variables (2*2*N*4)
-    const typename PolynomialParams<TORUS>::ZModuleType *const zparams =
+    const ZModuleParams<TORUS> *const zparams =
         params->zmodule_params;
 
     // Karatsuba
@@ -323,7 +323,7 @@ void TorusPolynomial<TORUS>::AddMulRKaratsuba(
 template<typename TORUS>
 void TorusPolynomial<TORUS>::SubMulRKaratsuba(
     TorusPolynomial<TORUS> *result,
-    const IntPolynomial<INT_TYPE> *poly1,
+    const IntPolynomial<TORUS> *poly1,
     const TorusPolynomial<TORUS> *poly2,
     const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
@@ -332,7 +332,7 @@ void TorusPolynomial<TORUS>::SubMulRKaratsuba(
     const int32_t N = params->N;
     TORUS *R = new TORUS[2 * N - 1];
     char *buf = new char[16 * N]; //that's large enough to store every tmp variables (2*2*N*4)
-    const typename PolynomialParams<TORUS>::ZModuleType *const zparams =
+    const ZModuleParams<TORUS> *const zparams =
         params->zmodule_params;
 
     // Karatsuba

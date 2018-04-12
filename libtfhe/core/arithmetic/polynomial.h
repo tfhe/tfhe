@@ -7,12 +7,15 @@
 
 #include <cassert>
 
-template<typename TYPE>
+/**
+ * @brief Polynomial class
+ *
+ * @tparam TORUS torus type
+ * @tparam TYPE = TORUS polynomial coefficient type
+ */
+template<typename TORUS, typename TYPE = TORUS>
 class Polynomial
 {
-protected:
-    using ZModuleType = typename PolynomialParams<TYPE>::ZModuleType;
-
 public:
     TYPE *coefs;
 
@@ -23,7 +26,7 @@ public:
      * @param context thread execution context
      * @param alloc allocator to use
      */
-    Polynomial(const PolynomialParams<TYPE> *params,
+    Polynomial(const PolynomialParams<TORUS> *params,
         TfheThreadContext *context,
         Allocator *alloc);
 
@@ -34,7 +37,7 @@ public:
      * @param context thread execution context
      * @param alloc allocator to use
      */
-    void destroy(const PolynomialParams<TYPE> *params,
+    void destroy(const PolynomialParams<TORUS> *params,
         TfheThreadContext *context,
         Allocator *alloc);
 
@@ -46,8 +49,8 @@ public:
      * @brief Clear polynomial (zeros coefficients)
      */
     static void Clear(
-        Polynomial<TYPE> *result,
-        const PolynomialParams<TYPE> *params,
+        Polynomial<TORUS,TYPE> *result,
+        const PolynomialParams<TORUS> *params,
         TfheThreadContext *context,
         Allocator alloc);
 
@@ -55,9 +58,9 @@ public:
      * @brief Copy \c source polynomial to \c result
      */
     static void Copy(
-        Polynomial<TYPE> *result,
-        const Polynomial<TYPE> *source,
-        const PolynomialParams<TYPE> *params,
+        Polynomial<TORUS,TYPE> *result,
+        const Polynomial<TORUS,TYPE> *source,
+        const PolynomialParams<TORUS> *params,
         TfheThreadContext *context,
         Allocator alloc);
 
@@ -66,10 +69,10 @@ public:
      *      i.e. result = poly1 + poly2
      */
     static void Add(
-        Polynomial<TYPE> *result,
-        const Polynomial<TYPE> *poly1,
-        const Polynomial<TYPE> *poly2,
-        const PolynomialParams<TYPE> *params,
+        Polynomial<TORUS,TYPE> *result,
+        const Polynomial<TORUS,TYPE> *poly1,
+        const Polynomial<TORUS,TYPE> *poly2,
+        const PolynomialParams<TORUS> *params,
         TfheThreadContext *context,
         Allocator alloc);
 
@@ -78,9 +81,9 @@ public:
      *      i.e. result = result + poly
      */
     static void AddTo(
-        Polynomial<TYPE> *result,
-        const Polynomial<TYPE> *poly,
-        const PolynomialParams<TYPE> *params,
+        Polynomial<TORUS,TYPE> *result,
+        const Polynomial<TORUS,TYPE> *poly,
+        const PolynomialParams<TORUS> *params,
         TfheThreadContext *context,
         Allocator alloc);
 
@@ -89,10 +92,10 @@ public:
      *      i.e. result = poly1 - poly2
      */
     static void Sub(
-        Polynomial<TYPE> *result,
-        const Polynomial<TYPE> *poly1,
-        const Polynomial<TYPE> *poly2,
-        const PolynomialParams<TYPE> *params,
+        Polynomial<TORUS,TYPE> *result,
+        const Polynomial<TORUS,TYPE> *poly1,
+        const Polynomial<TORUS,TYPE> *poly2,
+        const PolynomialParams<TORUS> *params,
         TfheThreadContext *context,
         Allocator alloc);
 
@@ -101,9 +104,9 @@ public:
      *      i.e. result = result - poly
      */
     static void SubTo(
-        Polynomial<TYPE> *result,
-        const Polynomial<TYPE> *poly,
-        const PolynomialParams<TYPE> *params,
+        Polynomial<TORUS,TYPE> *result,
+        const Polynomial<TORUS,TYPE> *poly,
+        const PolynomialParams<TORUS> *params,
         TfheThreadContext *context,
         Allocator alloc);
 
@@ -112,10 +115,10 @@ public:
      *      i.e. result = (X^{a}-1) * source
      */
     static void MulByXaiMinusOne(
-        Polynomial<TYPE> *result,
+        Polynomial<TORUS,TYPE> *result,
         const int32_t a,
-        const Polynomial<TYPE> *source,
-        const PolynomialParams<TYPE> *params,
+        const Polynomial<TORUS,TYPE> *source,
+        const PolynomialParams<TORUS> *params,
         TfheThreadContext *context,
         Allocator alloc);
 
@@ -124,10 +127,10 @@ public:
      *      i.e. result = (X^{a}-1) * source
      */
     static void MulByXai(
-        Polynomial<TYPE> *result,
+        Polynomial<TORUS,TYPE> *result,
         const int32_t a,
-        const Polynomial<TYPE> *source,
-        const PolynomialParams<TYPE> *params,
+        const Polynomial<TORUS,TYPE> *source,
+        const PolynomialParams<TORUS> *params,
         TfheThreadContext *context,
         Allocator alloc);
 };

@@ -34,7 +34,7 @@ void TorusPolynomial<BigTorus>::AddMulZ(
     BigTorus *r = result->coefs;
     const BigTorus *a = poly1->coefs;
     const BigTorus *b = poly2->coefs;
-    const ZModuleType *const zparams =
+    const ZModuleParams<BigTorus> *const zparams =
         params->zmodule_params;
 
     BigTorus *t = alloc.newObject<BigTorus>(zparams, &alloc);
@@ -74,7 +74,7 @@ void TorusPolynomial<BigTorus>::SubMulZ(
     BigTorus *r = result->coefs;
     const BigTorus *a = poly1->coefs;
     const BigTorus *b = poly2->coefs;
-    const ZModuleType *const zparams =
+    const ZModuleParams<BigTorus> *const zparams =
         params->zmodule_params;
 
     BigTorus *t = alloc.newObject<BigTorus>(zparams, &alloc);
@@ -109,7 +109,7 @@ double TorusPolynomial<BigTorus>::NormInftyDist(
 {
     const int32_t N = params->N;
     double norm = 0;
-    const ZModuleType *const zparams =
+    const ZModuleParams<BigTorus> *const zparams =
         params->zmodule_params;
 
     // Max between the coefficients of abs(poly1-poly2)
@@ -127,7 +127,7 @@ void TorusPolynomial<BigTorus>::MultNaive_plain_aux(
     const INT_TYPE *__restrict poly1,
     const BigTorus *__restrict poly2,
     const int32_t N,
-    const ZModuleType *const zparams,
+    const ZModuleParams<BigTorus> *const zparams,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -159,7 +159,7 @@ void TorusPolynomial<BigTorus>::MultNaive_aux(
     const INT_TYPE *__restrict poly1,
     const BigTorus *__restrict poly2,
     const int32_t N,
-    const ZModuleType *const zparams,
+    const ZModuleParams<BigTorus> *const zparams,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -188,7 +188,7 @@ void TorusPolynomial<BigTorus>::MultNaive_aux(
 template<>
 void TorusPolynomial<BigTorus>::MultNaive(
     TorusPolynomial<BigTorus> *result,
-    const IntPolynomial<INT_TYPE> *poly1,
+    const IntPolynomial<BigTorus> *poly1,
     const TorusPolynomial<BigTorus> *poly2,
     const PolynomialParams<BigTorus> *params,
     TfheThreadContext *context,
@@ -197,7 +197,7 @@ void TorusPolynomial<BigTorus>::MultNaive(
     assert(result != poly2);
 
     const int32_t N = params->N;
-    const ZModuleType *const zparams =
+    const ZModuleParams<BigTorus> *const zparams =
         params->zmodule_params;
 
     TorusPolynomial<BigTorus>::MultNaive_aux(result->coefs, poly1->coefs,
@@ -220,7 +220,7 @@ void TorusPolynomial<BigTorus>::Karatsuba_aux(
     const BigTorus *B,
     const int32_t size,
     const char *buf,
-    const ZModuleType *const zparams,
+    const ZModuleParams<BigTorus> *const zparams,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -231,7 +231,7 @@ void TorusPolynomial<BigTorus>::Karatsuba_aux(
 template<>
 void TorusPolynomial<BigTorus>::MultKaratsuba(
     TorusPolynomial<BigTorus> *result,
-    const IntPolynomial<INT_TYPE> *poly1,
+    const IntPolynomial<BigTorus> *poly1,
     const TorusPolynomial<BigTorus> *poly2,
     const PolynomialParams<BigTorus> *params,
     TfheThreadContext *context,
@@ -244,7 +244,7 @@ void TorusPolynomial<BigTorus>::MultKaratsuba(
 template<>
 void TorusPolynomial<BigTorus>::AddMulRKaratsuba(
     TorusPolynomial<BigTorus> *result,
-    const IntPolynomial<INT_TYPE> *poly1,
+    const IntPolynomial<BigTorus> *poly1,
     const TorusPolynomial<BigTorus> *poly2,
     const PolynomialParams<BigTorus> *params,
     TfheThreadContext *context,
@@ -257,7 +257,7 @@ void TorusPolynomial<BigTorus>::AddMulRKaratsuba(
 template<>
 void TorusPolynomial<BigTorus>::SubMulRKaratsuba(
     TorusPolynomial<BigTorus> *result,
-    const IntPolynomial<INT_TYPE> *poly1,
+    const IntPolynomial<BigTorus> *poly1,
     const TorusPolynomial<BigTorus> *poly2,
     const PolynomialParams<BigTorus> *params,
     TfheThreadContext *context,

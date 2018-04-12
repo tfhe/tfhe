@@ -4,31 +4,33 @@
 /**
  * Instantiate Polynomial class for native torus and int types
  */
-EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(Polynomial);
-// EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_INT(Polynomial); // native torus and int types are the same => don't need both
+EXPLICIT_INSTANTIATE_CLASS(Polynomial, Torus32, TorusUtils<Torus32>::INT_TYPE);
+EXPLICIT_INSTANTIATE_CLASS(Polynomial, Torus64, TorusUtils<Torus64>::INT_TYPE);
+// EXPLICIT_INSTANTIATE_CLASS(Polynomial, Torus32, Torus32);   // native torus and int types are the same => don't need both
+// EXPLICIT_INSTANTIATE_CLASS(Polynomial, Torus64, Torus64);
 
-template<typename TYPE>
-Polynomial<TYPE>::Polynomial(
-    const PolynomialParams<TYPE> *params,
+template<typename TORUS, typename TYPE>
+Polynomial<TORUS,TYPE>::Polynomial(
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator *alloc)
 {
     coefs = alloc->newArray<TYPE>(params->N);
 }
 
-template<typename TYPE>
-void Polynomial<TYPE>::destroy(
-    const PolynomialParams<TYPE> *params,
+template<typename TORUS, typename TYPE>
+void Polynomial<TORUS,TYPE>::destroy(
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator *alloc)
 {
     alloc->deleteArray<TYPE>(params->N, coefs);
 }
 
-template<typename TYPE>
-void Polynomial<TYPE>::Clear(
-    Polynomial<TYPE> *result,
-    const PolynomialParams<TYPE> *params,
+template<typename TORUS, typename TYPE>
+void Polynomial<TORUS,TYPE>::Clear(
+    Polynomial<TORUS,TYPE> *result,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -37,11 +39,11 @@ void Polynomial<TYPE>::Clear(
         result->coefs[i] = 0;
 }
 
-template<typename TYPE>
-void Polynomial<TYPE>::Copy(
-    Polynomial<TYPE> *result,
-    const Polynomial<TYPE> *source,
-    const PolynomialParams<TYPE> *params,
+template<typename TORUS, typename TYPE>
+void Polynomial<TORUS,TYPE>::Copy(
+    Polynomial<TORUS,TYPE> *result,
+    const Polynomial<TORUS,TYPE> *source,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -55,12 +57,12 @@ void Polynomial<TYPE>::Copy(
         r[i] = s[i];
 }
 
-template<typename TYPE>
-void Polynomial<TYPE>::Add(
-    Polynomial<TYPE> *result,
-    const Polynomial<TYPE> *poly1,
-    const Polynomial<TYPE> *poly2,
-    const PolynomialParams<TYPE> *params,
+template<typename TORUS, typename TYPE>
+void Polynomial<TORUS,TYPE>::Add(
+    Polynomial<TORUS,TYPE> *result,
+    const Polynomial<TORUS,TYPE> *poly1,
+    const Polynomial<TORUS,TYPE> *poly2,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -76,11 +78,11 @@ void Polynomial<TYPE>::Add(
         r[i] = a[i] + b[i];
 }
 
-template<typename TYPE>
-void Polynomial<TYPE>::AddTo(
-    Polynomial<TYPE> *result,
-    const Polynomial<TYPE> *poly,
-    const PolynomialParams<TYPE> *params,
+template<typename TORUS, typename TYPE>
+void Polynomial<TORUS,TYPE>::AddTo(
+    Polynomial<TORUS,TYPE> *result,
+    const Polynomial<TORUS,TYPE> *poly,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -92,12 +94,12 @@ void Polynomial<TYPE>::AddTo(
         r[i] += s[i];
 }
 
-template<typename TYPE>
-void Polynomial<TYPE>::Sub(
-    Polynomial<TYPE> *result,
-    const Polynomial<TYPE> *poly1,
-    const Polynomial<TYPE> *poly2,
-    const PolynomialParams<TYPE> *params,
+template<typename TORUS, typename TYPE>
+void Polynomial<TORUS,TYPE>::Sub(
+    Polynomial<TORUS,TYPE> *result,
+    const Polynomial<TORUS,TYPE> *poly1,
+    const Polynomial<TORUS,TYPE> *poly2,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -113,11 +115,11 @@ void Polynomial<TYPE>::Sub(
         r[i] = a[i] - b[i];
 }
 
-template<typename TYPE>
-void Polynomial<TYPE>::SubTo(
-    Polynomial<TYPE> *result,
-    const Polynomial<TYPE> *poly,
-    const PolynomialParams<TYPE> *params,
+template<typename TORUS, typename TYPE>
+void Polynomial<TORUS,TYPE>::SubTo(
+    Polynomial<TORUS,TYPE> *result,
+    const Polynomial<TORUS,TYPE> *poly,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -131,12 +133,12 @@ void Polynomial<TYPE>::SubTo(
         r[i] -= s[i];
 }
 
-template<typename TYPE>
-void Polynomial<TYPE>::MulByXaiMinusOne(
-    Polynomial<TYPE> *result,
+template<typename TORUS, typename TYPE>
+void Polynomial<TORUS,TYPE>::MulByXaiMinusOne(
+    Polynomial<TORUS,TYPE> *result,
     const int32_t a,
-    const Polynomial<TYPE> *source,
-    const PolynomialParams<TYPE> *params,
+    const Polynomial<TORUS,TYPE> *source,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
@@ -161,12 +163,12 @@ void Polynomial<TYPE>::MulByXaiMinusOne(
     }
 }
 
-template<typename TYPE>
-void Polynomial<TYPE>::MulByXai(
-    Polynomial<TYPE> *result,
+template<typename TORUS, typename TYPE>
+void Polynomial<TORUS,TYPE>::MulByXai(
+    Polynomial<TORUS,TYPE> *result,
     const int32_t a,
-    const Polynomial<TYPE> *source,
-    const PolynomialParams<TYPE> *params,
+    const Polynomial<TORUS,TYPE> *source,
+    const PolynomialParams<TORUS> *params,
     TfheThreadContext *context,
     Allocator alloc)
 {
