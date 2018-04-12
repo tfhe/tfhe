@@ -4,19 +4,38 @@
 #include "polynomial_param.h"
 #include "../allocator/allocator.h"
 #include "threadcontext.h"
+#include "torus_utils.h"
 
 #include <cassert>
+
+/**
+ * Polynomial coefficient types enumeration
+ */
+enum CoefTypeEnum {
+    Torus,
+    Integer,
+    Real            // for complex Lagrangian representation?
+};
 
 /**
  * @brief Polynomial class
  *
  * @tparam TORUS torus type
- * @tparam TYPE = TORUS polynomial coefficient type
+ * @tparam CoefType = CoefTypeEnum::Torus type of coefficients
  */
-template<typename TORUS, typename TYPE = TORUS>
-class Polynomial
-{
+template<typename TORUS, CoefTypeEnum CoefType>
+class Polynomial {
 public:
+    static_assert(CoefType == CoefTypeEnum::Torus or CoefType == CoefTypeEnum::Integer,
+                  "Polynomial<TORUS,CoefTypeEnum> only Torus and Integer underlying types are supported for the moment");
+
+    using TYPE = typename
+    std::conditional<
+            CoefType == CoefTypeEnum::Torus,
+            TORUS,
+            typename TorusUtils<TORUS>::INT_TYPE
+    >::type;
+
     TYPE *coefs;
 
     /**
@@ -26,9 +45,10 @@ public:
      * @param context thread execution context
      * @param alloc allocator to use
      */
-    Polynomial(const PolynomialParams<TORUS> *params,
-        TfheThreadContext *context,
-        Allocator *alloc);
+    Polynomial(
+            const PolynomialParams<TORUS> *params,
+            TfheThreadContext *context,
+            Allocator *alloc);
 
     /**
      * @brief Destroys inner data of polynomial
@@ -37,9 +57,10 @@ public:
      * @param context thread execution context
      * @param alloc allocator to use
      */
-    void destroy(const PolynomialParams<TORUS> *params,
-        TfheThreadContext *context,
-        Allocator *alloc);
+    void destroy(
+            const PolynomialParams<TORUS> *params,
+            TfheThreadContext *context,
+            Allocator *alloc);
 
     /**
      * Static methods
@@ -49,90 +70,90 @@ public:
      * @brief Clear polynomial (zeros coefficients)
      */
     static void Clear(
-        Polynomial<TORUS,TYPE> *result,
-        const PolynomialParams<TORUS> *params,
-        TfheThreadContext *context,
-        Allocator alloc);
+            Polynomial<TORUS, CoefType> *result,
+            const PolynomialParams<TORUS> *params,
+            TfheThreadContext *context,
+            Allocator alloc);
 
     /**
      * @brief Copy \c source polynomial to \c result
      */
     static void Copy(
-        Polynomial<TORUS,TYPE> *result,
-        const Polynomial<TORUS,TYPE> *source,
-        const PolynomialParams<TORUS> *params,
-        TfheThreadContext *context,
-        Allocator alloc);
+            Polynomial<TORUS, CoefType> *result,
+            const Polynomial<TORUS, CoefType> *source,
+            const PolynomialParams<TORUS> *params,
+            TfheThreadContext *context,
+            Allocator alloc);
 
     /**
      * @brief Add \c poly1 to \c poly2 and store result in \c result
      *      i.e. result = poly1 + poly2
      */
     static void Add(
-        Polynomial<TORUS,TYPE> *result,
-        const Polynomial<TORUS,TYPE> *poly1,
-        const Polynomial<TORUS,TYPE> *poly2,
-        const PolynomialParams<TORUS> *params,
-        TfheThreadContext *context,
-        Allocator alloc);
+            Polynomial<TORUS, CoefType> *result,
+            const Polynomial<TORUS, CoefType> *poly1,
+            const Polynomial<TORUS, CoefType> *poly2,
+            const PolynomialParams<TORUS> *params,
+            TfheThreadContext *context,
+            Allocator alloc);
 
     /**
      * @brief Add \c poly polynomial to \c result
      *      i.e. result = result + poly
      */
     static void AddTo(
-        Polynomial<TORUS,TYPE> *result,
-        const Polynomial<TORUS,TYPE> *poly,
-        const PolynomialParams<TORUS> *params,
-        TfheThreadContext *context,
-        Allocator alloc);
+            Polynomial<TORUS, CoefType> *result,
+            const Polynomial<TORUS, CoefType> *poly,
+            const PolynomialParams<TORUS> *params,
+            TfheThreadContext *context,
+            Allocator alloc);
 
     /**
      * @brief Substract \c poly2 from \c poly1 and store result in \c result
      *      i.e. result = poly1 - poly2
      */
     static void Sub(
-        Polynomial<TORUS,TYPE> *result,
-        const Polynomial<TORUS,TYPE> *poly1,
-        const Polynomial<TORUS,TYPE> *poly2,
-        const PolynomialParams<TORUS> *params,
-        TfheThreadContext *context,
-        Allocator alloc);
+            Polynomial<TORUS, CoefType> *result,
+            const Polynomial<TORUS, CoefType> *poly1,
+            const Polynomial<TORUS, CoefType> *poly2,
+            const PolynomialParams<TORUS> *params,
+            TfheThreadContext *context,
+            Allocator alloc);
 
     /**
      * @brief Substract \c poly polynomial from \c result
      *      i.e. result = result - poly
      */
     static void SubTo(
-        Polynomial<TORUS,TYPE> *result,
-        const Polynomial<TORUS,TYPE> *poly,
-        const PolynomialParams<TORUS> *params,
-        TfheThreadContext *context,
-        Allocator alloc);
+            Polynomial<TORUS, CoefType> *result,
+            const Polynomial<TORUS, CoefType> *poly,
+            const PolynomialParams<TORUS> *params,
+            TfheThreadContext *context,
+            Allocator alloc);
 
     /**
      * @brief Multiply polynomial by (X^{a}-1)
      *      i.e. result = (X^{a}-1) * source
      */
     static void MulByXaiMinusOne(
-        Polynomial<TORUS,TYPE> *result,
-        const int32_t a,
-        const Polynomial<TORUS,TYPE> *source,
-        const PolynomialParams<TORUS> *params,
-        TfheThreadContext *context,
-        Allocator alloc);
+            Polynomial<TORUS, CoefType> *result,
+            const int32_t a,
+            const Polynomial<TORUS, CoefType> *source,
+            const PolynomialParams<TORUS> *params,
+            TfheThreadContext *context,
+            Allocator alloc);
 
     /**
      * @brief Multiply polynomial by X^{a}
      *      i.e. result = (X^{a}-1) * source
      */
     static void MulByXai(
-        Polynomial<TORUS,TYPE> *result,
-        const int32_t a,
-        const Polynomial<TORUS,TYPE> *source,
-        const PolynomialParams<TORUS> *params,
-        TfheThreadContext *context,
-        Allocator alloc);
+            Polynomial<TORUS, CoefType> *result,
+            const int32_t a,
+            const Polynomial<TORUS, CoefType> *source,
+            const PolynomialParams<TORUS> *params,
+            TfheThreadContext *context,
+            Allocator alloc);
 };
 
 #endif // POLYNOMIAL_H
