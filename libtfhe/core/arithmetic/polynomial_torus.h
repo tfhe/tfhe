@@ -87,19 +87,19 @@ private:
                               Allocator alloc);
 
 
-    static void MultNaive_plain_aux1(TORUS_TYPE *temp,
-                                     TORUS_TYPE *__restrict result,
-                                     const INT_TYPE *__restrict poly1,
-                                     const TORUS_TYPE *__restrict poly2,
+    static void MultNaive_plain_aux1(BigTorus *temp,
+                                     BigTorus *__restrict result,
+                                     const BigInt *__restrict poly1,
+                                     const BigTorus *__restrict poly2,
                                      const int32_t N,
                                      const ZModuleType *const zparams);
 
-    static void Karatsuba_aux1(TORUS_TYPE *R,
-                               INT_TYPE *bufBigInt,
-                               TORUS_TYPE *bufBigTorus,
-                               TORUS_TYPE *temp,
-                               const INT_TYPE *A,
-                               const TORUS_TYPE *B,
+    static void Karatsuba_aux1(BigTorus *R,
+                               BigInt *bufBigInt,
+                               BigTorus *bufBigTorus,
+                               BigTorus *temp,
+                               const BigInt *A,
+                               const BigTorus *B,
                                const int32_t size,
                                const ZModuleType *const zparams);
 
@@ -201,13 +201,27 @@ public:
                                  Allocator alloc);
 
 
-    static void MultKaratsuba1(TorusPolynomial<TORUS_TYPE> *result,
-                               const IntPolynomial<INT_TYPE> *poly1,
-                               const TorusPolynomial<TORUS_TYPE> *poly2,
-                               const PolynomialParams<TORUS_TYPE> *params,
+    static void MultKaratsuba1(TorusPolynomial<BigTorus> *result,
+                               const IntPolynomial<BigInt> *poly1,
+                               const TorusPolynomial<BigTorus> *poly2,
+                               const PolynomialParams<BigTorus> *params,
                                TfheThreadContext *context,
                                Allocator alloc);
 
+    static void AddMulRKaratsuba1(TorusPolynomial<BigTorus> *result,
+                                  const IntPolynomial<BigInt> *poly1,
+                                  const TorusPolynomial<BigTorus> *poly2,
+                                  const PolynomialParams<BigTorus> *params,
+                                  TfheThreadContext *context,
+                                  Allocator alloc);
+
+
+    static void SubMulRKaratsuba1(TorusPolynomial<BigTorus> *result,
+                                  const IntPolynomial<BigInt> *poly1,
+                                  const TorusPolynomial<BigTorus> *poly2,
+                                  const PolynomialParams<BigTorus> *params,
+                                  TfheThreadContext *context,
+                                  Allocator alloc);
 
 };
 

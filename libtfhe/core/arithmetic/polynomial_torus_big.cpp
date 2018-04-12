@@ -452,7 +452,7 @@ void TorusPolynomial<BigTorus>::Karatsuba_aux1(BigTorus *R,
     // We split the polynomials in 2
     // A = A0 + A1*X^h
     // Atemp = A0 + A1
-    INT_TYPE *Atemp = (INT_TYPE *) bufBigInt;
+    BigInt *Atemp = bufBigInt;
     for (int32_t i = 0; i < h; ++i) {
         add(Atemp + i, A + i, A + (h + i), zparams);
     }
@@ -525,6 +525,92 @@ void TorusPolynomial<BigTorus>::MultKaratsuba1(TorusPolynomial<BigTorus> *result
     }
     mpn_copyi(result->coefs[N - 1].data, R[N - 1].data, zparams->max_nbLimbs);
     //copy(result->coefs + (N - 1), R + (N - 1), zparams);
+
+
+    // delete
+    alloc.deleteObject<BigTorus>(temp, zparams, &alloc);
+    alloc.deleteArray<BigTorus>(2*N-1, R, zparams, &alloc);
+    alloc.deleteArray<BigTorus>(3*N, bufBigTorus, zparams, &alloc);
+    alloc.deleteArray<BigInt>(N, bufBigInt);
+}
+
+
+
+// poly1, poly2 and result are polynomials mod X^N+1
+template<>
+void TorusPolynomial<BigTorus>::AddMulRKaratsuba1(TorusPolynomial<BigTorus> *result,
+                                                  const IntPolynomial<BigInt> *poly1,
+                                                  const TorusPolynomial<BigTorus> *poly2,
+                                                  const PolynomialParams<BigTorus> *params,
+                                                  TfheThreadContext *context,
+                                                  Allocator alloc) {
+    const int32_t N = params->N;
+    // zmodule_params
+    const typename PolynomialParams<BigTorus>::ZModuleType *const zparams = params->zmodule_params;
+
+
+    // Buffer: that's large enough to store every tmp BigInt variable (1*N*sizeof(BigInt))
+    BigInt *bufBigInt = alloc.newArray<BigInt>(N, 42);
+    // Buffer: that's large enough to store every tmp BigTorus variable (3*N*sizeof(BigTorus))
+    BigTorus *bufBigTorus = alloc.newArray<BigTorus>(3 * N, zparams, &alloc);
+    // Result in Karatsuba_aux
+    BigTorus *R = alloc.newArray<BigTorus>(2 * N - 1, zparams, &alloc);
+    // Temp value
+    BigTorus *temp = alloc.newObject<BigTorus>(zparams, &alloc);
+
+
+    // Karatsuba
+    Karatsuba_aux1(R, bufBigInt, bufBigTorus, temp, poly1->coefs, poly2->coefs, N, zparams);
+
+    // Reduction mod X^N+1
+    for (int32_t i = 0; i < N - 1; ++i) {
+        sub(temp, R + i, R + (N + i), zparams);
+        add(result->coefs + i, result->coefs + i, temp, zparams);
+    }
+    add(result->coefs + (N - 1), result->coefs + (N - 1), R + (N - 1), zparams);
+
+
+    // delete
+    alloc.deleteObject<BigTorus>(temp, zparams, &alloc);
+    alloc.deleteArray<BigTorus>(2*N-1, R, zparams, &alloc);
+    alloc.deleteArray<BigTorus>(3*N, bufBigTorus, zparams, &alloc);
+    alloc.deleteArray<BigInt>(N, bufBigInt);
+}
+
+
+
+// poly1, poly2 and result are polynomials mod X^N+1
+template<>
+void TorusPolynomial<BigTorus>::SubMulRKaratsuba1(TorusPolynomial<BigTorus> *result,
+                                                  const IntPolynomial<BigInt> *poly1,
+                                                  const TorusPolynomial<BigTorus> *poly2,
+                                                  const PolynomialParams<BigTorus> *params,
+                                                  TfheThreadContext *context,
+                                                  Allocator alloc) {
+    const int32_t N = params->N;
+    // zmodule_params
+    const typename PolynomialParams<BigTorus>::ZModuleType *const zparams = params->zmodule_params;
+
+
+    // Buffer: that's large enough to store every tmp BigInt variable (1*N*sizeof(BigInt))
+    BigInt *bufBigInt = alloc.newArray<BigInt>(N, 42);
+    // Buffer: that's large enough to store every tmp BigTorus variable (3*N*sizeof(BigTorus))
+    BigTorus *bufBigTorus = alloc.newArray<BigTorus>(3 * N, zparams, &alloc);
+    // Result in Karatsuba_aux
+    BigTorus *R = alloc.newArray<BigTorus>(2 * N - 1, zparams, &alloc);
+    // Temp value
+    BigTorus *temp = alloc.newObject<BigTorus>(zparams, &alloc);
+
+
+    // Karatsuba
+    Karatsuba_aux1(R, bufBigInt, bufBigTorus, temp, poly1->coefs, poly2->coefs, N, zparams);
+
+    // Reduction mod X^N+1
+    for (int32_t i = 0; i < N - 1; ++i) {
+        sub(temp, R + i, R + (N + i), zparams);
+        sub(result->coefs + i, result->coefs + i, temp, zparams);
+    }
+    sub(result->coefs + (N - 1), result->coefs + (N - 1), R + (N - 1), zparams);
 
 
     // delete
