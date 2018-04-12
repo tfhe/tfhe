@@ -8,15 +8,10 @@
 /**
  * @brief Polynomial with integer coefficients
  *
- * @tparam INT_TYPE integer type of coefficients
+ * @tparam TORUS torus type
  */
-template<typename INT_TYPE>
-class IntPolynomial : public Polynomial<INT_TYPE>
-{
-    static_assert(std::is_same<INT_TYPE, BigInt>::value or
-        (std::is_integral<INT_TYPE>::value and std::is_signed<INT_TYPE>::value),
-        "IntPolynomial<T> defined only for native signed integer types and BigInt");
-
+template<typename TORUS>
+class IntPolynomial : public Polynomial<TORUS, CoefTypeEnum::Integer> {
 public:
     /**
      * @brief Constructs a polynomial with given parameters
@@ -26,9 +21,9 @@ public:
      * @param alloc allocator to use
      */
     IntPolynomial(
-        const PolynomialParams<INT_TYPE> *params,
-        TfheThreadContext *context,
-        Allocator *alloc) : Polynomial<INT_TYPE>(params, context, alloc) { }
+            const PolynomialParams<TORUS> *params,
+            TfheThreadContext *context,
+            Allocator *alloc) : Polynomial<TORUS, CoefTypeEnum::Integer>(params, context, alloc) {}
 
     /**
      * @brief Destroys inner data of polynomial
@@ -38,10 +33,9 @@ public:
      * @param alloc allocator to use
      */
     void destroy(
-        const PolynomialParams<INT_TYPE> *params,
-        TfheThreadContext *context,
-        Allocator *alloc)
-    {
+            const PolynomialParams<TORUS> *params,
+            TfheThreadContext *context,
+            Allocator *alloc) {
         destroy(params, context, alloc);
     }
 
@@ -52,17 +46,17 @@ public:
      */
 public:
     /** Euclidean norm of an Integer Polynomial */
-    static double Norm2sq(const IntPolynomial<INT_TYPE> *poly,
-        const PolynomialParams<INT_TYPE> *params,
-        TfheThreadContext *context,
-        Allocator alloc);
+    static double Norm2sq(const IntPolynomial<TORUS> *poly,
+                          const PolynomialParams<TORUS> *params,
+                          TfheThreadContext *context,
+                          Allocator alloc);
 
     /** Infinity norm of the distance between two integer polynomials */
-    static double NormInftyDist(const IntPolynomial<INT_TYPE> *poly1,
-        const IntPolynomial<INT_TYPE> *poly2,
-        const PolynomialParams<INT_TYPE> *params,
-        TfheThreadContext *context,
-        Allocator alloc);
+    static double NormInftyDist(const IntPolynomial<TORUS> *poly1,
+                                const IntPolynomial<TORUS> *poly2,
+                                const PolynomialParams<TORUS> *params,
+                                TfheThreadContext *context,
+                                Allocator alloc);
 };
 
 #endif // POLYNOMIAL_INT_H
