@@ -75,6 +75,15 @@ public:
      */
     ~Allocator() {}
 
+    // An allocator cannot be copied. Move is ok, however.
+    Allocator(const Allocator &alloc) = delete;
+
+    Allocator(Allocator &&alloc) = default;
+
+    Allocator &operator=(const Allocator &alloc)= delete;
+
+    Allocator &operator=(Allocator &&alloc)= default;
+
     /**
      * Allocates and constructs a new object of type T, aligned with the specified alignment,
      * and call the constructor using args

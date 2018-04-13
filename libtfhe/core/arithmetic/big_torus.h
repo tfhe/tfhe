@@ -24,46 +24,48 @@ public:
     PREVENT_STACK_COPY(BigTorus);
 };
 
+namespace tfhe_backend {
+
 /**
  * @brief res = 0
  */
-void zero(BigTorus *res, const ZModuleParams<BigTorus> *params);
+    void zero(BigTorus *res, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = src
  */
-void copy(BigTorus *res, const BigTorus* src, const ZModuleParams<BigTorus> *params);
+    void copy(BigTorus *res, const BigTorus *src, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = 2^-k
  */
-void setPowHalf(BigTorus *res, const int k, const ZModuleParams<BigTorus> *params);
+    void setPowHalf(BigTorus *res, const int k, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = a + b
  */
-void add(BigTorus *res, const BigTorus *a, const BigTorus *b, const ZModuleParams<BigTorus> *params);
+    void add(BigTorus *res, const BigTorus *a, const BigTorus *b, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = a - b
  */
-void sub(BigTorus *res, const BigTorus *a, const BigTorus *b, const ZModuleParams<BigTorus> *params);
+    void sub(BigTorus *res, const BigTorus *a, const BigTorus *b, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = a * b
  */
-void mul(BigTorus *res, int64_t a, const BigTorus *b, const ZModuleParams<BigTorus> *params);
+    void mul(BigTorus *res, int64_t a, const BigTorus *b, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = a * b
  * WARNING: for this function, res and b must not overlap.
  */
-void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<BigTorus> *params, Allocator alloc);
+    void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<BigTorus> *params, Allocator alloc);
 
 /**
  * @brief res = -a
  */
-void neg(BigTorus *res, const BigTorus *a, const ZModuleParams<BigTorus> *params);
+    void neg(BigTorus *res, const BigTorus *a, const ZModuleParams<BigTorus> *params);
 
 
 /**
@@ -71,14 +73,14 @@ void neg(BigTorus *res, const BigTorus *a, const ZModuleParams<BigTorus> *params
  * @param d real to convert
  * @return torus value
  */
-void from_double(BigTorus *reps, const double d, const ZModuleParams<BigTorus> *params);
+    void from_double(BigTorus *reps, const double d, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief Converts torus to real number (mainly for printing).
  * @param x torus element to convert
  * @return real number
 */
-double to_double(const BigTorus *a, const ZModuleParams<BigTorus> *b);
+    double to_double(const BigTorus *a, const ZModuleParams<BigTorus> *b);
 
 /**
  * @brief Rounds the torus value to the nearest multiple of 1/Msize
@@ -86,7 +88,9 @@ double to_double(const BigTorus *a, const ZModuleParams<BigTorus> *b);
  * @param Msize discrete space size
  * @return approximated torus value
  */
-void approxPhase(BigTorus *res, const BigTorus *phase, uint64_t Msize, ZModuleParams<BigTorus> *params, Allocator alloc);
+    void
+    approxPhase(BigTorus *res, const BigTorus *phase, uint64_t Msize, const ZModuleParams<BigTorus> *params,
+                Allocator alloc);
 
 /**
  * @brief Mod-Rescale from the torus to Z/Msize.Z
@@ -95,7 +99,8 @@ void approxPhase(BigTorus *res, const BigTorus *phase, uint64_t Msize, ZModulePa
  * @param Msize discrete space size
  * @return discrete space value in [0, MSize[
  */
-uint64_t modSwitchFromTorus(const BigTorus *phase, uint64_t Msize, ZModuleParams<BigTorus> *params, Allocator alloc);
+    uint64_t
+    modSwitchFromTorus(const BigTorus *phase, uint64_t Msize, const ZModuleParams<BigTorus> *params, Allocator alloc);
 
 /**
  * @brief Converts discrete message space to torus
@@ -104,7 +109,9 @@ uint64_t modSwitchFromTorus(const BigTorus *phase, uint64_t Msize, ZModuleParams
  * @param Msize discrete space size
  * @return torus value
  */
-void modSwitchToTorus(BigTorus *res, const uint64_t mu, const uint64_t Msize, ZModuleParams<BigTorus> *params, Allocator alloc);
+    void modSwitchToTorus(BigTorus *res, const uint64_t mu, const uint64_t Msize, const ZModuleParams<BigTorus> *params,
+                          Allocator alloc);
 
+}
 
 #endif //TFHE_BIGTORUS_H

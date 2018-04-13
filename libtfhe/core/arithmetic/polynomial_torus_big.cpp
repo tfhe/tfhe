@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+using namespace tfhe_backend;
+
 /**
  * Instantiate TorusPolynomial class for big torus type
  */
@@ -39,7 +41,7 @@ void TorusPolynomial<BigTorus>::AddMulZ(
     BigTorus *t = alloc.newObject<BigTorus>(zparams, &alloc);
     for (int32_t i = 0; i < N; ++i) {
         copy(t, b + i, zparams);
-        mul(t, p, t, zparams, alloc);
+        mul(t, p, t, zparams, alloc.createStackChildAllocator());
         add(r + i, a + i, t, zparams);
     }
 }
@@ -53,7 +55,7 @@ void TorusPolynomial<BigTorus>::AddMulZTo(
         const PolynomialParams<BigTorus> *params,
         TfheThreadContext *context,
         Allocator alloc) {
-    TorusPolynomial<BigTorus>::AddMulZ(result, result, p, poly2, params, context, alloc);
+    TorusPolynomial<BigTorus>::AddMulZ(result, result, p, poly2, params, context, std::move(alloc));
 }
 
 // TorusPolynomial - p*TorusPolynomial
@@ -77,7 +79,7 @@ void TorusPolynomial<BigTorus>::SubMulZ(
     BigTorus *t = alloc.newObject<BigTorus>(zparams, &alloc);
     for (int32_t i = 0; i < N; ++i) {
         copy(t, b + i, zparams);
-        mul(t, p, t, zparams, alloc);
+        mul(t, p, t, zparams, alloc.createStackChildAllocator());
         sub(r + i, a + i, t, zparams);
     }
 }
@@ -91,7 +93,7 @@ void TorusPolynomial<BigTorus>::SubMulZTo(
         const PolynomialParams<BigTorus> *params,
         TfheThreadContext *context,
         Allocator alloc) {
-    TorusPolynomial<BigTorus>::SubMulZ(result, result, p, poly2, params, context, alloc);
+    TorusPolynomial<BigTorus>::SubMulZ(result, result, p, poly2, params, context, std::move(alloc));
 }
 
 // Infinity norm of the distance between two TorusPolynomial
@@ -132,7 +134,7 @@ void TorusPolynomial<BigTorus>::MultNaive_plain_aux(
         BigTorus *ri = result + i;
         zero(ri, zparams);
         for (int32_t j = 0; j <= i; j++) {
-            mul(ti, poly1 + j, poly2 + (i - j), zparams, alloc);
+            mul(ti, poly1 + j, poly2 + (i - j), zparams, alloc.createStackChildAllocator());
             add(ri, ri, ti, zparams);
         }
     }
@@ -141,7 +143,7 @@ void TorusPolynomial<BigTorus>::MultNaive_plain_aux(
         BigTorus *ri = result + i;
         zero(ri, zparams);
         for (int32_t j = i - N + 1; j < N; j++) {
-            mul(ti, poly1 + j, poly2 + (i - j), zparams, alloc);
+            mul(ti, poly1 + j, poly2 + (i - j), zparams, alloc.createStackChildAllocator());
             add(ri, ri, ti, zparams);
         }
     }
@@ -163,11 +165,11 @@ void TorusPolynomial<BigTorus>::MultNaive_aux(
         zero(ri, zparams);
 
         for (int32_t j = 0; j <= i; j++) {
-            mul(ti, poly1 + j, poly2 + (i - j), zparams, alloc);
+            mul(ti, poly1 + j, poly2 + (i - j), zparams, alloc.createStackChildAllocator());
             add(ri, ri, ti, zparams);
         }
         for (int32_t j = i + 1; j < N; j++) {
-            mul(ti, poly1 + j, poly2 + (N + i - j), zparams, alloc);
+            mul(ti, poly1 + j, poly2 + (N + i - j), zparams, alloc.createStackChildAllocator());
             sub(ri, ri, ti, zparams);
         }
     }

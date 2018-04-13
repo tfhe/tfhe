@@ -25,6 +25,14 @@ public:
 
     ~ValgrindAllocator();
 
+    ValgrindAllocator(const ValgrindAllocator &alloc) = delete;
+
+    ValgrindAllocator(ValgrindAllocator &&alloc) = default;
+
+    ValgrindAllocator &operator=(const ValgrindAllocator &alloc)= delete;
+
+    ValgrindAllocator &operator=(ValgrindAllocator &&alloc)= default;
+
     Allocator createStackChildAllocator(const size_t expected_size = default_stack_size);
 };
 

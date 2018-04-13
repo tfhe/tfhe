@@ -1,5 +1,7 @@
 #include "polynomial.h"
 
+using namespace tfhe_backend;
+
 /**
  * Instantiate Polynomial class for big torus and int types
  */
