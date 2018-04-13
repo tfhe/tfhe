@@ -6,24 +6,24 @@
  * Instantiate IntPolynomial class for big int type
  */
 template
-struct IntPolynomial<BigInt>;
+class IntPolynomial<BigTorus>;
 
 // Euclidean norm of an IntPolynomial
 template<>
-double IntPolynomial<BigInt>::Norm2sq(const IntPolynomial<BigInt> *poly,
-                                      const PolynomialParams<BigInt> *params,
-                                      TfheThreadContext *context,
-                                      Allocator alloc) {
+double IntPolynomial<BigTorus>::Norm2sq(const IntPolynomial<BigTorus> *poly,
+                                        const PolynomialParams<BigTorus> *params,
+                                        TfheThreadContext *context,
+                                        Allocator alloc) {
     const int32_t N = params->N;
-    const typename PolynomialParams<BigTorus>::ZModuleType *const zparams = params->zmodule_params;
+    //typename PolynomialParams<BigTorus>::ZModuleParams<BigTorus> *zparams = params->zmodule_params;
     double norm_d = 0;
     BigInt *r = alloc.newObject<BigInt>(0);
     BigInt *norm = alloc.newObject<BigInt>(0);
 
 
     for (int32_t i = 0; i < N; ++i) {
-        mul(r, poly->coefs + i, poly->coefs + i, zparams);
-        add(norm, norm, r, zparams);
+        mul(r, poly->coefs + i, poly->coefs + i, params->zmodule_params);
+        add(norm, norm, r, params->zmodule_params);
     }
 
     // get the double from BigInt
@@ -38,11 +38,11 @@ double IntPolynomial<BigInt>::Norm2sq(const IntPolynomial<BigInt> *poly,
 
 // Infinity norm of the distance between two IntPolynomial
 template<>
-double IntPolynomial<BigInt>::NormInftyDist(const IntPolynomial<BigInt> *poly1,
-                                            const IntPolynomial<BigInt> *poly2,
-                                            const PolynomialParams<BigInt> *params,
-                                            TfheThreadContext *context,
-                                            Allocator alloc) {
+double IntPolynomial<BigTorus>::NormInftyDist(const IntPolynomial<BigTorus> *poly1,
+                                              const IntPolynomial<BigTorus> *poly2,
+                                              const PolynomialParams<BigTorus> *params,
+                                              TfheThreadContext *context,
+                                              Allocator alloc){
     const int32_t N = params->N;
     double norm = 0;
     double r;

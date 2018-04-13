@@ -4,47 +4,44 @@
 /**
  * Instantiate Polynomial class for native torus and int types
  */
-EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(Polynomial);
-// EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_INT(Polynomial); // native torus and int types are the same => don't need both
+EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(Polynomial, CoefTypeEnum::Torus);
 
-template<typename TYPE>
-Polynomial<TYPE>::Polynomial(
-    const PolynomialParams<TYPE> *params,
-    TfheThreadContext *context,
-    Allocator *alloc)
-{
+EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(Polynomial, CoefTypeEnum::Integer);
+
+template<typename TORUS, CoefTypeEnum CoefType>
+Polynomial<TORUS, CoefType>::Polynomial(
+        const PolynomialParams<TORUS> *params,
+        TfheThreadContext *context,
+        Allocator *alloc) {
     coefs = alloc->newArray<TYPE>(params->N);
 }
 
-template<typename TYPE>
-void Polynomial<TYPE>::destroy(
-    const PolynomialParams<TYPE> *params,
-    TfheThreadContext *context,
-    Allocator *alloc)
-{
+template<typename TORUS, CoefTypeEnum CoefType>
+void Polynomial<TORUS, CoefType>::destroy(
+        const PolynomialParams<TORUS> *params,
+        TfheThreadContext *context,
+        Allocator *alloc) {
     alloc->deleteArray<TYPE>(params->N, coefs);
 }
 
-template<typename TYPE>
-void Polynomial<TYPE>::Clear(
-    Polynomial<TYPE> *result,
-    const PolynomialParams<TYPE> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
+template<typename TORUS, CoefTypeEnum CoefType>
+void Polynomial<TORUS, CoefType>::Clear(
+        Polynomial<TORUS, CoefType> *result,
+        const PolynomialParams<TORUS> *params,
+        TfheThreadContext *context,
+        Allocator alloc) {
     const int32_t N = params->N;
     for (int32_t i = 0; i < N; ++i)
         result->coefs[i] = 0;
 }
 
-template<typename TYPE>
-void Polynomial<TYPE>::Copy(
-    Polynomial<TYPE> *result,
-    const Polynomial<TYPE> *source,
-    const PolynomialParams<TYPE> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
+template<typename TORUS, CoefTypeEnum CoefType>
+void Polynomial<TORUS, CoefType>::Copy(
+        Polynomial<TORUS, CoefType> *result,
+        const Polynomial<TORUS, CoefType> *source,
+        const PolynomialParams<TORUS> *params,
+        TfheThreadContext *context,
+        Allocator alloc) {
     assert(result != source);
 
     const int32_t N = params->N;
@@ -55,15 +52,14 @@ void Polynomial<TYPE>::Copy(
         r[i] = s[i];
 }
 
-template<typename TYPE>
-void Polynomial<TYPE>::Add(
-    Polynomial<TYPE> *result,
-    const Polynomial<TYPE> *poly1,
-    const Polynomial<TYPE> *poly2,
-    const PolynomialParams<TYPE> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
+template<typename TORUS, CoefTypeEnum CoefType>
+void Polynomial<TORUS, CoefType>::Add(
+        Polynomial<TORUS, CoefType> *result,
+        const Polynomial<TORUS, CoefType> *poly1,
+        const Polynomial<TORUS, CoefType> *poly2,
+        const PolynomialParams<TORUS> *params,
+        TfheThreadContext *context,
+        Allocator alloc) {
     assert(result != poly1); //if it fails here, please use addTo
     assert(result != poly2); //if it fails here, please use addTo
 
@@ -76,14 +72,13 @@ void Polynomial<TYPE>::Add(
         r[i] = a[i] + b[i];
 }
 
-template<typename TYPE>
-void Polynomial<TYPE>::AddTo(
-    Polynomial<TYPE> *result,
-    const Polynomial<TYPE> *poly,
-    const PolynomialParams<TYPE> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
+template<typename TORUS, CoefTypeEnum CoefType>
+void Polynomial<TORUS, CoefType>::AddTo(
+        Polynomial<TORUS, CoefType> *result,
+        const Polynomial<TORUS, CoefType> *poly,
+        const PolynomialParams<TORUS> *params,
+        TfheThreadContext *context,
+        Allocator alloc) {
     const int32_t N = params->N;
     const TYPE *s = poly->coefs;
     TYPE *r = result->coefs;
@@ -92,15 +87,14 @@ void Polynomial<TYPE>::AddTo(
         r[i] += s[i];
 }
 
-template<typename TYPE>
-void Polynomial<TYPE>::Sub(
-    Polynomial<TYPE> *result,
-    const Polynomial<TYPE> *poly1,
-    const Polynomial<TYPE> *poly2,
-    const PolynomialParams<TYPE> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
+template<typename TORUS, CoefTypeEnum CoefType>
+void Polynomial<TORUS, CoefType>::Sub(
+        Polynomial<TORUS, CoefType> *result,
+        const Polynomial<TORUS, CoefType> *poly1,
+        const Polynomial<TORUS, CoefType> *poly2,
+        const PolynomialParams<TORUS> *params,
+        TfheThreadContext *context,
+        Allocator alloc) {
     assert(result != poly1); //if it fails here, please use addTo
     assert(result != poly2); //if it fails here, please use addTo
 
@@ -113,14 +107,13 @@ void Polynomial<TYPE>::Sub(
         r[i] = a[i] - b[i];
 }
 
-template<typename TYPE>
-void Polynomial<TYPE>::SubTo(
-    Polynomial<TYPE> *result,
-    const Polynomial<TYPE> *poly,
-    const PolynomialParams<TYPE> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
+template<typename TORUS, CoefTypeEnum CoefType>
+void Polynomial<TORUS, CoefType>::SubTo(
+        Polynomial<TORUS, CoefType> *result,
+        const Polynomial<TORUS, CoefType> *poly,
+        const PolynomialParams<TORUS> *params,
+        TfheThreadContext *context,
+        Allocator alloc) {
     assert(result != poly);
 
     const int32_t N = params->N;
@@ -131,15 +124,14 @@ void Polynomial<TYPE>::SubTo(
         r[i] -= s[i];
 }
 
-template<typename TYPE>
-void Polynomial<TYPE>::MulByXaiMinusOne(
-    Polynomial<TYPE> *result,
-    const int32_t a,
-    const Polynomial<TYPE> *source,
-    const PolynomialParams<TYPE> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
+template<typename TORUS, CoefTypeEnum CoefType>
+void Polynomial<TORUS, CoefType>::MulByXaiMinusOne(
+        Polynomial<TORUS, CoefType> *result,
+        const int32_t a,
+        const Polynomial<TORUS, CoefType> *source,
+        const PolynomialParams<TORUS> *params,
+        TfheThreadContext *context,
+        Allocator alloc) {
     const int32_t N = params->N;
     assert(result != source);
     assert(a >= 0 && a < 2 * N);
@@ -161,15 +153,14 @@ void Polynomial<TYPE>::MulByXaiMinusOne(
     }
 }
 
-template<typename TYPE>
-void Polynomial<TYPE>::MulByXai(
-    Polynomial<TYPE> *result,
-    const int32_t a,
-    const Polynomial<TYPE> *source,
-    const PolynomialParams<TYPE> *params,
-    TfheThreadContext *context,
-    Allocator alloc)
-{
+template<typename TORUS, CoefTypeEnum CoefType>
+void Polynomial<TORUS, CoefType>::MulByXai(
+        Polynomial<TORUS, CoefType> *result,
+        const int32_t a,
+        const Polynomial<TORUS, CoefType> *source,
+        const PolynomialParams<TORUS> *params,
+        TfheThreadContext *context,
+        Allocator alloc) {
     const int32_t N = params->N;
     assert(result != source);
     assert(a >= 0 && a < 2 * N);
