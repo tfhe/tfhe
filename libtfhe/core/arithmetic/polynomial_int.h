@@ -23,7 +23,8 @@ public:
     IntPolynomial(
             const PolynomialParams<TORUS> *params,
             TfheThreadContext *context,
-            Allocator *alloc) : Polynomial<TORUS, CoefTypeEnum::Integer>(params, context, alloc) {}
+            Allocator *alloc) : Polynomial<TORUS,
+            CoefTypeEnum::Integer>(params, context, alloc) {}
 
     /**
      * @brief Destroys inner data of polynomial
@@ -32,10 +33,9 @@ public:
      * @param context thread execution context
      * @param alloc allocator to use
      */
-    void destroy(
-            const PolynomialParams<TORUS> *params,
-            TfheThreadContext *context,
-            Allocator *alloc) {
+    void destroy(const PolynomialParams<TORUS> *params,
+                 TfheThreadContext *context,
+                 Allocator *alloc) {
         destroy(params, context, alloc);
     }
 

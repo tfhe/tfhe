@@ -1,6 +1,7 @@
 #include <gmp.h>
 #include "big_int.h"
 
+
 BigInt::BigInt(int64_t value) {
     mpz_init_set_si(data, value);
 }
@@ -101,3 +102,4 @@ void tfhe_backend::setvalue(BigInt *res, const BigInt *a, const ZModuleParams<Bi
 void tfhe_backend::setvalue(BigInt *res, const int64_t a, const ZModuleParams<BigTorus> *params) {
     mpz_set_si(res->data, a);
 }
+
