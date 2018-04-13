@@ -32,7 +32,7 @@ void zero(BigTorus *res, const ZModuleParams<BigTorus> *params);
 /**
  * @brief res = src
  */
-void copy(BigTorus *res, const BigTorus* src, const ZModuleParams<BigTorus> *params);
+void copy(BigTorus *res, const BigTorus *src, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = 2^-k
@@ -54,11 +54,14 @@ void sub(BigTorus *res, const BigTorus *a, const BigTorus *b, const ZModuleParam
  */
 void mul(BigTorus *res, int64_t a, const BigTorus *b, const ZModuleParams<BigTorus> *params);
 
+/**
+ * @brief res = a * b
+ * WARNING: for this function, res and b must not overlap.
+ */
 void mul_no_overlap(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = a * b
- * WARNING: for this function, res and b must not overlap.
  */
 void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<BigTorus> *params, Allocator alloc);
 
@@ -88,7 +91,8 @@ double to_double(const BigTorus *a, const ZModuleParams<BigTorus> *b);
  * @param Msize discrete space size
  * @return approximated torus value
  */
-void approxPhase(BigTorus *res, const BigTorus *phase, uint64_t Msize, ZModuleParams<BigTorus> *params, Allocator alloc);
+void
+approxPhase(BigTorus *res, const BigTorus *phase, uint64_t Msize, ZModuleParams<BigTorus> *params, Allocator alloc);
 
 /**
  * @brief Mod-Rescale from the torus to Z/Msize.Z
@@ -106,7 +110,8 @@ uint64_t modSwitchFromTorus(const BigTorus *phase, uint64_t Msize, ZModuleParams
  * @param Msize discrete space size
  * @return torus value
  */
-void modSwitchToTorus(BigTorus *res, const uint64_t mu, const uint64_t Msize, ZModuleParams<BigTorus> *params, Allocator alloc);
+void modSwitchToTorus(BigTorus *res, const uint64_t mu, const uint64_t Msize, ZModuleParams<BigTorus> *params,
+                      Allocator alloc);
 
 
 #endif //TFHE_BIGTORUS_H
