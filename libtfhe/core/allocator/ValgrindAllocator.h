@@ -3,17 +3,18 @@
 
 
 #include <set>
-
-class Allocator;
+#include "allocator.h"
 
 /**
  * this class will in fact allocate everything with malloc and deallocate everything with free.
  * Il will also check that everything that has been allocated is freed according to the allocator policy.
  */
-class ValgrindAllocator {
-    ValgrindAllocator *const father;
+template<>
+class AllocatorImpl<VALGRIND_ALLOCATOR> {
+    AllocatorImpl *const father;
     std::set<void *> addresses;
     bool has_child;
+    bool has_moved;
     size_t beginAddress;
     const size_t endAddress;
 public:
@@ -21,19 +22,16 @@ public:
 
     void deallocate(void *ptr);
 
-    ValgrindAllocator(ValgrindAllocator *father = nullptr, size_t beginAddress = 0, size_t endAddress = 0);
+    AllocatorImpl(AllocatorImpl *father = nullptr, size_t beginAddress = 0, size_t endAddress = 0);
 
-    ~ValgrindAllocator();
+    ~AllocatorImpl();
 
-    ValgrindAllocator(const ValgrindAllocator &alloc) = delete;
 
-    ValgrindAllocator(ValgrindAllocator &&alloc) = default;
+    AllocatorImpl(AllocatorImpl &&alloc);
 
-    ValgrindAllocator &operator=(const ValgrindAllocator &alloc)= delete;
+    AllocatorImpl createStackChildAllocator(const size_t expected_size = default_stack_size);
 
-    ValgrindAllocator &operator=(ValgrindAllocator &&alloc)= default;
-
-    Allocator createStackChildAllocator(const size_t expected_size = default_stack_size);
+#include "allocator-shortcut-functions.h"
 };
 
 

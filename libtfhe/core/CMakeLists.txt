@@ -31,7 +31,7 @@ set(CORE_SRCS
         arithmetic/big_torus.h
         arithmetic/zmodule_param.h
         arithmetic/zmodule_param.cpp
-)
+        allocator/allocator-shortcut-functions.h)
 
 add_library(tfhe-core OBJECT ${CORE_SRCS})
 set_property(TARGET tfhe-core PROPERTY POSITION_INDEPENDENT_CODE ON)
