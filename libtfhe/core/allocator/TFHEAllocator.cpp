@@ -41,8 +41,6 @@ AllocatorImpl<TFHE_ALLOCATOR>::AllocatorImpl(AllocatorImpl<TFHE_ALLOCATOR> *cons
 
 AllocatorImpl<TFHE_ALLOCATOR>::AllocatorImpl(AllocatorImpl<TFHE_ALLOCATOR> &&origin) :
         father(origin.father), beginAddress(origin.beginAddress) {
-    //in the move constructor, we explicitely reset the father's origin
-    AllocatorImpl<TFHE_ALLOCATOR> **x = (AllocatorImpl<TFHE_ALLOCATOR> **) &origin.father;
-    *x = nullptr;
+    origin.father = nullptr;
     origin.beginAddress = 0;
 }

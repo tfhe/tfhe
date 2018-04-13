@@ -60,12 +60,12 @@ namespace tfhe_backend {
  * @brief res = a * b
  * WARNING: for this function, res and b must not overlap.
  */
-void mul_no_overlap(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<BigTorus> *params);
+    void mul_no_overlap(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<BigTorus> *params);
 
 /**
  * @brief res = a * b
  */
-void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<BigTorus> *params, Allocator alloc);
+    void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<BigTorus> *params, Allocator alloc);
 
 /**
  * @brief res = -a

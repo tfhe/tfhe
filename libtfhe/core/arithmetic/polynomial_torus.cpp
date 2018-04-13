@@ -221,7 +221,8 @@ void TorusPolynomial<TORUS>::Karatsuba_aux_old(
     //we stop the karatsuba recursion at h=4, because on my machine,
     //it seems to be optimal
     if (h <= 4) {
-        TorusPolynomial<TORUS>::MultNaive_plain_aux(R, A, B, size, zparams, context, alloc.createStackChildAllocator());
+        TorusPolynomial<TORUS>::MultNaive_plain_aux_old(R, A, B, size, zparams, context,
+                                                        alloc.createStackChildAllocator());
         return;
     }
 
@@ -240,10 +241,11 @@ void TorusPolynomial<TORUS>::Karatsuba_aux_old(
         Btemp[i] = B[i] + B[h + i];
 
     // Karatsuba recursivly
-    Karatsuba_aux_old(R, A, B, h, buf, zparams, context, alloc); // (R[0],R[2*h-2]), (A[0],A[h-1]), (B[0],B[h-1])
+    Karatsuba_aux_old(R, A, B, h, buf, zparams, context,
+                      alloc.createStackChildAllocator()); // (R[0],R[2*h-2]), (A[0],A[h-1]), (B[0],B[h-1])
     Karatsuba_aux_old(R + size, A + h, B + h, h, buf, zparams, context,
-                      alloc); // (R[2*h],R[4*h-2]), (A[h],A[2*h-1]), (B[h],B[2*h-1])
-    Karatsuba_aux_old(Rtemp, Atemp, Btemp, h, buf, zparams, context, alloc);
+                      alloc.createStackChildAllocator()); // (R[2*h],R[4*h-2]), (A[h],A[2*h-1]), (B[h],B[2*h-1])
+    Karatsuba_aux_old(Rtemp, Atemp, Btemp, h, buf, zparams, context, alloc.createStackChildAllocator());
     R[sm1] = 0; //this one needs to be copy manually
     for (int32_t i = 0; i < sm1; ++i)
         Rtemp[i] -= R[i] + R[size + i];
@@ -269,7 +271,7 @@ void TorusPolynomial<TORUS>::MultKaratsuba_old(
             params->zmodule_params;
 
     // Karatsuba
-    Karatsuba_aux_old(R, poly1->coefs, poly2->coefs, N, buf, zparams, context, alloc);
+    Karatsuba_aux_old(R, poly1->coefs, poly2->coefs, N, buf, zparams, context, alloc.createStackChildAllocator());
 
     // reduction mod X^N+1
     for (int32_t i = 0; i < N - 1; ++i)
@@ -296,7 +298,7 @@ void TorusPolynomial<TORUS>::AddMulRKaratsuba_old(
             params->zmodule_params;
 
     // Karatsuba
-    Karatsuba_aux_old(R, poly1->coefs, poly2->coefs, N, buf, zparams, context, alloc);
+    Karatsuba_aux_old(R, poly1->coefs, poly2->coefs, N, buf, zparams, context, alloc.createStackChildAllocator());
 
     // reduction mod X^N+1
     for (int32_t i = 0; i < N - 1; ++i)
@@ -323,7 +325,7 @@ void TorusPolynomial<TORUS>::SubMulRKaratsuba_old(
             params->zmodule_params;
 
     // Karatsuba
-    Karatsuba_aux_old(R, poly1->coefs, poly2->coefs, N, buf, zparams, context, alloc);
+    Karatsuba_aux_old(R, poly1->coefs, poly2->coefs, N, buf, zparams, context, alloc.createStackChildAllocator());
 
     // reduction mod X^N+1
     for (int32_t i = 0; i < N - 1; ++i)

@@ -26,7 +26,8 @@ void tfhe_backend::mul(BigTorus *res, int64_t a, const BigTorus *b, const ZModul
     }
 }
 
-void mul_no_overlap(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<BigTorus> *params) {
+void tfhe_backend::mul_no_overlap(BigTorus *__restrict res, const BigInt *a, const BigTorus *__restrict b,
+                                  const ZModuleParams<BigTorus> *params) {
     assert(res != b);
     if (a->data->_mp_size > 0) { //positive
         const int m = a->data->_mp_size;
@@ -46,10 +47,10 @@ void mul_no_overlap(BigTorus *res, const BigInt *a, const BigTorus *b, const ZMo
 
 void tfhe_backend::mul(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<BigTorus> *params,
                        Allocator alloc) {
-    if (res!=b) {
+    if (res != b) {
         mul_no_overlap(res, a, b, params);
     } else {
-        BigTorus* tmp = alloc.newObject<BigTorus>(params, &alloc);
+        BigTorus *tmp = alloc.newObject<BigTorus>(params, &alloc);
         copy(tmp, b, params);
         mul_no_overlap(res, a, tmp, params);
         alloc.deleteObject(tmp, params, &alloc);
@@ -65,7 +66,7 @@ void tfhe_backend::from_double(BigTorus *reps, const double d, const ZModulePara
     static constexpr uint64_t mantissa_msb = (uint64_t(1) << 52);
     static constexpr uint64_t mantissa_mask = mantissa_msb - 1;
     static constexpr uint64_t expo_mask = (uint64_t(1) << 11) - 1;
-    uint64_t* dip = (uint64_t *)&d;  //get the bits of d
+    uint64_t *dip = (uint64_t *) &d;  //get the bits of d
     uint64_t di = *dip;
     uint64_t mantissa = (di & mantissa_mask) | mantissa_msb;
     uint64_t expo = (di >> 52) & expo_mask;
@@ -218,13 +219,13 @@ uint64_t tfhe_backend::modSwitchFromTorus(const BigTorus *phase, uint64_t Msize,
 
 void tfhe_backend::modSwitchToTorus(BigTorus *res, const uint64_t message, const uint64_t Msize,
                                     const ZModuleParams<BigTorus> *params, Allocator alloc) {
-    const uint64_t mu = ((message % Msize)+Msize)%Msize; //between 0 and Msize-1
+    const uint64_t mu = ((message % Msize) + Msize) % Msize; //between 0 and Msize-1
     TorusMsgSpace msgSpace(Msize, params, &alloc);
     msgSpace.encryptTrivial(res, mu);
 }
 
 double tfhe_backend::to_double(const BigTorus *a, const ZModuleParams<BigTorus> *params) {
     // quick and dirty
-    return double(int64_t(a->data[params->max_nbLimbs-1]))*pow(0.5,64);
+    return double(int64_t(a->data[params->max_nbLimbs - 1])) * pow(0.5, 64);
 }
 

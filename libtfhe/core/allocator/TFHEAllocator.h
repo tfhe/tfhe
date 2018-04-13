@@ -9,7 +9,7 @@
  */
 template<>
 class AllocatorImpl<TFHE_ALLOCATOR> {
-    AllocatorImpl *const father;
+    AllocatorImpl *father;
     size_t beginAddress;
 public:
     void *allocate(size_t alignment, size_t byte_size);
