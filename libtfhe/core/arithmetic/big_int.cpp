@@ -1,5 +1,6 @@
 #include "big_int.h"
 
+
 BigInt::BigInt(int64_t value) {
     mpz_init_set_si(data, value);
 }
@@ -7,6 +8,7 @@ BigInt::BigInt(int64_t value) {
 void BigInt::destroy() {
     mpz_clear(data);
 }
+
 
 void clamp2p(BigInt *res, const ZModuleParams<BigTorus> *params) {
     if (res->data->_mp_size > params->max_nbLimbs) {
@@ -94,3 +96,4 @@ void setvalue(BigInt *res, const BigInt *a, const ZModuleParams<BigTorus> *param
 void setvalue(BigInt *res, const int64_t a, const ZModuleParams<BigTorus> *params) {
     mpz_set_si(res->data, a);
 }
+
