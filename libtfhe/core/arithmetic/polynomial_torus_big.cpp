@@ -379,12 +379,20 @@ void TorusPolynomial<BigTorus>::SubMulRKaratsuba_old(TorusPolynomial<BigTorus> *
 
 
 /**
- * MultNaive_plain_aux1
- * Karatsuba_aux1
- * MultKaratsuba1
+ * Multiplication of two polynomials, one integer (BigInteger) and the other
+ * with torus (BigTorus) coefficients via Karatsuba
+ * The auxiliary functions (_aux) are:
+ * * MultNaive_plain_aux: computes a naive multiplication
+ * * Karatsuba_aux: recursive Karatsuba function
+ * The main functions (calling Karatsuba_aux) perform the Karatsuba
+ * multiplication of the two polynomials modulo X^N+1:
+ * MultKaratsuba: result = poly1 * poly 2
+ * AddMultKaratsuba: result += poly1 * poly 2
+ * SubMultKaratsuba: result -= poly1 * poly 2
  */
 
 
+// naive multiplication
 static void MultNaive_plain_aux(BigTorus *temp,
                                 BigTorus *__restrict result,
                                 const BigInt *__restrict poly1,
@@ -398,7 +406,6 @@ static void MultNaive_plain_aux(BigTorus *temp,
         zero(ri, zparams);
         for (int32_t j = 0; j <= i; j++) {
             mul_no_overlap(temp, poly1 + j, poly2 + (i - j), zparams);
-            //mul(temp, poly1+j, poly2+(i-j), zparams, alloc);
             add(ri, ri, temp, zparams);
         }
     }
@@ -408,12 +415,12 @@ static void MultNaive_plain_aux(BigTorus *temp,
         zero(ri, zparams);
         for (int32_t j = i - N + 1; j < N; j++) {
             mul_no_overlap(temp, poly1 + j, poly2 + (i - j), zparams);
-            //mul(temp, poly1+j, poly2+(i-j), zparams, alloc);
             add(ri, ri, temp, zparams);
         }
     }
 }
 
+// recursive Karatsuba
 // A and B of size = size
 // R of size = 2*size-1
 static void Karatsuba_aux(BigTorus *R,
@@ -430,7 +437,6 @@ static void Karatsuba_aux(BigTorus *R,
     // h<=4 experimentally chosen
     if (h <= 4) {
         MultNaive_plain_aux(temp, R, A, B, size, zparams);
-        //TorusPolynomial<BigTorus>::MultNaive_aux(R, A, B, size, zparams, context, alloc.createStackChildAllocator());
         return; // the algorithm finishes
     }
 
@@ -478,6 +484,7 @@ static void Karatsuba_aux(BigTorus *R,
 
 }
 
+// Karatsuba: result = poly1 * poly2
 // poly1, poly2 and result are polynomials mod X^N+1
 template<>
 void TorusPolynomial<BigTorus>::MultKaratsuba(TorusPolynomial<BigTorus> *result,
@@ -492,7 +499,7 @@ void TorusPolynomial<BigTorus>::MultKaratsuba(TorusPolynomial<BigTorus> *result,
 
 
     // Buffer: that's large enough to store every tmp BigInt variable (1*N*sizeof(BigInt))
-    BigInt *bufBigInt = alloc.newArray<BigInt>(N, 42);
+    BigInt *bufBigInt = alloc.newArray<BigInt>(N);
     // Buffer: that's large enough to store every tmp BigTorus variable (3*N*sizeof(BigTorus))
     BigTorus *bufBigTorus = alloc.newArray<BigTorus>(3 * N, zparams, &alloc);
     // Result in Karatsuba_aux
@@ -520,6 +527,7 @@ void TorusPolynomial<BigTorus>::MultKaratsuba(TorusPolynomial<BigTorus> *result,
 }
 
 
+// Karatsuba: result += poly1 * poly2
 // poly1, poly2 and result are polynomials mod X^N+1
 template<>
 void TorusPolynomial<BigTorus>::AddMulRKaratsuba(TorusPolynomial<BigTorus> *result,
@@ -534,7 +542,7 @@ void TorusPolynomial<BigTorus>::AddMulRKaratsuba(TorusPolynomial<BigTorus> *resu
 
 
     // Buffer: that's large enough to store every tmp BigInt variable (1*N*sizeof(BigInt))
-    BigInt *bufBigInt = alloc.newArray<BigInt>(N, 42);
+    BigInt *bufBigInt = alloc.newArray<BigInt>(N);
     // Buffer: that's large enough to store every tmp BigTorus variable (3*N*sizeof(BigTorus))
     BigTorus *bufBigTorus = alloc.newArray<BigTorus>(3 * N, zparams, &alloc);
     // Result in Karatsuba_aux
@@ -562,6 +570,7 @@ void TorusPolynomial<BigTorus>::AddMulRKaratsuba(TorusPolynomial<BigTorus> *resu
 }
 
 
+// Karatsuba: result -= poly1 * poly2
 // poly1, poly2 and result are polynomials mod X^N+1
 template<>
 void TorusPolynomial<BigTorus>::SubMulRKaratsuba(TorusPolynomial<BigTorus> *result,
@@ -576,7 +585,7 @@ void TorusPolynomial<BigTorus>::SubMulRKaratsuba(TorusPolynomial<BigTorus> *resu
 
 
     // Buffer: that's large enough to store every tmp BigInt variable (1*N*sizeof(BigInt))
-    BigInt *bufBigInt = alloc.newArray<BigInt>(N, 42);
+    BigInt *bufBigInt = alloc.newArray<BigInt>(N);
     // Buffer: that's large enough to store every tmp BigTorus variable (3*N*sizeof(BigTorus))
     BigTorus *bufBigTorus = alloc.newArray<BigTorus>(3 * N, zparams, &alloc);
     // Result in Karatsuba_aux

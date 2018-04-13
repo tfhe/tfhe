@@ -185,6 +185,13 @@ public:
                                      Allocator alloc);
 
 
+    /**
+     * This function multiplies 2 polynomials (an integer poly and a torus poly)
+     * by using Karatsuba
+     * WARNING: N must be a power of 2 to use this function. Else, the
+     * behaviour is unpredictable
+     */
+
     static void MultKaratsuba(TorusPolynomial<TORUS> *result,
                               const IntPolynomial<TORUS> *poly1,
                               const TorusPolynomial<TORUS> *poly2,
@@ -192,6 +199,11 @@ public:
                               TfheThreadContext *context,
                               Allocator alloc);
 
+    /**
+    * result += poly1 * poly2 (via Karatsuba)
+    * WARNING: N must be a power of 2 to use this function. Else, the
+    * behaviour is unpredictable
+    */
     static void AddMulRKaratsuba(TorusPolynomial<TORUS> *result,
                                  const IntPolynomial<TORUS> *poly1,
                                  const TorusPolynomial<TORUS> *poly2,
@@ -200,6 +212,11 @@ public:
                                  Allocator alloc);
 
 
+    /**
+    * result -= poly1 * poly2 (via Karatsuba)
+    * WARNING: N must be a power of 2 to use this function. Else, the
+    * behaviour is unpredictable
+    */
     static void SubMulRKaratsuba(TorusPolynomial<TORUS> *result,
                                  const IntPolynomial<TORUS> *poly1,
                                  const TorusPolynomial<TORUS> *poly2,

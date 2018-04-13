@@ -357,20 +357,21 @@ void TorusPolynomial<TORUS>::SubMulRKaratsuba_old(
 
 
 
+/**
+ * Multiplication of two polynomials, one integer (INT_TYPE) and the other
+ * with torus (TORUS) coefficients via Karatsuba
+ * The auxiliary functions (_aux) are:
+ * * MultNaive_plain_aux: computes a naive multiplication
+ * * Karatsuba_aux: recursive Karatsuba function
+ * The main functions (calling Karatsuba_aux) perform the Karatsuba
+ * multiplication of the two polynomials modulo X^N+1:
+ * MultKaratsuba: result = poly1 * poly 2
+ * AddMultKaratsuba: result += poly1 * poly 2
+ * SubMultKaratsuba: result -= poly1 * poly 2
+ */
 
 
-
-
-
-
-
-
-
-
-// new functions
-
-
-
+// naive multiplication
 template<typename TORUS, typename INT_TYPE>
 static void MultNaive_plain_aux(TORUS *__restrict result,
                                 const INT_TYPE *__restrict poly1,
@@ -397,6 +398,7 @@ static void MultNaive_plain_aux(TORUS *__restrict result,
 }
 
 
+// recursive Karatsuba
 // A and B of size = size
 // R of size = 2*size-1
 template<typename TORUS, typename INT_TYPE>
@@ -410,8 +412,8 @@ void Karatsuba_aux(TORUS *R,
     const int32_t h = size / 2;
     const int32_t sm1 = size - 1;
 
-    //we stop the karatsuba recursion at h=4, because on my machine,
-    //it seems to be optimal
+    // h<=4 experimentally chosen
+    // it seems to be optimal
     if (h <= 4) {
         MultNaive_plain_aux(R, A, B, size);
         return;
@@ -419,28 +421,39 @@ void Karatsuba_aux(TORUS *R,
 
 
     //we split the polynomials in 2
+    // A = A0 + A1*X^h
+    // Atemp = A0 + A1
     INT_TYPE *Atemp = bufInt;
     for (int32_t i = 0; i < h; ++i) {
         Atemp[i] = A[i] + A[h + i];
     }
 
+    // B = B0 + B1*X^h
+    // Btemp = B0 + B1
     TORUS *Btemp = bufTorus;
     for (int32_t i = 0; i < h; ++i) {
         Btemp[i] = B[i] + B[h + i];
     }
 
+    // R
     TORUS *Rtemp = bufTorus + h;
 
 
     // Karatsuba recursivly
+    // R0 = A0 * B0
     // (R[0],R[2*h-2]), (A[0],A[h-1]), (B[0],B[h-1])
     Karatsuba_aux(R, bufInt, bufTorus, A, B, h, zparams);
+    // R1 = A1 * B1
     // (R[2*h],R[4*h-2]), (A[h],A[2*h-1]), (B[h],B[2*h-1])
     Karatsuba_aux(R + size, bufInt, bufTorus, A + h, B + h, h, zparams);
+    // Rtemp = Atemp * Btemp = (A0 + A1)*(B0 + B1)
     Karatsuba_aux(Rtemp, bufInt, bufTorus, Atemp, Btemp, h, zparams);
+    // R[2*h-1] = 0
     R[sm1] = 0; //this one needs to be copy manually
 
 
+    // R = R0 + Rtemp * X^h + R1 * X^size
+    // with Rtemp = Rtemp - R0 - R1
     for (int32_t i = 0; i < sm1; ++i)
         Rtemp[i] -= R[i] + R[size + i];
     for (int32_t i = 0; i < sm1; ++i)
@@ -449,6 +462,7 @@ void Karatsuba_aux(TORUS *R,
 }
 
 
+// Karatsuba: result = poly1 * poly2
 // poly1, poly2 and result are polynomials mod X^N+1
 template<typename TORUS>
 void TorusPolynomial<TORUS>::MultKaratsuba(TorusPolynomial<TORUS> *result,
@@ -463,7 +477,7 @@ void TorusPolynomial<TORUS>::MultKaratsuba(TorusPolynomial<TORUS> *result,
 
 
     // Buffer: that's large enough to store every tmp INT variable (1*N*sizeof(INT_TYPE))
-    INT_TYPE *bufInt = alloc.newArray<INT_TYPE>(N, 42);
+    INT_TYPE *bufInt = alloc.newArray<INT_TYPE>(N);
     // Buffer: that's large enough to store every tmp TORUS variable (3*N*sizeof(TORUS))
     TORUS *bufTorus = alloc.newArray<TORUS>(3 * N);
     // Result in Karatsuba_aux
@@ -487,6 +501,7 @@ void TorusPolynomial<TORUS>::MultKaratsuba(TorusPolynomial<TORUS> *result,
 }
 
 
+// Karatsuba: result += poly1 * poly2
 // poly1, poly2 and result are polynomials mod X^N+1
 template<typename TORUS>
 void TorusPolynomial<TORUS>::AddMulRKaratsuba(TorusPolynomial<TORUS> *result,
@@ -501,7 +516,7 @@ void TorusPolynomial<TORUS>::AddMulRKaratsuba(TorusPolynomial<TORUS> *result,
 
 
     // Buffer: that's large enough to store every tmp INT variable (1*N*sizeof(INT_TYPE))
-    INT_TYPE *bufInt = alloc.newArray<INT_TYPE>(N, 42);
+    INT_TYPE *bufInt = alloc.newArray<INT_TYPE>(N);
     // Buffer: that's large enough to store every tmp TORUS variable (3*N*sizeof(TORUS))
     TORUS *bufTorus = alloc.newArray<TORUS>(3 * N);
     // Result in Karatsuba_aux
@@ -525,6 +540,7 @@ void TorusPolynomial<TORUS>::AddMulRKaratsuba(TorusPolynomial<TORUS> *result,
 }
 
 
+// Karatsuba: result -= poly1 * poly2
 // poly1, poly2 and result are polynomials mod X^N+1
 template<typename TORUS>
 void TorusPolynomial<TORUS>::SubMulRKaratsuba(TorusPolynomial<TORUS> *result,
@@ -539,7 +555,7 @@ void TorusPolynomial<TORUS>::SubMulRKaratsuba(TorusPolynomial<TORUS> *result,
 
 
     // Buffer: that's large enough to store every tmp INT variable (1*N*sizeof(INT_TYPE))
-    INT_TYPE *bufInt = alloc.newArray<INT_TYPE>(N, 42);
+    INT_TYPE *bufInt = alloc.newArray<INT_TYPE>(N);
     // Buffer: that's large enough to store every tmp TORUS variable (3*N*sizeof(TORUS))
     TORUS *bufTorus = alloc.newArray<TORUS>(3 * N);
     // Result in Karatsuba_aux
