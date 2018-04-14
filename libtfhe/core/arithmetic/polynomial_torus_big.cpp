@@ -2,6 +2,7 @@
 
 #include <cassert>
 
+using namespace tfhe_backend;
 
 /**
  * Instantiate TorusPolynomial class for big torus type
@@ -38,7 +39,7 @@ void TorusPolynomial<BigTorus>::AddMulZ(TorusPolynomial<BigTorus> *result,
     BigTorus *t = alloc.newObject<BigTorus>(zparams, &alloc);
     for (int32_t i = 0; i < N; ++i) {
         copy(t, b + i, zparams);
-        mul(t, p, t, zparams, alloc);
+        mul(t, p, t, zparams, alloc.createStackChildAllocator());
         add(r + i, a + i, t, zparams);
     }
 }
@@ -46,13 +47,14 @@ void TorusPolynomial<BigTorus>::AddMulZ(TorusPolynomial<BigTorus> *result,
 
 // TorusPolynomial += p*TorusPolynomial
 template<>
-void TorusPolynomial<BigTorus>::AddMulZTo(TorusPolynomial<BigTorus> *result,
-                                          const INT_TYPE *p,
-                                          const TorusPolynomial<BigTorus> *poly2,
-                                          const PolynomialParams<BigTorus> *params,
-                                          TfheThreadContext *context,
-                                          Allocator alloc) {
-    TorusPolynomial<BigTorus>::AddMulZ(result, result, p, poly2, params, context, alloc);
+void TorusPolynomial<BigTorus>::AddMulZTo(
+        TorusPolynomial<BigTorus> *result,
+        const INT_TYPE *p,
+        const TorusPolynomial<BigTorus> *poly2,
+        const PolynomialParams<BigTorus> *params,
+        TfheThreadContext *context,
+        Allocator alloc) {
+    TorusPolynomial<BigTorus>::AddMulZ(result, result, p, poly2, params, context, std::move(alloc));
 }
 
 
@@ -75,7 +77,7 @@ void TorusPolynomial<BigTorus>::SubMulZ(TorusPolynomial<BigTorus> *result,
     BigTorus *t = alloc.newObject<BigTorus>(zparams, &alloc);
     for (int32_t i = 0; i < N; ++i) {
         copy(t, b + i, zparams);
-        mul(t, p, t, zparams, alloc);
+        mul(t, p, t, zparams, alloc.createStackChildAllocator());
         sub(r + i, a + i, t, zparams);
     }
 }
@@ -83,13 +85,14 @@ void TorusPolynomial<BigTorus>::SubMulZ(TorusPolynomial<BigTorus> *result,
 
 // TorusPolynomial -= p*TorusPolynomial
 template<>
-void TorusPolynomial<BigTorus>::SubMulZTo(TorusPolynomial<BigTorus> *result,
-                                          const INT_TYPE *p,
-                                          const TorusPolynomial<BigTorus> *poly2,
-                                          const PolynomialParams<BigTorus> *params,
-                                          TfheThreadContext *context,
-                                          Allocator alloc) {
-    TorusPolynomial<BigTorus>::SubMulZ(result, result, p, poly2, params, context, alloc);
+void TorusPolynomial<BigTorus>::SubMulZTo(
+        TorusPolynomial<BigTorus> *result,
+        const INT_TYPE *p,
+        const TorusPolynomial<BigTorus> *poly2,
+        const PolynomialParams<BigTorus> *params,
+        TfheThreadContext *context,
+        Allocator alloc) {
+    TorusPolynomial<BigTorus>::SubMulZ(result, result, p, poly2, params, context, std::move(alloc));
 }
 
 
@@ -128,7 +131,7 @@ void TorusPolynomial<BigTorus>::MultNaive_plain_aux_old(BigTorus *__restrict res
         BigTorus *ri = result + i;
         zero(ri, zparams);
         for (int32_t j = 0; j <= i; j++) {
-            mul(ti, poly1 + j, poly2 + (i - j), zparams, alloc);
+            mul(ti, poly1 + j, poly2 + (i - j), zparams, alloc.createStackChildAllocator());
             add(ri, ri, ti, zparams);
         }
     }
@@ -137,7 +140,7 @@ void TorusPolynomial<BigTorus>::MultNaive_plain_aux_old(BigTorus *__restrict res
         BigTorus *ri = result + i;
         zero(ri, zparams);
         for (int32_t j = i - N + 1; j < N; j++) {
-            mul(ti, poly1 + j, poly2 + (i - j), zparams, alloc);
+            mul(ti, poly1 + j, poly2 + (i - j), zparams, alloc.createStackChildAllocator());
             add(ri, ri, ti, zparams);
         }
     }
@@ -159,11 +162,11 @@ void TorusPolynomial<BigTorus>::MultNaive_aux(BigTorus *__restrict result,
         zero(ri, zparams);
 
         for (int32_t j = 0; j <= i; j++) {
-            mul(ti, poly1 + j, poly2 + (i - j), zparams, alloc);
+            mul(ti, poly1 + j, poly2 + (i - j), zparams, alloc.createStackChildAllocator());
             add(ri, ri, ti, zparams);
         }
         for (int32_t j = i + 1; j < N; j++) {
-            mul(ti, poly1 + j, poly2 + (N + i - j), zparams, alloc);
+            mul(ti, poly1 + j, poly2 + (N + i - j), zparams, alloc.createStackChildAllocator());
             sub(ri, ri, ti, zparams);
         }
     }
@@ -248,14 +251,14 @@ void TorusPolynomial<BigTorus>::Karatsuba_aux_old(BigTorus *R,
     // Karatsuba recursively
     // R0 = A0 * B0
     // (R[0],R[2*h-2]), (A[0],A[h-1]), (B[0],B[h-1])
-    Karatsuba_aux_old(R, A, B, h, buf, zparams, context, alloc);
+    Karatsuba_aux_old(R, A, B, h, buf, zparams, context, alloc.createStackChildAllocator());
     // R[2*h-1] = 0
     zero(R + sm1, zparams);
     // R1 = A1 * B1
     // (R[2*h],R[4*h-2]), (A[h],A[2*h-1]), (B[h],B[2*h-1])
-    Karatsuba_aux_old(R + size, A + h, B + h, h, buf, zparams, context, alloc);
+    Karatsuba_aux_old(R + size, A + h, B + h, h, buf, zparams, context, alloc.createStackChildAllocator());
     // Rtemp = Atemp * Btemp = (A0 + A1)*(B0 + B1)
-    Karatsuba_aux_old(Rtemp, Atemp, Btemp, h, buf, zparams, context, alloc);
+    Karatsuba_aux_old(Rtemp, Atemp, Btemp, h, buf, zparams, context, alloc.createStackChildAllocator());
 
     // R = R0 + Rtemp * X^h + R1 * X^size
     // with Rtemp = Rtemp - R0 - R1
@@ -291,7 +294,7 @@ void TorusPolynomial<BigTorus>::MultKaratsuba_old(TorusPolynomial<BigTorus> *res
     BigTorus *R = alloc.newArray<BigTorus>(2 * N - 1, zparams, &alloc);
 
     // Karatsuba
-    Karatsuba_aux_old(R, poly1->coefs, poly2->coefs, N, buf, zparams, context, alloc);
+    Karatsuba_aux_old(R, poly1->coefs, poly2->coefs, N, buf, zparams, context, alloc.createStackChildAllocator());
 
     // Reduction mod X^N+1
     for (int32_t i = 0; i < N - 1; ++i) {
@@ -326,7 +329,7 @@ void TorusPolynomial<BigTorus>::AddMulRKaratsuba_old(TorusPolynomial<BigTorus> *
     BigTorus *temp = alloc.newObject<BigTorus>(zparams, &alloc);
 
     // Karatsuba
-    Karatsuba_aux_old(R, poly1->coefs, poly2->coefs, N, buf, zparams, context, alloc);
+    Karatsuba_aux_old(R, poly1->coefs, poly2->coefs, N, buf, zparams, context, alloc.createStackChildAllocator());
 
     // Reduction mod X^N+1
     for (int32_t i = 0; i < N - 1; ++i) {
@@ -362,7 +365,7 @@ void TorusPolynomial<BigTorus>::SubMulRKaratsuba_old(TorusPolynomial<BigTorus> *
     BigTorus *temp = alloc.newObject<BigTorus>(zparams, &alloc);
 
     // Karatsuba
-    Karatsuba_aux_old(R, poly1->coefs, poly2->coefs, N, buf, zparams, context, alloc);
+    Karatsuba_aux_old(R, poly1->coefs, poly2->coefs, N, buf, zparams, context, alloc.createStackChildAllocator());
 
     // Reduction mod X^N+1
     for (int32_t i = 0; i < N - 1; ++i) {
@@ -392,11 +395,19 @@ void TorusPolynomial<BigTorus>::SubMulRKaratsuba_old(TorusPolynomial<BigTorus> *
  */
 
 
-// naive multiplication
-static void MultNaive_plain_aux(BigTorus *temp,
-                                BigTorus *__restrict result,
-                                const BigInt *__restrict poly1,
-                                const BigTorus *__restrict poly2,
+/** @brief raw naive multiplication f two polynomials, given by their coefficients vectors
+ * The two operands have degree <N, and the result has degree <2N-1
+ * @param temp a single Bigtorus, preallocated, to store a temporary variable
+ * @param result an array of 2N-1 BigTorus, preallocated
+ * @param poly1 an array of N BigInt, containing the coefs of the first operand
+ * @param poly2 an array of N BigTorus, containing the coefs of the second operand
+ * @param N bound on the degree
+ * @param zparams params of the Z module
+ */
+static void MultNaive_plain_aux(BigTorus *__restrict const temp,
+                                BigTorus *__restrict const result,
+                                const BigInt *__restrict const poly1,
+                                const BigTorus *__restrict const poly2,
                                 const int32_t N,
                                 const ZModuleParams<BigTorus> *const zparams) {
     const int32_t _2Nm1 = 2 * N - 1;

@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+using namespace tfhe_backend;
+
 /**
  * Instantiate IntPolynomial class for big int type
  */
@@ -42,7 +44,7 @@ double IntPolynomial<BigTorus>::NormInftyDist(const IntPolynomial<BigTorus> *pol
                                               const IntPolynomial<BigTorus> *poly2,
                                               const PolynomialParams<BigTorus> *params,
                                               TfheThreadContext *context,
-                                              Allocator alloc){
+                                              Allocator alloc) {
     const int32_t N = params->N;
     double norm = 0;
     double r;

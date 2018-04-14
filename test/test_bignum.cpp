@@ -7,6 +7,7 @@
 #include "gmpxx.h"
 
 using namespace std;
+using namespace tfhe_backend;
 
 TEST(BigNum, BigIntAllocSet) {
     // here, we test a few constructors with or without value

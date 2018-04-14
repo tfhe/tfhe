@@ -2,25 +2,29 @@
 #define TFHE_STACKALLOCATOR_H
 
 #include <cstddef>
-
-class Allocator;
+#include "allocator.h"
 
 /**
  * This class is the optimized allocator.
  */
-class TFHEAllocator {
-    TFHEAllocator* const father;
+template<>
+class AllocatorImpl<TFHE_ALLOCATOR> {
+    AllocatorImpl *father;
     size_t beginAddress;
 public:
     void *allocate(size_t alignment, size_t byte_size);
 
     void deallocate(void *ptr);
 
-    TFHEAllocator(TFHEAllocator* const father, const size_t beginAddr);
+    AllocatorImpl(AllocatorImpl *const father, const size_t beginAddr);
 
-    Allocator createStackChildAllocator(const size_t expected_size);
+    AllocatorImpl(AllocatorImpl &&);
 
-    ~TFHEAllocator() {};
+    AllocatorImpl createStackChildAllocator(const size_t expected_size);
+
+    ~AllocatorImpl() {};
+
+#include "allocator-shortcut-functions.h"
 };
 
 

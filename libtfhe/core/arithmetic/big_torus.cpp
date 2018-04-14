@@ -9,15 +9,15 @@ void BigTorus::destroy(const ZModuleParams<BigTorus> *params, Allocator *alloc) 
     alloc->deleteArray(params->max_nbLimbs, data);
 }
 
-void add(BigTorus *res, const BigTorus *a, const BigTorus *b, const ZModuleParams<BigTorus> *params) {
+void tfhe_backend::add(BigTorus *res, const BigTorus *a, const BigTorus *b, const ZModuleParams<BigTorus> *params) {
     mpn_add_n(res->data, a->data, b->data, params->max_nbLimbs);
 }
 
-void sub(BigTorus *res, const BigTorus *a, const BigTorus *b, const ZModuleParams<BigTorus> *params) {
+void tfhe_backend::sub(BigTorus *res, const BigTorus *a, const BigTorus *b, const ZModuleParams<BigTorus> *params) {
     mpn_sub_n(res->data, a->data, b->data, params->max_nbLimbs);
 }
 
-void mul(BigTorus *res, int64_t a, const BigTorus *b, const ZModuleParams<BigTorus> *params) {
+void tfhe_backend::mul(BigTorus *res, int64_t a, const BigTorus *b, const ZModuleParams<BigTorus> *params) {
     if (a >= 0) {
         mpn_mul_1(res->data, b->data, params->max_nbLimbs, uint64_t(a));
     } else {
@@ -26,7 +26,8 @@ void mul(BigTorus *res, int64_t a, const BigTorus *b, const ZModuleParams<BigTor
     }
 }
 
-void mul_no_overlap(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<BigTorus> *params) {
+void tfhe_backend::mul_no_overlap(BigTorus *__restrict res, const BigInt *a, const BigTorus *__restrict b,
+                                  const ZModuleParams<BigTorus> *params) {
     assert(res != b);
     if (a->data->_mp_size > 0) { //positive
         const int m = a->data->_mp_size;
@@ -44,27 +45,28 @@ void mul_no_overlap(BigTorus *res, const BigInt *a, const BigTorus *b, const ZMo
     }
 }
 
-void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<BigTorus> *params, Allocator alloc) {
-    if (res!=b) {
+void tfhe_backend::mul(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<BigTorus> *params,
+                       Allocator alloc) {
+    if (res != b) {
         mul_no_overlap(res, a, b, params);
     } else {
-        BigTorus* tmp = alloc.newObject<BigTorus>(params, &alloc);
+        BigTorus *tmp = alloc.newObject<BigTorus>(params, &alloc);
         copy(tmp, b, params);
         mul_no_overlap(res, a, tmp, params);
         alloc.deleteObject(tmp, params, &alloc);
     }
 }
 
-void neg(BigTorus *res, const BigTorus *a, const ZModuleParams<BigTorus> *params) {
+void tfhe_backend::neg(BigTorus *res, const BigTorus *a, const ZModuleParams<BigTorus> *params) {
     mpn_neg(res->data, a->data, params->max_nbLimbs);
 }
 
-void from_double(BigTorus *reps, const double d, const ZModuleParams<BigTorus> *params) {
+void tfhe_backend::from_double(BigTorus *reps, const double d, const ZModuleParams<BigTorus> *params) {
     //dissect the input double: extract sign, exponent, mantissa
     static constexpr uint64_t mantissa_msb = (uint64_t(1) << 52);
     static constexpr uint64_t mantissa_mask = mantissa_msb - 1;
     static constexpr uint64_t expo_mask = (uint64_t(1) << 11) - 1;
-    uint64_t* dip = (uint64_t *)&d;  //get the bits of d
+    uint64_t *dip = (uint64_t *) &d;  //get the bits of d
     uint64_t di = *dip;
     uint64_t mantissa = (di & mantissa_mask) | mantissa_msb;
     uint64_t expo = (di >> 52) & expo_mask;
@@ -107,15 +109,15 @@ void from_double(BigTorus *reps, const double d, const ZModuleParams<BigTorus> *
     }
 }
 
-void zero(BigTorus *res, const ZModuleParams<BigTorus> *params) {
+void tfhe_backend::zero(BigTorus *res, const ZModuleParams<BigTorus> *params) {
     mpn_zero(res->data, params->max_nbLimbs);
 }
 
-void copy(BigTorus *res, const BigTorus* src, const ZModuleParams<BigTorus> *params) {
+void tfhe_backend::copy(BigTorus *res, const BigTorus *src, const ZModuleParams<BigTorus> *params) {
     mpn_copyi(res->data, src->data, params->max_nbLimbs);
 }
 
-void setPowHalf(BigTorus *res, const int k, const ZModuleParams<BigTorus> *params) {
+void tfhe_backend::setPowHalf(BigTorus *res, const int k, const ZModuleParams<BigTorus> *params) {
     zero(res, params);
     int idx = params->p - k;
     if (k <= 0 || idx < 0) return;
@@ -202,24 +204,28 @@ namespace {
     };
 }
 
-void approxPhase(BigTorus *res, const BigTorus *phase, uint64_t Msize, ZModuleParams<BigTorus> *params, Allocator alloc) {
+void
+tfhe_backend::approxPhase(BigTorus *res, const BigTorus *phase, uint64_t Msize, const ZModuleParams<BigTorus> *params,
+                          Allocator alloc) {
     TorusMsgSpace msgSpace(Msize, params, &alloc);
     msgSpace.roundPhase(res, phase);
 }
 
-uint64_t modSwitchFromTorus(const BigTorus *phase, uint64_t Msize, ZModuleParams<BigTorus> *params, Allocator alloc) {
+uint64_t tfhe_backend::modSwitchFromTorus(const BigTorus *phase, uint64_t Msize, const ZModuleParams<BigTorus> *params,
+                                          Allocator alloc) {
     TorusMsgSpace msgSpace(Msize, params, &alloc);
     return msgSpace.decrypt(phase);
 }
 
-void modSwitchToTorus(BigTorus *res, const uint64_t message, const uint64_t Msize, ZModuleParams<BigTorus> *params, Allocator alloc) {
-    const uint64_t mu = ((message % Msize)+Msize)%Msize; //between 0 and Msize-1
+void tfhe_backend::modSwitchToTorus(BigTorus *res, const uint64_t message, const uint64_t Msize,
+                                    const ZModuleParams<BigTorus> *params, Allocator alloc) {
+    const uint64_t mu = ((message % Msize) + Msize) % Msize; //between 0 and Msize-1
     TorusMsgSpace msgSpace(Msize, params, &alloc);
     msgSpace.encryptTrivial(res, mu);
 }
 
-double to_double(const BigTorus *a, const ZModuleParams<BigTorus> *params) {
+double tfhe_backend::to_double(const BigTorus *a, const ZModuleParams<BigTorus> *params) {
     // quick and dirty
-    return double(int64_t(a->data[params->max_nbLimbs-1]))*pow(0.5,64);
+    return double(int64_t(a->data[params->max_nbLimbs - 1])) * pow(0.5, 64);
 }
 
