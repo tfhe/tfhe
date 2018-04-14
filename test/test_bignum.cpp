@@ -2,7 +2,7 @@
 #include <core/arithmetic/big_int.h>
 #include <core/arithmetic/big_torus.h>
 #include <core/allocator/allocator.h>
-#include "tfhetestlib/ntl_conversions.h"
+#include "tfhetestlib/ntl_utils.h"
 #include <gmp.h>
 
 using namespace std;
@@ -10,11 +10,6 @@ using namespace tfhe_backend;
 using namespace tfhe_test;
 using NTL::ZZ;
 using NTL::RR;
-
-//quick and dirty function to convert a bigTorus modulus to 2^p
-ZZ zmodu(const ZModuleParams<BigTorus> *params) {
-    return NTL::power2_ZZ(params->p);
-}
 
 //quick and dirty function to fill a bigtorus with random
 void randomBigTorus(BigTorus *res, const ZModuleParams<BigTorus> *params) {
@@ -30,18 +25,6 @@ void randomBigInt(BigInt *res, const ZModuleParams<BigTorus> *params) {
         mul(res, res, rand(), params);
     }
 }
-
-/*
-//quick and dirty function to convert a bigTorus to a gmp float
-mpf_class fval(const BigTorus *x, const ZModuleParams<BigTorus> *params) {
-    __mpz_struct tmp;
-    tmp._mp_d = x->data;
-    tmp._mp_size = params->max_nbLimbs;
-    tmp._mp_alloc = params->max_nbLimbs;
-    return mpf_class(ZZ(&tmp)) / pow(2., params->p);
-}
-*/
-
 
 
 TEST(BigNum, BigIntAllocSet) {
@@ -180,7 +163,7 @@ TEST(BigNum, BigIntNeg) {
     Allocator alloc;
     ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(2);
     //everything is modulo p
-    ZZ p = zmodu(params);
+    ZZ p = extract_modulus(params);
 
     int64_t tval = std::numeric_limits<int64_t>::min() / 3;
     int64_t tval2 = std::numeric_limits<int64_t>::min() / 5;
@@ -362,7 +345,7 @@ void testBinaryOperation(
 
 
 static ZZ testBigTAdd(ZZ aa, ZZ bb, const ZModuleParams<BigTorus> *params) {
-    return (aa + bb) % zmodu(params);
+    return (aa + bb) % extract_modulus(params);
 }
 
 /*
@@ -374,7 +357,7 @@ TEST(BigTorus, addition) {
 }
 
 static ZZ testBigTSub(ZZ aa, ZZ bb, const ZModuleParams<BigTorus> *params) {
-    return (aa - bb + zmodu(params)) % zmodu(params);
+    return (aa - bb + extract_modulus(params)) % extract_modulus(params);
 }
 
 /*
@@ -405,7 +388,7 @@ TEST(BigTorus, multInt) {
             mul(b, x, a, params);
             ZZ cc = to_ntl_ZZ(b, params);
             ASSERT_EQ(to_ntl_ZZ(a, params), aa); //a did not change
-            ASSERT_EQ(posmod(x * aa, zmodu(params)), cc); //result is ok
+            ASSERT_EQ(posmod(x * aa, extract_modulus(params)), cc); //result is ok
         }
         for (int trials = 0; trials < 5; trials++) {
             // a = x*a
@@ -414,7 +397,7 @@ TEST(BigTorus, multInt) {
             ZZ aa = to_ntl_ZZ(a, params);
             mul(a, x, a, params);
             ZZ cc = to_ntl_ZZ(a, params);
-            ASSERT_EQ(posmod(x * aa, zmodu(params)), cc);
+            ASSERT_EQ(posmod(x * aa, extract_modulus(params)), cc);
         }
         alloc.deleteObject(b, params, &alloc);
         alloc.deleteObject(a, params, &alloc);
@@ -445,7 +428,7 @@ TEST(BigTorus, multBigInt) {
             mul(b, x, a, params, alloc.createStackChildAllocator());
             ZZ cc = to_ntl_ZZ(b, params);
             ASSERT_EQ(to_ntl_ZZ(a, params), aa); //a did not change
-            ASSERT_EQ(posmod(aa * to_ntl_ZZ(x, params), zmodu(params)), cc); //result is ok
+            ASSERT_EQ(posmod(aa * to_ntl_ZZ(x, params), extract_modulus(params)), cc); //result is ok
         }
         for (int trials = 0; trials < 5; trials++) {
             // a = x*a
@@ -454,7 +437,7 @@ TEST(BigTorus, multBigInt) {
             ZZ aa = to_ntl_ZZ(a, params);
             mul(a, x, a, params, alloc.createStackChildAllocator());
             ZZ cc = to_ntl_ZZ(a, params);
-            ASSERT_EQ(posmod(aa * to_ntl_ZZ(x, params), zmodu(params)), cc);
+            ASSERT_EQ(posmod(aa * to_ntl_ZZ(x, params), extract_modulus(params)), cc);
         }
         alloc.deleteObject(b, params, &alloc);
         alloc.deleteObject(x);
@@ -482,7 +465,7 @@ TEST(BigTorus, negate) {
             neg(b, a, params);
             ZZ cc = to_ntl_ZZ(b, params);
             ASSERT_EQ(to_ntl_ZZ(a, params), aa); //a did not change
-            ASSERT_EQ(posmod(-aa, zmodu(params)), cc); //result is ok
+            ASSERT_EQ(posmod(-aa, extract_modulus(params)), cc); //result is ok
         }
         for (int trials = 0; trials < 5; trials++) {
             // a = x*a
@@ -490,7 +473,7 @@ TEST(BigTorus, negate) {
             ZZ aa = to_ntl_ZZ(a, params);
             neg(a, a, params);
             ZZ cc = to_ntl_ZZ(a, params);
-            ASSERT_EQ(posmod(-aa, zmodu(params)), cc);
+            ASSERT_EQ(posmod(-aa, extract_modulus(params)), cc);
         }
         alloc.deleteObject(b, params, &alloc);
         alloc.deleteObject(a, params, &alloc);

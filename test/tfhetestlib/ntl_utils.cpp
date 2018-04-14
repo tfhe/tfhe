@@ -1,4 +1,4 @@
-#include "ntl_conversions.h"
+#include "ntl_utils.h"
 #include <NTL/ZZ_limbs.h>
 #include <cstdint>
 #include <gmp.h>
@@ -49,12 +49,14 @@ NTL::ZZ tfhe_test::centermod(const NTL::ZZ &a, const NTL::ZZ &p) {
 }
 
 NTL::RR tfhe_test::posmod_to_ntl_RR(const BigTorus *a, const ZModuleParams<BigTorus> *params) {
+    RR::SetPrecision(params->p + 64);
     NTL::RR v = to_RR(to_ntl_ZZ(a, params));
     NTL::RR p = power2_RR(-params->p);
     return v * p;
 }
 
 NTL::RR tfhe_test::centermod_to_ntl_RR(const BigTorus *a, const ZModuleParams<BigTorus> *params) {
+    RR::SetPrecision(params->p + 64);
     NTL::RR res = posmod_to_ntl_RR(a, params);
     if (res > 0.5) res -= 1;
     return res;
@@ -63,4 +65,8 @@ NTL::RR tfhe_test::centermod_to_ntl_RR(const BigTorus *a, const ZModuleParams<Bi
 NTL::RR tfhe_test::distance_mod_1(const NTL::RR &a, const NTL::RR &b) {
     RR diff = b - a;
     return abs(diff - round(diff));
+}
+
+NTL::ZZ tfhe_test::extract_modulus(const ZModuleParams<BigTorus> *params) {
+    return power2_ZZ(params->p);
 }
