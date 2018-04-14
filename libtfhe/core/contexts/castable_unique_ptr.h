@@ -8,6 +8,7 @@
 
 #include <cassert>
 #include <functional>
+#include "../arithmetic/tfhe_core.h"
 
 /**
  * Utility function that deletes type D
@@ -78,12 +79,6 @@ public:
         if (deleter) deleteSmartPointer();
     }
 
-    /** Copy constructor: FORBIDDEN */
-    CastableUniquePointer(const CastableUniquePointer &) = delete;
-
-    /** Copy Assignment Operator: FORBIDDEN */
-    void operator=(const CastableUniquePointer &smartPointer)= delete;
-
     /** Copy this temporary, and take ownership of the data */
     CastableUniquePointer(CastableUniquePointer &&smartPointer) {
         constructMove(std::move(smartPointer));
@@ -128,6 +123,7 @@ public:
      */
     CastableUniquePointer weakRef() const { return CastableUniquePointer(data, nullptr); }
 
+    PREVENT_COPY_ALLOW_STACK(CastableUniquePointer);
 };
 
 #endif //TFHE_CASTABLE_UNIQUE_PTR_H

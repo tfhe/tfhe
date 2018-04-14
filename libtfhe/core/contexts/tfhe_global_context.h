@@ -4,10 +4,10 @@
 
 #include <set>
 #include <cstdint>
-#include <map>
 #include <memory>
 #include <mutex>
 #include <condition_variable>
+#include <unordered_map>
 #include "tfhe_thread_context.h"
 #include "context_object_creator.h"
 #include "../allocator/allocator.h"
@@ -16,11 +16,11 @@ class TfheGlobalContext {
     /** @brief next available thread context id */
     static uint64_t nextThreadId;
     /** @brief map of all available thread contexts, indexed by thread context id */
-    std::map<uint64_t, TfheThreadContext> threadContexts;
+    std::unordered_map<uint64_t, TfheThreadContext> threadContexts;
     /** @brief vector of thread context objects factories (same indexes as the actual objects in the thread contexts) */
     std::vector<std::unique_ptr<ContextObjectCreator>> contextObjectCreators;
     /** @brief map between a (human readable) string identifier for a thread object and its actual index */
-    std::map<std::string, int64_t> contextObjectIndex;
+    std::unordered_map<std::string, int64_t> contextObjectIndex;
     /** @brief global allocator */
     Allocator globalAllocator;
 
