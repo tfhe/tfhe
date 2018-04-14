@@ -1,5 +1,5 @@
 #include "ntl_utils.h"
-#include <NTL/ZZ_limbs.h>
+#include <NTL/version.h>
 #include <cstdint>
 #include <gmp.h>
 #include <core/arithmetic/big_torus.h>
@@ -7,6 +7,10 @@
 
 using namespace NTL;
 using namespace std;
+
+#if NTL_MAJOR_VERSION > 9
+
+#include <NTL/ZZ_limbs.h>
 
 // if any of this assertion fails, tfhe is not usable on your operating system
 static_assert(std::is_same<NTL::ZZ_limb_t, uint64_t>::value);
@@ -35,6 +39,46 @@ NTL::ZZ tfhe_test::to_ntl_ZZ(const BigTorus *a, const ZModuleParams<BigTorus> *p
     ZZ_limbs_set(reps, a->data, length);
     return reps;
 }
+
+#else
+//Prior to version 9.0 of NTL, there was no access to the limbs in NTL, so we provide a manual conversion
+//Note also: Prior to version 9.0, NTL had GPL license. If it is an issue please upgrade NTL
+
+/** @brief limb array to NTL ZZ conversion */
+static ZZ mpn_to_ZZ(const mp_limb_t* data, int n) {
+   ZZ reps(0);
+   for (int i=n-1; i>=0; i--) {
+       // important note: there is no uint64_t to ZZ constructor in NTL,
+       // because of the sign, we have to split in 32-bit words instead of 64
+       reps <<= 32;
+       reps |= (data[i] >> 32u);
+       reps <<= 32;
+       reps |= (data[i] & 0xFFFFFFFFul);
+       //cout << reps << endl;
+   }
+   return reps;
+}
+
+NTL::ZZ tfhe_test::to_ntl_ZZ(const BigInt *a, const ZModuleParams<BigTorus> *params) {
+    const mpz_t &aa = a->data;
+    if (aa->_mp_size >= 0) {
+        return mpn_to_ZZ(aa->_mp_d, aa->_mp_size);
+    } else {
+        return -mpn_to_ZZ(aa->_mp_d, -aa->_mp_size);
+    }
+}
+
+NTL::ZZ tfhe_test::to_ntl_ZZ(const BigTorus *a, const ZModuleParams<BigTorus> *params) {
+    ZZ reps;
+    //find the actual number of limbs
+    int length;
+    for (length = params->max_nbLimbs; length > 1; length--) {
+        if (a->data[length - 1] != 0) break;
+    }
+    return mpn_to_ZZ(a->data, length);
+}
+
+#endif
 
 NTL::ZZ tfhe_test::posmod(const NTL::ZZ &a, const NTL::ZZ &p) {
     //return (p + (a % p)) % p;
