@@ -13,8 +13,8 @@ using namespace std;
 #include <NTL/ZZ_limbs.h>
 
 // if any of this assertion fails, tfhe is not usable on your operating system
-static_assert(std::is_same<NTL::ZZ_limb_t, uint64_t>::value);
-static_assert(std::is_same<mp_limb_t, uint64_t>::value);
+static_assert(std::is_same<NTL::ZZ_limb_t, uint64_t>::value, "TFHE is not usable on your operating system");
+static_assert(std::is_same<mp_limb_t, uint64_t>::value, "TFHE is not usable on your operating system");
 
 
 NTL::ZZ tfhe_test::to_ntl_ZZ(const BigInt *a, const ZModuleParams<BigTorus> *params) {
