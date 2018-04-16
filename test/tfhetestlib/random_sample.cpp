@@ -6,7 +6,6 @@ void tfhe_test::randomBigReal(BigReal *res, const RealParams<BigTorus> *params) 
     for (int i = 0; i < params->nbLimbs; i++) {
         res->data[i] = ((uint64_t) rand() << 32) + rand();
     }
-    res->data[params->nbLimbs - 1] |= (1l << 63);
 }
 
 //quick and dirty function to fill a bigtorus with random

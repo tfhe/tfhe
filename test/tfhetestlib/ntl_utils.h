@@ -4,6 +4,7 @@
 #include <NTL/ZZ.h>
 #include <NTL/RR.h>
 #include "core/arithmetic/big_int.h"
+#include <core/arithmetic/big_real.h>
 
 namespace tfhe_test {
 
@@ -31,6 +32,14 @@ namespace tfhe_test {
     /** @brief a mod p, result in [-p/2,p/2] */
     NTL::ZZ centermod(const NTL::ZZ &a, const NTL::ZZ &p);
 
+    /** @brief BigReal to NTL::ZZ conversion. result between 0 and 2^(nbLimbsInt+nbLimbsFrac) */
+    NTL::ZZ to_ntl_ZZ(const BigReal *a, const RealParams<BigTorus> *params);
+
+    /** @brief BigReal to NTL::ZZ conversion. result between 0 and 2^(nbLimbsInt+nbLimbsFrac) */
+    NTL::RR posmod_to_ntl_RR(const BigReal *a, const RealParams<BigTorus> *params);
+
+    /** @brief BigReal to NTL::ZZ conversion. result between 0 and 2^(nbLimbsInt+nbLimbsFrac) */
+    NTL::RR centermod_to_ntl_RR(const BigReal *a, const RealParams<BigTorus> *params);
 }
 
 
