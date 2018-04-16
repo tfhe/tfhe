@@ -3,6 +3,7 @@
 #include <core/arithmetic/big_torus.h>
 #include <core/allocator/allocator.h>
 #include "tfhetestlib/ntl_utils.h"
+#include "tfhetestlib/random_sample.h"
 #include <gmp.h>
 
 using namespace std;
@@ -10,22 +11,6 @@ using namespace tfhe_backend;
 using namespace tfhe_test;
 using NTL::ZZ;
 using NTL::RR;
-
-//quick and dirty function to fill a bigtorus with random
-void randomBigTorus(BigTorus *res, const ZModuleParams<BigTorus> *params) {
-    for (int i = 0; i < params->max_nbLimbs; i++) {
-        res->data[i] = rand();
-    }
-}
-
-//quick and dirty function to fill a bigtorus with random
-void randomBigInt(BigInt *res, const ZModuleParams<BigTorus> *params) {
-    setvalue(res, rand() - RAND_MAX / 2, params);
-    for (int i = 1; i < 2 * params->max_nbLimbs; i++) {
-        mul(res, res, rand(), params);
-    }
-}
-
 
 TEST(BigNum, BigIntAllocSet) {
     // here, we test a few constructors with or without value
