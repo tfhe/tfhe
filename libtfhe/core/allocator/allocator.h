@@ -36,6 +36,7 @@ class AllocatorImpl;
 
 // for now, we'll work only with the valgrind allocator, who will check all usages
 // in release mode, we'll switch to TFHE_ALLOCATOR
-typedef AllocatorImpl<VALGRIND_ALLOCATOR> Allocator;
+//typedef AllocatorImpl<VALGRIND_ALLOCATOR> Allocator;
+typedef AllocatorImpl<TFHE_ALLOCATOR> Allocator;
 
 #endif //TFHE_ALLOCATOR_H

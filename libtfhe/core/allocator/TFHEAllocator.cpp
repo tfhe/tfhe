@@ -5,7 +5,7 @@
 void *AllocatorImpl<TFHE_ALLOCATOR>::allocate(size_t alignment, size_t byte_size) {
     if (beginAddress == 0ul) {
         //malloc mode
-        return aligned_alloc(alignment, byte_size);
+        return aligned_alloc(alignment, byte_size); //TODO: fix strange bug!!!
     } else {
         //stack mode
         size_t newBegin = ceilalign(beginAddress, alignment);
@@ -24,11 +24,22 @@ void AllocatorImpl<TFHE_ALLOCATOR>::deallocate(void *ptr) {
     }
 }
 
+AllocatorImpl<TFHE_ALLOCATOR>::~AllocatorImpl() {
+    if (father != nullptr) {
+        //first stack mode
+        free((void*)father->beginAddress);
+        father->beginAddress=0ul;
+    } else {
+        //malloc mode
+        //nothing
+    }
+}
+
 AllocatorImpl<TFHE_ALLOCATOR> AllocatorImpl<TFHE_ALLOCATOR>::createStackChildAllocator(const size_t expected_size) {
     if (beginAddress == 0ul) {
         //malloc mode
-        size_t addr = size_t(aligned_alloc(expected_size, 1));
-        return AllocatorImpl(this, addr);
+        beginAddress = size_t(aligned_alloc(1, expected_size));
+        return AllocatorImpl(this, beginAddress);
     } else {
         //stack mode
         return AllocatorImpl(nullptr, beginAddress);

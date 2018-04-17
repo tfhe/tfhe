@@ -16,13 +16,13 @@ public:
 
     void deallocate(void *ptr);
 
-    AllocatorImpl(AllocatorImpl *const father, const size_t beginAddr);
+    AllocatorImpl(AllocatorImpl *const father = nullptr, const size_t beginAddr = 0ul);
 
     AllocatorImpl(AllocatorImpl &&);
 
-    AllocatorImpl createStackChildAllocator(const size_t expected_size);
+    AllocatorImpl createStackChildAllocator(const size_t expected_size = default_stack_size);
 
-    ~AllocatorImpl() {};
+    ~AllocatorImpl();
 
 #include "allocator-shortcut-functions.h"
 };
