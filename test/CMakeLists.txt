@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 
 add_subdirectory(googletest EXCLUDE_FROM_ALL)
+add_subdirectory(tfhetestlib)
+
 
 include_directories(${GTEST_INCLUDE_DIRS} ../libtfhe)
 
@@ -17,7 +19,7 @@ set(GOOGLETEST_SOURCES
 
 #the unittests are compiled with the google test framework
 add_executable(unittests ${GOOGLETEST_SOURCES})
-target_link_libraries(unittests tfhe gtest gtest_main -lgmpxx -lpthread)
+target_link_libraries(unittests tfhetestlib tfhe gtest gtest_main -lntl -lgmp -lpthread)
 add_test(unittests unittests)
 
 # # We build a specific unit and integration test for each fft processor
