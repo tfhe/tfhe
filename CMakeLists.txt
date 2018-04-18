@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.0)
 
 set(CMAKE_CONFIGURATION_TYPES Debug Optim CACHE TYPE INTERNAL FORCE)
 set(CMAKE_BUILD_TYPE "optim" CACHE STRING "Build Type: Debug or Optim")
+set(USE_VALGRIND_ALLOCATOR ON CACHE BOOL "Use the valgrind-mode allocator")
 #set(ENABLE_FFTW OFF CACHE BOOL "Enable the FFTW FFT processor (GPL)")
 #set(ENABLE_NAYUKI_PORTABLE ON CACHE BOOL "Enable the Nayuki portable FFT processor (MIT)")
 #set(ENABLE_NAYUKI_AVX ON CACHE BOOL "Enable the Nayuki AVX assembly FFT processor (MIT)")
@@ -29,11 +30,15 @@ set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -std=c99")
 set(CMAKE_CXX_FLAGS_DEBUG "${CLANG_FLAGS} -g3 -O0 -Wall -Werror")
 set(CMAKE_C_FLAGS_DEBUG "-g3 -O0 -Wall -Werror")
 
-set(CMAKE_CXX_FLAGS_OPTIM "${CLANG_FLAGS} -g3 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
-set(CMAKE_C_FLAGS_OPTIM "-g3 -march=native -O3 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_CXX_FLAGS_OPTIM "${CLANG_FLAGS} -g3 -march=native -O9 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_C_FLAGS_OPTIM "-g3 -march=native -O9 -DNDEBUG -funroll-loops -Wall -Werror")
 
-set(CMAKE_CXX_FLAGS_RELEASE "${CLANG_FLAGS} -g0 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
-set(CMAKE_C_FLAGS_RELEASE "-g0 -march=native -O3 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_CXX_FLAGS_RELEASE "${CLANG_FLAGS} -g0 -march=native -O9 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_C_FLAGS_RELEASE "-g0 -march=native -O9 -DNDEBUG -funroll-loops -Wall -Werror")
+
+if (USE_VALGRIND_ALLOCATOR)
+  add_definitions(-DUSE_VALGRIND_ALLOCATOR)
+endif(USE_VALGRIND_ALLOCATOR)
 
 #if (ENABLE_NAYUKI_PORTABLE)
 #list(APPEND FFT_PROCESSORS "nayuki-portable")

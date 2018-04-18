@@ -9,14 +9,14 @@
  */
 template<>
 class AllocatorImpl<TFHE_ALLOCATOR> {
-    AllocatorImpl *father;
+    void* baseAddr;
     size_t beginAddress;
 public:
     void *allocate(size_t alignment, size_t byte_size);
 
     void deallocate(void *ptr);
 
-    AllocatorImpl(AllocatorImpl *const father = nullptr, const size_t beginAddr = 0ul);
+    AllocatorImpl(void *const baseAddr = nullptr, const size_t beginAddr = 0ul);
 
     AllocatorImpl(AllocatorImpl &&);
 
