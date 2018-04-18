@@ -195,7 +195,8 @@ void testBinaryOperation(
         ZZ(*testOp)(ZZ a, ZZ b, const RealParams<BigTorus> *params),
         void(*compRes)(ZZ a, ZZ b)
 ) {
-    Allocator alloc;
+    Allocator alloc0;
+    Allocator alloc = alloc0.createStackChildAllocator();
     for (int K: set<int>{1, 2, 5, 10}) {
         for (int L: set<int>{1, 2, 5, 10}) {
             ZModuleParams<BigTorus> *zparams = alloc.newObject<ZModuleParams<BigTorus>>(K);

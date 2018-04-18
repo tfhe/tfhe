@@ -38,7 +38,7 @@ AllocatorImpl<TFHE_ALLOCATOR> AllocatorImpl<TFHE_ALLOCATOR>::createStackChildAll
     if (beginAddress == 0ul) {
         //malloc mode
         void* baseAddress = aligned_alloc(1, expected_size);
-        return AllocatorImpl(baseAddress, size_t(beginAddress));
+        return AllocatorImpl(baseAddress, size_t(baseAddress));
     } else {
         //stack mode
         return AllocatorImpl(nullptr, beginAddress);
