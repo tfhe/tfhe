@@ -8,6 +8,7 @@ set(GOOGLEBENCH_SOURCES
         bench_bigreal.cpp
         bench_bigint.cpp
         bench_bigtorus.cpp
+        bench_allocator.cpp
         )
 
 #the benchmark applications are compiled with google benchmark framework
