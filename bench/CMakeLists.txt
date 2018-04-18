@@ -4,8 +4,10 @@ set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "No benchmark framework testing" FOR
 add_subdirectory(benchmark EXCLUDE_FROM_ALL)
 
 set(GOOGLEBENCH_SOURCES
+        bench.cpp
         bench_bigreal.cpp
         bench_bigint.cpp
+        bench_bigtorus.cpp
         )
 
 #the benchmark applications are compiled with google benchmark framework

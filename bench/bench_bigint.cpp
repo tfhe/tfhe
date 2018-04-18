@@ -3,15 +3,21 @@
 #include <core/allocator/allocator.h>
 
 
-class BigIntBench : public benchmark::Fixture {
+class BigInt_Bench : public benchmark::Fixture {
 public:
+    BigInt_Bench() {
+        gmp_randinit_default(rnd_state);
+    }
+
+    ~BigInt_Bench() {
+        gmp_randclear(rnd_state);
+    }
+
     void SetUp(const ::benchmark::State &state) {
         const auto nbLimbsFrac = state.range(0);
 
         params = alloc.newObject<ZModuleParams<BigTorus>>(nbLimbsFrac);
         big_int_arr = alloc.newArray<BigInt>(big_int_arr_size);
-        gmp_randstate_t rnd_state;
-        gmp_randinit_default(rnd_state);
         for (int i = 0; i < big_int_arr_size; ++i)
             mpz_urandomb(big_int_arr[i].data, rnd_state, params->p);
     }
@@ -21,6 +27,7 @@ public:
         alloc.deleteObject(params);
     }
 
+    gmp_randstate_t rnd_state;
     Allocator alloc;
     ZModuleParams<BigTorus> *params = nullptr;
 
@@ -28,20 +35,37 @@ public:
     BigInt *big_int_arr = nullptr;
 };
 
-BENCHMARK_DEFINE_F(BigIntBench, add)(benchmark::State &state) {
+// void add(BigInt *res, const BigInt *a, const BigInt *b, const ZModuleParams<BigTorus> *params);
+BENCHMARK_DEFINE_F(BigInt_Bench, add_II)(benchmark::State &state) {
     for (auto _ : state) {
         tfhe_backend::add(big_int_arr + 2, big_int_arr + 1, big_int_arr + 0, params);
     }
 }
+BENCHMARK_REGISTER_F(BigInt_Bench, add_II)->Range(1, 128);
 
-BENCHMARK_REGISTER_F(BigIntBench, add)->Ranges({{1, 64},
-                                                {1, 64}});
+// void add(BigInt *res, const BigInt *a, int64_t b, const ZModuleParams<BigTorus> *params);
+BENCHMARK_DEFINE_F(BigInt_Bench, add_iI)(benchmark::State &state) {
+    int64_t a = rand();
+    for (auto _ : state) {
+        tfhe_backend::add(big_int_arr + 2, a, big_int_arr + 0,params);
+    }
+}
+BENCHMARK_REGISTER_F(BigInt_Bench, add_iI)->Range(1, 128);
 
-BENCHMARK_DEFINE_F(BigIntBench, mul)(benchmark::State &state) {
+// void mul(BigInt *res, const BigInt *a, const BigInt *b, const ZModuleParams<BigTorus> *params);
+BENCHMARK_DEFINE_F(BigInt_Bench, mul_II)(benchmark::State &state) {
     for (auto _ : state) {
         tfhe_backend::mul(big_int_arr + 2, big_int_arr + 1, big_int_arr + 0, params);
     }
 }
+BENCHMARK_REGISTER_F(BigInt_Bench, mul_II)->Range(1, 128);
 
-BENCHMARK_REGISTER_F(BigIntBench, mul)->Ranges({{1, 64},
-                                                {1, 64}});
+// void mul(BigInt *res, const BigInt *a, int64_t b, const ZModuleParams<BigTorus> *params);
+BENCHMARK_DEFINE_F(BigInt_Bench, mul_iI)(benchmark::State &state) {
+    int64_t a = rand();
+    for (auto _ : state) {
+        tfhe_backend::mul(big_int_arr + 2, a, big_int_arr + 0,params);
+    }
+}
+BENCHMARK_REGISTER_F(BigInt_Bench, mul_iI)->Range(1, 128);
+

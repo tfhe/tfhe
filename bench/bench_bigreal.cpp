@@ -2,7 +2,7 @@
 #include <core/arithmetic/big_real.h>
 #include <core/allocator/allocator.h>
 
-class BigRealBench : public benchmark::Fixture {
+class BigReal_Bench : public benchmark::Fixture {
 public:
     void SetUp(const ::benchmark::State &state) {
         const auto nbLimbsInt = state.range(0);
@@ -27,51 +27,50 @@ public:
     BigReal *big_real_arr = nullptr;
 };
 
-BENCHMARK_DEFINE_F(BigRealBench, add)(benchmark::State &state) {
+// void add(BigReal *res, const BigReal *a, const BigReal *b, const RealParams<BigTorus> *params);
+BENCHMARK_DEFINE_F(BigReal_Bench, add)(benchmark::State &state) {
     for (auto _ : state) {
         tfhe_backend::add(big_real_arr + 2, big_real_arr + 1, big_real_arr + 0, params);
     }
 }
-
-BENCHMARK_REGISTER_F(BigRealBench, add)->Ranges({{1, 64},
+BENCHMARK_REGISTER_F(BigReal_Bench, add)->Ranges({{1, 64},
                                                  {1, 64}});
-BENCHMARK_REGISTER_F(BigRealBench, add)->Args({1, 9})->Threads(1);
 
-
-BENCHMARK_DEFINE_F(BigRealBench, mul_naive_round)(benchmark::State &state) {
+// void mul_naive_round(BigReal *res, const BigReal *a, const BigReal *b, const RealParams<BigTorus> *params,
+//                      Allocator alloc);
+BENCHMARK_DEFINE_F(BigReal_Bench, mul_naive_round)(benchmark::State &state) {
     for (auto _ : state) {
         tfhe_backend::mul_naive_round(big_real_arr + 2, big_real_arr + 1, big_real_arr + 0, params,
-                                      alloc.createStackChildAllocator());
+                                      &alloc);
     }
 }
-
-BENCHMARK_REGISTER_F(BigRealBench, mul_naive_round)->Ranges({{1, 64},
+BENCHMARK_REGISTER_F(BigReal_Bench, mul_naive_round)->Ranges({{1, 64},
                                                              {1, 64}});
 
 
-BENCHMARK_DEFINE_F(BigRealBench, mul_naive_trunc)(benchmark::State &state) {
+// void mul_naive_trunc(BigReal *res, const BigReal *a, const BigReal *b, const RealParams<BigTorus> *params,
+//                      Allocator alloc);
+BENCHMARK_DEFINE_F(BigReal_Bench, mul_naive_trunc)(benchmark::State &state) {
     for (auto _ : state) {
         tfhe_backend::mul_naive_trunc(big_real_arr + 2, big_real_arr + 1, big_real_arr + 0, params,
-                                      alloc.createStackChildAllocator());
+                                      &alloc);
     }
 }
-
-BENCHMARK_REGISTER_F(BigRealBench, mul_naive_trunc)->Ranges({{1, 64},
+BENCHMARK_REGISTER_F(BigReal_Bench, mul_naive_trunc)->Ranges({{1, 64},
                                                              {1, 64}});
 
 
-BENCHMARK_DEFINE_F(BigRealBench, mul)(benchmark::State &state) {
+// void mul(BigReal *res, const BigReal *a, const BigReal *b, const RealParams<BigTorus> *params, Allocator alloc);
+BENCHMARK_DEFINE_F(BigReal_Bench, mul)(benchmark::State &state) {
     for (auto _ : state) {
         tfhe_backend::mul(big_real_arr + 2, big_real_arr + 1, big_real_arr + 0, params,
-                          alloc.createStackChildAllocator());
+                          &alloc);
     }
 }
+BENCHMARK_REGISTER_F(BigReal_Bench, mul)->Ranges({{1, 64},
+                                                 {1, 64}});
 
-BENCHMARK_REGISTER_F(BigRealBench, mul)->Ranges({{1, 64},
-                                                 {1, 64}})->Threads(1);
-BENCHMARK_REGISTER_F(BigRealBench, mul)->Args({1, 9})->Threads(1);
-
-static void RealBench_add(benchmark::State &state) {
+static void PrimitiveInt64_add(benchmark::State &state) {
     uint64_t a, b;
     a = rand() * rand();
     b = rand() * rand();
@@ -80,10 +79,9 @@ static void RealBench_add(benchmark::State &state) {
         benchmark::DoNotOptimize(c = a + b);
     }
 }
+BENCHMARK(PrimitiveInt64_add);
 
-BENCHMARK(RealBench_add);
-
-static void RealBench_mul(benchmark::State &state) {
+static void PrimitiveInt64_mul(benchmark::State &state) {
     uint64_t a, b;
     a = rand() * rand();
     b = rand() * rand();
@@ -92,9 +90,5 @@ static void RealBench_mul(benchmark::State &state) {
         benchmark::DoNotOptimize(c = a * b);
     }
 }
-
-BENCHMARK(RealBench_mul);
-
-
-BENCHMARK_MAIN();
+BENCHMARK(PrimitiveInt64_mul);
 

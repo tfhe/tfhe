@@ -22,6 +22,8 @@ public:
 
     ZModuleParams(const int max_nbLimbs);
 
+    ZModuleParams(const int max_nbLimbs, const int p);
+
     void destroy();
 
     PREVENT_STACK_COPY(ZModuleParams);
