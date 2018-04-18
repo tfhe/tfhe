@@ -2,14 +2,15 @@
 #include <core/allocator/allocator.h>
 
 template<typename AllocatorTest>
-static void Allocator_Bench_construct(benchmark::State& state) {
+static void Allocator_Bench_con_decon(benchmark::State& state) {
     AllocatorTest *alloc;
     for (auto _ : state) {
-        benchmark::DoNotOptimize(alloc = new AllocatorTest());
+        alloc = new AllocatorTest();
+        delete alloc;
     }
 }
-BENCHMARK_TEMPLATE(Allocator_Bench_construct, AllocatorImpl<TFHE_ALLOCATOR>);
-BENCHMARK_TEMPLATE(Allocator_Bench_construct, AllocatorImpl<VALGRIND_ALLOCATOR>);
+BENCHMARK_TEMPLATE(Allocator_Bench_con_decon, AllocatorImpl<TFHE_ALLOCATOR>);
+BENCHMARK_TEMPLATE(Allocator_Bench_con_decon, AllocatorImpl<VALGRIND_ALLOCATOR>);
 
 template<typename AllocatorTest>
 static void Allocator_Bench_alloc_dealloc(benchmark::State& state) {
@@ -18,22 +19,22 @@ static void Allocator_Bench_alloc_dealloc(benchmark::State& state) {
     AllocatorTest *alloc = new AllocatorTest();
 
     for (auto _ : state) {
-        benchmark::DoNotOptimize(arr = (uint8_t*)alloc->allocate(0, nbBytes));
+        arr = (uint8_t*)alloc->allocate(1, nbBytes);
         alloc->deallocate(arr);
-        benchmark::ClobberMemory();
     }
 
     delete alloc;
 }
-BENCHMARK_TEMPLATE(Allocator_Bench_alloc_dealloc, AllocatorImpl<TFHE_ALLOCATOR>)->Range(1<<6, 1<<16);
-BENCHMARK_TEMPLATE(Allocator_Bench_alloc_dealloc, AllocatorImpl<VALGRIND_ALLOCATOR>)->Range(1<<6, 1<<16);
+BENCHMARK_TEMPLATE(Allocator_Bench_alloc_dealloc, AllocatorImpl<TFHE_ALLOCATOR>)->Range(1<<6, 1<<20);
+BENCHMARK_TEMPLATE(Allocator_Bench_alloc_dealloc, AllocatorImpl<VALGRIND_ALLOCATOR>)->Range(1<<6, 1<<20);
 
 template<typename AllocatorTest>
 static void Allocator_Bench_createStackChildAllocator(benchmark::State& state) {
-    AllocatorTest alloc;
+    AllocatorTest *alloc = new AllocatorTest();
     for (auto _ : state) {
-        alloc.createStackChildAllocator();
+        AllocatorTest child_alloc = alloc->createStackChildAllocator();
     }
+    delete alloc;
 }
 BENCHMARK_TEMPLATE(Allocator_Bench_createStackChildAllocator, AllocatorImpl<TFHE_ALLOCATOR>);
 BENCHMARK_TEMPLATE(Allocator_Bench_createStackChildAllocator, AllocatorImpl<VALGRIND_ALLOCATOR>);
