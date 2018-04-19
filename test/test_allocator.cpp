@@ -20,7 +20,7 @@ void crazyrec(int i, Allocator alloc) {
     if (i == 100) return;
     size_t *r = alloc.newObject<size_t>();
     *r = i;
-    crazyrec(i + 1, alloc.createStackChildAllocator(0));
+    crazyrec(i + 1, alloc.createStackChildAllocator());
     ASSERT_EQ(*r, i);
     alloc.deleteObject(r);
 }
