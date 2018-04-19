@@ -36,6 +36,14 @@ public:
 
 class BigTorus_Bench2 : public BigTorus_Bench1 {
 public:
+    BigTorus_Bench2() {
+        gmp_randinit_default(rnd_state);
+    }
+
+    ~BigTorus_Bench2() {
+        gmp_randclear(rnd_state);
+    }
+
     virtual void BuildParams(const ::benchmark::State &state) {
         params = alloc.newObject<ZModuleParams<BigTorus>>(state.range(1), state.range(0)*64);
     }
@@ -43,6 +51,8 @@ public:
     virtual void BuildAuxData() {
         BigTorus_Bench1::BuildAuxData();
         big_int_arr = alloc.newArray<BigInt>(big_int_arr_size);
+        for (int i = 0; i < big_int_arr_size; ++i)
+            mpz_urandomb(big_int_arr[i].data, rnd_state, params->p);
     }
 
     virtual void DeleteAuxData() {
@@ -52,6 +62,7 @@ public:
 
     const int big_int_arr_size = 1;
     BigInt *big_int_arr = nullptr;
+    gmp_randstate_t rnd_state;
 };
 
 // void add(BigTorus *res, const BigTorus *a, const BigTorus *b, const ZModuleParams<BigTorus> *params);
