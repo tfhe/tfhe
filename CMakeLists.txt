@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.0)
 
 set(CMAKE_CONFIGURATION_TYPES Debug Optim CACHE TYPE INTERNAL FORCE)
 set(CMAKE_BUILD_TYPE "optim" CACHE STRING "Build Type: Debug or Optim")
-set(USE_VALGRIND_ALLOCATOR ON CACHE BOOL "Use the valgrind-mode allocator")
+set(USE_VALGRIND_ALLOCATOR OFF CACHE BOOL "Use the valgrind-mode allocator")
 #set(ENABLE_FFTW OFF CACHE BOOL "Enable the FFTW FFT processor (GPL)")
 #set(ENABLE_NAYUKI_PORTABLE ON CACHE BOOL "Enable the Nayuki portable FFT processor (MIT)")
 #set(ENABLE_NAYUKI_AVX ON CACHE BOOL "Enable the Nayuki AVX assembly FFT processor (MIT)")

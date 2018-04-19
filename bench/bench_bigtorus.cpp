@@ -73,17 +73,14 @@ static void BigTorusCustomArgs(benchmark::internal::Benchmark* b) {
 }
 
 // void mul(BigTorus *res, const BigInt *a, const BigTorus *b, const ZModuleParams<BigTorus> *params, Allocator alloc);
-BENCHMARK_DEFINE_F(BigTorus_Bench2, mul_TI)(benchmark::State &state) {
+BENCHMARK_DEFINE_F(BigTorus_Bench2, mul_IT)(benchmark::State &state) {
+    Allocator alloc1 = alloc.createStackChildAllocator();
     for (auto _ : state) {
         tfhe_backend::mul(big_torus_arr + 1, big_int_arr + 0, big_torus_arr + 0, params,
-                          &alloc);
-
-        // alloc.createStackChildAllocator() is slow and biases measures
-        // tfhe_backend::mul(big_torus_arr + 1, big_int_arr + 0, big_torus_arr + 0, params,
-        //                   alloc.createStackChildAllocator());
+                          alloc1.createStackChildAllocator());
     }
 }
-BENCHMARK_REGISTER_F(BigTorus_Bench2, mul_TI)->Apply(BigTorusCustomArgs);
+BENCHMARK_REGISTER_F(BigTorus_Bench2, mul_IT)->Apply(BigTorusCustomArgs);
 
 // void mul(BigTorus *res, int64_t a, const BigTorus *b, const ZModuleParams<BigTorus> *params);
 BENCHMARK_DEFINE_F(BigTorus_Bench1, mul_iT)(benchmark::State &state) {

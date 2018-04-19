@@ -39,9 +39,10 @@ BENCHMARK_REGISTER_F(BigReal_Bench, add)->Ranges({{1, 64},
 // void mul_naive_round(BigReal *res, const BigReal *a, const BigReal *b, const RealParams<BigTorus> *params,
 //                      Allocator alloc);
 BENCHMARK_DEFINE_F(BigReal_Bench, mul_naive_round)(benchmark::State &state) {
+    Allocator alloc1 = alloc.createStackChildAllocator();
     for (auto _ : state) {
         tfhe_backend::mul_naive_round(big_real_arr + 2, big_real_arr + 1, big_real_arr + 0, params,
-                                      &alloc);
+                                      alloc1.createStackChildAllocator());
     }
 }
 BENCHMARK_REGISTER_F(BigReal_Bench, mul_naive_round)->Ranges({{1, 64},
@@ -51,9 +52,10 @@ BENCHMARK_REGISTER_F(BigReal_Bench, mul_naive_round)->Ranges({{1, 64},
 // void mul_naive_trunc(BigReal *res, const BigReal *a, const BigReal *b, const RealParams<BigTorus> *params,
 //                      Allocator alloc);
 BENCHMARK_DEFINE_F(BigReal_Bench, mul_naive_trunc)(benchmark::State &state) {
+    Allocator alloc1 = alloc.createStackChildAllocator();
     for (auto _ : state) {
         tfhe_backend::mul_naive_trunc(big_real_arr + 2, big_real_arr + 1, big_real_arr + 0, params,
-                                      &alloc);
+                                      alloc1.createStackChildAllocator());
     }
 }
 BENCHMARK_REGISTER_F(BigReal_Bench, mul_naive_trunc)->Ranges({{1, 64},
@@ -62,9 +64,10 @@ BENCHMARK_REGISTER_F(BigReal_Bench, mul_naive_trunc)->Ranges({{1, 64},
 
 // void mul(BigReal *res, const BigReal *a, const BigReal *b, const RealParams<BigTorus> *params, Allocator alloc);
 BENCHMARK_DEFINE_F(BigReal_Bench, mul)(benchmark::State &state) {
+    Allocator alloc1 = alloc.createStackChildAllocator();
     for (auto _ : state) {
         tfhe_backend::mul(big_real_arr + 2, big_real_arr + 1, big_real_arr + 0, params,
-                          &alloc);
+                          alloc1.createStackChildAllocator());
     }
 }
 BENCHMARK_REGISTER_F(BigReal_Bench, mul)->Ranges({{1, 64},
