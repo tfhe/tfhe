@@ -19,9 +19,11 @@ void TorusPolynomial<TORUS>::Uniform(
         Allocator alloc) {
     const int32_t N = params->N;
     TORUS *x = result->coefs;
+    const ZModuleParams<TORUS> *const zparams =
+            params->zmodule_params;
 
     for (int32_t i = 0; i < N; ++i)
-        x[i] = RandomGenTorus<TORUS>::uniform();
+        RandomGenTorus<TORUS>::uniform(x[i], zparams);
 }
 
 // TorusPolynomial + p*TorusPolynomial

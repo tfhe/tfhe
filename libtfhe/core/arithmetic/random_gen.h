@@ -65,28 +65,71 @@ private:
 
 public:
     /**
-     * Generate an uniformly distributed torus element
+     * @brief Generate an uniformly distributed torus element
      */
-    static TORUS uniform() {
-        return uniform_distrib(generator);
-    }
+    static TORUS uniform(
+            const ZModuleParams<TORUS> *params);
 
     /**
-     * Generate a normally distributed torus element with given mean and standard deviation
+     * @brief Generate a normally distributed torus element with given mean and standard deviation
      * @param mean normal distribution mean value
      * @param sigma normal distribution standard deviation
      */
-    static TORUS gaussian(const TORUS mean, const double sigma) {
-        return mean + TorusUtils<TORUS>::from_double(RandomGen::gaussian(sigma));
-    }
+    static TORUS gaussian(
+            const TORUS mean,
+            const double sigma,
+            const ZModuleParams<TORUS> *params);
+
+    /**
+     * @brief Generate an uniformly distributed torus element
+     * @param dst output variable
+     */
+    static void uniform(
+            TORUS &dst,
+            const ZModuleParams<TORUS> *params) { dst = uniform(params); }
+
+    /**
+     * @brief Generate a normally distributed torus element with given mean and standard deviation
+     * @param dst output variable
+     * @param mean normal distribution mean value
+     * @param sigma normal distribution standard deviation
+     */
+    static void gaussian(
+            TORUS &dst,
+            const TORUS mean,
+            const double sigma,
+            const ZModuleParams<TORUS> *params) { dst = gaussian(mean, sigma, params); }
 };
 
-template<typename TORUS>
-std::uniform_int_distribution <TORUS> RandomGenTorus<TORUS>::uniform_distrib =
-        std::uniform_int_distribution<TORUS>(TorusUtils<TORUS>::min_val, TorusUtils<TORUS>::max_val);
-
+/**
+ * Instantiation for BigTorus type
+ */
 template<>
 class RandomGenTorus<BigTorus> : public RandomGen {
+protected:
+
+public:
+    using TORUS = BigTorus;
+
+    /**
+     * @brief Generate an uniformly distributed torus element
+     * @param dst output variable
+     */
+    static void uniform(
+            TORUS *dst,
+            const ZModuleParams<TORUS> *params);
+
+    /**
+     * @brief Generate a normally distributed big torus element with given mean and standard deviation
+     * @param dst output variable
+     * @param mean normal distribution mean value
+     * @param sigma normal distribution standard deviation
+     */
+    static void gaussian(
+            TORUS *dst,
+            const TORUS *mean,
+            const double sigma,
+            const ZModuleParams<TORUS> *params);
 };
 
 #endif //RANDOM_GEN_H

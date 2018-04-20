@@ -16,6 +16,7 @@ set(CORE_SRCS
         arithmetic/polynomial_torus_big.cpp
         arithmetic/random_gen.cpp
         arithmetic/random_gen.h
+        arithmetic/random_gen_big.cpp
         arithmetic/tfhe_core.h
         arithmetic/torus.h
         arithmetic/threadcontext.h
