@@ -120,6 +120,14 @@ public:
             const ZModuleParams<TORUS> *params);
 
     /**
+     * @brief Generate an uniformly distributed torus element
+     * @param dst output variable
+     */
+    static void uniform(
+            TORUS &dst,
+            const ZModuleParams<TORUS> *params) { uniform(&dst, params); }
+
+    /**
      * @brief Generate a normally distributed big torus element with given mean and standard deviation
      * @param dst output variable
      * @param mean normal distribution mean value
@@ -130,6 +138,18 @@ public:
             const TORUS *mean,
             const double sigma,
             const ZModuleParams<TORUS> *params);
+
+    /**
+     * @brief Generate a normally distributed big torus element with given mean and standard deviation
+     * @param dst output variable
+     * @param mean normal distribution mean value
+     * @param sigma normal distribution standard deviation
+     */
+    static void gaussian(
+            TORUS &dst,
+            const TORUS &mean,
+            const double sigma,
+            const ZModuleParams<TORUS> *params) { gaussian(&dst, &mean, sigma, params); }
 };
 
 #endif //RANDOM_GEN_H

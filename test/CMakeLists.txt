@@ -11,6 +11,7 @@ set(GOOGLETEST_SOURCES
         test_allocator.cpp
         test_bignum.cpp
         test_bigreal.cpp
+        test_random_gen.cpp
         )
 
 # set(CPP_ITESTS

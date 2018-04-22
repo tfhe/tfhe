@@ -18,7 +18,7 @@ public:
      * @return torus value
      */
     static void from_double(TORUS *res, const double d, const ZModuleParams<TORUS> *params) {
-        from_double(res, d, params);
+        tfhe_backend::from_double(res, d, params);
     }
 
     /**
@@ -27,7 +27,16 @@ public:
      * @return real number
     */
     static double to_double(const TORUS *x, const ZModuleParams<TORUS> *params) {
-        return to_double(x, params);
+        return tfhe_backend::to_double(x, params);
+    }
+
+    /**
+     * @brief Converts torus to real number (mainly for printing)
+     * @param x torus element to convert
+     * @return real number
+    */
+    static double to_double(const TORUS &x, const ZModuleParams<TORUS> *params) {
+        return tfhe_backend::to_double(&x, params);
     }
 
     /**
@@ -70,8 +79,20 @@ public:
      * @return double value of the infinity norm
      */
     static double normInftyDist(const TORUS *t1, const TORUS *t2, const ZModuleParams<TORUS> *params) {
-        abort(); //TODO the code below won't do mod 1 properly (e.g. dist(0.01,0.99) is wrong): add a distance function to the torus
-        return abs(TorusUtils<TORUS>::to_double(t1, params)-TorusUtils<TORUS>::to_double(t2, params)); // quick and dirty :P
+        double diff = std::abs(TorusUtils<TORUS>::to_double(t1, params)-TorusUtils<TORUS>::to_double(t2, params));
+        diff = (diff > 0.5) ? 1.0 - diff : diff;
+        return diff;
+    }
+
+    /**
+     * @brief Return infinity norm between 2 torus elements
+     *
+     * @param t1 first torus element
+     * @param t2 second torus element
+     * @return double value of the infinity norm
+     */
+    static double normInftyDist(const TORUS &t1, const TORUS &t2, const ZModuleParams<TORUS> *params) {
+        return normInftyDist(&t1, &t2, params);
     }
 };
 

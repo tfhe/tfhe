@@ -119,7 +119,7 @@ public:
      * @return double value of the infinity norm
      */
     static double normInftyDist(const TORUS t1, const TORUS t2, const ZModuleParams<TORUS> *params) {
-        return abs(TorusUtils<TORUS>::to_double(t1 - t2, params));
+        return std::abs(TorusUtils<TORUS>::to_double(t1 - t2, params));
     }
 };
 
