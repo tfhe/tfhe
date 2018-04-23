@@ -23,7 +23,7 @@ void TorusPolynomial<TORUS>::Uniform(
             params->zmodule_params;
 
     for (int32_t i = 0; i < N; ++i)
-        RandomGenTorus<TORUS>::uniform(x[i], zparams);
+        x[i] = RandomGenTorus<TORUS>::uniform(zparams);
 }
 
 // TorusPolynomial + p*TorusPolynomial

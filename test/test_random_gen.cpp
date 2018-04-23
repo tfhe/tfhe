@@ -4,6 +4,9 @@
 #include <core/allocator/allocator.h>
 #include <core/arithmetic/random_gen.h>
 
+#include "tfhe_test_extra/torus_utils.h"
+#include "tfhe_test_extra/random_gen.h"
+
 using namespace std;
 using namespace tfhe_backend;
 using namespace std;
@@ -48,7 +51,7 @@ TEST(RandomGen, gaussian) {
     double min_val = *min_element(vals.begin(), vals.end());
     EXPECT_GE(min_val, -5);
 
-    EXPECT_GE(max_val-min_val, 2);
+    EXPECT_GE(max_val - min_val, 2);
 
     double sum_val = accumulate(vals.begin(), vals.end(), 0.0);
     double mean_val = sum_val / nb_iter;
@@ -56,7 +59,7 @@ TEST(RandomGen, gaussian) {
     EXPECT_GE(mean_val, -0.4);
 }
 
-template <typename TORUS>
+template<typename TORUS>
 class RandomGenTorusTestBase : public ::testing::Test {
 public:
     Allocator alloc;
@@ -66,7 +69,7 @@ public:
     TORUS *sample_arr = nullptr;
 };
 
-template <typename TORUS>
+template<typename TORUS>
 class RandomGenTorusTest : public RandomGenTorusTestBase<TORUS> {
 public:
     Allocator alloc;
@@ -105,8 +108,8 @@ TYPED_TEST(RandomGenTorusTest, uniform) {
 
     vector<double> vals;
     for (int i = 0; i < nb_iter; ++i) {
-        RandomGenTorus<TORUS>::uniform(this->sample_arr[0], this->params);
-        double sampled = TorusUtils<TORUS>::to_double(this->sample_arr[0], this->params);
+        RandomGenTorusExtra<TORUS>::uniform(this->sample_arr[0], this->params);
+        double sampled = TorusUtilsExtra<TORUS>::to_double(this->sample_arr[0], this->params);
         vals.push_back(sampled);
     }
 
@@ -125,11 +128,11 @@ TYPED_TEST(RandomGenTorusTest, gaussian) {
         TORUS &sample = this->sample_arr[0];
         TORUS &mean = this->sample_arr[1];
 
-        double sigma = (double)rand() / RAND_MAX / 100;
-        RandomGenTorus<TORUS>::gaussian(sample, mean, sigma, this->params);
+        double sigma = (double) rand() / RAND_MAX / 100;
+        RandomGenTorusExtra<TORUS>::gaussian(sample, mean, sigma, this->params);
 
         // -5.sigma<x<5.sigma with overhelming probability
-        double dist = TorusUtils<TORUS>::normInftyDist(sample, mean, this->params);
+        double dist = TorusUtilsExtra<TORUS>::normInftyDist(sample, mean, this->params);
         EXPECT_LE(dist, 5 * sigma);
     }
 }
