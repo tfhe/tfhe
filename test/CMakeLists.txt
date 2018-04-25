@@ -12,8 +12,6 @@ set(GOOGLETEST_SOURCES
         test_bignum.cpp
         test_bigreal.cpp
         test_random_gen.cpp
-        tfhe_test_extra/random_gen.h
-        tfhe_test_extra/torus_utils.h
         )
 
 # set(CPP_ITESTS

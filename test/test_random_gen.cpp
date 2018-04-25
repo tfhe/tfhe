@@ -4,12 +4,8 @@
 #include <core/allocator/allocator.h>
 #include <core/arithmetic/random_gen.h>
 
-#include "tfhe_test_extra/torus_utils.h"
-#include "tfhe_test_extra/random_gen.h"
-
 using namespace std;
 using namespace tfhe_backend;
-using namespace std;
 
 TEST(RandomGen, DISABLED_set_seed) { // see why seeding doest not work
     double v1, v2;
@@ -105,11 +101,12 @@ TYPED_TEST(RandomGenTorusTest, uniform) {
     typedef TypeParam TORUS;
 
     const int nb_iter = 10;
+    TORUS *sample = this->sample_arr + 0;
 
     vector<double> vals;
     for (int i = 0; i < nb_iter; ++i) {
-        RandomGenTorusExtra<TORUS>::uniform(this->sample_arr[0], this->params);
-        double sampled = TorusUtilsExtra<TORUS>::to_double(this->sample_arr[0], this->params);
+        RandomGenTorus<TORUS>::uniform(sample, this->params);
+        double sampled = TorusUtils<TORUS>::to_double(sample, this->params);
         vals.push_back(sampled);
     }
 
@@ -125,14 +122,14 @@ TYPED_TEST(RandomGenTorusTest, gaussian) {
 
     vector<double> vals;
     for (int i = 0; i < nb_iter; ++i) {
-        TORUS &sample = this->sample_arr[0];
-        TORUS &mean = this->sample_arr[1];
+        TORUS *sample = this->sample_arr + 0;
+        TORUS *mean = this->sample_arr + 1;
 
         double sigma = (double) rand() / RAND_MAX / 100;
-        RandomGenTorusExtra<TORUS>::gaussian(sample, mean, sigma, this->params);
+        RandomGenTorus<TORUS>::gaussian(sample, mean, sigma, this->params);
 
         // -5.sigma<x<5.sigma with overhelming probability
-        double dist = TorusUtilsExtra<TORUS>::normInftyDist(sample, mean, this->params);
+        double dist = TorusUtils<TORUS>::distance(sample, mean, this->params, this->alloc.createStackChildAllocator());
         EXPECT_LE(dist, 5 * sigma);
     }
 }

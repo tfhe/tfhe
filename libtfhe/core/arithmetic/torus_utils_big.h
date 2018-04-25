@@ -36,7 +36,8 @@ public:
      * @param Msize discrete space size
      * @return approximated torus value
      */
-    static void approxPhase(TORUS *res, const TORUS *phase, const uint64_t Msize, const ZModuleParams<TORUS> *params, Allocator alloc) {
+    static void approxPhase(TORUS *res, const TORUS *phase, const uint64_t Msize, const ZModuleParams<TORUS> *params,
+                            Allocator alloc) {
         tfhe_backend::approxPhase(res, phase, Msize, params, std::move(alloc));
     }
 
@@ -47,7 +48,8 @@ public:
      * @param Msize discrete space size
      * @return discrete space value in [0, MSize[
      */
-    static uint64_t modSwitchFromTorus(const TORUS *phase, const uint64_t Msize, const ZModuleParams<TORUS> *params, Allocator alloc) {
+    static uint64_t
+    modSwitchFromTorus(const TORUS *phase, const uint64_t Msize, const ZModuleParams<TORUS> *params, Allocator alloc) {
         return tfhe_backend::modSwitchFromTorus(phase, Msize, params, std::move(alloc));
     }
 
@@ -58,20 +60,24 @@ public:
      * @param Msize discrete space size
      * @return torus value
      */
-    static void modSwitchToTorus(TORUS *res, const uint64_t mu, const uint64_t Msize, const ZModuleParams<TORUS> *params, Allocator alloc) {
+    static void
+    modSwitchToTorus(TORUS *res, const uint64_t mu, const uint64_t Msize, const ZModuleParams<TORUS> *params,
+                     Allocator alloc) {
         tfhe_backend::modSwitchToTorus(res, mu, Msize, params, std::move(alloc));
     }
 
     /**
-     * @brief Return infinity norm between 2 torus elements
+     * @brief Return absolute distance between 2 torus elements
      *
      * @param t1 first torus element
      * @param t2 second torus element
      * @return double value of the infinity norm
      */
-    static double normInftyDist(const TORUS *t1, const TORUS *t2, const ZModuleParams<TORUS> *params) {
-        double diff = std::abs(TorusUtils<TORUS>::to_double(t1, params)-TorusUtils<TORUS>::to_double(t2, params));
-        diff = (diff > 0.5) ? 1.0 - diff : diff;
+    static double distance(const TORUS *t1, const TORUS *t2, const ZModuleParams<TORUS> *params, Allocator alloc) {
+        TORUS *t = alloc.newObject<TORUS>(params, &alloc);
+        tfhe_backend::sub(t, t1, t2, params);
+        double diff = std::abs(TorusUtils<TORUS>::to_double(t, params));
+        alloc.deleteObject(t, params, &alloc);
         return diff;
     }
 };

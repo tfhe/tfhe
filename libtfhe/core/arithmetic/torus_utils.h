@@ -57,7 +57,7 @@ public:
      * @param d real to convert
      * @param reps torus value
      */
-    static void from_double(TORUS &reps, const double d, const ZModuleParams<TORUS> *params) {
+    static void from_double(TORUS *reps, const double d, const ZModuleParams<TORUS> *params) {
         reps = from_double(d, params);
     }
 
@@ -66,8 +66,8 @@ public:
      * @param x torus element to convert
      * @return real number
     */
-    static double to_double(const TORUS x, const ZModuleParams<TORUS> *params) {
-        return double(x) / dtot_factor;
+    static double to_double(const TORUS *x, const ZModuleParams<TORUS> *params) {
+        return double(*x) / dtot_factor;
     }
 
     /**
@@ -112,14 +112,15 @@ public:
     }
 
     /**
-     * @brief Return infinity norm between 2 torus elements
+     * @brief Return absolute distance between 2 torus elements
      *
      * @param t1 first torus element
      * @param t2 second torus element
      * @return double value of the infinity norm
      */
-    static double normInftyDist(const TORUS t1, const TORUS t2, const ZModuleParams<TORUS> *params) {
-        return std::abs(TorusUtils<TORUS>::to_double(t1 - t2, params));
+    static double distance(const TORUS *t1, const TORUS *t2, const ZModuleParams<TORUS> *params, Allocator alloc) {
+        TORUS t = *t1 - *t2;
+        return std::abs(TorusUtils<TORUS>::to_double(&t, params));
     }
 };
 

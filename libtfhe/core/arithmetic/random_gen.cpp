@@ -5,8 +5,10 @@ using namespace std;
 
 default_random_engine RandomGen::generator;
 
-uniform_int_distribution <int32_t> RandomGen::uniform_bool_distrib(0, 1);
+uniform_int_distribution<int32_t> RandomGen::uniform_bool_distrib(0, 1);
 normal_distribution<double> RandomGen::std_normal_distrib;
+uniform_int_distribution<uint64_t> RandomGen::uniform_uint64_distrib(std::numeric_limits<uint64_t>::min(),
+                                                                     std::numeric_limits<uint64_t>::max());
 
 /**
  * Instantiate RandomGenTorus class for available torus types
@@ -14,28 +16,46 @@ normal_distribution<double> RandomGen::std_normal_distrib;
 EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(RandomGenTorus);
 
 /**
- * Static members
- */
-template<>
-std::uniform_int_distribution <Torus32> RandomGenTorus<Torus32>::uniform_distrib =
-        std::uniform_int_distribution<Torus32>(TorusUtils<Torus32>::min_val, TorusUtils<Torus32>::max_val);
-template<>
-std::uniform_int_distribution <Torus64> RandomGenTorus<Torus64>::uniform_distrib =
-        std::uniform_int_distribution<Torus64>(TorusUtils<Torus64>::min_val, TorusUtils<Torus64>::max_val);
-
-/**
- * Static functions
+ * Static functions for native torus types
  */
 template<typename TORUS>
-TORUS RandomGenTorus<TORUS>::uniform(
+void RandomGenTorus<TORUS>::uniform(
+        TORUS *dst,
         const ZModuleParams<TORUS> *params) {
-    return RandomGenTorus::uniform_distrib(generator);
+    *dst = (TORUS) RandomGen::uniform();
 }
 
 template<typename TORUS>
-TORUS RandomGenTorus<TORUS>::gaussian(
-        const TORUS mean,
+void RandomGenTorus<TORUS>::gaussian(
+        TORUS *dst,
+        const TORUS *mean,
         const double sigma,
         const ZModuleParams<TORUS> *params) {
-    return mean + TorusUtils<TORUS>::from_double(RandomGen::gaussian(sigma), params);
+    *dst = *mean + TorusUtils<TORUS>::from_double(RandomGen::gaussian(sigma), params);
+}
+
+
+/**
+ * Static functions specializations for big torus types
+ */
+template<>
+void RandomGenTorus<BigTorus>::uniform(
+        BigTorus *dst,
+        const ZModuleParams<BigTorus> *params) {
+
+    mp_limb_t *const data = dst->data;
+    for (int i = 0; i < params->max_nbLimbs; ++i)
+        data[i] = RandomGen::uniform();
+}
+
+template<>
+void RandomGenTorus<BigTorus>::gaussian(
+        BigTorus *dst,
+        const BigTorus *mean,
+        const double sigma,
+        const ZModuleParams<BigTorus> *params) {
+
+    // double precision normal should be fine for big torus
+    TorusUtils<BigTorus>::from_double(dst, RandomGen::gaussian(sigma), params);
+    tfhe_backend::add(dst, mean, dst, params);
 }

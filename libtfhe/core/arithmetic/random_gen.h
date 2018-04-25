@@ -11,8 +11,9 @@
 class RandomGen {
 private:
 
-    static std::uniform_int_distribution <int32_t> uniform_bool_distrib;
+    static std::uniform_int_distribution<int32_t> uniform_bool_distrib;
     static std::normal_distribution<double> std_normal_distrib;
+    static std::uniform_int_distribution<uint64_t> uniform_uint64_distrib;
 
 public:
     /**
@@ -52,6 +53,13 @@ public:
     static double gaussian(const double sigma) {
         return std_normal_distrib(generator) * sigma;
     }
+
+    /**
+     * @brief Generate an uniformly distributed integer from range [0,2^64-1]
+     */
+    static uint64_t uniform() {
+        return uniform_uint64_distrib(generator);
+    }
 };
 
 /**
@@ -60,48 +68,15 @@ public:
  */
 template<typename TORUS>
 class RandomGenTorus : public RandomGen {
-private:
-    static std::uniform_int_distribution <TORUS> uniform_distrib;
-
 public:
     /**
      * @brief Generate an uniformly distributed torus element
      */
-    static TORUS uniform(
-            const ZModuleParams<TORUS> *params);
+    static void uniform(TORUS *dst,
+                        const ZModuleParams<TORUS> *params);
 
     /**
      * @brief Generate a normally distributed torus element with given mean and standard deviation
-     * @param mean normal distribution mean value
-     * @param sigma normal distribution standard deviation
-     */
-    static TORUS gaussian(
-            const TORUS mean,
-            const double sigma,
-            const ZModuleParams<TORUS> *params);
-};
-
-/**
- * Instantiation for BigTorus type
- */
-template<>
-class RandomGenTorus<BigTorus> : public RandomGen {
-protected:
-
-public:
-    using TORUS = BigTorus;
-
-    /**
-     * @brief Generate an uniformly distributed torus element
-     * @param dst output variable
-     */
-    static void uniform(
-            TORUS *dst,
-            const ZModuleParams<TORUS> *params);
-
-    /**
-     * @brief Generate a normally distributed big torus element with given mean and standard deviation
-     * @param dst output variable
      * @param mean normal distribution mean value
      * @param sigma normal distribution standard deviation
      */

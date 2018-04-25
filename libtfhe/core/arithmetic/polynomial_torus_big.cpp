@@ -10,16 +10,6 @@ using namespace tfhe_backend;
 template
 class TorusPolynomial<BigTorus>;
 
-// TorusPolynomial = random
-template<>
-void TorusPolynomial<BigTorus>::Uniform(TorusPolynomial<BigTorus> *result,
-                                        const PolynomialParams<BigTorus> *params,
-                                        TfheThreadContext *context,
-                                        Allocator alloc) {
-    abort(); //not implemented yet
-}
-
-
 // TorusPolynomial + p*TorusPolynomial
 template<>
 void TorusPolynomial<BigTorus>::AddMulZ(TorusPolynomial<BigTorus> *result,
@@ -94,27 +84,6 @@ void TorusPolynomial<BigTorus>::SubMulZTo(
         Allocator alloc) {
     TorusPolynomial<BigTorus>::SubMulZ(result, result, p, poly2, params, context, std::move(alloc));
 }
-
-
-// Infinity norm of the distance between two TorusPolynomial
-template<>
-double TorusPolynomial<BigTorus>::NormInftyDist(const TorusPolynomial<BigTorus> *poly1,
-                                                const TorusPolynomial<BigTorus> *poly2,
-                                                const PolynomialParams<BigTorus> *params,
-                                                TfheThreadContext *context,
-                                                Allocator alloc) {
-    const int32_t N = params->N;
-    double norm = 0;
-    const ZModuleParams<BigTorus> *const zparams = params->zmodule_params;
-
-    // Max between the coefficients of abs(poly1-poly2)
-    for (int32_t i = 0; i < N; ++i) {
-        double r = TorusUtils<BigTorus>::normInftyDist(poly1->coefs + i, poly2->coefs + i, zparams);
-        if (r > norm) { norm = r; }
-    }
-    return norm;
-}
-
 
 template<>
 void TorusPolynomial<BigTorus>::MultNaive_plain_aux_old(BigTorus *__restrict result,
