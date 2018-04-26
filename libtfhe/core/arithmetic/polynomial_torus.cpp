@@ -43,7 +43,7 @@ double TorusPolynomial<TORUS>::NormInftyDist(
 
     // Max between the coefficients of abs(poly1-poly2)
     for (int32_t i = 0; i < N; ++i) {
-        double r = TorusUtils<TORUS>::distance(poly1->coefs + i, poly2->coefs + i, zparams, std::move(alloc));
+        double r = TorusUtils<TORUS>::distance(poly1->coefs + i, poly2->coefs + i, zparams, alloc.createStackChildAllocator());
         if (r > norm) { norm = r; }
     }
     return norm;
