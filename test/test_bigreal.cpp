@@ -41,7 +41,7 @@ TEST(BigReal, to_double) {
         double aval = tfhe_backend::to_double(a, params);
         double bval = to_double(b);
 
-        ASSERT_LE(abs(aval - bval), 10);
+        ASSERT_DOUBLE_EQ(aval, bval);
     }
 
     alloc.deleteObject(a, params, &alloc);
@@ -90,13 +90,6 @@ TEST(BigReal, to_torus) {
     for (int i = 0; i < 100; ++i) {
         randomBigReal(a, params);
         tfhe_backend::to_torus(b, a, params);
-
-        // for (int i = 0; i < params->nbLimbs; ++i)
-        //     printf("%ld ", a->data[i]);
-        // printf("\n");
-        // for (int i = 0; i < params->nbLimbsFrac; ++i)
-        //     printf("%ld ", b->data[i]);
-        // printf("\n");
 
         ZZ azz = to_ntl_ZZ(a, params);
         ZZ bzz = to_ntl_ZZ(b, zparams);

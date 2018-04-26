@@ -13,6 +13,7 @@ set(CORE_SRCS
         arithmetic/polynomial_int_big.cpp
         arithmetic/polynomial_torus.h
         arithmetic/polynomial_torus.cpp
+        arithmetic/polynomial_torus_sml.cpp
         arithmetic/polynomial_torus_big.cpp
         arithmetic/random_gen.cpp
         arithmetic/random_gen.h
