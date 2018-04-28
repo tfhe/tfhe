@@ -12,6 +12,19 @@
 #include "context_object_creator.h"
 #include "../allocator/allocator.h"
 
+/**
+ * There is a unique tfhe global context, which can create or delete tfhe thread contexts.
+ * Thread contexts are meant to keep thread_local variables that are too big or too costly to create on the fly via standard allocation mechnisms. *e.g. the precomputed FFT preprocessors*
+ *
+ * The goals:
+ * two functions can run in parallel (on independent data) as long as each of them use a different threadContext. It doesn't matter which thread context is used, they are all inter-changeable.
+ *
+ * Proposed interface:
+ * ThreadContexts are a vector of objects (of arbitrary type, essentially unique_ptr<void*>, which will be casted to the right type on use).
+ *  * Indexing is the same accross all threadContexts,
+ *  * Accessing an object by index is a raw pointer access (in particular, access by index could be written in assembly by a human and has a near-zero latency)
+ *  * To allow dynamic creation/deletion of threadContexts, the gobal context holds an array of factories, using the same indexes.
+ */
 class TfheGlobalContext {
     /** @brief next available thread context id */
     static uint64_t nextThreadId;
