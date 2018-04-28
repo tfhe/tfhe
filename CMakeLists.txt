@@ -5,12 +5,14 @@ cmake_minimum_required(VERSION 3.0)
 
 set(CMAKE_CONFIGURATION_TYPES Debug Optim CACHE TYPE INTERNAL FORCE)
 set(CMAKE_BUILD_TYPE "optim" CACHE STRING "Build Type: Debug or Optim")
+set(USE_VALGRIND_ALLOCATOR ON CACHE BOOL "Use the valgrind-mode allocator")
 #set(ENABLE_FFTW OFF CACHE BOOL "Enable the FFTW FFT processor (GPL)")
 #set(ENABLE_NAYUKI_PORTABLE ON CACHE BOOL "Enable the Nayuki portable FFT processor (MIT)")
 #set(ENABLE_NAYUKI_AVX ON CACHE BOOL "Enable the Nayuki AVX assembly FFT processor (MIT)")
 #set(ENABLE_SPQLIOS_AVX ON CACHE BOOL "Enable the SPQLIOS AVX assembly FFT processor")
 #set(ENABLE_SPQLIOS_FMA ON CACHE BOOL "Enable the SPQLIOS FMA assembly FFT processor")
 set(ENABLE_TESTS ON CACHE BOOL "Build the tests (requires googletest)")
+set(ENABLE_BENCH ON CACHE BOOL "Build the benchmarks (requires google benchmark framework)")
 
 project(tfhe)
 
@@ -28,11 +30,15 @@ set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -std=c99")
 set(CMAKE_CXX_FLAGS_DEBUG "${CLANG_FLAGS} -g3 -O0 -Wall -Werror")
 set(CMAKE_C_FLAGS_DEBUG "-g3 -O0 -Wall -Werror")
 
-set(CMAKE_CXX_FLAGS_OPTIM "${CLANG_FLAGS} -g3 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
-set(CMAKE_C_FLAGS_OPTIM "-g3 -march=native -O3 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_CXX_FLAGS_OPTIM "${CLANG_FLAGS} -g3 -march=native -O9 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_C_FLAGS_OPTIM "-g3 -march=native -O9 -DNDEBUG -funroll-loops -Wall -Werror")
 
-set(CMAKE_CXX_FLAGS_RELEASE "${CLANG_FLAGS} -g0 -march=native -O2 -DNDEBUG -funroll-loops -Wall -Werror")
-set(CMAKE_C_FLAGS_RELEASE "-g0 -march=native -O3 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_CXX_FLAGS_RELEASE "${CLANG_FLAGS} -g0 -march=native -O9 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_C_FLAGS_RELEASE "-g0 -march=native -O9 -DNDEBUG -funroll-loops -Wall -Werror")
+
+if (USE_VALGRIND_ALLOCATOR)
+  add_definitions(-DUSE_VALGRIND_ALLOCATOR)
+endif(USE_VALGRIND_ALLOCATOR)
 
 #if (ENABLE_NAYUKI_PORTABLE)
 #list(APPEND FFT_PROCESSORS "nayuki-portable")
@@ -46,7 +52,7 @@ set(CMAKE_C_FLAGS_RELEASE "-g0 -march=native -O3 -DNDEBUG -funroll-loops -Wall -
 # set(FFTW_DEFINITIONS ${PC_FFTW_CFLAGS_OTHER})
 # find_path(FFTW_INCLUDES fftw3.h
 #     HINTS ${PC_FFTW_INCLUDEDIR} ${PC_FFTW_INCLUDE_DIRS})
-# find_library (FFTW_LIBRARIES NAMES fftw3 
+# find_library (FFTW_LIBRARIES NAMES fftw3
 #     HINTS ${PC_FFTW_LIBDIR} ${PC_FFTW_LIBRARY_DIRS})
 # # handle the QUIETLY and REQUIRED arguments and set FFTW_FOUND to
 # # TRUE if all listed variables are TRUE
@@ -54,22 +60,22 @@ set(CMAKE_C_FLAGS_RELEASE "-g0 -march=native -O3 -DNDEBUG -funroll-loops -Wall -
 # find_package_handle_standard_args (FFTW DEFAULT_MSG FFTW_LIBRARIES FFTW_INCLUDES)
 # mark_as_advanced (FFTW_LIBRARIES FFTW_INCLUDES)
 # endif(ENABLE_FFTW)
-# 
+#
 # if (ENABLE_NAYUKI_AVX)
 # list(APPEND FFT_PROCESSORS "nayuki-avx")
 # endif(ENABLE_NAYUKI_AVX)
-# 
+#
 # if (ENABLE_SPQLIOS_AVX)
 # list(APPEND FFT_PROCESSORS "spqlios-avx")
 # endif(ENABLE_SPQLIOS_AVX)
-# 
+#
 # if (ENABLE_SPQLIOS_FMA)
 # list(APPEND FFT_PROCESSORS "spqlios-fma")
 # endif(ENABLE_SPQLIOS_FMA)
-# 
+#
 # include_directories("include")
 # file(GLOB TFHE_HEADERS include/*.h)
-# 
+#
 # install(FILES ${TFHE_HEADERS}
 #     DESTINATION include/tfhe
 #     PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ)
@@ -81,3 +87,8 @@ if (ENABLE_TESTS)
 enable_testing()
 add_subdirectory(test)
 endif (ENABLE_TESTS)
+
+
+if (ENABLE_BENCH)
+    add_subdirectory(bench)
+endif (ENABLE_BENCH)

@@ -76,15 +76,15 @@ AllocatorImpl<VALGRIND_ALLOCATOR>::AllocatorImpl(AllocatorImpl<VALGRIND_ALLOCATO
     origin.has_moved = true;
 }
 
-Allocator AllocatorImpl<VALGRIND_ALLOCATOR>::createStackChildAllocator(const size_t expected_size) {
+AllocatorImpl<VALGRIND_ALLOCATOR> AllocatorImpl<VALGRIND_ALLOCATOR>::createStackChildAllocator(const size_t expected_size) {
     REQUIRE_DRAMATICALLY(!has_moved, "Trying to re-use a moved allocator");
     // if in stack mode, virtually allocate
     if (beginAddress != 0ul) {
         //stack mode
-        return Allocator(this, beginAddress, endAddress);
+        return AllocatorImpl(this, beginAddress, endAddress);
     } else {
         //malloc mode
-        return Allocator(this, 1, expected_size + 1);
+        return AllocatorImpl(this, 1, expected_size + 1);
     }
 }
 

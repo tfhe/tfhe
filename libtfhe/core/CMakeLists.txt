@@ -13,6 +13,7 @@ set(CORE_SRCS
         arithmetic/polynomial_int_big.cpp
         arithmetic/polynomial_torus.h
         arithmetic/polynomial_torus.cpp
+        arithmetic/polynomial_torus_sml.cpp
         arithmetic/polynomial_torus_big.cpp
         arithmetic/random_gen.cpp
         arithmetic/random_gen.h
@@ -37,7 +38,12 @@ set(CORE_SRCS
         contexts/castable_unique_ptr.h
         contexts/context_object_creator.cpp
         contexts/context_object_creator.h
-        contexts/tfhe_thread_context.cpp)
+        contexts/tfhe_thread_context.cpp
+        arithmetic/big_real.cpp
+        arithmetic/big_real.h
+        arithmetic/real_param.h
+        arithmetic/real_param.cpp
+)
 
 add_library(tfhe-core OBJECT ${CORE_SRCS})
 set_property(TARGET tfhe-core PROPERTY POSITION_INDEPENDENT_CODE ON)

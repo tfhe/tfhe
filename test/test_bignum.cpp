@@ -2,12 +2,15 @@
 #include <core/arithmetic/big_int.h>
 #include <core/arithmetic/big_torus.h>
 #include <core/allocator/allocator.h>
+#include "tfhetestlib/ntl_utils.h"
+#include "tfhetestlib/random_sample.h"
 #include <gmp.h>
-
-#include "gmpxx.h"
 
 using namespace std;
 using namespace tfhe_backend;
+using namespace tfhe_test;
+using NTL::ZZ;
+using NTL::RR;
 
 TEST(BigNum, BigIntAllocSet) {
     // here, we test a few constructors with or without value
@@ -18,14 +21,14 @@ TEST(BigNum, BigIntAllocSet) {
     BigInt *b = alloc.newObject<BigInt>(42);
     BigInt *c = alloc.newObject<BigInt>(std::numeric_limits<int64_t>::max());
     BigInt *d = alloc.newObject<BigInt>(std::numeric_limits<int64_t>::min());
-    ASSERT_EQ(mpz_class(a->data), 0);
-    ASSERT_EQ(mpz_class(b->data), 42);
-    ASSERT_EQ(mpz_class(c->data), std::numeric_limits<int64_t>::max());
-    ASSERT_EQ(mpz_class(d->data), std::numeric_limits<int64_t>::min());
+    ASSERT_EQ(to_ntl_ZZ(a, params), 0);
+    ASSERT_EQ(to_ntl_ZZ(b, params), 42);
+    ASSERT_EQ(to_ntl_ZZ(c, params), std::numeric_limits<int64_t>::max());
+    ASSERT_EQ(to_ntl_ZZ(d, params), std::numeric_limits<int64_t>::min());
     setvalue(a, b, params);
     setvalue(b, 43, params);
-    ASSERT_EQ(mpz_class(a->data), 42);
-    ASSERT_EQ(mpz_class(b->data), 43);
+    ASSERT_EQ(to_ntl_ZZ(a, params), 42);
+    ASSERT_EQ(to_ntl_ZZ(b, params), 43);
     alloc.deleteObject(a);
     alloc.deleteObject(b);
     alloc.deleteObject(c);
@@ -35,13 +38,13 @@ TEST(BigNum, BigIntAllocSet) {
 
 TEST(BigNum, BigIntAdd) {
     // here, we do a small random walk, performing a few additions and comparing with a reference
-    // mpz_class implementation
+    // ZZ implementation
     Allocator alloc;
     ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(2);
     int64_t tval = std::numeric_limits<int64_t>::max() / 3;
-    mpz_class aref = tval;
+    ZZ aref(tval);
     BigInt *a = alloc.newObject<BigInt>(tval);
-    ASSERT_EQ(mpz_class(a->data), aref);
+    ASSERT_EQ(to_ntl_ZZ(a, params), aref);
     for (int i = 0; i < 20; i++) {
         switch (i % 3) {
             case 0:
@@ -57,7 +60,7 @@ TEST(BigNum, BigIntAdd) {
                 aref = tval + aref;
                 break;
         }
-        ASSERT_EQ(mpz_class(a->data), aref);
+        ASSERT_EQ(to_ntl_ZZ(a, params), aref);
     }
     alloc.deleteObject(a);
     alloc.deleteObject(params);
@@ -65,17 +68,17 @@ TEST(BigNum, BigIntAdd) {
 
 TEST(BigNum, BigIntSub) {
     // here, we do a small random walk, performing a few multiplications and comparing with a reference
-    // mpz_class implementation
+    // ZZ implementation
     Allocator alloc;
     ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(2);
     int64_t tval = std::numeric_limits<int64_t>::max() / 3;
     int64_t tval2 = std::numeric_limits<int64_t>::max() / 5;
-    mpz_class aref = tval;
+    ZZ aref(tval);
     BigInt *a = alloc.newObject<BigInt>(tval);
-    mpz_class bref = tval2;
+    ZZ bref(tval2);
     BigInt *b = alloc.newObject<BigInt>(tval2);
-    ASSERT_EQ(mpz_class(a->data), aref);
-    ASSERT_EQ(mpz_class(b->data), bref);
+    ASSERT_EQ(to_ntl_ZZ(a, params), aref);
+    ASSERT_EQ(to_ntl_ZZ(b, params), bref);
     for (int i = 0; i < 20; i++) {
         switch (i % 3) {
             case 0:
@@ -91,7 +94,7 @@ TEST(BigNum, BigIntSub) {
                 aref = tval - aref;
                 break;
         }
-        ASSERT_EQ(mpz_class(a->data), aref);
+        ASSERT_EQ(to_ntl_ZZ(a, params), aref);
     }
     alloc.deleteObject(b);
     alloc.deleteObject(a);
@@ -100,23 +103,22 @@ TEST(BigNum, BigIntSub) {
 
 TEST(BigNum, BigIntMul) {
     // here, we do a small random walk, performing a few multiplications and comparing with a reference
-    // mpz_class implementation
+    // ZZ implementation
     Allocator alloc;
     ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(2);
     //everything is modulo p
-    mpz_class p;
-    mpz_ui_pow_ui(p.get_mpz_t(), 2, params->p);
+    ZZ p = NTL::power2_ZZ(params->p);
 
     int64_t tval = std::numeric_limits<int64_t>::min() / 3;
     int64_t tval2 = std::numeric_limits<int64_t>::min() / 5;
 
-    mpz_class aref = tval;
+    ZZ aref(tval);
     BigInt *a = alloc.newObject<BigInt>(tval);
-    ASSERT_EQ(mpz_class(a->data), aref);
+    ASSERT_EQ(to_ntl_ZZ(a, params), aref);
 
-    mpz_class bref = tval2;
+    ZZ bref(tval2);
     BigInt *b = alloc.newObject<BigInt>(tval2);
-    ASSERT_EQ(mpz_class(b->data), bref);
+    ASSERT_EQ(to_ntl_ZZ(b, params), bref);
 
     for (int i = 0; i < 20; i++) {
         switch (i % 3) {
@@ -133,7 +135,7 @@ TEST(BigNum, BigIntMul) {
                 aref = (aref * bref) % p;
                 break;
         }
-        ASSERT_EQ(mpz_class(a->data), aref);
+        ASSERT_EQ(posmod(to_ntl_ZZ(a, params), p), aref);
     }
     alloc.deleteObject(b);
     alloc.deleteObject(a);
@@ -142,82 +144,37 @@ TEST(BigNum, BigIntMul) {
 
 TEST(BigNum, BigIntNeg) {
     // here, we do a few negations and comparing with a reference
-    // mpz_class implementation
+    // ZZ implementation
     Allocator alloc;
     ZModuleParams<BigTorus> *params = alloc.newObject<ZModuleParams<BigTorus>>(2);
     //everything is modulo p
-    mpz_class p;
-    mpz_ui_pow_ui(p.get_mpz_t(), 2, params->p);
+    ZZ p = extract_modulus(params);
 
     int64_t tval = std::numeric_limits<int64_t>::min() / 3;
     int64_t tval2 = std::numeric_limits<int64_t>::min() / 5;
 
-    mpz_class aref = tval;
+    ZZ aref(tval);
     BigInt *a = alloc.newObject<BigInt>(tval);
-    ASSERT_EQ(mpz_class(a->data), aref);
+    ASSERT_EQ(to_ntl_ZZ(a, params), aref);
 
     mul(a, a, tval2, params);
     aref = aref * tval2;
-    ASSERT_EQ(mpz_class(a->data), aref);
+    ASSERT_EQ(to_ntl_ZZ(a, params), aref);
 
     neg(a, a, params);
-    ASSERT_EQ(mpz_class(a->data), -aref);
+    ASSERT_EQ(to_ntl_ZZ(a, params), -aref);
 
     neg(a, a, params);
-    ASSERT_EQ(mpz_class(a->data), aref);
+    ASSERT_EQ(to_ntl_ZZ(a, params), aref);
 
     neg(a, tval, params);
-    ASSERT_EQ(mpz_class(a->data), -tval);
+    ASSERT_EQ(to_ntl_ZZ(a, params), -tval);
 
     neg(a, a, params);
-    ASSERT_EQ(mpz_class(a->data), tval);
+    ASSERT_EQ(to_ntl_ZZ(a, params), tval);
 
     alloc.deleteObject(a);
     alloc.deleteObject(params);
-}
-
-//quick and dirty function to convert a bigTorus to a gmp float
-mpf_class fval(const BigTorus *x, const ZModuleParams<BigTorus> *params) {
-    __mpz_struct tmp;
-    tmp._mp_d = x->data;
-    tmp._mp_size = params->max_nbLimbs;
-    tmp._mp_alloc = params->max_nbLimbs;
-    return mpf_class(mpz_class(&tmp)) / pow(2., params->p);
-}
-
-//quick and dirty function to convert a bigTorus to a gmp integer
-mpz_class zval(const BigTorus *x, const ZModuleParams<BigTorus> *params) {
-    int K;
-    for (K = params->max_nbLimbs; K > 0; K--) {
-        if (x->data[K - 1] != 0) {
-            __mpz_struct tmp;
-            tmp._mp_d = x->data;
-            tmp._mp_size = K;
-            tmp._mp_alloc = params->max_nbLimbs;
-            return mpz_class(&tmp);
-        }
-    }
-    return 0;
-}
-
-//quick and dirty function to convert a bigTorus modulus to 2^p
-mpz_class zmodu(const ZModuleParams<BigTorus> *params) {
-    return mpz_class(1) << params->p;
-}
-
-//quick and dirty function to fill a bigtorus with random
-void randomBigTorus(BigTorus *res, const ZModuleParams<BigTorus> *params) {
-    for (int i = 0; i < params->max_nbLimbs; i++) {
-        res->data[i] = rand();
-    }
-}
-
-//quick and dirty function to fill a bigtorus with random
-void randomBigInt(BigInt *res, const ZModuleParams<BigTorus> *params) {
-    setvalue(res, rand() - RAND_MAX / 2, params);
-    for (int i = 1; i < 2 * params->max_nbLimbs; i++) {
-        mul(res, res, rand(), params);
-    }
 }
 
 TEST(BigTorus, FromDouble) {
@@ -229,9 +186,9 @@ TEST(BigTorus, FromDouble) {
         double tval = 2. * (rand() / double(RAND_MAX) - 0.5);
         tval *= pow(2., -(i / 3));
         from_double(a, tval, params);
-        mpf_class atrans = fval(a, params);
+        RR atrans = posmod_to_ntl_RR(a, params);
         //cout << "test val " << tval << " vs " << atrans << endl;
-        mpf_class diff = atrans - tval;
+        RR diff = atrans - tval;
         ASSERT_EQ(diff - floor(diff + 0.5), 0.);
     }
     from_double(a, pow(2., -140), params);
@@ -272,18 +229,6 @@ TEST(BigTorus, zero) {
     }
 }
 
-void testPow2(const BigTorus *a, const int k, const ZModuleParams<BigTorus> *params) {
-    int blocpos = k / 64;
-    int inpos = k % 64;
-    for (int i = 0; i < params->max_nbLimbs; i++) {
-        if (i != blocpos) {
-            ASSERT_EQ(a->data[i], 0);
-        } else {
-            ASSERT_EQ(a->data[i], UINT64_C(1) << inpos);
-        }
-    }
-}
-
 /*
  * @brief res = 2^-k
  */
@@ -297,22 +242,22 @@ TEST(BigTorus, setPowHalf) {
             //k negative
             randomBigTorus(a, params);
             setPowHalf(a, -1, params);
-            ASSERT_TRUE(mpn_zero_p(a->data, K));
+            ASSERT_EQ(to_ntl_ZZ(a, params), 0);
             randomBigTorus(a, params);
             setPowHalf(a, 0, params);
-            ASSERT_TRUE(mpn_zero_p(a->data, K));
+            ASSERT_EQ(to_ntl_ZZ(a, params), 0);
             //k > p
             randomBigTorus(a, params);
             setPowHalf(a, params->p + 1, params);
-            ASSERT_TRUE(mpn_zero_p(a->data, K));
+            ASSERT_EQ(to_ntl_ZZ(a, params), 0);
             randomBigTorus(a, params);
             setPowHalf(a, params->p + 5, params);
-            ASSERT_TRUE(mpn_zero_p(a->data, K));
+            ASSERT_EQ(to_ntl_ZZ(a, params), 0);
         }
         for (int k = 1; k < params->p; k += 5) {
             randomBigTorus(a, params);
             setPowHalf(a, k, params);
-            testPow2(a, params->p - k, params);
+            ASSERT_EQ(to_ntl_ZZ(a, params), NTL::power2_ZZ(params->p - k));
         }
         alloc.deleteObject(a, params, &alloc);
         alloc.deleteObject(params);
@@ -321,7 +266,7 @@ TEST(BigTorus, setPowHalf) {
 
 void testBinaryOperation(
         void(*BigTorusOp)(BigTorus *res, const BigTorus *a, const BigTorus *b, const ZModuleParams<BigTorus> *params),
-        mpz_class(*testOp)(mpz_class a, mpz_class b, const ZModuleParams<BigTorus> *params)
+        ZZ(*testOp)(ZZ a, ZZ b, const ZModuleParams<BigTorus> *params)
 ) {
     Allocator alloc;
     for (int K: set<int>{2, 5, 10}) {
@@ -334,12 +279,12 @@ void testBinaryOperation(
             randomBigTorus(a, params);
             randomBigTorus(b, params);
             randomBigTorus(c, params);
-            mpz_class aa = zval(a, params);
-            mpz_class bb = zval(b, params);
+            ZZ aa = to_ntl_ZZ(a, params);
+            ZZ bb = to_ntl_ZZ(b, params);
             BigTorusOp(c, a, b, params);
-            mpz_class cc = zval(c, params);
-            ASSERT_EQ(zval(a, params), aa); //a did not change
-            ASSERT_EQ(zval(b, params), bb); //b did not change
+            ZZ cc = to_ntl_ZZ(c, params);
+            ASSERT_EQ(to_ntl_ZZ(a, params), aa); //a did not change
+            ASSERT_EQ(to_ntl_ZZ(b, params), bb); //b did not change
             ASSERT_EQ(testOp(aa, bb, params), cc); //result is ok
         }
         {
@@ -347,11 +292,11 @@ void testBinaryOperation(
             randomBigTorus(a, params);
             randomBigTorus(b, params);
             randomBigTorus(c, params);
-            mpz_class aa = zval(a, params);
-            mpz_class bb = zval(b, params);
+            ZZ aa = to_ntl_ZZ(a, params);
+            ZZ bb = to_ntl_ZZ(b, params);
             BigTorusOp(a, a, b, params);
-            mpz_class cc = zval(a, params);
-            ASSERT_EQ(zval(b, params), bb); //b did not change
+            ZZ cc = to_ntl_ZZ(a, params);
+            ASSERT_EQ(to_ntl_ZZ(b, params), bb); //b did not change
             ASSERT_EQ(testOp(aa, bb, params), cc);
         }
         {
@@ -359,11 +304,11 @@ void testBinaryOperation(
             randomBigTorus(a, params);
             randomBigTorus(b, params);
             randomBigTorus(c, params);
-            mpz_class aa = zval(a, params);
-            mpz_class bb = zval(b, params);
+            ZZ aa = to_ntl_ZZ(a, params);
+            ZZ bb = to_ntl_ZZ(b, params);
             BigTorusOp(b, a, b, params);
-            mpz_class cc = zval(b, params);
-            ASSERT_EQ(zval(a, params), aa); //a did not change
+            ZZ cc = to_ntl_ZZ(b, params);
+            ASSERT_EQ(to_ntl_ZZ(a, params), aa); //a did not change
             ASSERT_EQ(testOp(aa, bb, params), cc);
         }
         {
@@ -371,9 +316,9 @@ void testBinaryOperation(
             randomBigTorus(a, params);
             randomBigTorus(b, params);
             randomBigTorus(c, params);
-            mpz_class aa = zval(a, params);
+            ZZ aa = to_ntl_ZZ(a, params);
             BigTorusOp(a, a, a, params);
-            mpz_class cc = zval(a, params);
+            ZZ cc = to_ntl_ZZ(a, params);
             ASSERT_EQ(testOp(aa, aa, params), cc);
         }
         alloc.deleteObject(c, params, &alloc);
@@ -384,8 +329,8 @@ void testBinaryOperation(
 }
 
 
-mpz_class testBigTAdd(mpz_class aa, mpz_class bb, const ZModuleParams<BigTorus> *params) {
-    return (aa + bb) % zmodu(params);
+static ZZ testBigTAdd(ZZ aa, ZZ bb, const ZModuleParams<BigTorus> *params) {
+    return (aa + bb) % extract_modulus(params);
 }
 
 /*
@@ -393,11 +338,11 @@ mpz_class testBigTAdd(mpz_class aa, mpz_class bb, const ZModuleParams<BigTorus> 
  */
 //void add(BigTorus *res, const BigTorus *a, const BigTorus *b, const ZModuleParams *params);
 TEST(BigTorus, addition) {
-    testBinaryOperation(add, testBigTAdd);
+    testBinaryOperation(tfhe_backend::add, testBigTAdd);
 }
 
-mpz_class testBigTSub(mpz_class aa, mpz_class bb, const ZModuleParams<BigTorus> *params) {
-    return (aa - bb + zmodu(params)) % zmodu(params);
+static ZZ testBigTSub(ZZ aa, ZZ bb, const ZModuleParams<BigTorus> *params) {
+    return (aa - bb + extract_modulus(params)) % extract_modulus(params);
 }
 
 /*
@@ -405,10 +350,8 @@ mpz_class testBigTSub(mpz_class aa, mpz_class bb, const ZModuleParams<BigTorus> 
  */
 //void sub(BigTorus *res, const BigTorus *a, const BigTorus *b, const ZModuleParams *params);
 TEST(BigTorus, subtraction) {
-    testBinaryOperation(sub, testBigTSub);
+    testBinaryOperation(tfhe_backend::sub, testBigTSub);
 }
-
-mpz_class posmod(mpz_class a, mpz_class b) { return ((a % b) + b) % b; }
 
 /*
  * @brief res = a * b
@@ -425,21 +368,21 @@ TEST(BigTorus, multInt) {
             randomBigTorus(a, params);
             randomBigTorus(b, params);
             int64_t x = rand() - RAND_MAX / 2;
-            mpz_class aa = zval(a, params);
-            mpz_class bb = zval(b, params);
+            ZZ aa = to_ntl_ZZ(a, params);
+            ZZ bb = to_ntl_ZZ(b, params);
             mul(b, x, a, params);
-            mpz_class cc = zval(b, params);
-            ASSERT_EQ(zval(a, params), aa); //a did not change
-            ASSERT_EQ(posmod(x * aa, zmodu(params)), cc); //result is ok
+            ZZ cc = to_ntl_ZZ(b, params);
+            ASSERT_EQ(to_ntl_ZZ(a, params), aa); //a did not change
+            ASSERT_EQ(posmod(x * aa, extract_modulus(params)), cc); //result is ok
         }
         for (int trials = 0; trials < 5; trials++) {
             // a = x*a
             randomBigTorus(a, params);
             int64_t x = rand() - RAND_MAX / 2;
-            mpz_class aa = zval(a, params);
+            ZZ aa = to_ntl_ZZ(a, params);
             mul(a, x, a, params);
-            mpz_class cc = zval(a, params);
-            ASSERT_EQ(posmod(x * aa, zmodu(params)), cc);
+            ZZ cc = to_ntl_ZZ(a, params);
+            ASSERT_EQ(posmod(x * aa, extract_modulus(params)), cc);
         }
         alloc.deleteObject(b, params, &alloc);
         alloc.deleteObject(a, params, &alloc);
@@ -465,21 +408,21 @@ TEST(BigTorus, multBigInt) {
             randomBigTorus(a, params);
             randomBigInt(x, params);
             randomBigTorus(b, params);
-            mpz_class aa = zval(a, params);
-            mpz_class bb = zval(b, params);
+            ZZ aa = to_ntl_ZZ(a, params);
+            ZZ bb = to_ntl_ZZ(b, params);
             mul(b, x, a, params, alloc.createStackChildAllocator());
-            mpz_class cc = zval(b, params);
-            ASSERT_EQ(zval(a, params), aa); //a did not change
-            ASSERT_EQ(posmod(aa * mpz_class(x->data), zmodu(params)), cc); //result is ok
+            ZZ cc = to_ntl_ZZ(b, params);
+            ASSERT_EQ(to_ntl_ZZ(a, params), aa); //a did not change
+            ASSERT_EQ(posmod(aa * to_ntl_ZZ(x, params), extract_modulus(params)), cc); //result is ok
         }
         for (int trials = 0; trials < 5; trials++) {
             // a = x*a
             randomBigTorus(a, params);
             randomBigInt(x, params);
-            mpz_class aa = zval(a, params);
+            ZZ aa = to_ntl_ZZ(a, params);
             mul(a, x, a, params, alloc.createStackChildAllocator());
-            mpz_class cc = zval(a, params);
-            ASSERT_EQ(posmod(aa * mpz_class(x->data), zmodu(params)), cc);
+            ZZ cc = to_ntl_ZZ(a, params);
+            ASSERT_EQ(posmod(aa * to_ntl_ZZ(x, params), extract_modulus(params)), cc);
         }
         alloc.deleteObject(b, params, &alloc);
         alloc.deleteObject(x);
@@ -502,20 +445,20 @@ TEST(BigTorus, negate) {
             // a, c different
             randomBigTorus(a, params);
             randomBigTorus(b, params);
-            mpz_class aa = zval(a, params);
-            mpz_class bb = zval(b, params);
+            ZZ aa = to_ntl_ZZ(a, params);
+            ZZ bb = to_ntl_ZZ(b, params);
             neg(b, a, params);
-            mpz_class cc = zval(b, params);
-            ASSERT_EQ(zval(a, params), aa); //a did not change
-            ASSERT_EQ(posmod(-aa, zmodu(params)), cc); //result is ok
+            ZZ cc = to_ntl_ZZ(b, params);
+            ASSERT_EQ(to_ntl_ZZ(a, params), aa); //a did not change
+            ASSERT_EQ(posmod(-aa, extract_modulus(params)), cc); //result is ok
         }
         for (int trials = 0; trials < 5; trials++) {
             // a = x*a
             randomBigTorus(a, params);
-            mpz_class aa = zval(a, params);
+            ZZ aa = to_ntl_ZZ(a, params);
             neg(a, a, params);
-            mpz_class cc = zval(a, params);
-            ASSERT_EQ(posmod(-aa, zmodu(params)), cc);
+            ZZ cc = to_ntl_ZZ(a, params);
+            ASSERT_EQ(posmod(-aa, extract_modulus(params)), cc);
         }
         alloc.deleteObject(b, params, &alloc);
         alloc.deleteObject(a, params, &alloc);

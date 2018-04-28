@@ -9,20 +9,20 @@
  */
 template<>
 class AllocatorImpl<TFHE_ALLOCATOR> {
-    AllocatorImpl *father;
+    void* baseAddr;
     size_t beginAddress;
 public:
     void *allocate(size_t alignment, size_t byte_size);
 
     void deallocate(void *ptr);
 
-    AllocatorImpl(AllocatorImpl *const father, const size_t beginAddr);
+    AllocatorImpl(void *const baseAddr = nullptr, const size_t beginAddr = 0ul);
 
     AllocatorImpl(AllocatorImpl &&);
 
-    AllocatorImpl createStackChildAllocator(const size_t expected_size);
+    AllocatorImpl createStackChildAllocator(const size_t expected_size = default_stack_size);
 
-    ~AllocatorImpl() {};
+    ~AllocatorImpl();
 
 #include "allocator-shortcut-functions.h"
 };
