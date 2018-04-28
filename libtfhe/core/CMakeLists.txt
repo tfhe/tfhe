@@ -19,8 +19,6 @@ set(CORE_SRCS
         arithmetic/random_gen.h
         arithmetic/tfhe_core.h
         arithmetic/torus.h
-        arithmetic/threadcontext.h
-        tfhe-core.cpp
         allocator/allocator.h
         allocator/ValgrindAllocator.cpp
         allocator/ValgrindAllocator.h
@@ -33,6 +31,14 @@ set(CORE_SRCS
         arithmetic/zmodule_param.h
         arithmetic/zmodule_param.cpp
         allocator/allocator-shortcut-functions.h
+        contexts/tfhe_thread_context.h
+        contexts/tfhe_global_context.cpp
+        contexts/tfhe_global_context.h
+        contexts/castable_unique_ptr.cpp
+        contexts/castable_unique_ptr.h
+        contexts/context_object_creator.cpp
+        contexts/context_object_creator.h
+        contexts/tfhe_thread_context.cpp
         arithmetic/big_real.cpp
         arithmetic/big_real.h
         arithmetic/real_param.h

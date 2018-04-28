@@ -3,7 +3,7 @@
 
 #include "polynomial_param.h"
 #include "../allocator/allocator.h"
-#include "threadcontext.h"
+#include "../contexts/tfhe_thread_context.h"
 #include "torus_utils.h"
 
 #include <cassert>
