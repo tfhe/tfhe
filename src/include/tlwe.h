@@ -55,7 +55,7 @@ struct TLweSample {
 };
 
 template<typename TORUS>
-struct TLweSampleFFT {
+struct TLweSampleFFT: InitializerTag {
   const int k; //required during the destructor call...
   LagrangeHalfCPolynomial* a; ///< array of length k+1: mask + right term
   LagrangeHalfCPolynomial* b; ///< alias of a[k] to get the right term
@@ -73,7 +73,7 @@ struct TLweSampleFFT {
   void operator=(const TLweSampleFFT<TORUS>&) = delete;
 
   static void init_obj(TLweSampleFFT<TORUS>* obj, const TLweParams<TORUS>* params);
-  static void destroy_obj(TLweSampleFFT<TORUS>* obj)  ;
+  static void destroy_obj(TLweSampleFFT<TORUS>* obj);
 };
 
 template struct TLweParams<Torus32>;
@@ -210,16 +210,6 @@ inline void delete_TLweSampleFFT(TLweSampleFFT<TORUS>* obj) {
 template<typename TORUS>
 inline void delete_TLweSampleFFT_array(int nbelts, TLweSampleFFT<TORUS>* obj) {
   del_obj<TLweSampleFFT<TORUS>>(nbelts, obj);
-}
-
-template<typename TORUS>
-void init_obj(TLweSampleFFT<TORUS>* obj, const TLweParams<TORUS>* params) {
-  TLweSampleFFT<TORUS>::init_obj(obj, params);
-}
-
-template<typename TORUS>
-void destroy_obj(TLweSampleFFT<TORUS>* obj) {
-  TLweSampleFFT<TORUS>::destroy_obj(obj);
 }
 
 #endif // RINGLWE_H

@@ -8,7 +8,7 @@
 #include "tfhe_alloc.h"
 
 template<typename TORUS>
-struct LweBootstrappingKey{
+struct LweBootstrappingKey: InitializerTag {
   const LweParams<TORUS>* in_out_params; ///< paramètre de l'input et de l'output. key: s
   const TGswParams<TORUS>* bk_params; ///< params of the Gsw elems in bk. key: s"
   const TLweParams<TORUS>* accum_params; ///< params of the accum variable key: s"
@@ -45,7 +45,7 @@ struct LweBootstrappingKey{
 };
 
 template<typename TORUS>
-struct LweBootstrappingKeyFFT {
+struct LweBootstrappingKeyFFT: InitializerTag {
   const LweParams<TORUS>* in_out_params; ///< paramètre de l'input et de l'output. key: s
   const TGswParams<TORUS>* bk_params; ///< params of the Gsw elems in bk. key: s"
   const TLweParams<TORUS>* accum_params; ///< params of the accum variable key: s"
@@ -124,36 +124,6 @@ inline void delete_LweBootstrappingKeyFFT(LweBootstrappingKeyFFT<TORUS>* obj) {
 template<typename TORUS>
 inline void delete_LweBootstrappingKeyFFT_array(int nbelts, LweBootstrappingKeyFFT<TORUS>* obj) {
   del_obj_array<LweBootstrappingKeyFFT<TORUS>>(nbelts, obj);
-}
-
-/* wrapper to LweBootstrappingKey initialization function */
-template<typename TORUS>
-inline void init_obj(
-  LweBootstrappingKey<TORUS>* obj,
-  const int ks_t,
-  const int ks_basebit,
-  const LweParams<TORUS>* in_out_params,
-  const TGswParams<TORUS>* bk_params)
-{
-  LweBootstrappingKey<TORUS>::init_obj(obj, ks_t, ks_basebit, in_out_params, bk_params);
-}
-
-/* wrapper to LweBootstrappingKey destroy function */
-template<typename TORUS>
-inline void destroy_obj(LweBootstrappingKey<TORUS>* obj) {
-  LweBootstrappingKey<TORUS>::destroy_obj(obj);
-}
-
-/* wrapper to LweBootstrappingKeyFFT initialization function */
-template<typename TORUS>
-inline void init_obj(LweBootstrappingKeyFFT<TORUS>* obj, const LweBootstrappingKey<TORUS>* bk) {
-  LweBootstrappingKeyFFT<TORUS>::init_obj(obj, bk);
-}
-
-/* wrapper to LweBootstrappingKeyFFT destroy function */
-template<typename TORUS>
-inline void destroy_obj(LweBootstrappingKeyFFT<TORUS>* obj) {
-  LweBootstrappingKeyFFT<TORUS>::destroy_obj(obj);
 }
 
 

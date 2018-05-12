@@ -39,8 +39,6 @@ TLweSample<TORUS>::~TLweSample() {
   del_obj_array(k+1, a);
 }
 
-
-
 template<typename TORUS>
 void TLweSampleFFT<TORUS>::init_obj(TLweSampleFFT<TORUS>* obj, const TLweParams<TORUS>* params)
 {

@@ -41,7 +41,7 @@ template struct TorusPolynomial<Torus64>;
  * This type is meant to be specialized, and all implementations of the structure must be compatible
  * (reinterpret_cast) with this one. Namely, they should contain at most 2 pointers
  */
-struct LagrangeHalfCPolynomial
+struct LagrangeHalfCPolynomial: InitializerTag
 {
   void* data;
   void* precomp;
@@ -107,16 +107,6 @@ inline void delete_LagrangeHalfCPolynomial(LagrangeHalfCPolynomial* obj) {
 }
 inline void delete_LagrangeHalfCPolynomial_array(int nbelts, LagrangeHalfCPolynomial* obj) {
   del_obj_array(nbelts, obj);
-}
-
-/* wrapper to LagrangeHalfCPolynomial initialization function */
-inline void init_obj(LagrangeHalfCPolynomial* obj, const int N) {
-  LagrangeHalfCPolynomial::init_obj(obj, N);
-}
-
-/* wrapper to LagrangeHalfCPolynomial destroy function */
-inline void destroy_obj(LagrangeHalfCPolynomial* obj) {
-  LagrangeHalfCPolynomial::destroy_obj(obj);
 }
 
 #endif //POLYNOMIALS_H

@@ -5,7 +5,7 @@ using namespace std;
 
 
 LagrangeHalfCPolynomial_IMPL::LagrangeHalfCPolynomial_IMPL(const int N) {
-  assert(N==1024);
+  // assert(N==1024);
   coefsC = new double[N];
   proc = &fftp1024;
 }

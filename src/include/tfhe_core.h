@@ -81,4 +81,10 @@ struct LagrangeHalfCPolynomial;
 //struct SemiTGswKey;
 //struct SemiTGswSample;
 
+
+// #include "tfhe_alloc.h"
+#include "random_gen.h"
+#include "numeric_functions.h"
+
+
 #endif //TFHE_CORE_H

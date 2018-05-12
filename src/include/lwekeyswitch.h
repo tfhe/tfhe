@@ -11,7 +11,7 @@
 #include "lwesamples.h"
 
 template<typename TORUS>
-struct LweKeySwitchKey {
+struct LweKeySwitchKey: InitializerTag {
   int n; ///< length of the input key: s'
   int t; ///< decomposition length
   int basebit; ///< log_2(base)
@@ -59,24 +59,6 @@ inline void delete_LweKeySwitchKey(LweKeySwitchKey<TORUS>* obj) {
 template<typename TORUS>
 inline void delete_LweKeySwitchKey_array(int nbelts, LweKeySwitchKey<TORUS>* obj) {
   del_obj_array<LweKeySwitchKey<TORUS>>(nbelts, obj);
-}
-
-/* wrapper to KeySwitchKey initialization function */
-template<typename TORUS>
-void init_obj(
-  LweKeySwitchKey<TORUS>* obj,
-  const int n,
-  const int t,
-  const int basebit,
-  const LweParams<TORUS>* out_params)
-{
-  LweKeySwitchKey<TORUS>::init_obj(obj, n, t, basebit, out_params);
-}
-
-/* wrapper to KeySwitchKey destroy function */
-template<typename TORUS>
-void destroy_obj(LweKeySwitchKey<TORUS>* obj) {
-  LweKeySwitchKey<TORUS>::destroy_obj(obj);
 }
 
 #endif // LWEKEYSWITCH_H

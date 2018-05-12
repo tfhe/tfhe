@@ -54,7 +54,7 @@ struct TGswKey {
 
 
 template<typename TORUS>
-struct TGswSample {
+struct TGswSample: InitializerTag {
   TLweSample<TORUS>* all_sample; ///< TLweSample<TORUS>* all_sample; (k+1)l TLwe Sample
   TLweSample<TORUS>** bloc_sample;///< accès optionnel aux différents blocs de taille l.
   // double current_variance;
@@ -77,7 +77,7 @@ struct TGswSample {
 };
 
 template<typename TORUS>
-struct TGswSampleFFT {
+struct TGswSampleFFT: InitializerTag {
   TLweSampleFFT<TORUS>* all_samples; ///< TLweSample<TORUS>* all_sample; (k+1)l TLwe Sample
   TLweSampleFFT<TORUS>** sample; ///< accès optionnel aux différents blocs de taille l.
   //double current_variance;
@@ -195,26 +195,5 @@ template<typename TORUS>
 inline void delete_TGswSampleFFT_array(int nbelts, TGswSampleFFT<TORUS>* obj) {
   del_obj<TGswSampleFFT<TORUS>>(nbelts, obj);
 }
-
-template<typename TORUS>
-inline void init_obj(TGswSample<TORUS>* obj, const TGswParams<TORUS>* params) {
-  TGswSample<TORUS>::init_obj(obj, params);
-}
-
-template<typename TORUS>
-inline void destroy_obj(TGswSample<TORUS>* obj) {
-  TGswSample<TORUS>::destroy_obj(obj);
-}
-
-template<typename TORUS>
-inline void init_obj(TGswSampleFFT<TORUS>* obj, const TGswParams<TORUS>* params) {
-  TGswSampleFFT<TORUS>::init_obj(obj, params);
-}
-
-template<typename TORUS>
-inline void destroy_obj(TGswSampleFFT<TORUS>* obj) {
-  TGswSampleFFT<TORUS>::destroy_obj(obj);
-}
-
 
 #endif // TGSW_H
