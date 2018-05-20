@@ -1,5 +1,5 @@
 #include "polynomial.h"
-#include "torus.h"
+#include "core/arithmetic/torus.h"
 
 /**
  * Instantiate Polynomial class for native torus and int types

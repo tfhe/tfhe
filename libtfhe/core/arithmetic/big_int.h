@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <gmp.h>
 #include "tfhe_core.h"
-#include "../allocator/allocator.h"
+#include "core/allocator/allocator.h"
 #include "zmodule_param.h"
 
 /**

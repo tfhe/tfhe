@@ -1,8 +1,6 @@
 #ifndef TORUS_H
 #define TORUS_H
 
-#include "torus_utils.h"
-
 #include <cstdint>
 
 // Idea:

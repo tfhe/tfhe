@@ -2,8 +2,8 @@
 #define POLYNOMIAL_INT_H
 
 
-#include "torus.h"
-#include "polynomial.h"
+#include "core/arithmetic/torus.h"
+#include "core/arithmetic/generic/polynomial.h"
 
 /**
  * @brief Polynomial with integer coefficients
@@ -36,7 +36,7 @@ public:
     void destroy(const PolynomialParams<TORUS> *params,
                  TfheThreadContext *context,
                  Allocator *alloc) {
-        destroy(params, context, alloc);
+        Polynomial<TORUS,CoefTypeEnum ::Integer>::destroy(params, context, alloc);
     }
 
     PREVENT_STACK_COPY(IntPolynomial);

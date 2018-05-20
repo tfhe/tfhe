@@ -1,5 +1,5 @@
 #include "polynomial_torus.h"
-#include "random_gen.h"
+#include "core/arithmetic/random_gen.h"
 
 #include <cassert>
 

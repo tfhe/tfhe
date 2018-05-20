@@ -2,9 +2,9 @@
 #define POLYNOMIAL_H
 
 #include "polynomial_param.h"
-#include "../allocator/allocator.h"
-#include "../contexts/tfhe_thread_context.h"
-#include "torus_utils.h"
+#include "core/allocator/allocator.h"
+#include "core/contexts/tfhe_thread_context.h"
+#include "core/arithmetic/torus_utils.h"
 
 #include <cassert>
 

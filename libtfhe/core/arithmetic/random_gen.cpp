@@ -1,5 +1,5 @@
 #include "random_gen.h"
-#include "torus_utils.h"
+#include "core/arithmetic/torus_utils.h"
 
 using namespace std;
 

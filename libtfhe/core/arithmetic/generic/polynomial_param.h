@@ -1,9 +1,9 @@
 #ifndef POLYNOMIAL_PARAM_H
 #define POLYNOMIAL_PARAM_H
 
-#include "big_int.h"
-#include "big_torus.h"
-#include "zmodule_param.h"
+#include "core/arithmetic/big_int.h"
+#include "core/arithmetic/big_torus.h"
+#include "core/arithmetic/zmodule_param.h"
 
 #include <cstdint>
 #include <type_traits>

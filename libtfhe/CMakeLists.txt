@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 
+include_directories(.)
+
 # include the fft processors in the build process
 add_subdirectory(core)
 

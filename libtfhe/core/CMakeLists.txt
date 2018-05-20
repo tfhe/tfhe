@@ -4,21 +4,23 @@ set(CORE_SRCS
         #list all .cpp and .h files here, one file per file
         arithmetic/torus_utils.h
         arithmetic/torus_utils_big.h
-        arithmetic/polynomial_param.h
-        arithmetic/polynomial.h
-        arithmetic/polynomial.cpp
-        arithmetic/polynomial_big.cpp
-        arithmetic/polynomial_int.h
-        arithmetic/polynomial_int.cpp
-        arithmetic/polynomial_int_big.cpp
-        arithmetic/polynomial_torus.h
-        arithmetic/polynomial_torus.cpp
-        arithmetic/polynomial_torus_sml.cpp
-        arithmetic/polynomial_torus_big.cpp
+        arithmetic/generic/polynomial_param.h
+        arithmetic/generic/polynomial.h
+        arithmetic/generic/polynomial.cpp
+        arithmetic/generic/polynomial_big.cpp
+        arithmetic/generic/polynomial_int.h
+        arithmetic/generic/polynomial_int.cpp
+        arithmetic/generic/polynomial_int_big.cpp
+        arithmetic/generic/polynomial_torus.h
+        arithmetic/generic/polynomial_torus.cpp
+        arithmetic/generic/polynomial_torus_sml.cpp
+        arithmetic/generic/polynomial_torus_big.cpp
         arithmetic/random_gen.cpp
         arithmetic/random_gen.h
         arithmetic/tfhe_core.h
         arithmetic/torus.h
+        arithmetic/torus_utils_primitive.h
+        arithmetic/torus_utils_primitive.cpp
         allocator/allocator.h
         allocator/ValgrindAllocator.cpp
         allocator/ValgrindAllocator.h
@@ -43,7 +45,7 @@ set(CORE_SRCS
         arithmetic/big_real.h
         arithmetic/real_param.h
         arithmetic/real_param.cpp
-)
+        arithmetic/torus_utils_primitive.h arithmetic/torus_utils_primitive.cpp arithmetic/torus_utils_big.cpp)
 
 add_library(tfhe-core OBJECT ${CORE_SRCS})
 set_property(TARGET tfhe-core PROPERTY POSITION_INDEPENDENT_CODE ON)
