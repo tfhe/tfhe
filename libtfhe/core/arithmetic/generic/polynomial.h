@@ -5,17 +5,9 @@
 #include "core/allocator/allocator.h"
 #include "core/contexts/tfhe_thread_context.h"
 #include "core/arithmetic/torus_utils.h"
+#include "coeff_type.h"
 
 #include <cassert>
-
-/**
- * Polynomial coefficient types enumeration
- */
-enum CoefTypeEnum {
-    Torus,
-    Integer,
-    Real            // for complex Lagrangian representation?
-};
 
 /**
  * @brief Polynomial class

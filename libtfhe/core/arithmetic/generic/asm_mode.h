@@ -1,0 +1,12 @@
+#ifndef TFHE_ASM_OPTIMIZATIONS_H
+#define TFHE_ASM_OPTIMIZATIONS_H
+
+enum class AsmTypeEnum {
+    PORTABLE, AVX2
+};
+
+enum class FFTTypeEnum {
+    PORTABLE, FFTW, SPQLIOS_AVX, SPQLIOS_FMA
+};
+
+#endif //TFHE_ASM_OPTIMIZATIONS_H
