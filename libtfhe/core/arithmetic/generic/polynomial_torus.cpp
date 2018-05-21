@@ -7,14 +7,14 @@
 /**
  * Instantiate TorusPolynomial class for all torus types
  */
-EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(TorusPolynomial);
+EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(TorusPolynomial, AsmTypeEnum::PORTABLE);
 template
-class TorusPolynomial<BigTorus>;
+class TorusPolynomial<BigTorus, AsmTypeEnum::PORTABLE>;
 
-template<typename TORUS>
-void TorusPolynomial<TORUS>::Uniform(
-        TorusPolynomial<TORUS> *result,
-        const PolynomialParams<TORUS> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::Uniform(
+        TorusPolynomial<TORUS, AsmType> *result,
+        const PolynomialParams<TORUS, AsmType> *params,
         TfheThreadContext *context,
         Allocator alloc) {
     const int32_t N = params->N;
@@ -29,11 +29,11 @@ void TorusPolynomial<TORUS>::Uniform(
 
 
 // Infinity norm of the distance between two TorusPolynomial
-template<typename TORUS>
-double TorusPolynomial<TORUS>::NormInftyDist(
-        const TorusPolynomial<TORUS> *poly1,
-        const TorusPolynomial<TORUS> *poly2,
-        const PolynomialParams<TORUS> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+double TorusPolynomial<TORUS, AsmType>::NormInftyDist(
+        const TorusPolynomial<TORUS, AsmType> *poly1,
+        const TorusPolynomial<TORUS, AsmType> *poly2,
+        const PolynomialParams<TORUS, AsmType> *params,
         TfheThreadContext *context,
         Allocator alloc) {
     const int32_t N = params->N;

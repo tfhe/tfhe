@@ -4,6 +4,8 @@
 #include "core/arithmetic/big_int.h"
 #include "core/arithmetic/big_torus.h"
 #include "core/arithmetic/zmodule_param.h"
+#include "asm_mode.h"
+#include "zmodule_vector_params.h"
 
 #include <cstdint>
 #include <type_traits>
@@ -13,11 +15,9 @@
  *
  * @tparam TORUS torus type
  */
-template<typename TORUS>
-class PolynomialParams {
+template<typename TORUS, AsmTypeEnum AsmType>
+class PolynomialParams : public ZModuleVectorParams<TORUS, AsmType> {
 public:
-    int32_t N;
-    ZModuleParams<TORUS> *zmodule_params;
 };
 
 #endif //POLYNOMIAL_PARAM_H

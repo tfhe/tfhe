@@ -5,17 +5,29 @@
 /**
  * Instantiate IntPolynomial class for available torus types
  */
-EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(IntPolynomial);
+EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(IntPolynomial, AsmTypeEnum::PORTABLE);
+
+
+template<typename TORUS, AsmTypeEnum AsmType>
+IntPolynomial<TORUS, AsmType>::IntPolynomial(const PolynomialParams<TORUS, AsmType> *params, TfheThreadContext *context,
+                                             Allocator *alloc) :
+        Polynomial<TORUS, CoefTypeEnum::Integer, AsmType>(params, context, alloc) {}
+
+template<typename TORUS, AsmTypeEnum AsmType>
+void IntPolynomial<TORUS, AsmType>::destroy(const PolynomialParams<TORUS, AsmType> *params, TfheThreadContext *context,
+                                            Allocator *alloc) {
+    Polynomial<TORUS, CoefTypeEnum::Integer, AsmType>::destroy(params, context, alloc);
+}
 
 /**
  * Integer polynomial functions
  */
 
 // Euclidean norm of an IntPolynomial
-template<typename TORUS>
-double IntPolynomial<TORUS>::Norm2sq(
-        const IntPolynomial<TORUS> *poly,
-        const PolynomialParams<TORUS> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+double IntPolynomial<TORUS, AsmType>::Norm2sq(
+        const IntPolynomial<TORUS, AsmType> *poly,
+        const PolynomialParams<TORUS, AsmType> *params,
         TfheThreadContext *context,
         Allocator alloc) {
     const int32_t N = params->N;
@@ -29,11 +41,11 @@ double IntPolynomial<TORUS>::Norm2sq(
 }
 
 // Infinity norm of the distance between two IntPolynomial
-template<typename TORUS>
-double IntPolynomial<TORUS>::NormInftyDist(
-        const IntPolynomial<TORUS> *poly1,
-        const IntPolynomial<TORUS> *poly2,
-        const PolynomialParams<TORUS> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+double IntPolynomial<TORUS, AsmType>::NormInftyDist(
+        const IntPolynomial<TORUS, AsmType> *poly1,
+        const IntPolynomial<TORUS, AsmType> *poly2,
+        const PolynomialParams<TORUS, AsmType> *params,
         TfheThreadContext *context,
         Allocator alloc) {
     const int32_t N = params->N;

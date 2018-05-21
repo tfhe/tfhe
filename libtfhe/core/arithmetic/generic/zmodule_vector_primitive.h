@@ -38,6 +38,9 @@ void ZModuleVector<TORUS, CoefType, AsmType>::Copy(ZModuleVector<TORUS, CoefType
     const int32_t N = params->N;
     TYPE *const reps = result->coefs;
     const TYPE *const src = source->coefs;
+
+    assert(result != source);
+
     for (int32_t i = 0; i < N; i++) {
         reps[i] = src[i];
     }
@@ -53,6 +56,10 @@ void ZModuleVector<TORUS, CoefType, AsmType>::Add(ZModuleVector<TORUS, CoefType,
     TYPE *const reps = result->coefs;
     const TYPE *const a = vec1->coefs;
     const TYPE *const b = vec2->coefs;
+
+    assert(reps != a); //if it fails here, please use addTo
+    assert(reps != b); //if it fails here, please use addTo
+
     for (int32_t i = 0; i < N; i++) {
         reps[i] = a[i] + b[i];
     }
@@ -68,6 +75,9 @@ void ZModuleVector<TORUS, CoefType, AsmType>::Sub(ZModuleVector<TORUS, CoefType,
     TYPE *const reps = result->coefs;
     const TYPE *const a = vec1->coefs;
     const TYPE *const b = vec2->coefs;
+
+    assert(reps != a); //if it fails here, please use subTo
+
     for (int32_t i = 0; i < N; i++) {
         reps[i] = a[i] - b[i];
     }

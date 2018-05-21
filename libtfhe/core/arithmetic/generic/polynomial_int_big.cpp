@@ -8,24 +8,24 @@ using namespace tfhe_backend;
  * Instantiate IntPolynomial class for big int type
  */
 template
-class IntPolynomial<BigTorus>;
+class IntPolynomial<BigTorus, AsmTypeEnum::PORTABLE>;
 
 // Euclidean norm of an IntPolynomial
-template<>
-double IntPolynomial<BigTorus>::Norm2sq(const IntPolynomial<BigTorus> *poly,
-                                        const PolynomialParams<BigTorus> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+double IntPolynomial<TORUS, AsmType>::Norm2sq(const IntPolynomial<TORUS, AsmType> *poly,
+                                              const PolynomialParams<TORUS, AsmType> *params,
                                         TfheThreadContext *context,
                                         Allocator alloc) {
     const int32_t N = params->N;
-    //typename PolynomialParams<BigTorus>::ZModuleParams<BigTorus> *zparams = params->zmodule_params;
+    //typename PolynomialParams<TORUS>::ZModuleParams<TORUS> *zparams = params->zmodule_params;
     double norm_d = 0;
     BigInt *r = alloc.newObject<BigInt>(0);
     BigInt *norm = alloc.newObject<BigInt>(0);
 
 
     for (int32_t i = 0; i < N; ++i) {
-        mul(r, poly->coefs + i, poly->coefs + i, params->zmodule_params);
-        add(norm, norm, r, params->zmodule_params);
+        tfhe_backend::mul(r, poly->coefs + i, poly->coefs + i, params->zmodule_params);
+        tfhe_backend::add(norm, norm, r, params->zmodule_params);
     }
 
     // get the double from BigInt
@@ -39,10 +39,10 @@ double IntPolynomial<BigTorus>::Norm2sq(const IntPolynomial<BigTorus> *poly,
 }
 
 // Infinity norm of the distance between two IntPolynomial
-template<>
-double IntPolynomial<BigTorus>::NormInftyDist(const IntPolynomial<BigTorus> *poly1,
-                                              const IntPolynomial<BigTorus> *poly2,
-                                              const PolynomialParams<BigTorus> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+double IntPolynomial<TORUS, AsmType>::NormInftyDist(const IntPolynomial<TORUS, AsmType> *poly1,
+                                                    const IntPolynomial<TORUS, AsmType> *poly2,
+                                                    const PolynomialParams<TORUS, AsmType> *params,
                                               TfheThreadContext *context,
                                               Allocator alloc) {
     const int32_t N = params->N;

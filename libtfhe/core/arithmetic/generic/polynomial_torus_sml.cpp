@@ -7,16 +7,16 @@ using namespace std;
 /**
  * Instantiate TorusPolynomial class for available torus types
  */
-EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(TorusPolynomial);
+EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(TorusPolynomial, AsmTypeEnum::PORTABLE);
 
 // TorusPolynomial + p*TorusPolynomial
-template<typename TORUS>
-void TorusPolynomial<TORUS>::AddMulZ(
-        TorusPolynomial<TORUS> *result,
-        const TorusPolynomial<TORUS> *poly1,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::AddMulZ(
+        TorusPolynomial<TORUS, AsmType> *result,
+        const TorusPolynomial<TORUS, AsmType> *poly1,
         const INT_TYPE *p,
-        const TorusPolynomial<TORUS> *poly2,
-        const PolynomialParams<TORUS> *params,
+        const TorusPolynomial<TORUS, AsmType> *poly2,
+        const PolynomialParams<TORUS, AsmType> *params,
         TfheThreadContext *context,
         Allocator alloc) {
     const int32_t N = params->N;
@@ -30,12 +30,12 @@ void TorusPolynomial<TORUS>::AddMulZ(
 }
 
 // TorusPolynomial += p*TorusPolynomial
-template<typename TORUS>
-void TorusPolynomial<TORUS>::AddMulZTo(
-        TorusPolynomial<TORUS> *result,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::AddMulZTo(
+        TorusPolynomial<TORUS, AsmType> *result,
         const INT_TYPE *p,
-        const TorusPolynomial<TORUS> *poly2,
-        const PolynomialParams<TORUS> *params,
+        const TorusPolynomial<TORUS, AsmType> *poly2,
+        const PolynomialParams<TORUS, AsmType> *params,
         TfheThreadContext *context,
         Allocator alloc) {
     const int32_t N = params->N;
@@ -47,13 +47,13 @@ void TorusPolynomial<TORUS>::AddMulZTo(
 }
 
 // TorusPolynomial - p*TorusPolynomial
-template<typename TORUS>
-void TorusPolynomial<TORUS>::SubMulZ(
-        TorusPolynomial<TORUS> *result,
-        const TorusPolynomial<TORUS> *poly1,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::SubMulZ(
+        TorusPolynomial<TORUS, AsmType> *result,
+        const TorusPolynomial<TORUS, AsmType> *poly1,
         const INT_TYPE *p,
-        const TorusPolynomial<TORUS> *poly2,
-        const PolynomialParams<TORUS> *params,
+        const TorusPolynomial<TORUS, AsmType> *poly2,
+        const PolynomialParams<TORUS, AsmType> *params,
         TfheThreadContext *context,
         Allocator alloc) {
     const int32_t N = params->N;
@@ -67,12 +67,12 @@ void TorusPolynomial<TORUS>::SubMulZ(
 }
 
 // TorusPolynomial -= p*TorusPolynomial
-template<typename TORUS>
-void TorusPolynomial<TORUS>::SubMulZTo(
-        TorusPolynomial<TORUS> *result,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::SubMulZTo(
+        TorusPolynomial<TORUS, AsmType> *result,
         const INT_TYPE *p,
-        const TorusPolynomial<TORUS> *poly2,
-        const PolynomialParams<TORUS> *params,
+        const TorusPolynomial<TORUS, AsmType> *poly2,
+        const PolynomialParams<TORUS, AsmType> *params,
         TfheThreadContext *context,
         Allocator alloc) {
     const int32_t N = params->N;
@@ -83,8 +83,8 @@ void TorusPolynomial<TORUS>::SubMulZTo(
         r[i] -= *p * b[i];
 }
 
-template<typename TORUS>
-void TorusPolynomial<TORUS>::MultNaive_plain_aux_old(
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::MultNaive_plain_aux_old(
         TORUS *__restrict result,
         const INT_TYPE *__restrict poly1,
         const TORUS *__restrict poly2,
@@ -112,8 +112,8 @@ void TorusPolynomial<TORUS>::MultNaive_plain_aux_old(
     }
 }
 
-template<typename TORUS>
-void TorusPolynomial<TORUS>::MultNaive_aux(
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::MultNaive_aux(
         TORUS *__restrict result,
         const INT_TYPE *__restrict poly1,
         const TORUS *__restrict poly2,
@@ -140,12 +140,12 @@ void TorusPolynomial<TORUS>::MultNaive_aux(
  * with a torus polynomial. (this function should yield exactly the same
  * result as the karatsuba or fft version)
  */
-template<typename TORUS>
-void TorusPolynomial<TORUS>::MultNaive(
-        TorusPolynomial<TORUS> *result,
-        const IntPolynomial<TORUS> *poly1,
-        const TorusPolynomial<TORUS> *poly2,
-        const PolynomialParams<TORUS> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::MultNaive(
+        TorusPolynomial<TORUS, AsmType> *result,
+        const IntPolynomial<TORUS, AsmType> *poly1,
+        const TorusPolynomial<TORUS, AsmType> *poly2,
+        const PolynomialParams<TORUS, AsmType> *params,
         TfheThreadContext *context,
         Allocator alloc) {
     assert(result != poly2);
@@ -154,8 +154,8 @@ void TorusPolynomial<TORUS>::MultNaive(
     const ZModuleParams<TORUS> *const zparams =
             params->zmodule_params;
 
-    TorusPolynomial<TORUS>::MultNaive_aux(result->coefs, poly1->coefs,
-                                          poly2->coefs, N, zparams, context, alloc.createStackChildAllocator());
+    TorusPolynomial<TORUS, AsmType>::MultNaive_aux(result->coefs, poly1->coefs,
+                                                   poly2->coefs, N, zparams, context, alloc.createStackChildAllocator());
 }
 
 /**
@@ -167,8 +167,8 @@ void TorusPolynomial<TORUS>::MultNaive(
 
 // A and B of size = size
 // R of size = 2*size-1
-template<typename TORUS>
-void TorusPolynomial<TORUS>::Karatsuba_aux_old(
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::Karatsuba_aux_old(
         TORUS *R,
         const INT_TYPE *A,
         const TORUS *B,
@@ -183,8 +183,8 @@ void TorusPolynomial<TORUS>::Karatsuba_aux_old(
     //we stop the karatsuba recursion at h=4, because on my machine,
     //it seems to be optimal
     if (h <= 4) {
-        TorusPolynomial<TORUS>::MultNaive_plain_aux_old(R, A, B, size, zparams, context,
-                                                        alloc.createStackChildAllocator());
+        TorusPolynomial<TORUS, AsmType>::MultNaive_plain_aux_old(R, A, B, size, zparams, context,
+                                                                 alloc.createStackChildAllocator());
         return;
     }
 
@@ -217,12 +217,12 @@ void TorusPolynomial<TORUS>::Karatsuba_aux_old(
 }
 
 // poly1, poly2 and result are polynomials mod X^N+1
-template<typename TORUS>
-void TorusPolynomial<TORUS>::MultKaratsuba_old(
-        TorusPolynomial<TORUS> *result,
-        const IntPolynomial<TORUS> *poly1,
-        const TorusPolynomial<TORUS> *poly2,
-        const PolynomialParams<TORUS> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::MultKaratsuba_old(
+        TorusPolynomial<TORUS, AsmType> *result,
+        const IntPolynomial<TORUS, AsmType> *poly1,
+        const TorusPolynomial<TORUS, AsmType> *poly2,
+        const PolynomialParams<TORUS, AsmType> *params,
         TfheThreadContext *context,
         Allocator alloc) {
     const int32_t N = params->N;
@@ -245,12 +245,12 @@ void TorusPolynomial<TORUS>::MultKaratsuba_old(
 }
 
 // poly1, poly2 and result are polynomials mod X^N+1
-template<typename TORUS>
-void TorusPolynomial<TORUS>::AddMulRKaratsuba_old(
-        TorusPolynomial<TORUS> *result,
-        const IntPolynomial<TORUS> *poly1,
-        const TorusPolynomial<TORUS> *poly2,
-        const PolynomialParams<TORUS> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::AddMulRKaratsuba_old(
+        TorusPolynomial<TORUS, AsmType> *result,
+        const IntPolynomial<TORUS, AsmType> *poly1,
+        const TorusPolynomial<TORUS, AsmType> *poly2,
+        const PolynomialParams<TORUS, AsmType> *params,
         TfheThreadContext *context,
         Allocator alloc) {
     const int32_t N = params->N;
@@ -272,12 +272,12 @@ void TorusPolynomial<TORUS>::AddMulRKaratsuba_old(
 }
 
 // poly1, poly2 and result are polynomials mod X^N+1
-template<typename TORUS>
-void TorusPolynomial<TORUS>::SubMulRKaratsuba_old(
-        TorusPolynomial<TORUS> *result,
-        const IntPolynomial<TORUS> *poly1,
-        const TorusPolynomial<TORUS> *poly2,
-        const PolynomialParams<TORUS> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::SubMulRKaratsuba_old(
+        TorusPolynomial<TORUS, AsmType> *result,
+        const IntPolynomial<TORUS, AsmType> *poly1,
+        const TorusPolynomial<TORUS, AsmType> *poly2,
+        const PolynomialParams<TORUS, AsmType> *params,
         TfheThreadContext *context,
         Allocator alloc) {
     const int32_t N = params->N;
@@ -428,11 +428,11 @@ void Karatsuba_aux(TORUS *R,
 
 // Karatsuba: result = poly1 * poly2
 // poly1, poly2 and result are polynomials mod X^N+1
-template<typename TORUS>
-void TorusPolynomial<TORUS>::MultKaratsuba(TorusPolynomial<TORUS> *result,
-                                           const IntPolynomial<TORUS> *poly1,
-                                           const TorusPolynomial<TORUS> *poly2,
-                                           const PolynomialParams<TORUS> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::MultKaratsuba(TorusPolynomial<TORUS, AsmType> *result,
+                                                    const IntPolynomial<TORUS, AsmType> *poly1,
+                                                    const TorusPolynomial<TORUS, AsmType> *poly2,
+                                                    const PolynomialParams<TORUS, AsmType> *params,
                                            TfheThreadContext *context,
                                            Allocator alloc) {
     const int32_t N = params->N;
@@ -467,11 +467,11 @@ void TorusPolynomial<TORUS>::MultKaratsuba(TorusPolynomial<TORUS> *result,
 
 // Karatsuba: result += poly1 * poly2
 // poly1, poly2 and result are polynomials mod X^N+1
-template<typename TORUS>
-void TorusPolynomial<TORUS>::AddMulRKaratsuba(TorusPolynomial<TORUS> *result,
-                                              const IntPolynomial<TORUS> *poly1,
-                                              const TorusPolynomial<TORUS> *poly2,
-                                              const PolynomialParams<TORUS> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::AddMulRKaratsuba(TorusPolynomial<TORUS, AsmType> *result,
+                                                       const IntPolynomial<TORUS, AsmType> *poly1,
+                                                       const TorusPolynomial<TORUS, AsmType> *poly2,
+                                                       const PolynomialParams<TORUS, AsmType> *params,
                                               TfheThreadContext *context,
                                               Allocator alloc) {
     const int32_t N = params->N;
@@ -506,11 +506,11 @@ void TorusPolynomial<TORUS>::AddMulRKaratsuba(TorusPolynomial<TORUS> *result,
 
 // Karatsuba: result -= poly1 * poly2
 // poly1, poly2 and result are polynomials mod X^N+1
-template<typename TORUS>
-void TorusPolynomial<TORUS>::SubMulRKaratsuba(TorusPolynomial<TORUS> *result,
-                                              const IntPolynomial<TORUS> *poly1,
-                                              const TorusPolynomial<TORUS> *poly2,
-                                              const PolynomialParams<TORUS> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::SubMulRKaratsuba(TorusPolynomial<TORUS, AsmType> *result,
+                                                       const IntPolynomial<TORUS, AsmType> *poly1,
+                                                       const TorusPolynomial<TORUS, AsmType> *poly2,
+                                                       const PolynomialParams<TORUS, AsmType> *params,
                                               TfheThreadContext *context,
                                               Allocator alloc) {
     const int32_t N = params->N;

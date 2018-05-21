@@ -8,8 +8,8 @@
  *
  * @tparam TORUS type of coefficients
  */
-template<typename TORUS>
-class TorusPolynomial : public Polynomial<TORUS, CoefTypeEnum::Torus> {
+template<typename TORUS, AsmTypeEnum AsmType>
+class TorusPolynomial : public Polynomial<TORUS, CoefTypeEnum::Torus, AsmType> {
     using INT_TYPE = typename TorusUtils<TORUS>::INT_TYPE;
 
 public:
@@ -20,10 +20,10 @@ public:
      * @param context thread execution context
      * @param alloc allocator to use
      */
-    TorusPolynomial(const PolynomialParams<TORUS> *params,
+    TorusPolynomial(const PolynomialParams<TORUS, AsmType> *params,
                     TfheThreadContext *context,
-                    Allocator *alloc) : Polynomial<TORUS,
-            CoefTypeEnum::Torus>(params, context, alloc) {}
+                    Allocator *alloc) :
+            Polynomial<TORUS, CoefTypeEnum::Torus, AsmType>(params, context, alloc) {}
 
     /**
      * @brief Destroys inner data of polynomial
@@ -32,10 +32,10 @@ public:
      * @param context thread execution context
      * @param alloc allocator to use
      */
-    void destroy(const PolynomialParams<TORUS> *params,
+    void destroy(const PolynomialParams<TORUS, AsmType> *params,
                  TfheThreadContext *context,
                  Allocator *alloc) {
-        destroy(params, context, alloc);
+        Polynomial<TORUS, CoefTypeEnum::Torus, AsmType>::destroy(params, context, alloc);
     }
 
     PREVENT_STACK_COPY(TorusPolynomial);
@@ -89,49 +89,49 @@ private:
 
 public:
     /**  @brief TorusPolynomial = random */
-    static void Uniform(TorusPolynomial<TORUS> *result,
-                        const PolynomialParams<TORUS> *params,
+    static void Uniform(TorusPolynomial<TORUS, AsmType> *result,
+                        const PolynomialParams<TORUS, AsmType> *params,
                         TfheThreadContext *context,
                         Allocator alloc);
 
     /**  TorusPolynomial + p*TorusPolynomial */
-    static void AddMulZ(TorusPolynomial<TORUS> *result,
-                        const TorusPolynomial<TORUS> *poly1,
+    static void AddMulZ(TorusPolynomial<TORUS, AsmType> *result,
+                        const TorusPolynomial<TORUS, AsmType> *poly1,
                         const INT_TYPE *p,
-                        const TorusPolynomial<TORUS> *poly2,
-                        const PolynomialParams<TORUS> *params,
+                        const TorusPolynomial<TORUS, AsmType> *poly2,
+                        const PolynomialParams<TORUS, AsmType> *params,
                         TfheThreadContext *context,
                         Allocator alloc);
 
     /**  TorusPolynomial += p*TorusPolynomial */
-    static void AddMulZTo(TorusPolynomial<TORUS> *result,
+    static void AddMulZTo(TorusPolynomial<TORUS, AsmType> *result,
                           const INT_TYPE *p,
-                          const TorusPolynomial<TORUS> *poly2,
-                          const PolynomialParams<TORUS> *params,
+                          const TorusPolynomial<TORUS, AsmType> *poly2,
+                          const PolynomialParams<TORUS, AsmType> *params,
                           TfheThreadContext *context,
                           Allocator alloc);
 
     /**  TorusPolynomial - p*TorusPolynomial */
-    static void SubMulZ(TorusPolynomial<TORUS> *result,
-                        const TorusPolynomial<TORUS> *poly1,
+    static void SubMulZ(TorusPolynomial<TORUS, AsmType> *result,
+                        const TorusPolynomial<TORUS, AsmType> *poly1,
                         const INT_TYPE *p,
-                        const TorusPolynomial<TORUS> *poly2,
-                        const PolynomialParams<TORUS> *params,
+                        const TorusPolynomial<TORUS, AsmType> *poly2,
+                        const PolynomialParams<TORUS, AsmType> *params,
                         TfheThreadContext *context,
                         Allocator alloc);
 
     /**  TorusPolynomial -= p*TorusPolynomial */
-    static void SubMulZTo(TorusPolynomial<TORUS> *result,
+    static void SubMulZTo(TorusPolynomial<TORUS, AsmType> *result,
                           const INT_TYPE *p,
-                          const TorusPolynomial<TORUS> *poly2,
-                          const PolynomialParams<TORUS> *params,
+                          const TorusPolynomial<TORUS, AsmType> *poly2,
+                          const PolynomialParams<TORUS, AsmType> *params,
                           TfheThreadContext *context,
                           Allocator alloc);
 
     /**  Infinity norm of the distance between two torus polynomials */
-    static double NormInftyDist(const TorusPolynomial<TORUS> *poly1,
-                                const TorusPolynomial<TORUS> *poly2,
-                                const PolynomialParams<TORUS> *params,
+    static double NormInftyDist(const TorusPolynomial<TORUS, AsmType> *poly1,
+                                const TorusPolynomial<TORUS, AsmType> *poly2,
+                                const PolynomialParams<TORUS, AsmType> *params,
                                 TfheThreadContext *context,
                                 Allocator alloc);
 
@@ -140,10 +140,10 @@ public:
      * with a torus polynomial. (this function should yield exactly the same
      * result as the karatsuba or fft version, but should be slower)
      */
-    static void MultNaive(TorusPolynomial<TORUS> *result,
-                          const IntPolynomial<TORUS> *poly1,
-                          const TorusPolynomial<TORUS> *poly2,
-                          const PolynomialParams<TORUS> *params,
+    static void MultNaive(TorusPolynomial<TORUS, AsmType> *result,
+                          const IntPolynomial<TORUS, AsmType> *poly1,
+                          const TorusPolynomial<TORUS, AsmType> *poly2,
+                          const PolynomialParams<TORUS, AsmType> *params,
                           TfheThreadContext *context,
                           Allocator alloc);
 
@@ -153,10 +153,10 @@ public:
      * WARNING: N must be a power of 2 to use this function. Else, the
      * behaviour is unpredictable
      */
-    static void MultKaratsuba_old(TorusPolynomial<TORUS> *result,
-                                  const IntPolynomial<TORUS> *poly1,
-                                  const TorusPolynomial<TORUS> *poly2,
-                                  const PolynomialParams<TORUS> *params,
+    static void MultKaratsuba_old(TorusPolynomial<TORUS, AsmType> *result,
+                                  const IntPolynomial<TORUS, AsmType> *poly1,
+                                  const TorusPolynomial<TORUS, AsmType> *poly2,
+                                  const PolynomialParams<TORUS, AsmType> *params,
                                   TfheThreadContext *context,
                                   Allocator alloc);
 
@@ -165,10 +165,10 @@ public:
      * WARNING: N must be a power of 2 to use this function. Else, the
      * behaviour is unpredictable
      */
-    static void AddMulRKaratsuba_old(TorusPolynomial<TORUS> *result,
-                                     const IntPolynomial<TORUS> *poly1,
-                                     const TorusPolynomial<TORUS> *poly2,
-                                     const PolynomialParams<TORUS> *params,
+    static void AddMulRKaratsuba_old(TorusPolynomial<TORUS, AsmType> *result,
+                                     const IntPolynomial<TORUS, AsmType> *poly1,
+                                     const TorusPolynomial<TORUS, AsmType> *poly2,
+                                     const PolynomialParams<TORUS, AsmType> *params,
                                      TfheThreadContext *context,
                                      Allocator alloc);
 
@@ -177,10 +177,10 @@ public:
      * WARNING: N must be a power of 2 to use this function. Else, the
      * behaviour is unpredictable
      */
-    static void SubMulRKaratsuba_old(TorusPolynomial<TORUS> *result,
-                                     const IntPolynomial<TORUS> *poly1,
-                                     const TorusPolynomial<TORUS> *poly2,
-                                     const PolynomialParams<TORUS> *params,
+    static void SubMulRKaratsuba_old(TorusPolynomial<TORUS, AsmType> *result,
+                                     const IntPolynomial<TORUS, AsmType> *poly1,
+                                     const TorusPolynomial<TORUS, AsmType> *poly2,
+                                     const PolynomialParams<TORUS, AsmType> *params,
                                      TfheThreadContext *context,
                                      Allocator alloc);
 
@@ -192,10 +192,10 @@ public:
      * behaviour is unpredictable
      */
 
-    static void MultKaratsuba(TorusPolynomial<TORUS> *result,
-                              const IntPolynomial<TORUS> *poly1,
-                              const TorusPolynomial<TORUS> *poly2,
-                              const PolynomialParams<TORUS> *params,
+    static void MultKaratsuba(TorusPolynomial<TORUS, AsmType> *result,
+                              const IntPolynomial<TORUS, AsmType> *poly1,
+                              const TorusPolynomial<TORUS, AsmType> *poly2,
+                              const PolynomialParams<TORUS, AsmType> *params,
                               TfheThreadContext *context,
                               Allocator alloc);
 
@@ -204,10 +204,10 @@ public:
     * WARNING: N must be a power of 2 to use this function. Else, the
     * behaviour is unpredictable
     */
-    static void AddMulRKaratsuba(TorusPolynomial<TORUS> *result,
-                                 const IntPolynomial<TORUS> *poly1,
-                                 const TorusPolynomial<TORUS> *poly2,
-                                 const PolynomialParams<TORUS> *params,
+    static void AddMulRKaratsuba(TorusPolynomial<TORUS, AsmType> *result,
+                                 const IntPolynomial<TORUS, AsmType> *poly1,
+                                 const TorusPolynomial<TORUS, AsmType> *poly2,
+                                 const PolynomialParams<TORUS, AsmType> *params,
                                  TfheThreadContext *context,
                                  Allocator alloc);
 
@@ -217,10 +217,10 @@ public:
     * WARNING: N must be a power of 2 to use this function. Else, the
     * behaviour is unpredictable
     */
-    static void SubMulRKaratsuba(TorusPolynomial<TORUS> *result,
-                                 const IntPolynomial<TORUS> *poly1,
-                                 const TorusPolynomial<TORUS> *poly2,
-                                 const PolynomialParams<TORUS> *params,
+    static void SubMulRKaratsuba(TorusPolynomial<TORUS, AsmType> *result,
+                                 const IntPolynomial<TORUS, AsmType> *poly1,
+                                 const TorusPolynomial<TORUS, AsmType> *poly2,
+                                 const PolynomialParams<TORUS, AsmType> *params,
                                  TfheThreadContext *context,
                                  Allocator alloc);
 

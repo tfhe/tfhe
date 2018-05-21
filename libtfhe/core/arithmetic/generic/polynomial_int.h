@@ -10,8 +10,8 @@
  *
  * @tparam TORUS torus type
  */
-template<typename TORUS>
-class IntPolynomial : public Polynomial<TORUS, CoefTypeEnum::Integer> {
+template<typename TORUS, AsmTypeEnum AsmType>
+class IntPolynomial : public Polynomial<TORUS, CoefTypeEnum::Integer, AsmType> {
 public:
     /**
      * @brief Constructs a polynomial with given parameters
@@ -21,10 +21,9 @@ public:
      * @param alloc allocator to use
      */
     IntPolynomial(
-            const PolynomialParams<TORUS> *params,
+            const PolynomialParams<TORUS, AsmType> *params,
             TfheThreadContext *context,
-            Allocator *alloc) : Polynomial<TORUS,
-            CoefTypeEnum::Integer>(params, context, alloc) {}
+            Allocator *alloc);
 
     /**
      * @brief Destroys inner data of polynomial
@@ -33,11 +32,9 @@ public:
      * @param context thread execution context
      * @param alloc allocator to use
      */
-    void destroy(const PolynomialParams<TORUS> *params,
+    void destroy(const PolynomialParams<TORUS, AsmType> *params,
                  TfheThreadContext *context,
-                 Allocator *alloc) {
-        Polynomial<TORUS,CoefTypeEnum ::Integer>::destroy(params, context, alloc);
-    }
+                 Allocator *alloc);
 
     PREVENT_STACK_COPY(IntPolynomial);
 
@@ -46,15 +43,15 @@ public:
      */
 public:
     /** Euclidean norm of an Integer Polynomial */
-    static double Norm2sq(const IntPolynomial<TORUS> *poly,
-                          const PolynomialParams<TORUS> *params,
+    static double Norm2sq(const IntPolynomial<TORUS, AsmType> *poly,
+                          const PolynomialParams<TORUS, AsmType> *params,
                           TfheThreadContext *context,
                           Allocator alloc);
 
     /** Infinity norm of the distance between two integer polynomials */
-    static double NormInftyDist(const IntPolynomial<TORUS> *poly1,
-                                const IntPolynomial<TORUS> *poly2,
-                                const PolynomialParams<TORUS> *params,
+    static double NormInftyDist(const IntPolynomial<TORUS, AsmType> *poly1,
+                                const IntPolynomial<TORUS, AsmType> *poly2,
+                                const PolynomialParams<TORUS, AsmType> *params,
                                 TfheThreadContext *context,
                                 Allocator alloc);
 };

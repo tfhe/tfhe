@@ -8,25 +8,25 @@ using namespace tfhe_backend;
  * Instantiate TorusPolynomial class for big torus type
  */
 template
-class TorusPolynomial<BigTorus>;
+class TorusPolynomial<BigTorus, AsmTypeEnum::PORTABLE>;
 
 // TorusPolynomial + p*TorusPolynomial
-template<>
-void TorusPolynomial<BigTorus>::AddMulZ(TorusPolynomial<BigTorus> *result,
-                                        const TorusPolynomial<BigTorus> *poly1,
-                                        const INT_TYPE *p,
-                                        const TorusPolynomial<BigTorus> *poly2,
-                                        const PolynomialParams<BigTorus> *params,
-                                        TfheThreadContext *context,
-                                        Allocator alloc) {
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::AddMulZ(TorusPolynomial<TORUS, AsmType> *result,
+                                              const TorusPolynomial<TORUS, AsmType> *poly1,
+                                              const INT_TYPE *p,
+                                              const TorusPolynomial<TORUS, AsmType> *poly2,
+                                              const PolynomialParams<TORUS, AsmType> *params,
+                                              TfheThreadContext *context,
+                                              Allocator alloc) {
     const int32_t N = params->N;
     assert(result != poly1); //if it fails here, please use AddMulZTo
-    BigTorus *r = result->coefs;
-    const BigTorus *a = poly1->coefs;
-    const BigTorus *b = poly2->coefs;
-    const ZModuleParams<BigTorus> *const zparams = params->zmodule_params;
+    TORUS *r = result->coefs;
+    const TORUS *a = poly1->coefs;
+    const TORUS *b = poly2->coefs;
+    const ZModuleParams<TORUS> *const zparams = params->zmodule_params;
 
-    BigTorus *t = alloc.newObject<BigTorus>(zparams, &alloc);
+    TORUS *t = alloc.newObject<TORUS>(zparams, &alloc);
     for (int32_t i = 0; i < N; ++i) {
         copy(t, b + i, zparams);
         mul(t, p, t, zparams, alloc.createStackChildAllocator());
@@ -36,35 +36,35 @@ void TorusPolynomial<BigTorus>::AddMulZ(TorusPolynomial<BigTorus> *result,
 
 
 // TorusPolynomial += p*TorusPolynomial
-template<>
-void TorusPolynomial<BigTorus>::AddMulZTo(
-        TorusPolynomial<BigTorus> *result,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::AddMulZTo(
+        TorusPolynomial<TORUS, AsmType> *result,
         const INT_TYPE *p,
-        const TorusPolynomial<BigTorus> *poly2,
-        const PolynomialParams<BigTorus> *params,
+        const TorusPolynomial<TORUS, AsmType> *poly2,
+        const PolynomialParams<TORUS, AsmType> *params,
         TfheThreadContext *context,
         Allocator alloc) {
-    TorusPolynomial<BigTorus>::AddMulZ(result, result, p, poly2, params, context, std::move(alloc));
+    TorusPolynomial<TORUS, AsmType>::AddMulZ(result, result, p, poly2, params, context, std::move(alloc));
 }
 
 
 // TorusPolynomial - p*TorusPolynomial
-template<>
-void TorusPolynomial<BigTorus>::SubMulZ(TorusPolynomial<BigTorus> *result,
-                                        const TorusPolynomial<BigTorus> *poly1,
-                                        const INT_TYPE *p,
-                                        const TorusPolynomial<BigTorus> *poly2,
-                                        const PolynomialParams<BigTorus> *params,
-                                        TfheThreadContext *context,
-                                        Allocator alloc) {
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::SubMulZ(TorusPolynomial<TORUS, AsmType> *result,
+                                              const TorusPolynomial<TORUS, AsmType> *poly1,
+                                              const INT_TYPE *p,
+                                              const TorusPolynomial<TORUS, AsmType> *poly2,
+                                              const PolynomialParams<TORUS, AsmType> *params,
+                                              TfheThreadContext *context,
+                                              Allocator alloc) {
     const int32_t N = params->N;
     assert(result != poly1); //if it fails here, please use AddMulZTo
-    BigTorus *r = result->coefs;
-    const BigTorus *a = poly1->coefs;
-    const BigTorus *b = poly2->coefs;
-    const ZModuleParams<BigTorus> *const zparams = params->zmodule_params;
+    TORUS *r = result->coefs;
+    const TORUS *a = poly1->coefs;
+    const TORUS *b = poly2->coefs;
+    const ZModuleParams<TORUS> *const zparams = params->zmodule_params;
 
-    BigTorus *t = alloc.newObject<BigTorus>(zparams, &alloc);
+    TORUS *t = alloc.newObject<TORUS>(zparams, &alloc);
     for (int32_t i = 0; i < N; ++i) {
         copy(t, b + i, zparams);
         mul(t, p, t, zparams, alloc.createStackChildAllocator());
@@ -74,30 +74,30 @@ void TorusPolynomial<BigTorus>::SubMulZ(TorusPolynomial<BigTorus> *result,
 
 
 // TorusPolynomial -= p*TorusPolynomial
-template<>
-void TorusPolynomial<BigTorus>::SubMulZTo(
-        TorusPolynomial<BigTorus> *result,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::SubMulZTo(
+        TorusPolynomial<TORUS, AsmType> *result,
         const INT_TYPE *p,
-        const TorusPolynomial<BigTorus> *poly2,
-        const PolynomialParams<BigTorus> *params,
+        const TorusPolynomial<TORUS, AsmType> *poly2,
+        const PolynomialParams<TORUS, AsmType> *params,
         TfheThreadContext *context,
         Allocator alloc) {
-    TorusPolynomial<BigTorus>::SubMulZ(result, result, p, poly2, params, context, std::move(alloc));
+    TorusPolynomial<TORUS, AsmType>::SubMulZ(result, result, p, poly2, params, context, std::move(alloc));
 }
 
-template<>
-void TorusPolynomial<BigTorus>::MultNaive_plain_aux_old(BigTorus *__restrict result,
-                                                        const INT_TYPE *__restrict poly1,
-                                                        const BigTorus *__restrict poly2,
-                                                        const int32_t N,
-                                                        const ZModuleParams<BigTorus> *const zparams,
-                                                        TfheThreadContext *context,
-                                                        Allocator alloc) {
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::MultNaive_plain_aux_old(TORUS *__restrict result,
+                                                              const INT_TYPE *__restrict poly1,
+                                                              const TORUS *__restrict poly2,
+                                                              const int32_t N,
+                                                              const ZModuleParams<TORUS> *const zparams,
+                                                              TfheThreadContext *context,
+                                                              Allocator alloc) {
     const int32_t _2Nm1 = 2 * N - 1;
-    BigTorus *ti = alloc.newObject<BigTorus>(zparams, &alloc);
+    TORUS *ti = alloc.newObject<TORUS>(zparams, &alloc);
 
     for (int32_t i = 0; i < N; i++) {
-        BigTorus *ri = result + i;
+        TORUS *ri = result + i;
         zero(ri, zparams);
         for (int32_t j = 0; j <= i; j++) {
             mul(ti, poly1 + j, poly2 + (i - j), zparams, alloc.createStackChildAllocator());
@@ -106,7 +106,7 @@ void TorusPolynomial<BigTorus>::MultNaive_plain_aux_old(BigTorus *__restrict res
     }
 
     for (int32_t i = N; i < _2Nm1; i++) {
-        BigTorus *ri = result + i;
+        TORUS *ri = result + i;
         zero(ri, zparams);
         for (int32_t j = i - N + 1; j < N; j++) {
             mul(ti, poly1 + j, poly2 + (i - j), zparams, alloc.createStackChildAllocator());
@@ -116,18 +116,18 @@ void TorusPolynomial<BigTorus>::MultNaive_plain_aux_old(BigTorus *__restrict res
 }
 
 
-template<>
-void TorusPolynomial<BigTorus>::MultNaive_aux(BigTorus *__restrict result,
-                                              const INT_TYPE *__restrict poly1,
-                                              const BigTorus *__restrict poly2,
-                                              const int32_t N,
-                                              const ZModuleParams<BigTorus> *const zparams,
-                                              TfheThreadContext *context,
-                                              Allocator alloc) {
-    BigTorus *ti = alloc.newObject<BigTorus>(zparams, &alloc);
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::MultNaive_aux(TORUS *__restrict result,
+                                                    const INT_TYPE *__restrict poly1,
+                                                    const TORUS *__restrict poly2,
+                                                    const int32_t N,
+                                                    const ZModuleParams<TORUS> *const zparams,
+                                                    TfheThreadContext *context,
+                                                    Allocator alloc) {
+    TORUS *ti = alloc.newObject<TORUS>(zparams, &alloc);
 
     for (int32_t i = 0; i < N; i++) {
-        BigTorus *ri = result + i;
+        TORUS *ri = result + i;
         zero(ri, zparams);
 
         for (int32_t j = 0; j <= i; j++) {
@@ -146,19 +146,19 @@ void TorusPolynomial<BigTorus>::MultNaive_aux(BigTorus *__restrict result,
  * with a torus polynomial. (this function should yield exactly the same
  * result as the karatsuba or fft version)
  */
-template<>
-void TorusPolynomial<BigTorus>::MultNaive(TorusPolynomial<BigTorus> *result,
-                                          const IntPolynomial<BigTorus> *poly1,
-                                          const TorusPolynomial<BigTorus> *poly2,
-                                          const PolynomialParams<BigTorus> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::MultNaive(TorusPolynomial<TORUS, AsmType> *result,
+                                                const IntPolynomial<TORUS, AsmType> *poly1,
+                                                const TorusPolynomial<TORUS, AsmType> *poly2,
+                                                const PolynomialParams<TORUS, AsmType> *params,
                                           TfheThreadContext *context,
                                           Allocator alloc) {
     assert(result != poly2);
 
     const int32_t N = params->N;
-    const ZModuleParams<BigTorus> *const zparams = params->zmodule_params;
+    const ZModuleParams<TORUS> *const zparams = params->zmodule_params;
 
-    TorusPolynomial<BigTorus>::MultNaive_aux(result->coefs, poly1->coefs,
+    TorusPolynomial<TORUS, AsmType>::MultNaive_aux(result->coefs, poly1->coefs,
                                              poly2->coefs, N, zparams, context, alloc.createStackChildAllocator());
 }
 //
@@ -171,26 +171,26 @@ void TorusPolynomial<BigTorus>::MultNaive(TorusPolynomial<BigTorus> *result,
 
 // A and B of size = size
 // R of size = 2*size-1
-template<>
-void TorusPolynomial<BigTorus>::Karatsuba_aux_old(BigTorus *R,
-                                                  const INT_TYPE *A,
-                                                  const BigTorus *B,
-                                                  const int32_t size,
-                                                  const char *buf,
-                                                  const ZModuleParams<BigTorus> *const zparams,
-                                                  TfheThreadContext *context,
-                                                  Allocator alloc) {
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::Karatsuba_aux_old(TORUS *R,
+                                                        const INT_TYPE *A,
+                                                        const TORUS *B,
+                                                        const int32_t size,
+                                                        const char *buf,
+                                                        const ZModuleParams<TORUS> *const zparams,
+                                                        TfheThreadContext *context,
+                                                        Allocator alloc) {
 
     const int32_t h = size / 2;
     const int32_t sm1 = size - 1;
     // temp value
-    BigTorus *temp = alloc.newObject<BigTorus>(zparams, &alloc);
+    TORUS *temp = alloc.newObject<TORUS>(zparams, &alloc);
 
     // h<=4 experimentally chosen
     if (h <= 4) {
-        TorusPolynomial<BigTorus>::MultNaive_aux(R, A, B, size,
-                                                 zparams, context,
-                                                 alloc.createStackChildAllocator());
+        TorusPolynomial<TORUS, AsmType>::MultNaive_aux(R, A, B, size,
+                                                       zparams, context,
+                                                       alloc.createStackChildAllocator());
         return; // the algorithm finishes
     }
 
@@ -199,11 +199,11 @@ void TorusPolynomial<BigTorus>::Karatsuba_aux_old(BigTorus *R,
     INT_TYPE *Atemp = (INT_TYPE *) buf;
     buf += h * sizeof(INT_TYPE);
     // B = B0 + B1*X^h
-    BigTorus *Btemp = (BigTorus *) buf;
-    buf += h * sizeof(BigTorus);
+    TORUS *Btemp = (TORUS *) buf;
+    buf += h * sizeof(TORUS);
     // R
-    BigTorus *Rtemp = (BigTorus *) buf;
-    buf += size * sizeof(BigTorus);
+    TORUS *Rtemp = (TORUS *) buf;
+    buf += size * sizeof(TORUS);
     // Note: in the above line, I have put size instead of sm1 so
     // that buf remains aligned on a power of 2
 
@@ -241,26 +241,26 @@ void TorusPolynomial<BigTorus>::Karatsuba_aux_old(BigTorus *R,
 
 
     // delete
-    alloc.deleteObject<BigTorus>(temp, zparams, &alloc);
+    alloc.deleteObject<TORUS>(temp, zparams, &alloc);
 }
 
 
 // poly1, poly2 and result are polynomials mod X^N+1
-template<>
-void TorusPolynomial<BigTorus>::MultKaratsuba_old(TorusPolynomial<BigTorus> *result,
-                                                  const IntPolynomial<BigTorus> *poly1,
-                                                  const TorusPolynomial<BigTorus> *poly2,
-                                                  const PolynomialParams<BigTorus> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::MultKaratsuba_old(TorusPolynomial<TORUS, AsmType> *result,
+                                                        const IntPolynomial<TORUS, AsmType> *poly1,
+                                                        const TorusPolynomial<TORUS, AsmType> *poly2,
+                                                        const PolynomialParams<TORUS, AsmType> *params,
                                                   TfheThreadContext *context,
                                                   Allocator alloc) {
     const int32_t N = params->N;
 
     // Buffer: that's large enough to store every tmp variables (2*2*N*4)
-    char *buf = new char[4 * N * sizeof(BigTorus)];
+    char *buf = new char[4 * N * sizeof(TORUS)];
     // zmodule_params
-    const ZModuleParams<BigTorus> *const zparams = params->zmodule_params;
+    const ZModuleParams<TORUS> *const zparams = params->zmodule_params;
     // result in Karatsuba_aux
-    BigTorus *R = alloc.newArray<BigTorus>(2 * N - 1, zparams, &alloc);
+    TORUS *R = alloc.newArray<TORUS>(2 * N - 1, zparams, &alloc);
 
     // Karatsuba
     Karatsuba_aux_old(R, poly1->coefs, poly2->coefs, N, buf, zparams, context, alloc.createStackChildAllocator());
@@ -274,28 +274,28 @@ void TorusPolynomial<BigTorus>::MultKaratsuba_old(TorusPolynomial<BigTorus> *res
 
     // delete
     delete[] buf;
-    alloc.deleteArray<BigTorus>(2 * N - 1, R, zparams, &alloc);
+    alloc.deleteArray<TORUS>(2 * N - 1, R, zparams, &alloc);
 }
 
 
 // poly1, poly2 and result are polynomials mod X^N+1
-template<>
-void TorusPolynomial<BigTorus>::AddMulRKaratsuba_old(TorusPolynomial<BigTorus> *result,
-                                                     const IntPolynomial<BigTorus> *poly1,
-                                                     const TorusPolynomial<BigTorus> *poly2,
-                                                     const PolynomialParams<BigTorus> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::AddMulRKaratsuba_old(TorusPolynomial<TORUS, AsmType> *result,
+                                                           const IntPolynomial<TORUS, AsmType> *poly1,
+                                                           const TorusPolynomial<TORUS, AsmType> *poly2,
+                                                           const PolynomialParams<TORUS, AsmType> *params,
                                                      TfheThreadContext *context,
                                                      Allocator alloc) {
     const int32_t N = params->N;
 
     // Buffer: that's large enough to store every tmp variables (2*2*N*4)
-    char *buf = new char[4 * N * sizeof(BigTorus)];
+    char *buf = new char[4 * N * sizeof(TORUS)];
     // zmodule_params
-    const ZModuleParams<BigTorus> *const zparams = params->zmodule_params;
+    const ZModuleParams<TORUS> *const zparams = params->zmodule_params;
     // result in Karatsuba_aux
-    BigTorus *R = alloc.newArray<BigTorus>(2 * N - 1, zparams, &alloc);
+    TORUS *R = alloc.newArray<TORUS>(2 * N - 1, zparams, &alloc);
     // temp value
-    BigTorus *temp = alloc.newObject<BigTorus>(zparams, &alloc);
+    TORUS *temp = alloc.newObject<TORUS>(zparams, &alloc);
 
     // Karatsuba
     Karatsuba_aux_old(R, poly1->coefs, poly2->coefs, N, buf, zparams, context, alloc.createStackChildAllocator());
@@ -309,29 +309,29 @@ void TorusPolynomial<BigTorus>::AddMulRKaratsuba_old(TorusPolynomial<BigTorus> *
 
     // delete
     delete[] buf;
-    alloc.deleteObject<BigTorus>(temp, zparams, &alloc);
-    alloc.deleteArray<BigTorus>(2 * N - 1, R, zparams, &alloc);
+    alloc.deleteObject<TORUS>(temp, zparams, &alloc);
+    alloc.deleteArray<TORUS>(2 * N - 1, R, zparams, &alloc);
 }
 
 
 // poly1, poly2 and result are polynomials mod X^N+1
-template<>
-void TorusPolynomial<BigTorus>::SubMulRKaratsuba_old(TorusPolynomial<BigTorus> *result,
-                                                     const IntPolynomial<BigTorus> *poly1,
-                                                     const TorusPolynomial<BigTorus> *poly2,
-                                                     const PolynomialParams<BigTorus> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::SubMulRKaratsuba_old(TorusPolynomial<TORUS, AsmType> *result,
+                                                           const IntPolynomial<TORUS, AsmType> *poly1,
+                                                           const TorusPolynomial<TORUS, AsmType> *poly2,
+                                                           const PolynomialParams<TORUS, AsmType> *params,
                                                      TfheThreadContext *context,
                                                      Allocator alloc) {
     const int32_t N = params->N;
 
     // Buffer: that's large enough to store every tmp variables (2*2*N*4)
-    char *buf = new char[4 * N * sizeof(BigTorus)];
+    char *buf = new char[4 * N * sizeof(TORUS)];
     // zmodule_params
-    const ZModuleParams<BigTorus> *const zparams = params->zmodule_params;
+    const ZModuleParams<TORUS> *const zparams = params->zmodule_params;
     // result in Karatsuba_aux
-    BigTorus *R = alloc.newArray<BigTorus>(2 * N - 1, zparams, &alloc);
+    TORUS *R = alloc.newArray<TORUS>(2 * N - 1, zparams, &alloc);
     // temp value
-    BigTorus *temp = alloc.newObject<BigTorus>(zparams, &alloc);
+    TORUS *temp = alloc.newObject<TORUS>(zparams, &alloc);
 
     // Karatsuba
     Karatsuba_aux_old(R, poly1->coefs, poly2->coefs, N, buf, zparams, context, alloc.createStackChildAllocator());
@@ -345,14 +345,14 @@ void TorusPolynomial<BigTorus>::SubMulRKaratsuba_old(TorusPolynomial<BigTorus> *
 
     // delete
     delete[] buf;
-    alloc.deleteObject<BigTorus>(temp, zparams, &alloc);
-    alloc.deleteArray<BigTorus>(2 * N - 1, R, zparams, &alloc);
+    alloc.deleteObject<TORUS>(temp, zparams, &alloc);
+    alloc.deleteArray<TORUS>(2 * N - 1, R, zparams, &alloc);
 }
 
 
 /**
  * Multiplication of two polynomials, one integer (BigInteger) and the other
- * with torus (BigTorus) coefficients via Karatsuba
+ * with torus (TORUS) coefficients via Karatsuba
  * The auxiliary functions (_aux) are:
  * * MultNaive_plain_aux: computes a naive multiplication
  * * Karatsuba_aux: recursive Karatsuba function
@@ -366,10 +366,10 @@ void TorusPolynomial<BigTorus>::SubMulRKaratsuba_old(TorusPolynomial<BigTorus> *
 
 /** @brief raw naive multiplication f two polynomials, given by their coefficients vectors
  * The two operands have degree <N, and the result has degree <2N-1
- * @param temp a single Bigtorus, preallocated, to store a temporary variable
- * @param result an array of 2N-1 BigTorus, preallocated
+ * @param temp a single TORUS, preallocated, to store a temporary variable
+ * @param result an array of 2N-1 TORUS, preallocated
  * @param poly1 an array of N BigInt, containing the coefs of the first operand
- * @param poly2 an array of N BigTorus, containing the coefs of the second operand
+ * @param poly2 an array of N TORUS, containing the coefs of the second operand
  * @param N bound on the degree
  * @param zparams params of the Z module
  */
@@ -466,30 +466,30 @@ static void Karatsuba_aux(BigTorus *R,
 
 // Karatsuba: result = poly1 * poly2
 // poly1, poly2 and result are polynomials mod X^N+1
-template<>
-void TorusPolynomial<BigTorus>::MultKaratsuba(TorusPolynomial<BigTorus> *result,
-                                              const IntPolynomial<BigTorus> *poly1,
-                                              const TorusPolynomial<BigTorus> *poly2,
-                                              const PolynomialParams<BigTorus> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::MultKaratsuba(TorusPolynomial<TORUS, AsmType> *result,
+                                                    const IntPolynomial<TORUS, AsmType> *poly1,
+                                                    const TorusPolynomial<TORUS, AsmType> *poly2,
+                                                    const PolynomialParams<TORUS, AsmType> *params,
                                               TfheThreadContext *context,
                                               Allocator alloc) {
     const int32_t N = params->N;
     // zmodule_params
-    const ZModuleParams<BigTorus> *const zparams = params->zmodule_params;
+    const ZModuleParams<TORUS> *const zparams = params->zmodule_params;
 
 
     // Buffer: that's large enough to store every tmp BigInt variable (1*N*sizeof(BigInt))
     BigInt *bufBigInt = alloc.newArray<BigInt>(N);
-    // Buffer: that's large enough to store every tmp BigTorus variable (3*N*sizeof(BigTorus))
-    BigTorus *bufBigTorus = alloc.newArray<BigTorus>(3 * N, zparams, &alloc);
+    // Buffer: that's large enough to store every tmp TORUS variable (3*N*sizeof(TORUS))
+    TORUS *bufTORUS = alloc.newArray<TORUS>(3 * N, zparams, &alloc);
     // Result in Karatsuba_aux
-    BigTorus *R = alloc.newArray<BigTorus>(2 * N - 1, zparams, &alloc);
+    TORUS *R = alloc.newArray<TORUS>(2 * N - 1, zparams, &alloc);
     // Temp value
-    BigTorus *temp = alloc.newObject<BigTorus>(zparams, &alloc);
+    TORUS *temp = alloc.newObject<TORUS>(zparams, &alloc);
 
 
     // Karatsuba
-    Karatsuba_aux(R, bufBigInt, bufBigTorus, temp, poly1->coefs, poly2->coefs, N, zparams);
+    Karatsuba_aux(R, bufBigInt, bufTORUS, temp, poly1->coefs, poly2->coefs, N, zparams);
 
     // Reduction mod X^N+1
     for (int32_t i = 0; i < N - 1; ++i) {
@@ -500,39 +500,39 @@ void TorusPolynomial<BigTorus>::MultKaratsuba(TorusPolynomial<BigTorus> *result,
 
 
     // delete
-    alloc.deleteObject<BigTorus>(temp, zparams, &alloc);
-    alloc.deleteArray<BigTorus>(2 * N - 1, R, zparams, &alloc);
-    alloc.deleteArray<BigTorus>(3 * N, bufBigTorus, zparams, &alloc);
+    alloc.deleteObject<TORUS>(temp, zparams, &alloc);
+    alloc.deleteArray<TORUS>(2 * N - 1, R, zparams, &alloc);
+    alloc.deleteArray<TORUS>(3 * N, bufTORUS, zparams, &alloc);
     alloc.deleteArray<BigInt>(N, bufBigInt);
 }
 
 
 // Karatsuba: result += poly1 * poly2
 // poly1, poly2 and result are polynomials mod X^N+1
-template<>
-void TorusPolynomial<BigTorus>::AddMulRKaratsuba(TorusPolynomial<BigTorus> *result,
-                                                 const IntPolynomial<BigTorus> *poly1,
-                                                 const TorusPolynomial<BigTorus> *poly2,
-                                                 const PolynomialParams<BigTorus> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::AddMulRKaratsuba(TorusPolynomial<TORUS, AsmType> *result,
+                                                       const IntPolynomial<TORUS, AsmType> *poly1,
+                                                       const TorusPolynomial<TORUS, AsmType> *poly2,
+                                                       const PolynomialParams<TORUS, AsmType> *params,
                                                  TfheThreadContext *context,
                                                  Allocator alloc) {
     const int32_t N = params->N;
     // zmodule_params
-    const ZModuleParams<BigTorus> *const zparams = params->zmodule_params;
+    const ZModuleParams<TORUS> *const zparams = params->zmodule_params;
 
 
     // Buffer: that's large enough to store every tmp BigInt variable (1*N*sizeof(BigInt))
     BigInt *bufBigInt = alloc.newArray<BigInt>(N);
-    // Buffer: that's large enough to store every tmp BigTorus variable (3*N*sizeof(BigTorus))
-    BigTorus *bufBigTorus = alloc.newArray<BigTorus>(3 * N, zparams, &alloc);
+    // Buffer: that's large enough to store every tmp TORUS variable (3*N*sizeof(TORUS))
+    TORUS *bufTORUS = alloc.newArray<TORUS>(3 * N, zparams, &alloc);
     // Result in Karatsuba_aux
-    BigTorus *R = alloc.newArray<BigTorus>(2 * N - 1, zparams, &alloc);
+    TORUS *R = alloc.newArray<TORUS>(2 * N - 1, zparams, &alloc);
     // Temp value
-    BigTorus *temp = alloc.newObject<BigTorus>(zparams, &alloc);
+    TORUS *temp = alloc.newObject<TORUS>(zparams, &alloc);
 
 
     // Karatsuba
-    Karatsuba_aux(R, bufBigInt, bufBigTorus, temp, poly1->coefs, poly2->coefs, N, zparams);
+    Karatsuba_aux(R, bufBigInt, bufTORUS, temp, poly1->coefs, poly2->coefs, N, zparams);
 
     // Reduction mod X^N+1
     for (int32_t i = 0; i < N - 1; ++i) {
@@ -543,39 +543,39 @@ void TorusPolynomial<BigTorus>::AddMulRKaratsuba(TorusPolynomial<BigTorus> *resu
 
 
     // delete
-    alloc.deleteObject<BigTorus>(temp, zparams, &alloc);
-    alloc.deleteArray<BigTorus>(2 * N - 1, R, zparams, &alloc);
-    alloc.deleteArray<BigTorus>(3 * N, bufBigTorus, zparams, &alloc);
+    alloc.deleteObject<TORUS>(temp, zparams, &alloc);
+    alloc.deleteArray<TORUS>(2 * N - 1, R, zparams, &alloc);
+    alloc.deleteArray<TORUS>(3 * N, bufTORUS, zparams, &alloc);
     alloc.deleteArray<BigInt>(N, bufBigInt);
 }
 
 
 // Karatsuba: result -= poly1 * poly2
 // poly1, poly2 and result are polynomials mod X^N+1
-template<>
-void TorusPolynomial<BigTorus>::SubMulRKaratsuba(TorusPolynomial<BigTorus> *result,
-                                                 const IntPolynomial<BigTorus> *poly1,
-                                                 const TorusPolynomial<BigTorus> *poly2,
-                                                 const PolynomialParams<BigTorus> *params,
+template<typename TORUS, AsmTypeEnum AsmType>
+void TorusPolynomial<TORUS, AsmType>::SubMulRKaratsuba(TorusPolynomial<TORUS, AsmType> *result,
+                                                       const IntPolynomial<TORUS, AsmType> *poly1,
+                                                       const TorusPolynomial<TORUS, AsmType> *poly2,
+                                                       const PolynomialParams<TORUS, AsmType> *params,
                                                  TfheThreadContext *context,
                                                  Allocator alloc) {
     const int32_t N = params->N;
     // zmodule_params
-    const ZModuleParams<BigTorus> *const zparams = params->zmodule_params;
+    const ZModuleParams<TORUS> *const zparams = params->zmodule_params;
 
 
     // Buffer: that's large enough to store every tmp BigInt variable (1*N*sizeof(BigInt))
     BigInt *bufBigInt = alloc.newArray<BigInt>(N);
-    // Buffer: that's large enough to store every tmp BigTorus variable (3*N*sizeof(BigTorus))
-    BigTorus *bufBigTorus = alloc.newArray<BigTorus>(3 * N, zparams, &alloc);
+    // Buffer: that's large enough to store every tmp TORUS variable (3*N*sizeof(TORUS))
+    TORUS *bufTORUS = alloc.newArray<TORUS>(3 * N, zparams, &alloc);
     // Result in Karatsuba_aux
-    BigTorus *R = alloc.newArray<BigTorus>(2 * N - 1, zparams, &alloc);
+    TORUS *R = alloc.newArray<TORUS>(2 * N - 1, zparams, &alloc);
     // Temp value
-    BigTorus *temp = alloc.newObject<BigTorus>(zparams, &alloc);
+    TORUS *temp = alloc.newObject<TORUS>(zparams, &alloc);
 
 
     // Karatsuba
-    Karatsuba_aux(R, bufBigInt, bufBigTorus, temp, poly1->coefs, poly2->coefs, N, zparams);
+    Karatsuba_aux(R, bufBigInt, bufTORUS, temp, poly1->coefs, poly2->coefs, N, zparams);
 
     // Reduction mod X^N+1
     for (int32_t i = 0; i < N - 1; ++i) {
@@ -586,8 +586,8 @@ void TorusPolynomial<BigTorus>::SubMulRKaratsuba(TorusPolynomial<BigTorus> *resu
 
 
     // delete
-    alloc.deleteObject<BigTorus>(temp, zparams, &alloc);
-    alloc.deleteArray<BigTorus>(2 * N - 1, R, zparams, &alloc);
-    alloc.deleteArray<BigTorus>(3 * N, bufBigTorus, zparams, &alloc);
+    alloc.deleteObject<TORUS>(temp, zparams, &alloc);
+    alloc.deleteArray<TORUS>(2 * N - 1, R, zparams, &alloc);
+    alloc.deleteArray<TORUS>(3 * N, bufTORUS, zparams, &alloc);
     alloc.deleteArray<BigInt>(N, bufBigInt);
 }
