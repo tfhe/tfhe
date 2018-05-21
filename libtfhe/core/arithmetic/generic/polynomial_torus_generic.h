@@ -1,15 +1,24 @@
+#ifndef TFHE_POLYNOMIAL_TORUS_GENERIC_H
+#define TFHE_POLYNOMIAL_TORUS_GENERIC_H
+
 #include "polynomial_torus.h"
 #include "core/arithmetic/random_gen.h"
 
 #include <cassert>
 
+template<typename TORUS, AsmTypeEnum AsmType>
+TorusPolynomial<TORUS, AsmType>::TorusPolynomial(const PolynomialParams<TORUS, AsmType> *params,
+                                                 TfheThreadContext *context, Allocator *alloc) :
+        Polynomial<TORUS, CoefTypeEnum::Torus, AsmType>(params, context, alloc) {}
 
-/**
- * Instantiate TorusPolynomial class for all torus types
- */
-EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(TorusPolynomial, AsmTypeEnum::PORTABLE);
-template
-class TorusPolynomial<BigTorus, AsmTypeEnum::PORTABLE>;
+
+template<typename TORUS, AsmTypeEnum AsmType>
+void
+TorusPolynomial<TORUS, AsmType>::destroy(const PolynomialParams<TORUS, AsmType> *params, TfheThreadContext *context,
+                                         Allocator *alloc) {
+    Polynomial<TORUS, CoefTypeEnum::Torus, AsmType>::destroy(params, context, alloc);
+}
+
 
 template<typename TORUS, AsmTypeEnum AsmType>
 void TorusPolynomial<TORUS, AsmType>::Uniform(
@@ -23,9 +32,8 @@ void TorusPolynomial<TORUS, AsmType>::Uniform(
             params->zmodule_params;
 
     for (int32_t i = 0; i < N; ++i)
-        RandomGenTorus<TORUS>::uniform(x+i, zparams);
+        RandomGenTorus<TORUS>::uniform(x + i, zparams);
 }
-
 
 
 // Infinity norm of the distance between two TorusPolynomial
@@ -48,3 +56,5 @@ double TorusPolynomial<TORUS, AsmType>::NormInftyDist(
     }
     return norm;
 }
+
+#endif// TFHE_POLYNOMIAL_TORUS_GENERIC_H

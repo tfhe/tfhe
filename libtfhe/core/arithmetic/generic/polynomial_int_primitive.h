@@ -1,12 +1,13 @@
+#ifndef TFHE_POLYNOMIAL_INT_PRIMITIVE_H
+#define TFHE_POLYNOMIAL_INT_PRIMITIVE_H
+
 #include "polynomial_int.h"
 
+#ifdef TFHE_POLYNOMIAL_INT_BIG_H
+#error "polynomial_int_primitive.h and polynomial_int_big.h are incompatible"
+#endif
+
 #include <cassert>
-
-/**
- * Instantiate IntPolynomial class for available torus types
- */
-EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(IntPolynomial, AsmTypeEnum::PORTABLE);
-
 
 template<typename TORUS, AsmTypeEnum AsmType>
 IntPolynomial<TORUS, AsmType>::IntPolynomial(const PolynomialParams<TORUS, AsmType> *params, TfheThreadContext *context,
@@ -58,3 +59,5 @@ double IntPolynomial<TORUS, AsmType>::NormInftyDist(
     }
     return norm;
 }
+
+#endif //TFHE_POLYNOMIAL_INT_PRIMITIVE_H

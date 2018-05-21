@@ -1,13 +1,12 @@
+#ifndef TFHE_POLYNOMIAL_TORUS_PRIMITIVE_H
+#define TFHE_POLYNOMIAL_TORUS_PRIMITIVE_H
+
 #include "polynomial_torus.h"
+#include "polynomial_torus_generic.h"
 
 #include <cassert>
 
-using namespace std;
-
-/**
- * Instantiate TorusPolynomial class for available torus types
- */
-EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(TorusPolynomial, AsmTypeEnum::PORTABLE);
+//using namespace std;
 
 // TorusPolynomial + p*TorusPolynomial
 template<typename TORUS, AsmTypeEnum AsmType>
@@ -228,7 +227,7 @@ void TorusPolynomial<TORUS, AsmType>::MultKaratsuba_old(
     const int32_t N = params->N;
     TORUS *R = new TORUS[2 * N - 1];
     char *buf = new char[4 * N *
-                         sizeof(TORUS)]; //that's large enough to store every tmp variables (2*2*N*4) TODO: see if there is unused memory (before generic torus byte cnt was 16*N)
+            sizeof(TORUS)]; //that's large enough to store every tmp variables (2*2*N*4) TODO: see if there is unused memory (before generic torus byte cnt was 16*N)
     const ZModuleParams<TORUS> *const zparams =
             params->zmodule_params;
 
@@ -433,8 +432,8 @@ void TorusPolynomial<TORUS, AsmType>::MultKaratsuba(TorusPolynomial<TORUS, AsmTy
                                                     const IntPolynomial<TORUS, AsmType> *poly1,
                                                     const TorusPolynomial<TORUS, AsmType> *poly2,
                                                     const PolynomialParams<TORUS, AsmType> *params,
-                                           TfheThreadContext *context,
-                                           Allocator alloc) {
+                                                    TfheThreadContext *context,
+                                                    Allocator alloc) {
     const int32_t N = params->N;
     // zmodule_params
     const ZModuleParams<TORUS> *const zparams = params->zmodule_params;
@@ -472,8 +471,8 @@ void TorusPolynomial<TORUS, AsmType>::AddMulRKaratsuba(TorusPolynomial<TORUS, As
                                                        const IntPolynomial<TORUS, AsmType> *poly1,
                                                        const TorusPolynomial<TORUS, AsmType> *poly2,
                                                        const PolynomialParams<TORUS, AsmType> *params,
-                                              TfheThreadContext *context,
-                                              Allocator alloc) {
+                                                       TfheThreadContext *context,
+                                                       Allocator alloc) {
     const int32_t N = params->N;
     // zmodule_params
     const ZModuleParams<TORUS> *const zparams = params->zmodule_params;
@@ -511,8 +510,8 @@ void TorusPolynomial<TORUS, AsmType>::SubMulRKaratsuba(TorusPolynomial<TORUS, As
                                                        const IntPolynomial<TORUS, AsmType> *poly1,
                                                        const TorusPolynomial<TORUS, AsmType> *poly2,
                                                        const PolynomialParams<TORUS, AsmType> *params,
-                                              TfheThreadContext *context,
-                                              Allocator alloc) {
+                                                       TfheThreadContext *context,
+                                                       Allocator alloc) {
     const int32_t N = params->N;
     // zmodule_params
     const ZModuleParams<TORUS> *const zparams = params->zmodule_params;
@@ -543,4 +542,4 @@ void TorusPolynomial<TORUS, AsmType>::SubMulRKaratsuba(TorusPolynomial<TORUS, As
 }
 
 
-
+#endif //TFHE_POLYNOMIAL_TORUS_PRIMITIVE_H

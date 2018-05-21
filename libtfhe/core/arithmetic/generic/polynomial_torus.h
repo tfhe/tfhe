@@ -22,8 +22,7 @@ public:
      */
     TorusPolynomial(const PolynomialParams<TORUS, AsmType> *params,
                     TfheThreadContext *context,
-                    Allocator *alloc) :
-            Polynomial<TORUS, CoefTypeEnum::Torus, AsmType>(params, context, alloc) {}
+                    Allocator *alloc);
 
     /**
      * @brief Destroys inner data of polynomial
@@ -34,9 +33,7 @@ public:
      */
     void destroy(const PolynomialParams<TORUS, AsmType> *params,
                  TfheThreadContext *context,
-                 Allocator *alloc) {
-        Polynomial<TORUS, CoefTypeEnum::Torus, AsmType>::destroy(params, context, alloc);
-    }
+                 Allocator *alloc);
 
     PREVENT_STACK_COPY(TorusPolynomial);
 

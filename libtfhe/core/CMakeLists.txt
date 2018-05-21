@@ -9,12 +9,12 @@ set(CORE_SRCS
         arithmetic/generic/polynomial_primitive.h
         arithmetic/generic/polynomial_big.h
         arithmetic/generic/polynomial_int.h
-        arithmetic/generic/polynomial_int.cpp
-        arithmetic/generic/polynomial_int_big.cpp
+        arithmetic/generic/polynomial_int_primitive.h
+        arithmetic/generic/polynomial_int_big.h
         arithmetic/generic/polynomial_torus.h
-        arithmetic/generic/polynomial_torus.cpp
-        arithmetic/generic/polynomial_torus_sml.cpp
-        arithmetic/generic/polynomial_torus_big.cpp
+        arithmetic/generic/polynomial_torus_generic.h
+        arithmetic/generic/polynomial_torus_primitive.h
+        arithmetic/generic/polynomial_torus_big.h
         arithmetic/generic/zmodule_vector.h
         arithmetic/generic/zmodule_vector_params.h
         arithmetic/generic/zmodule_vector_big.h
@@ -50,7 +50,23 @@ set(CORE_SRCS
         arithmetic/big_real.h
         arithmetic/real_param.h
         arithmetic/real_param.cpp
-        arithmetic/torus_utils_primitive.h arithmetic/torus_utils_primitive.cpp arithmetic/torus_utils_big.cpp arithmetic/generic/zmodule_vector_big.h arithmetic/generic/zmodule_vector.h arithmetic/generic/asm_mode.h arithmetic/generic/coeff_type.h arithmetic/generic/zmodule_vector_params.h arithmetic/generic/zmodule_vector_primitive.h arithmetic/portable/zmodule_vector_primitive.cpp arithmetic/portable/zmodule_vector_big.cpp arithmetic/portable/polynomial_primitive.cpp arithmetic/portable/polynomial_big.cpp)
+        arithmetic/torus_utils_primitive.h
+        arithmetic/torus_utils_primitive.cpp
+        arithmetic/torus_utils_big.cpp
+        arithmetic/generic/zmodule_vector_big.h
+        arithmetic/generic/zmodule_vector.h
+        arithmetic/generic/asm_mode.h
+        arithmetic/generic/coeff_type.h
+        arithmetic/generic/zmodule_vector_params.h
+        arithmetic/generic/zmodule_vector_primitive.h
+        arithmetic/portable/zmodule_vector_primitive.cpp
+        arithmetic/portable/zmodule_vector_big.cpp
+        arithmetic/portable/polynomial_primitive.cpp
+        arithmetic/portable/polynomial_big.cpp
+        arithmetic/portable/polynomial_int_primitive.cpp
+        arithmetic/portable/polynomial_int_big.cpp
+        arithmetic/portable/polynomial_torus_primitive.cpp
+        arithmetic/portable/polynomial_torus_big.cpp)
 
 add_library(tfhe-core OBJECT ${CORE_SRCS})
 set_property(TARGET tfhe-core PROPERTY POSITION_INDEPENDENT_CODE ON)
