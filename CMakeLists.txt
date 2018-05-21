@@ -30,11 +30,11 @@ set(CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -std=c99")
 set(CMAKE_CXX_FLAGS_DEBUG "${CLANG_FLAGS} -g3 -O0 -Wall -Werror")
 set(CMAKE_C_FLAGS_DEBUG "-g3 -O0 -Wall -Werror")
 
-set(CMAKE_CXX_FLAGS_OPTIM "${CLANG_FLAGS} -g3 -march=native -O9 -DNDEBUG -funroll-loops -Wall -Werror")
-set(CMAKE_C_FLAGS_OPTIM "-g3 -march=native -O9 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_CXX_FLAGS_OPTIM "${CLANG_FLAGS} -g3 -march=native -O9 -DNDEBUG -funroll-loops -Wall ")
+set(CMAKE_C_FLAGS_OPTIM "-g3 -march=native -O9 -DNDEBUG -funroll-loops -Wall ")
 
-set(CMAKE_CXX_FLAGS_RELEASE "${CLANG_FLAGS} -g0 -march=native -O9 -DNDEBUG -funroll-loops -Wall -Werror")
-set(CMAKE_C_FLAGS_RELEASE "-g0 -march=native -O9 -DNDEBUG -funroll-loops -Wall -Werror")
+set(CMAKE_CXX_FLAGS_RELEASE "${CLANG_FLAGS} -g0 -march=native -O9 -DNDEBUG -funroll-loops -Wall ")
+set(CMAKE_C_FLAGS_RELEASE "-g0 -march=native -O9 -DNDEBUG -funroll-loops -Wall ")
 
 if (USE_VALGRIND_ALLOCATOR)
   add_definitions(-DUSE_VALGRIND_ALLOCATOR)

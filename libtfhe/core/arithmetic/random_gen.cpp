@@ -11,11 +11,6 @@ uniform_int_distribution<uint64_t> RandomGen::uniform_uint64_distrib(std::numeri
                                                                      std::numeric_limits<uint64_t>::max());
 
 /**
- * Instantiate RandomGenTorus class for available torus types
- */
-EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(RandomGenTorus);
-
-/**
  * Static functions for native torus types
  */
 template<typename TORUS>
@@ -59,3 +54,9 @@ void RandomGenTorus<BigTorus>::gaussian(
     TorusUtils<BigTorus>::from_double(dst, RandomGen::gaussian(sigma), params);
     tfhe_backend::add(dst, mean, dst, params);
 }
+
+/**
+ * Instantiate RandomGenTorus class for available torus types
+ */
+EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(RandomGenTorus);
+

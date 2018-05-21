@@ -53,7 +53,7 @@ double IntPolynomial<TORUS, AsmType>::NormInftyDist(const IntPolynomial<TORUS, A
 
     // Max between the coefficients of abs(poly1-poly2)
     for (int32_t i = 0; i < N; ++i) {
-        r = abs(mpz_get_d(poly1->coefs[i].data) - mpz_get_d(poly2->coefs[i].data));
+        r = std::abs(mpz_get_d(poly1->coefs[i].data) - mpz_get_d(poly2->coefs[i].data));
         if (r > norm) { norm = r; }
     }
 
