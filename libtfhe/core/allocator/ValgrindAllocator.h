@@ -7,7 +7,7 @@
 
 /**
  * this class will in fact allocate everything with malloc and deallocate everything with free.
- * Il will also check that everything that has been allocated is freed according to the allocator policy.
+ * It will also check that everything that has been allocated is freed according to the allocator policy.
  */
 template<>
 class AllocatorImpl<VALGRIND_ALLOCATOR> {
