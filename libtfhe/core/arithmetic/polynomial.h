@@ -145,7 +145,7 @@ public:
 
     /**
      * @brief Multiply polynomial by X^{a}
-     *      i.e. result = (X^{a}-1) * source
+     *      i.e. result = X^{a} * source
      */
     static void MulByXai(
             Polynomial<TORUS, CoefType> *result,
