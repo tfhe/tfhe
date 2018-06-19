@@ -1,5 +1,5 @@
 #include "random_gen.h"
-#include "torus_utils.h"
+#include "core/arithmetic/torus_utils.h"
 
 using namespace std;
 
@@ -9,11 +9,6 @@ uniform_int_distribution<int32_t> RandomGen::uniform_bool_distrib(0, 1);
 normal_distribution<double> RandomGen::std_normal_distrib;
 uniform_int_distribution<uint64_t> RandomGen::uniform_uint64_distrib(std::numeric_limits<uint64_t>::min(),
                                                                      std::numeric_limits<uint64_t>::max());
-
-/**
- * Instantiate RandomGenTorus class for available torus types
- */
-EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(RandomGenTorus);
 
 /**
  * Static functions for native torus types
@@ -59,3 +54,9 @@ void RandomGenTorus<BigTorus>::gaussian(
     TorusUtils<BigTorus>::from_double(dst, RandomGen::gaussian(sigma), params);
     tfhe_backend::add(dst, mean, dst, params);
 }
+
+/**
+ * Instantiate RandomGenTorus class for available torus types
+ */
+EXPLICIT_INSTANTIATE_ALL_PRIMITIVE_TORUS(RandomGenTorus);
+

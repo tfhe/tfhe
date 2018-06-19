@@ -1,13 +1,15 @@
 #ifndef ZMODULE_PARAM_H
 #define ZMODULE_PARAM_H
 
-#include "tfhe_core.h"
+#include "core/arithmetic/tfhe_core.h"
 
 /**
  * @brief params of the Z-module
  */
 template<typename TORUS>
 class ZModuleParams { };
+
+class BigTorus;
 
 /**
  * @brief specialization for "big" number classes

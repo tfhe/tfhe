@@ -1,8 +1,8 @@
 #ifndef FIXED_POINT_PARAM_H
 #define FIXED_POINT_PARAM_H
 
-#include "tfhe_core.h"
-#include "zmodule_param.h"
+#include "core/arithmetic/tfhe_core.h"
+#include "core/arithmetic/zmodule_param.h"
 
 /**
  * @brief params of fixed point real numbers
