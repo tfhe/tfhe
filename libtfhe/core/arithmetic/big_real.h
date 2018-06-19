@@ -34,7 +34,7 @@ namespace tfhe_backend {
 
     /**
      * @brief Transform a real to a double precision floating point
-     * @details Obtained result is an low-resolution approximation of input real.
+     * @details Obtained result is a low-resolution approximation of input real.
      *      Result is centered, i.e. belong to -2^(nbLimbsInt-1)..2^(nbLimbsInt-1)-1
      *
      * @param src source real
