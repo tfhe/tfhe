@@ -15,11 +15,8 @@ EXPORT void die_dramatically(const char *message) {
 }
 
 /** 
- * multiplies by sqrt(2/pi)  to convert a "litterature" gaussian
- * parameter into a standard deviation
- * TODO: get rid of this function and express everything as a function of the standard deviation
+ * Everything is expressed as a function of the standard deviation
  */
-// const inline double mulBySqrtTwoOverPi(double x) { return x * sqrt(2. / M_PI); }
 
 /** generate default gate bootstrapping parameters */
 EXPORT TFheGateBootstrappingParameterSet *new_default_gate_bootstrapping_parameters(int32_t minimum_lambda) {
@@ -33,9 +30,9 @@ EXPORT TFheGateBootstrappingParameterSet *new_default_gate_bootstrapping_paramet
     static const int32_t bk_Bgbit = 10;
     static const int32_t ks_basebit = 2;
     static const int32_t ks_length = 8;
-    static const double ks_stdev = 2.44e-5; //mulBySqrtTwoOverPi(pow(2., -15));   //standard deviation
-    static const double bk_stdev = 7.18e-9; //mulBySqrtTwoOverPi(9.e-9);          //standard deviation
-    static const double max_stdev = 0.012467; //mulBySqrtTwoOverPi(pow(2., -4) / 4.); //max standard deviation for a 1/4 msg space
+    static const double ks_stdev = 2.44e-5; //standard deviation
+    static const double bk_stdev = 7.18e-9; //standard deviation
+    static const double max_stdev = 0.012467; //max standard deviation for a 1/4 msg space
 
     LweParams *params_in = new_LweParams(n, ks_stdev, max_stdev);
     TLweParams *params_accum = new_TLweParams(N, k, bk_stdev, max_stdev);
