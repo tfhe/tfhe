@@ -27,23 +27,23 @@ struct TFheLutBootstrappingParameterSet: public TFheGateBootstrappingParameterSe
   const uint msg_space_size_2;
 
   TFheLutBootstrappingParameterSet(
-    const uint nb_inps, 
-    const int ks_t, 
-    const int ks_basebit, 
+    const uint nb_inps,
+    const int ks_t,
+    const int ks_basebit,
     const LweParams<Torus>* const params_in_out,
     const TGswParams<Torus>* const params_bk)
-    : 
-      TFheGateBootstrappingParameterSet<Torus>::TFheGateBootstrappingParameterSet(ks_t, ks_basebit, params_in_out, params_bk), 
+    :
+      TFheGateBootstrappingParameterSet<Torus>::TFheGateBootstrappingParameterSet(ks_t, ks_basebit, params_in_out, params_bk),
       nb_inps(nb_inps),
       msg_space_size(1<<nb_inps),
-      msg_space_size_2(msg_space_size<<1) 
+      msg_space_size_2(msg_space_size<<1)
     { }
 };
 
 struct TFheLutBootstrappingCloudKeySet: public TFheGateBootstrappingCloudKeySet<Torus> {
   const TFheLutBootstrappingParameterSet* const params;
   TFheLutBootstrappingCloudKeySet(
-    const TFheLutBootstrappingParameterSet* const params, 
+    const TFheLutBootstrappingParameterSet* const params,
     const LweBootstrappingKey<Torus>* const bk,
     const LweBootstrappingKeyFFT<Torus>* const bkFFT):
   TFheGateBootstrappingCloudKeySet(params, bk, bkFFT), params(params) {}
@@ -52,7 +52,7 @@ struct TFheLutBootstrappingCloudKeySet: public TFheGateBootstrappingCloudKeySet<
 struct TFheLutBootstrappingSecretKeySet: public TFheGateBootstrappingSecretKeySet<Torus> {
   const TFheLutBootstrappingParameterSet* params;
   TFheLutBootstrappingSecretKeySet(
-    const TFheLutBootstrappingParameterSet* const params, 
+    const TFheLutBootstrappingParameterSet* const params,
     const LweBootstrappingKey<Torus>* const bk,
     const LweBootstrappingKeyFFT<Torus>* const bkFFT,
     const LweKey<Torus>* lwe_key,
@@ -71,22 +71,22 @@ TFheLutBootstrappingParameterSet* new_default_lut_bootstrapping_parameters(uint 
     // const int N = 1024;
     const int N = 1024*16;
     const int k = 1;
-    const int n = 512+64*0;
-    
+    const int n = 803;
+
     const int bk_l = 8;
     const int bk_Bgbit = 6;
 
-    const int ks_t = 24;
-    const int ks_basebit = 1;
+    const int ks_t = 4;
+    const int ks_basebit = 4;
 
-    const double ks_stdev = pow(2.,-33);   //standard deviation
+    const double ks_stdev = pow(2.,-20);   //standard deviation
     const double bk_stdev = pow(2.,-50);          //standard deviation
-    const double max_stdev = mulBySqrtTwoOverPi(pow(2.,-8)/4.); 
+    const double max_stdev = mulBySqrtTwoOverPi(pow(2.,-8)/4.);
 
     // const int nb_divs = (1<<(nb_inps+2));
     // const double ks_stdev = pow(2.,-nb_divs-200);   //standard deviation
     // const double bk_stdev = pow(2.,-500);          //standard deviation
-    // const double max_stdev = mulBySqrtTwoOverPi(pow(2.,-8)/4.); 
+    // const double max_stdev = mulBySqrtTwoOverPi(pow(2.,-8)/4.);
 
     LweParams<Torus>* params_in_out = new_obj<LweParams<Torus>>(n, ks_stdev, max_stdev);
     TLweParams<Torus>* params_accum = new_obj<TLweParams<Torus>>(N, k, bk_stdev, max_stdev);
@@ -119,10 +119,10 @@ void delete_lut_bootstrapping_secret_keyset(TFheLutBootstrappingSecretKeySet* ke
     TGswKey<Torus>* tgsw_key = (TGswKey<Torus>*) keyset->tgsw_key;
     LweBootstrappingKey<Torus>* bk = (LweBootstrappingKey<Torus>*) keyset->cloud.bk;
     LweBootstrappingKeyFFT<Torus>* bkFFT = (LweBootstrappingKeyFFT<Torus>*) keyset->cloud.bkFFT;
-    if (bkFFT) del_obj(bkFFT);    
-    if (bk) del_obj(bk);    
+    if (bkFFT) del_obj(bkFFT);
+    if (bk) del_obj(bk);
     del_obj(tgsw_key);
-    del_obj(lwe_key); 
+    del_obj(lwe_key);
     delete keyset;
 }
 
@@ -204,7 +204,7 @@ void tfhe_blindrotate_lut_FFT(
   printf("\nbarb=%d bara[0]=%d\n", barb, bara[0]);
   printf("sum(bara*sk)-barb=%d phase=%ld barphase=%d error=%d\n", sum, phase, phase_bar, sum - phase_bar);
   // printf("barphase=%ld barphase<<53=%ld\n", phase_bar, phase_bar<<53);
-#endif 
+#endif
 
   // the initial testvec = [mu,mu,mu,...,mu]
   TorusPolynomial<Torus>* testvect_init = new_obj<TorusPolynomial<Torus>>(N);
@@ -223,8 +223,8 @@ void tfhe_blindrotate_lut_FFT(
   delete[] bara;
 }
 
-void tfhe_bootstrap_lut_FFT_no_KS(LweSample<Torus>* outputs, 
-    const LweBootstrappingKeyFFT<Torus>* bk, 
+void tfhe_bootstrap_lut_FFT_no_KS(LweSample<Torus>* outputs,
+    const LweBootstrappingKeyFFT<Torus>* bk,
     const Torus mu,
     const LweSample<Torus>* input,
     const int nb_divisions,
@@ -253,14 +253,14 @@ void tfhe_bootstrap_lut_FFT_no_KS(LweSample<Torus>* outputs,
     bart[i] = TorusUtils<Torus>::modSwitchFromTorus(divisions[i], Nx2);
   }
 
-  LweSample<Torus>** acc_coefs = new LweSample<Torus>*[nb_divisions] {NULL}; 
+  LweSample<Torus>** acc_coefs = new LweSample<Torus>*[nb_divisions] {NULL};
 
   for (int idx_lut = 0; idx_lut < nb_luts; ++idx_lut) {
     int sum_gamma = 0;
     for (int i = 0; i < nb_divisions; ++i) sum_gamma += gammas[idx_lut][i];
 
     LweSample<Torus>* result = outputs+idx_lut;
-    lweNoiselessTrivial(result, mu * sum_gamma, extract_params);  
+    lweNoiselessTrivial(result, mu * sum_gamma, extract_params);
 
     for (int i = 0; i < nb_divisions; ++i) {
       if (gammas[idx_lut][i] == 0) continue;
@@ -300,7 +300,7 @@ void tfhe_bootstrap_lut_FFT_no_KS(LweSample<Torus>* outputs,
   }
 
   for (int i = 0; i < nb_divisions; ++i)
-    if (acc_coefs[i] != NULL) 
+    if (acc_coefs[i] != NULL)
       del_obj(acc_coefs[i]);
   delete[] acc_coefs;
   delete[] bart;
@@ -313,7 +313,7 @@ void test_enc_dec() {
 
   const TFheLutBootstrappingParameterSet* params = keyset->params;
   const LweParams<Torus>* in_out_params = params->in_out_params;
-  
+
   default_random_engine generator(42);
   uniform_int_distribution<int> distribution(0,params->msg_space_size-1);
   for (int i = 0; i < 10; ++i) {
@@ -355,7 +355,7 @@ void init_lut_boots(Torus& mu, Torus*& divisions, const uint msg_space_size) {
 
 void create_random_luts(int**& lut_vals, int**& gammas, const uint nb_luts, const uint msg_space, int seed=42) {
   default_random_engine generator(seed);
-  uniform_int_distribution<int> distribution(0,1);  
+  uniform_int_distribution<int> distribution(0,1);
 
   for (uint i = 0; i < nb_luts; ++i) {
     for (uint j = 0; j < msg_space; ++j)
@@ -423,12 +423,12 @@ void test_lut_boots(uint nb_luts) {
     // printf("msg %d: \n", msg_inp);
 #endif
 
-    tfhe_bootstrap_lut_FFT_no_KS(outputs, 
+    tfhe_bootstrap_lut_FFT_no_KS(outputs,
       keyset->cloud.bkFFT,
       mu/2,
       input,
       msg_space_size,
-      divisions,        
+      divisions,
       nb_luts,
       (const int**)gammas
       );
@@ -501,12 +501,12 @@ void test_lut_boots_performance_no_KS(uint nb_luts, uint iter_cnt) {
   auto start = chrono::system_clock::now();
   for (uint iter = 0; iter < iter_cnt; ++iter)
   {
-    tfhe_bootstrap_lut_FFT_no_KS(outputs, 
+    tfhe_bootstrap_lut_FFT_no_KS(outputs,
       keyset->cloud.bkFFT,
       mu/2,
       input,
       msg_space_size,
-      divisions,        
+      divisions,
       nb_luts,
       (const int**)gammas
       );
@@ -559,12 +559,12 @@ void test_lut_performance(uint nb_luts, uint iter_cnt) {
     }
     create_random_luts(lut_vals, gammas, nb_luts, msg_space_size, iter);
 
-    tfhe_bootstrap_lut_FFT_no_KS(outputs, 
+    tfhe_bootstrap_lut_FFT_no_KS(outputs,
       keyset->cloud.bkFFT,
       mu/2,
       input,
       msg_space_size,
-      divisions,        
+      divisions,
       nb_luts,
       (const int**)gammas
       );
