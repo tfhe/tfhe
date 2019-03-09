@@ -105,12 +105,14 @@ At least one FFT processor is needed to run the project:
 ### How to cite this library
 
 ```
+{% raw %}
 @misc{TFHE,
   Title   = {{TFHE}: Fast Fully Homomorphic Encryption Library},
   Author  = {Ilaria Chillotti and  Nicolas Gama and Mariya Georgieva and Malika Izabach{\`e}ne},
   Note    = {https://tfhe.github.io/tfhe/},
   Year    = {August 2016}
 }
+{% endraw %}
 ```
 
 

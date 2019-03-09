@@ -1,6 +1,6 @@
 ---
 layout: default
-title: TFHE: current and future releases
+title: TFHE - current and future releases
 ---
 
 # Versions and features
