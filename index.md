@@ -100,6 +100,17 @@ At least one FFT processor is needed to run the project:
 * We plan to add other connectors in the future (for instance the Intel’s
   IPP Fourier Transform, which should be 1.5× faster than FFTW for 1D
   real data)
+  
+  
+### How to cite this library
+```
+@misc{TFHE,
+  Title   = {{TFHE}: Fast Fully Homomorphic Encryption Library},
+  Author  = {Ilaria Chillotti and  Nicolas Gama and Mariya Georgieva and Malika Izabach{\`e}ne},
+  Note    = {https://tfhe.github.io/tfhe/},
+  Year    = {August 2016}
+}
+```
 
 
 ### References
