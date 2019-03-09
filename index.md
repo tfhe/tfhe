@@ -115,7 +115,7 @@ At least one FFT processor is needed to run the project:
 
 ### Future releases based on
 
-`[CGGI17]`: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. Faster Packed Homomorphic Operations and Efficient Circuit Bootstrapping for TFHE. ASIACRYPT (1) 2017: 377-408. [<span>PDF</span>](https://eprint.iacr.org/2017/430.pdf){:target="_blank"} [<span>Slides</span>](){:target="_blank"} 
+`[CGGI17]`: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. Faster Packed Homomorphic Operations and Efficient Circuit Bootstrapping for TFHE. ASIACRYPT (1) 2017: 377-408. [<span>PDF</span>](https://eprint.iacr.org/2017/430.pdf){:target="_blank"} [<span>Slides</span>](https://tfhe.github.io/tfhe/assets/pres/pdf/pres-asiacrypt2017.pdf){:target="_blank"} 
 
 `[CGGI18]`: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. TFHE: Fast Fully Homomorphic Encryption over the Torus. IACR Cryptology ePrint Archive 2018: 421 (2018) (Invited JoC). [<span>PDF</span>](https://eprint.iacr.org/2018/421.pdf){:target="_blank"}
 
