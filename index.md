@@ -104,15 +104,46 @@ At least one FFT processor is needed to run the project:
 
 ### References
 
-[[CGGI17]](https://eprint.iacr.org/2017/430){:target="_blank"}: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. *Improving TFHE: faster packed homomorphic operations and efficient circuit bootstrapping*. Asiacrypt 2017. Cryptology ePrint Archive, report 2017/430.
+[CGGI16]: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. Faster fully homomorphic encryption: Bootstrapping in less than 0.1 seconds. In Asiacrypt 2016 (Best Paper), pages 3-33.  [<span>PDF</span>](https://eprint.iacr.org/2016/870.pdf){:target="_blank"} [<span>Slides</span>](){:target="_blank"}
 
-[[CGGI16]](https://eprint.iacr.org/2016/870){:target="_blank"}: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. *Faster fully homomorphic encryption: Bootstrapping in less than 0.1 seconds*. Asiacrypt 2016. Cryptology ePrint Archive, report 2016/870.
+[DM15]:   L. Ducas and D. Micciancio.  FHEW: Bootstrapping homomorphic encryption in less than a second.  In Eurocrypt 2015, pages 617-640. [<span>PDF</span>](https://eprint.iacr.org/2014/816.pdf){:target="_blank"}
 
-[[DM15]](https://eprint.iacr.org/2014/816){:target="_blank"}: L. Ducas and D. Micciancio.  *FHEW: Bootstrapping homomorphic
-encryption in less than a second*.  In Eurocrypt 2015, pages 617-640.
+[GSW13]:  C. Gentry, A. Sahai, and B. Waters. Homomorphic encryption from learning with errors:  Conceptually-simpler,  asymptotically-faster,  attribute-based. In Crypto 2013, pages 75-92. [<span>PDF</span>](https://eprint.iacr.org/2013/340.pdf){:target="_blank"}
 
-[[GSW13]](https://eprint.iacr.org/2013/340){:target="_blank"}:  C. Gentry, A. Sahai, and B. Waters. *Homomorphic encryption from
-learning with errors:  Conceptually-simpler,  asymptotically-faster,
-attribute-based.* In Crypto 2013, pages 75-92
+
+### Future releases based on
+
+[CGGI17]: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. Faster Packed Homomorphic Operations and Efficient Circuit Bootstrapping for TFHE. ASIACRYPT (1) 2017: 377-408. [<span>PDF</span>](https://eprint.iacr.org/2017/430.pdf){:target="_blank"} [<span>Slides</span>](){:target="_blank"} 
+
+[CGGI18]: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. TFHE: Fast Fully Homomorphic Encryption over the Torus. IACR Cryptology ePrint Archive 2018: 421 (2018) (Invited JoC). [<span>PDF</span>](https://eprint.iacr.org/2018/421.pdf){:target="_blank"} [<span>Slides</span>](){:target="_blank"} 
+
+[BGG18]: C. Boura, N. Gama, M. Georgieva: Chimera: a unified framework for B/FV, TFHE and HEAAN fully homomorphic encryption and predictions for deep learning. IACR Cryptology ePrint Archive 2018: 758 (2018). [<span>PDF</span>](https://eprint.iacr.org/2018/758.pdf){:target="_blank"}
+[<span>Slides</span>](){:target="_blank"} 
+
+[CIM19]: S. Carpov, M. Izabachène, V. Mollimard: New Techniques for Multi-value Input Homomorphic Evaluation and Applications. CT-RSA 2019: 106-126. [<span>PDF</span>](https://eprint.iacr.org/2018/622.pdf){:target="_blank"} 
+
+
+### Applications and open source projects based on TFHE: 
+
+[CGGT-P19]:	S. Carpov, N. Gama, M. Georgieva, J.R. Troncoso-Pastoriza: Privacy-preserving semi-parallel logistic regression training with Fully Homomorphic Encryption.(among the winners Idash 2018)  IACR Cryptology ePrint Archive 2019: 101 (2019) [<span>PDF</span>](https://eprint.iacr.org/2019/101.pdf){:target="_blank"} [<span>Slides</span>](){:target="_blank"} 
+
+[CCS19]: H. Chen, I. Chillotti, Y. Song: Multi-Key Homomophic Encryption from TFHE. IACR Cryptology ePrint Archive 2019: 116 (2019). [<span>PDF</span>](https://eprint.iacr.org/2019/116.pdf){:target="_blank"}
+
+[BMMP18]: F. Bourse, M. Minelli, M. Minihold, P. Paillier: Fast Homomorphic Evaluation of Deep Discretized Neural Networks. 
+CRYPTO (3) 2018: 483-512. [<span>PDF</span>](https://eprint.iacr.org/2017/1114.pdf){:target="_blank"}
+
+[CGGI16]: I. Chillotti, N. Gama, M. Georgieva, M. Izabachène: A Homomorphic LWE Based E-voting Scheme. PQCrypto 2016: 245-265. [<span>PDF</span>](https://ilachill.github.io/papers/CGGI16a-An_homomorphic_LWE_based_E-voting_Scheme.pdf){:target="_blank"} 
+[<span>Slides</span>](https://pqcrypto2016.jp/data/Chillotti-Gama_Georgieva_Izabachene-An_Homomorphic_LWE-based_E-voting_Scheme-less-pauses.pdf
+){:target="_blank"} 
+
+[cuFHE]: CUDA-accelerated Fully Homomorphic Encryption Library: [<span>PDF</span>](https://github.com/vernamlab/cuFHE){:target="_blank"}
+
+_(Please contact us to add your work based on TFHE)_
+
+
+### Use of TFHE in the industry: 
+* Inpher
+* CryptoExperts
+* NuCipher
 
 
