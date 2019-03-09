@@ -118,7 +118,7 @@ At least one FFT processor is needed to run the project:
 `[CGGI18]`: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. TFHE: Fast Fully Homomorphic Encryption over the Torus. IACR Cryptology ePrint Archive 2018: 421 (2018) (Invited JoC). [<span>PDF</span>](https://eprint.iacr.org/2018/421.pdf){:target="_blank"} [<span>Slides</span>](){:target="_blank"} 
 
 `[BGG18]`: C. Boura, N. Gama, M. Georgieva: Chimera: a unified framework for B/FV, TFHE and HEAAN fully homomorphic encryption and predictions for deep learning. IACR Cryptology ePrint Archive 2018: 758 (2018). [<span>PDF</span>](https://eprint.iacr.org/2018/758.pdf){:target="_blank"}
-[<span>Slides</span>](){:target="_blank"} 
+[<span>Slides</span>](https://tfhe.github.io/tfhe/assets/pres/pdf/pres-chimera.pdf){:target="_blank"} 
 
 `[CIM19]`: S. Carpov, M. Izabachène, V. Mollimard: New Techniques for Multi-value Input Homomorphic Evaluation and Applications. CT-RSA 2019: 106-126. [<span>PDF</span>](https://eprint.iacr.org/2018/622.pdf){:target="_blank"} 
 
