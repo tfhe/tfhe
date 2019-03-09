@@ -104,9 +104,9 @@ At least one FFT processor is needed to run the project:
 
 ### References
 
-`[CGGI16]`: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. Faster fully homomorphic encryption: Bootstrapping in less than 0.1 seconds. In Asiacrypt 2016 (Best Paper), pages 3-33.  [<span>PDF</span>](https://eprint.iacr.org/2016/870.pdf){:target="_blank"} [<span>Slides</span>](){:target="_blank"}
+`[CGGI16]`: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. Faster fully homomorphic encryption: Bootstrapping in less than 0.1 seconds. In Asiacrypt 2016 (Best Paper), pages 3-33.  [<span>PDF</span>](https://eprint.iacr.org/2016/870.pdf){:target="_blank"} [<span>Slides</span>](http://lab.algonics.net/slides_ac16/index-asiacrypt.html){:target="_blank"}
 
-`[CCS18]`: N.Gama. TFHE tutoreal presentation at CCS 2018. [<span>Slides</span>](http://lab.algonics.net/slides/index-ccs.html#/){:target="_blank"}
+`[CCS18]`: N.Gama. TFHE tutorial presentation at CCS 2018. [<span>Slides</span>](http://lab.algonics.net/slides/index-ccs.html#/){:target="_blank"}
 
 `[DM15]`:   L. Ducas and D. Micciancio.  FHEW: Bootstrapping homomorphic encryption in less than a second.  In Eurocrypt 2015, pages 617-640. [<span>PDF</span>](https://eprint.iacr.org/2014/816.pdf){:target="_blank"}
 
@@ -117,7 +117,7 @@ At least one FFT processor is needed to run the project:
 
 `[CGGI17]`: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. Faster Packed Homomorphic Operations and Efficient Circuit Bootstrapping for TFHE. ASIACRYPT (1) 2017: 377-408. [<span>PDF</span>](https://eprint.iacr.org/2017/430.pdf){:target="_blank"} [<span>Slides</span>](){:target="_blank"} 
 
-`[CGGI18]`: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. TFHE: Fast Fully Homomorphic Encryption over the Torus. IACR Cryptology ePrint Archive 2018: 421 (2018) (Invited JoC). [<span>PDF</span>](https://eprint.iacr.org/2018/421.pdf){:target="_blank"} [<span>Slides</span>](){:target="_blank"} 
+`[CGGI18]`: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. TFHE: Fast Fully Homomorphic Encryption over the Torus. IACR Cryptology ePrint Archive 2018: 421 (2018) (Invited JoC). [<span>PDF</span>](https://eprint.iacr.org/2018/421.pdf){:target="_blank"}
 
 `[BGG18]`: C. Boura, N. Gama, M. Georgieva: Chimera: a unified framework for B/FV, TFHE and HEAAN fully homomorphic encryption and predictions for deep learning. IACR Cryptology ePrint Archive 2018: 758 (2018). [<span>PDF</span>](https://eprint.iacr.org/2018/758.pdf){:target="_blank"}
 [<span>Slides</span>](https://tfhe.github.io/tfhe/assets/pres/pdf/pres-chimera.pdf){:target="_blank"} 
@@ -138,7 +138,7 @@ CRYPTO (3) 2018: 483-512. [<span>PDF</span>](https://eprint.iacr.org/2017/1114.p
 [<span>Slides</span>](https://pqcrypto2016.jp/data/Chillotti-Gama_Georgieva_Izabachene-An_Homomorphic_LWE-based_E-voting_Scheme-less-pauses.pdf
 ){:target="_blank"} 
 
-`[cuFHE]`: CUDA-accelerated Fully Homomorphic Encryption Library: [<span>PDF</span>](https://github.com/vernamlab/cuFHE){:target="_blank"}
+`[cuFHE]`: CUDA-accelerated Fully Homomorphic Encryption Library: [<span>GitHub</span>](https://github.com/vernamlab/cuFHE){:target="_blank"}
 
 _(Please contact us to add your work based on TFHE)_
 
