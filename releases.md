@@ -46,6 +46,6 @@ It should also support public key encryption and implement the bridges Chimera d
 [[CGGI17]](https://eprint.iacr.org/2017/430){:target="_blank"}: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. *Improving TFHE: faster packed homomorphic
 operations and efficient circuit bootstrapping*. Cryptology ePrint Archive, report 2017/430.
 
-`[BGG18]`: C. Boura, N. Gama, M. Georgieva: Chimera: a unified framework for B/FV, TFHE and HEAAN fully homomorphic encryption and predictions for deep learning. IACR Cryptology ePrint Archive 2018: 758 (2018).
+[[BGG18]](https://eprint.iacr.org/2018/758){:target="_blank"}: C. Boura, N. Gama, M. Georgieva: Chimera: a unified framework for B/FV, TFHE and HEAAN fully homomorphic encryption and predictions for deep learning. IACR Cryptology ePrint Archive 2018: 758 (2018).
 
 
