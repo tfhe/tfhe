@@ -103,6 +103,7 @@ At least one FFT processor is needed to run the project:
   
   
 ### How to cite this library
+
 ```
 @misc{TFHE,
   Title   = {{TFHE}: Fast Fully Homomorphic Encryption Library},
