@@ -31,12 +31,12 @@ well as the Mux gate.
 The current throughput of the library is one binary gate every 13ms,
 independently of the nature of the gate.
 
-### Future version: 1.5 (expected: Oktober 2017)
+### Future version: 1.5
 
 Version 1.5 will support multithreaded execution (pthread, openMP).
 It should also support public key encryption
 
-### Future version 2.0 (expected: 2018)
+### Future version 2.0 
 
 Version 2.0 should support both bootstrapped (FHE) and leveled (LHE) execution, as
 well as ciphertext packing, and circuit bootstrapping.
