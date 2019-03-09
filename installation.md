@@ -33,7 +33,7 @@ Get the latest version of the library either from the archive download link abov
 
 ~~~sh
 #clone the tfhe repository
-git clone https://github.com/tfhe/tfhe.git
+git clone --recurse-submodules --branch=master https://github.com/tfhe/tfhe.git
 cd tfhe
 ~~~
 
