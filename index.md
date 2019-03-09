@@ -106,6 +106,8 @@ At least one FFT processor is needed to run the project:
 
 `[CGGI16]`: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. Faster fully homomorphic encryption: Bootstrapping in less than 0.1 seconds. In Asiacrypt 2016 (Best Paper), pages 3-33.  [<span>PDF</span>](https://eprint.iacr.org/2016/870.pdf){:target="_blank"} [<span>Slides</span>](){:target="_blank"}
 
+`[CCS18]`: N.Gama. TFHE tutoreal presentation at CCS 2018. [<span>Slides</span>](http://lab.algonics.net/slides/index-ccs.html#/){:target="_blank"}
+
 `[DM15]`:   L. Ducas and D. Micciancio.  FHEW: Bootstrapping homomorphic encryption in less than a second.  In Eurocrypt 2015, pages 617-640. [<span>PDF</span>](https://eprint.iacr.org/2014/816.pdf){:target="_blank"}
 
 `[GSW13]`:  C. Gentry, A. Sahai, and B. Waters. Homomorphic encryption from learning with errors:  Conceptually-simpler,  asymptotically-faster,  attribute-based. In Crypto 2013, pages 75-92. [<span>PDF</span>](https://eprint.iacr.org/2013/340.pdf){:target="_blank"}
@@ -123,9 +125,9 @@ At least one FFT processor is needed to run the project:
 `[CIM19]`: S. Carpov, M. Izabachène, V. Mollimard: New Techniques for Multi-value Input Homomorphic Evaluation and Applications. CT-RSA 2019: 106-126. [<span>PDF</span>](https://eprint.iacr.org/2018/622.pdf){:target="_blank"} 
 
 
-### Applications and open source projects based on TFHE: 
+### Applications and open source projects based on TFHE
 
-`[CGGT-P19]`:	S. Carpov, N. Gama, M. Georgieva, J.R. Troncoso-Pastoriza: Privacy-preserving semi-parallel logistic regression training with Fully Homomorphic Encryption.(among the winners Idash 2018)  IACR Cryptology ePrint Archive 2019: 101 (2019) [<span>PDF</span>](https://eprint.iacr.org/2019/101.pdf){:target="_blank"} [<span>Slides</span>](){:target="_blank"} 
+`[CGGT.P19]`:	S. Carpov, N. Gama, M. Georgieva, J.R. Troncoso-Pastoriza: Privacy-preserving semi-parallel logistic regression training with Fully Homomorphic Encryption.(among the winners Idash 2018)  IACR Cryptology ePrint Archive 2019: 101 (2019) [<span>PDF</span>](https://eprint.iacr.org/2019/101.pdf){:target="_blank"} [<span>Slides</span>](https://tfhe.github.io/tfhe/assets/pres/pdf/pres-idash.pdf){:target="_blank"} 
 
 `[CCS19]`: H. Chen, I. Chillotti, Y. Song: Multi-Key Homomophic Encryption from TFHE. IACR Cryptology ePrint Archive 2019: 116 (2019). [<span>PDF</span>](https://eprint.iacr.org/2019/116.pdf){:target="_blank"}
 
