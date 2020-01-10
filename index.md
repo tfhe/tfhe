@@ -142,9 +142,15 @@ At least one FFT processor is needed to run the project:
 
 ### Applications and open source projects based on TFHE
 
+`[CCGG19]`: TFHE-Chimera team (s. Carpov, I. Chillotti, N. Gama, M. Georgieva): First place at IDASH 2019 - Track II: Secure Genotype Imputation using Homomorphic Encryption. [<span>IDASH</span>](http://www.humangenomeprivacy.org/2019/index.html){:target="_blank"}
+
+`[KVSP]`: Kyoto Virtual Secure Platform: [<span>GitHub</span>](https://github.com/virtualsecureplatform/kvsp){:target="_blank"} 
+
+`[CCR19]`: H. Chen, I. Chillotti, L. Ren: Onion Ring ORAM: Efficient Constant Bandwidth Oblivious RAM from (Leveled) TFHE. CCS 2019. [<span>PDF</span>](https://eprint.iacr.org/2019/736.pdf){:target="_blank"}
+
 `[CGGT.P19]`:	S. Carpov, N. Gama, M. Georgieva, J.R. Troncoso-Pastoriza: Privacy-preserving semi-parallel logistic regression training with Fully Homomorphic Encryption.(among the winners Idash 2018)  IACR Cryptology ePrint Archive 2019: 101 (2019) [<span>PDF</span>](https://eprint.iacr.org/2019/101.pdf){:target="_blank"} [<span>Slides</span>](https://tfhe.github.io/tfhe/assets/pres/pdf/pres-idash.pdf){:target="_blank"} 
 
-`[CCS19]`: H. Chen, I. Chillotti, Y. Song: Multi-Key Homomophic Encryption from TFHE. IACR Cryptology ePrint Archive 2019: 116 (2019). [<span>PDF</span>](https://eprint.iacr.org/2019/116.pdf){:target="_blank"}
+`[CCS19]`: H. Chen, I. Chillotti, Y. Song: Multi-Key Homomophic Encryption from TFHE. ASIACRYPT 2019. [<span>PDF</span>](https://eprint.iacr.org/2019/116.pdf){:target="_blank"}, [<span>GitHub</span>](https://github.com/ilachill/MK-TFHE){:target="_blank"}
 
 `[BMMP18]`: F. Bourse, M. Minelli, M. Minihold, P. Paillier: Fast Homomorphic Evaluation of Deep Discretized Neural Networks. 
 CRYPTO (3) 2018: 483-512. [<span>PDF</span>](https://eprint.iacr.org/2017/1114.pdf){:target="_blank"}
