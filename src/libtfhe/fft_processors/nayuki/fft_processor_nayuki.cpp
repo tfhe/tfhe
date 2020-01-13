@@ -12,7 +12,7 @@ FFT_Processor_nayuki::FFT_Processor_nayuki(const int32_t N): _2N(2*N),N(N),Ns2(N
     tables_reverse = fft_init_reverse(_2N);
     omegaxminus1 = (cplx*) malloc(sizeof(cplx) * _2N);
     for (int32_t x=0; x<_2N; x++) {
-	omegaxminus1[x]=cos(x*M_PI/N)-1. + sin(x*M_PI/N) * 1i; 
+	omegaxminus1[x]=cplx(cos(x*M_PI/N)-1., sin(x*M_PI/N)); // instead of cos(x*M_PI/N)-1. + sin(x*M_PI/N) * 1i 
 	//exp(i.x.pi/N)-1
     }
 }
