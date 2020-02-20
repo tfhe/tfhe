@@ -86,8 +86,8 @@ Please check the papers for more details.
 
 | 	        	| `n`	  | `sd`      | `\lambda` |
 | ---------------------	| ------- | --------- | --------- |
-| Key-Switching key     | `612`	  | `2^{-15}` | `129`     |
-| Bootstrapping key     | `1024`  | `2^{-26}` | `128`	  |
+| Key-Switching key     | `630`	  | `2^{-15}` | `128`     |
+| Bootstrapping key     | `1024`  | `2^{-25}` | `130`	  |
 
 Our security estimates are made by using the [<span>LWE estimator</span>](https://bitbucket.org/malb/lwe-estimator/src/master/){:target="_blank"}. 
 The estimates can change according to the new attacks proposed in the litterature and the updates of the estimator itself.
