@@ -54,13 +54,13 @@ static TFheGateBootstrappingParameterSet *default_128bit_gate_bootstrapping_para
     // (w.r.t bkz-sieve model, + additional hybrid attack models)
     static const int32_t N = 1024;
     static const int32_t k = 1;
-    static const int32_t n = 612;
+    static const int32_t n = 630;
     static const int32_t bk_l = 3;
     static const int32_t bk_Bgbit = 7;
     static const int32_t ks_basebit = 2;
     static const int32_t ks_length = 8;
     static const double ks_stdev = pow(2.,-15); //standard deviation
-    static const double bk_stdev = pow(2.,-26);; //standard deviation
+    static const double bk_stdev = pow(2.,-25);; //standard deviation
     static const double max_stdev = 0.012467; //max standard deviation for a 1/4 msg space
 
     LweParams *params_in = new_LweParams(n, ks_stdev, max_stdev);
