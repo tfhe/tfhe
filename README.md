@@ -89,13 +89,13 @@ Please check the papers for more details.
 | Key-Switching key     | `630`	  | `2^{-15}` | `128`     |
 | Bootstrapping key     | `1024`  | `2^{-25}` | `130`	  |
 
-With these parameteres, the gate bootstrapping runs in about `10-20 ms`, depending on the machine. As instance, it takes about `13 ms` on a MACHINE SPECS.  
+With these parameteres, the gate bootstrapping runs in about `10-20 ms`, depending on the machine. As instance, it takes about `13 ms` on a Intel i9-9900k CPU (single thread) and about `17 ms` on an average i7 Xeon processor (single thread).  
 
 Our security estimates are made by using the [<span>LWE estimator</span>](https://bitbucket.org/malb/lwe-estimator/src/master/){:target="_blank"}. 
 The estimates can change according to the new attacks proposed in the litterature and the updates of the estimator itself.
 If you want to use safe parameters on the library, please double check the estimates and update the code with the new parameters.
 
-The code to use in the LWE estimator to estimate hardness for the standard deviation `sd` (`2**(-26)` in the example) and dimension `n` 
+The code to use in the LWE estimator to estimate hardness for the standard deviation `sd` (`2**(-25)` in the example) and dimension `n` 
 (`1024` in the example) is provided below. We recommend to target 128-bits of security. 
 In our implementation, we use 32 bits integers (`q=2**32`) and binary keys. 
 For the choice of all the other TFHE parameters, please refer to the noise formulas in [CGGI19].
@@ -116,7 +116,7 @@ load('https://bitbucket.org/malb/lwe-estimator/raw/HEAD/estimator.py')
 
 n = 1024
 q = 2**32
-sd = 2**(-26) * q
+sd = 2**(-25) * q
 alpha = sqrt(2*pi)*sd/RR(q)
 m = oo # infinite samples 
 secret_distribution = (0,1)
@@ -151,7 +151,7 @@ print("QUANTUM DUAL (conservative)")
 print(dual_scale(n, alpha, q, secret_distribution=secret_distribution, m=m, success_probability=success_probability, reduction_cost_model=reduction_cost_model))
 ```
 
-_We would like to thank Fernando Virdia for the help in the estimation of the security parameters._
+_We would like to thank [<span>Fernando Virdia</span>](https://fundamental.domains/){:target="_blank"} for the help in the estimation of the security parameters._
 
 
 
