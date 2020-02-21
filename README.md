@@ -1,6 +1,8 @@
 # tfhe
 Fast Fully Homomorphic Encryption Library over the Torus
 
+**version 1.1** -- *Updated security parameters release date: 2020.02.21*
+
 **version 1.0** -- *first release date: 2017.05.02*
 
 **version 1.0-rc1** -- *first pre-release date: 2017.04.05*
