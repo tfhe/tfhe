@@ -19,10 +19,12 @@ EXPORT void die_dramatically(const char *message) {
  */
 
 /** generate default gate bootstrapping parameters */
-EXPORT TFheGateBootstrappingParameterSet *new_default_gate_bootstrapping_parameters(int32_t minimum_lambda) {
-    if (minimum_lambda > 128)
-        die_dramatically("Sorry, for now, the parameters are only implemented for about 128bit of security!");
 
+static TFheGateBootstrappingParameterSet *default_80bit_gate_bootstrapping_parameters() {
+    // These are the historic parameter set provided in 2016,
+    // that were analyzed against lattice enumeration attacks
+    // Currently (in 2020), the security of these parameters is estimated to lambda = **80-bit security**
+    // (w.r.t bkz-sieve model, + hybrid attack model)
     static const int32_t N = 1024;
     static const int32_t k = 1;
     static const int32_t n = 500;
@@ -43,6 +45,47 @@ EXPORT TFheGateBootstrappingParameterSet *new_default_gate_bootstrapping_paramet
     TfheGarbageCollector::register_param(params_bk);
 
     return new TFheGateBootstrappingParameterSet(ks_length, ks_basebit, params_in, params_bk);
+}
+
+// this is the default and recommended parameter set
+static TFheGateBootstrappingParameterSet *default_128bit_gate_bootstrapping_parameters() {
+    // These are the parameter set provided in CGGI2019.
+    // Currently (in 2020), the security of these parameters is estimated to lambda = 129-bit security
+    // (w.r.t bkz-sieve model, + additional hybrid attack models)
+    static const int32_t N = 1024;
+    static const int32_t k = 1;
+    static const int32_t n = 630;
+    static const int32_t bk_l = 3;
+    static const int32_t bk_Bgbit = 7;
+    static const int32_t ks_basebit = 2;
+    static const int32_t ks_length = 8;
+    static const double ks_stdev = pow(2.,-15); //standard deviation
+    static const double bk_stdev = pow(2.,-25);; //standard deviation
+    static const double max_stdev = 0.012467; //max standard deviation for a 1/4 msg space
+
+    LweParams *params_in = new_LweParams(n, ks_stdev, max_stdev);
+    TLweParams *params_accum = new_TLweParams(N, k, bk_stdev, max_stdev);
+    TGswParams *params_bk = new_TGswParams(bk_l, bk_Bgbit, params_accum);
+
+    TfheGarbageCollector::register_param(params_in);
+    TfheGarbageCollector::register_param(params_accum);
+    TfheGarbageCollector::register_param(params_bk);
+
+    return new TFheGateBootstrappingParameterSet(ks_length, ks_basebit, params_in, params_bk);
+}
+
+EXPORT TFheGateBootstrappingParameterSet *new_default_gate_bootstrapping_parameters(int32_t minimum_lambda) {
+    if (minimum_lambda > 128)
+        die_dramatically("Sorry, for now, the parameters are only implemented for 80bit and 128bit of security!");
+
+    if (minimum_lambda > 80 and minimum_lambda <= 128)
+        return default_128bit_gate_bootstrapping_parameters();
+
+    if (minimum_lambda > 0 and minimum_lambda <= 80)
+        return default_80bit_gate_bootstrapping_parameters();
+
+    die_dramatically("the requested security parameter must be positive (currently, 80 and 128-bits are supported)");
+    abort();
 }
 
 /** deletes gate bootstrapping parameters */
