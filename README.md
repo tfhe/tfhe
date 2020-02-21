@@ -1,4 +1,4 @@
-# tfhe
+# TFHE
 Fast Fully Homomorphic Encryption Library over the Torus
 
 **version 1.1** -- *Updated security parameters release date: 2020.02.21*
@@ -82,23 +82,23 @@ The available options are the following:
 ### Security estimates and parameter choices.
 
 The current parameters implemented in the TFHE library have been updated from the ones proposend in the original TFHE paper [CGGI16], 
-according to the new estimates done in the JoC paper [CGGI19]. 
-The implementation uses two sets of keys on two different parameter sets, both necessaries to execute the gate bootstrapping. 
-Please check the papers for more details. 
+according to the new estimates done in the JoC paper [CGGI19], and new attack models integrated in [<span>LWE estimator</span>](https://bitbucket.org/malb/lwe-estimator/src/master/){:target="_blank"}. 
+The implementation uses two sets of keys on two different noise levels, both required to execute the gate bootstrapping. 
 
-| 	        	| `n`	  | `sd`      | `\lambda` |
-| ---------------------	| ------- | --------- | --------- |
-| Key-Switching key     | `630`	  | `2^{-15}` | `128`     |
-| Bootstrapping key     | `1024`  | `2^{-25}` | `130`	  |
+|                                 | ciphertext dimension `n`	  | noise rate (stdev) `sd`      | security bits $\lambda$ |
+| ------------------------------- | ------- | --------- | -------------- |
+| Key-Switching key (LWE)         | 630     | $2^{-15}$ | 128 bits     |
+| Bootstrapping key (Ring-LWE)    | 1024    | $2^{-25}$ | 130 bits	 |
+| **Overall security**            |         |           | 128 bits       |
 
-With these parameteres, the gate bootstrapping runs in about `10-20 ms`, depending on the machine. As instance, it takes about `13 ms` on a Intel i9-9900k CPU (single thread) and about `17 ms` on an average i7 Xeon processor (single thread).  
+With these parameters, the gate bootstrapping runs in about `10-20 ms`, depending on the machine: as instance, one bootstrapped binary gate takes about `13 ms` on a Intel i9-9900k CPU and about `17 ms` on an average i7 Xeon processor (single core).
 
 Our security estimates are made by using the [<span>LWE estimator</span>](https://bitbucket.org/malb/lwe-estimator/src/master/){:target="_blank"}. 
 The estimates can change according to the new attacks proposed in the litterature and the updates of the estimator itself.
-If you want to use safe parameters on the library, please double check the estimates and update the code with the new parameters.
+If you want to use safe parameters on the library in production, please double check the estimates and update your code with the new parameters.
 
-The code to use in the LWE estimator to estimate hardness for the standard deviation `sd` (`2**(-25)` in the example) and dimension `n` 
-(`1024` in the example) is provided below. We recommend to target 128-bits of security. 
+The code to use in the LWE estimator to estimate hardness for the standard deviation `sd` ($2^{-25}$ in the example) and dimension `n` 
+(1024 in the example) is provided below. We recommend to target at least 128-bits of security. 
 In our implementation, we use 32 bits integers (`q=2**32`) and binary keys. 
 For the choice of all the other TFHE parameters, please refer to the noise formulas in [CGGI19].
 
@@ -110,30 +110,30 @@ To obtain more conservative parameters, we suggest using the core-SVP methodolog
 
 
 #### ESTIMATOR CODE
-```
 
+```python
 # To reproduce the estimate run this snippet on http://aleph.sagemath.org/
 from sage.all import load, sqrt, RR, ZZ, pi, oo
 load('https://bitbucket.org/malb/lwe-estimator/raw/HEAD/estimator.py')
 
-n = 1024
-q = 2**32
-sd = 2**(-25) * q
-alpha = sqrt(2*pi)*sd/RR(q)
-m = oo # infinite samples 
+n = 1024                 # ciphertext dimension (also, key entropy)
+sd = 2**(-25)            # noise standard deviation
+alpha = sqrt(2*pi)*sd    # estimator defines noise rate = sqrt(2pi).stdev
+q = 2**32                # for compatibility only
+m = oo                   # the attacker can use as many samples he wishes 
 secret_distribution = (0,1)
 success_probability = 0.99
 
 
 # Chosen cost model 
 # BKZ cost models: CLASSICAL - 0.292*beta + 16.4 + log(8*d,2) - primal
-reduction_cost_model =  lambda beta, d, B: ZZ(2)**RR(0.292*beta + 16.4 + log(8*d,2))
+# i.e. BKZ.sieve =  lambda beta, d, B: ZZ(2)**RR(0.292*beta + 16.4 + log(8*d,2))
 print("CLASSICAL PRIMAL")
-print(primal_usvp(n, alpha, q, secret_distribution=secret_distribution, m=m, success_probability=success_probability, reduction_cost_model=reduction_cost_model))
+print(primal_usvp(n, alpha, q, secret_distribution=secret_distribution, m=m, success_probability=success_probability, reduction_cost_model=BKZ.sieve))
 # BKZ cost models: CLASSICAL - 0.292*beta + 16.4 + log(8*d,2) - dual
-reduction_cost_model =  lambda beta, d, B: ZZ(2)**RR(0.292*beta + 16.4 + log(8*d,2))
+# i.e. BKZ.sieve =  lambda beta, d, B: ZZ(2)**RR(0.292*beta + 16.4 + log(8*d,2))
 print("CLASSICAL DUAL")
-print(dual_scale(n, alpha, q, secret_distribution=secret_distribution, m=m, success_probability=success_probability, reduction_cost_model=reduction_cost_model))
+print(dual_scale(n, alpha, q, secret_distribution=secret_distribution, m=m, success_probability=success_probability, reduction_cost_model=BKZ.sieve))
 
 
 # For more conservative parameters, both classical and quantum  
@@ -207,6 +207,7 @@ _(Please contact us to add your work based on TFHE)_
 * Inpher
 * CryptoExperts
 * NuCipher
+* Zama
 
 
 
