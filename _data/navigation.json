@@ -20,6 +20,10 @@
         "url" : "/gate-bootstrapping-api.html"
     },
     {
+        "topic" : "Security and Parameters",
+        "url" : "/security_and_params.html"
+    },
+    {
         "topic" : "Tutorial",
         "url" : "/coding.html",
         "subtopics" : 
