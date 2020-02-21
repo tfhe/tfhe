@@ -2,6 +2,7 @@
 layout: page
 title: TFHE - Gate Bootstrapping API
 previousPage: usage.html
+nextPage: security_and_params.html
 ---
 
 # The Gate Bootstrapping API

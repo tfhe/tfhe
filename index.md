@@ -119,6 +119,9 @@ At least one FFT processor is needed to run the project:
 
 ### References
 
+  
+`[CGGI19]`: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. TFHE: Fast Fully Homomorphic Encryptionover the Torus. In Journal of Cryptology, volume 33, pages 34–91 (2020). [<span>PDF</span>](https://eprint.iacr.org/2018/421.pdf){:target="_blank"}
+
 `[CGGI16]`: I. Chillotti, N. Gama, M. Georgieva, and M. Izabachène. Faster fully homomorphic encryption: Bootstrapping in less than 0.1 seconds. In Asiacrypt 2016 (Best Paper), pages 3-33.  [<span>PDF</span>](https://eprint.iacr.org/2016/870.pdf){:target="_blank"} [<span>Slides</span>](http://lab.algonics.net/slides_ac16/index-asiacrypt.html){:target="_blank"}
 
 `[CCS18]`: N.Gama. TFHE tutorial presentation at CCS 2018. [<span>Slides</span>](http://lab.algonics.net/slides/index-ccs.html#/){:target="_blank"}
@@ -168,5 +171,6 @@ _(Please contact us to add your work based on TFHE)_
 * Inpher
 * CryptoExperts
 * NuCipher
+* Zama
 
 

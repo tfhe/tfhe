@@ -1,5 +1,10 @@
 [
     {
+        "name": "v1.1",
+        "title": "Updated security parameters release",
+        "date": "2020.02.21"
+    },
+    {
         "name": "v1.0.1",
         "title": "TFHE for Linux and MacOs",
         "date": "2017.08.15"
