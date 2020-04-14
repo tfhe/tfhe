@@ -145,6 +145,8 @@ At least one FFT processor is needed to run the project:
 
 ### Applications and open source projects based on TFHE
 
+`[Cingulata]`: Compilation toolchain and run-time environment targeting TFHE: [<span>GitHub</span>](https://github.com/CEA-LIST/Cingulata){:target="_blank"} 
+
 `[CCGG19]`: TFHE-Chimera team (S. Carpov, I. Chillotti, N. Gama, M. Georgieva): First place at IDASH 2019 - Track II: Secure Genotype Imputation using Homomorphic Encryption. [<span>IDASH</span>](http://www.humangenomeprivacy.org/2019/index.html){:target="_blank"}
 
 `[KVSP]`: Kyoto Virtual Secure Platform: [<span>GitHub</span>](https://github.com/virtualsecureplatform/kvsp){:target="_blank"} 
