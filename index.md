@@ -145,11 +145,13 @@ At least one FFT processor is needed to run the project:
 
 ### Applications and open source projects based on TFHE
 
+`[Concrete]`: Concrete Operates oN Ciphertexts Rapidly by Extending TfhE: [<span>GitHub</span>](https://github.com/zama-ai/concrete){:target="_blank"} 
+
 `[Cingulata]`: Compilation toolchain and run-time environment targeting TFHE: [<span>GitHub</span>](https://github.com/CEA-LIST/Cingulata){:target="_blank"} 
 
 `[CCGG19]`: TFHE-Chimera team (S. Carpov, I. Chillotti, N. Gama, M. Georgieva): First place at IDASH 2019 - Track II: Secure Genotype Imputation using Homomorphic Encryption. [<span>IDASH</span>](http://www.humangenomeprivacy.org/2019/index.html){:target="_blank"}
 
-`[KVSP]`: Kyoto Virtual Secure Platform: [<span>GitHub</span>](https://github.com/virtualsecureplatform/kvsp){:target="_blank"} 
+`[KVSP]`: Kyoto Virtual Secure Platform: [<span>GitHub</span>](https://github.com/virtualsecureplatform/kvsp){:target="_blank"} [<span>PDF</span>](https://arxiv.org/pdf/2010.09410.pdf){:target="_blank"}
 
 `[CCR19]`: H. Chen, I. Chillotti, L. Ren: Onion Ring ORAM: Efficient Constant Bandwidth Oblivious RAM from (Leveled) TFHE. CCS 2019. [<span>PDF</span>](https://eprint.iacr.org/2019/736.pdf){:target="_blank"}
 
