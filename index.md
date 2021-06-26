@@ -145,6 +145,8 @@ At least one FFT processor is needed to run the project:
 
 ### Applications and open source projects based on TFHE
 
+`[Google FHE]`: Fully Homomorphic Encryption (FHE): [<span>github</span>](https://github.com/google/fully-homomorphic-encryption){:target="_blank"} 
+
 `[Concrete]`: Concrete Operates oN Ciphertexts Rapidly by Extending TfhE: [<span>GitHub</span>](https://github.com/zama-ai/concrete){:target="_blank"} 
 
 `[Cingulata]`: Compilation toolchain and run-time environment targeting TFHE: [<span>GitHub</span>](https://github.com/CEA-LIST/Cingulata){:target="_blank"} 
