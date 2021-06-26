@@ -187,6 +187,10 @@ _We would like to thank [<span>Fernando Virdia</span>](https://fundamental.domai
 
 ### Applications and open source projects based on TFHE: 
 
+[Google FHE]: Fully Homomorphic Encryption (FHE) [<span>github</span>](https://github.com/google/fully-homomorphic-encryption)
+  
+[Concrete]: Concrete Operates oN Ciphertexts Rapidly by Extending TfhE. [<span>github</span>](https://github.com/zama-ai/concrete)
+
 [Cingulata]: Compilation toolchain and run-time environment targeting TFHE [<span>github</span>](https://github.com/CEA-LIST/Cingulata)
 
 [CGGT-P19]:	S. Carpov, N. Gama, M. Georgieva, J.R. Troncoso-Pastoriza: Privacy-preserving semi-parallel logistic regression training with Fully Homomorphic Encryption.(among the winners Idash 2018)  IACR Cryptology ePrint Archive 2019: 101 (2019) [<span>PDF</span>](https://eprint.iacr.org/2019/101.pdf){:target="_blank"} [<span>Slides</span>](){:target="_blank"} 
