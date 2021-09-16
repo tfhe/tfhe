@@ -12,5 +12,6 @@ set(HEADERS
     lagrangehalfc_impl.h
     )
 
+include_directories(${FFTW_INCLUDES})
 add_library(tfhe-fft-fftw OBJECT ${SRCS} ${HEADERS})
 set_property(TARGET tfhe-fft-fftw PROPERTY POSITION_INDEPENDENT_CODE ON)
