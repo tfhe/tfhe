@@ -97,7 +97,7 @@ The implementation uses two sets of keys on two different noise levels, both req
 With these parameters, the gate bootstrapping runs in about `10-20 ms`, depending on the machine: as instance, one bootstrapped binary gate takes about `13 ms` on a Intel i9-9900k CPU and about `17 ms` on an average i7 Xeon processor (single core).
 
 Our security estimates are made by using the [<span>LWE estimator</span>](https://bitbucket.org/malb/lwe-estimator/src/master/){:target="_blank"}. 
-The estimates can change according to the new attacks proposed in the litterature and the updates of the estimator itself.
+The estimates can change according to the new attacks proposed in the literature and the updates of the estimator itself.
 If you want to use safe parameters on the library in production, please double check the estimates and update your code with the new parameters.
 
 The code to use in the LWE estimator to estimate hardness for the standard deviation `sd` ($2^{-25}$ in the example) and dimension `n` 
