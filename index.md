@@ -6,7 +6,7 @@ title: TFHE Fast Fully Homomorphic Encryption over the Torus
 # TFHE: Fast Fully Homomorphic Encryption over the Torus
 
 This library is the original version of TFHE that implements the base arithmetic and functionalities (bootstrapped and leveled). <br>
-If you need an enhanced API with some additional and more recent features of TFHE, or numpy integration, you can consult the [<span>Concrete library</span>](https://github.com/zama-ai/concrete){:target="_blank"}.
+If you need an enhanced API with some additional and more recent features of TFHE, you can consult the [<span>TFHE-rs library</span>](https://github.com/zama-ai/tfhe-rs){:target="_blank"}.
 
 <div>
 {% for release in site.data.revisions %}
