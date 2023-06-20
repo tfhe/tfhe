@@ -10,6 +10,7 @@ set(ENABLE_NAYUKI_PORTABLE ON CACHE BOOL "Enable the Nayuki portable FFT process
 set(ENABLE_NAYUKI_AVX ON CACHE BOOL "Enable the Nayuki AVX assembly FFT processor (MIT)")
 set(ENABLE_SPQLIOS_AVX ON CACHE BOOL "Enable the SPQLIOS AVX assembly FFT processor")
 set(ENABLE_SPQLIOS_FMA ON CACHE BOOL "Enable the SPQLIOS FMA assembly FFT processor")
+set(ENABLE_SPQLIOS_LIB OFF CACHE BOOL "Enable the SPQLIOS library FFT processor")
 set(ENABLE_TESTS OFF CACHE BOOL "Build the tests (requires googletest)")
 
 project(tfhe)
@@ -61,8 +62,20 @@ list(APPEND FFT_PROCESSORS "spqlios-avx")
 endif(ENABLE_SPQLIOS_AVX)
 
 if (ENABLE_SPQLIOS_FMA)
-list(APPEND FFT_PROCESSORS "spqlios-fma")
+  list(APPEND FFT_PROCESSORS "spqlios-fma")
 endif(ENABLE_SPQLIOS_FMA)
+
+if (ENABLE_SPQLIOS_LIB)
+  find_path(SPQLIOS_INCLUDES spqlios/spqlios-cplx-fft.h
+          HINTS /usr/local/include)
+  find_library (SPQLIOS_LIB NAMES spqlios-fft fft-spqlios
+          HINTS /usr/local/lib)
+  message(STATUS "Found SPQLIOS_LIB: I=${SPQLIOS_INCLUDES} L=${SPQLIOS_LIB}")
+  if (NOT SPQLIOS_INCLUDES OR NOT SPQLIOS_LIB)
+    message(FATAL_ERROR "SPQLIOS_LIB not found")
+  endif()
+  list(APPEND FFT_PROCESSORS "spqlios-lib")
+endif(ENABLE_SPQLIOS_LIB)
 
 include_directories("include")
 file(GLOB TFHE_HEADERS include/*.h)

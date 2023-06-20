@@ -42,6 +42,10 @@ foreach (FFT_PROCESSOR IN LISTS FFT_PROCESSORS)
 	$<TARGET_OBJECTS:tfhe-core>
         $<TARGET_OBJECTS:tfhe-fft-${FFT_PROCESSOR}>)
     set_property(TARGET tfhe-${FFT_PROCESSOR} PROPERTY POSITION_INDEPENDENT_CODE ON)
+    target_link_options(tfhe-${FFT_PROCESSOR} PUBLIC -Wl,--no-undefined)
+    if (FFT_PROCESSOR STREQUAL "spqlios-lib")
+        target_link_libraries(tfhe-${FFT_PROCESSOR} ${SPQLIOS_LIB})
+    endif()
 
     if (FFT_PROCESSOR STREQUAL "fftw")
         target_link_libraries(tfhe-fftw ${FFTW_LIBRARIES})
