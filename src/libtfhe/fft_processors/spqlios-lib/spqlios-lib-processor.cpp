@@ -1,5 +1,6 @@
 #include "spqlios-lib-impl.h"
-#include "/home/gama/perso/libfft-spqlios/spqlios/spqlios-cplx-fft.h"
+#include "spqlios/spqlios-cplx-fft.h"
+#include "spqlios/reim4/reim4-vecfft.h"
 #include <cassert>
 #include <cmath>
 #include <cstring>
@@ -23,8 +24,10 @@ FFT_Processor_Spqlios_Lib::FFT_Processor_Spqlios_Lib(const int32_t N) : _2N(2 * 
     from_tnx32_tables = new_cplx_from_tnx32_tables(Ns2);
     from_znx32_tables = new_cplx_from_znx32_tables(Ns2, 32);
     to_tnx32_tables = new_cplx_to_tnx32_tables(Ns2, Ns2, 18);
-    vecfft_mul_tables = new_cplx_fftvec_mul_tables(Ns2);
-    vecfft_addmul_tables = new_cplx_fftvec_addmul_tables(Ns2);
+    vecfft_mul_tables = new_reim4_fftvec_mul_tables(N);
+    vecfft_addmul_tables = new_reim4_fftvec_addmul_tables(N);
+    reim4_from_cplx_tables = new_reim4_from_cplx_tables(N);
+    reim4_to_cplx_tables = new_reim4_to_cplx_tables(N);
     reva = new int32_t[Ns2];
     cosomegaxminus1 = new double[2 * _2N];
     sinomegaxminus1 = cosomegaxminus1 + _2N;
@@ -44,7 +47,8 @@ void FFT_Processor_Spqlios_Lib::execute_reverse_int(double *res, const int32_t *
     //cplx_fft(fft_tables, res);
     cplx_from_znx32(from_znx32_tables, inout_fft_buffer, a);
     cplx_fft(fft_tables, inout_fft_buffer);
-    memcpy(res, inout_fft_buffer, N*sizeof(double));
+    //memcpy(res, inout_fft_buffer, N*sizeof(double));
+    reim4_from_cplx(reim4_from_cplx_tables, res, inout_fft_buffer);
 }
 
 void FFT_Processor_Spqlios_Lib::execute_reverse_torus32(double *res, const Torus32 *a) {
@@ -52,11 +56,13 @@ void FFT_Processor_Spqlios_Lib::execute_reverse_torus32(double *res, const Torus
     //cplx_fft(fft_tables, res);
     cplx_from_tnx32(from_tnx32_tables, inout_fft_buffer, a);
     cplx_fft(fft_tables, inout_fft_buffer);
-    memcpy(res, inout_fft_buffer, N*sizeof(double));
+    //memcpy(res, inout_fft_buffer, N*sizeof(double));
+    reim4_from_cplx(reim4_from_cplx_tables, res, inout_fft_buffer);
 }
 
 void FFT_Processor_Spqlios_Lib::execute_direct_torus32(Torus32 *res, const double *a) {
-    memcpy(inout_ifft_buffer, a, N*sizeof(double));
+    reim4_to_cplx(reim4_to_cplx_tables, inout_ifft_buffer, a);
+    //memcpy(inout_ifft_buffer, a, N*sizeof(double));
     cplx_ifft(ifft_tables, inout_ifft_buffer);
     cplx_to_tnx32(to_tnx32_tables, res, inout_ifft_buffer);
     //cplx_ifft(ifft_tables, (void*) a);
@@ -83,8 +89,9 @@ EXPORT void TorusPolynomial_fft(TorusPolynomial *result, const LagrangeHalfCPoly
 }
 
 EXPORT void LagrangeHalfCPolynomialMul(LagrangeHalfCPolynomial *r, const LagrangeHalfCPolynomial *a, const LagrangeHalfCPolynomial *b) {
-    cplx_fftvec_mul(fftp1024.vecfft_mul_tables, r->data,a->data,b->data);
+    reim4_fftvec_mul(fftp1024.vecfft_mul_tables, (double*) r->data,(double*) a->data,(double*) b->data);
 }
+
 EXPORT void LagrangeHalfCPolynomialAddMul(LagrangeHalfCPolynomial *r, const LagrangeHalfCPolynomial *a, const LagrangeHalfCPolynomial *b) {
-    cplx_fftvec_addmul(fftp1024.vecfft_addmul_tables, r->data,a->data,b->data);
+    reim4_fftvec_addmul(fftp1024.vecfft_addmul_tables, (double*)r->data,(double*)a->data,(double*)b->data);
 }

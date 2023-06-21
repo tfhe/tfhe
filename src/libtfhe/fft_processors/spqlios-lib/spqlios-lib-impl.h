@@ -6,6 +6,7 @@
 #include <tfhe.h>
 #include <polynomials.h>
 #include <spqlios/spqlios-cplx-fft.h>
+#include <spqlios/reim4/reim4-vecfft.h>
 
 class FFT_Processor_Spqlios_Lib {
 public:
@@ -22,8 +23,10 @@ public:
     CPLX_FROM_TNX32_PRECOMP* from_tnx32_tables;
     CPLX_FROM_ZNX32_PRECOMP* from_znx32_tables;
     CPLX_TO_TNX32_PRECOMP* to_tnx32_tables;
-    CPLX_VECFFT_MUL_PRECOMP* vecfft_mul_tables;
-    CPLX_VECFFT_ADDMUL_PRECOMP* vecfft_addmul_tables;
+    REIM4_VECFFT_MUL_PRECOMP* vecfft_mul_tables;
+    REIM4_VECFFT_ADDMUL_PRECOMP* vecfft_addmul_tables;
+    REIM4_FROM_CPLX_PRECOMP* reim4_from_cplx_tables;
+    REIM4_TO_CPLX_PRECOMP* reim4_to_cplx_tables;
 public:
     double *cosomegaxminus1;
     double *sinomegaxminus1;
