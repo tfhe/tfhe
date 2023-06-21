@@ -40,21 +40,27 @@ FFT_Processor_Spqlios_Lib::FFT_Processor_Spqlios_Lib(const int32_t N) : _2N(2 * 
 }
 
 void FFT_Processor_Spqlios_Lib::execute_reverse_int(double *res, const int32_t *a) {
-    cplx_from_znx32(from_znx32_tables, res, a);
-    cplx_fft(fft_tables, res);
+    //cplx_from_znx32(from_znx32_tables, res, a);
+    //cplx_fft(fft_tables, res);
+    cplx_from_znx32(from_znx32_tables, inout_fft_buffer, a);
+    cplx_fft(fft_tables, inout_fft_buffer);
+    memcpy(res, inout_fft_buffer, N*sizeof(double));
 }
 
 void FFT_Processor_Spqlios_Lib::execute_reverse_torus32(double *res, const Torus32 *a) {
-    cplx_from_tnx32(from_tnx32_tables, res, a);
-    cplx_fft(fft_tables, res);
+    //cplx_from_tnx32(from_tnx32_tables, res, a);
+    //cplx_fft(fft_tables, res);
+    cplx_from_tnx32(from_tnx32_tables, inout_fft_buffer, a);
+    cplx_fft(fft_tables, inout_fft_buffer);
+    memcpy(res, inout_fft_buffer, N*sizeof(double));
 }
 
 void FFT_Processor_Spqlios_Lib::execute_direct_torus32(Torus32 *res, const double *a) {
-    //memcpy(inout_ifft_buffer, a, N*sizeof(double));
-    //cplx_ifft(ifft_tables, inout_ifft_buffer);
-    //cplx_to_tnx32(to_tnx32_tables, res, inout_ifft_buffer);
-    cplx_ifft(ifft_tables, (void*) a);
-    cplx_to_tnx32(to_tnx32_tables, res, a);
+    memcpy(inout_ifft_buffer, a, N*sizeof(double));
+    cplx_ifft(ifft_tables, inout_ifft_buffer);
+    cplx_to_tnx32(to_tnx32_tables, res, inout_ifft_buffer);
+    //cplx_ifft(ifft_tables, (void*) a);
+    //cplx_to_tnx32(to_tnx32_tables, res, a);
 }
 
 FFT_Processor_Spqlios_Lib::~FFT_Processor_Spqlios_Lib() {
