@@ -19,27 +19,35 @@ static const double _two31_double = _two31;
 /** 
  * modular gaussian distribution of standard deviation sigma centered on
  * the message, on the Torus32
+ * This function has only 32 bits of precision.
  */ 
 EXPORT Torus32 gaussian32(Torus32 message, double sigma);
 
-/** conversion from double to Torus32 */
+/** conversion from double to Torus32
+ * d is reduced modulo 1 during this conversion.
+ */
 EXPORT Torus32 dtot32(double d);
-/** conversion from Torus32 to double */
+/** conversion from Torus32 to double
+ * the result is given in the real interval [-0.5,0.5[
+ */
 EXPORT double t32tod(Torus32 x);
 
 
 /**
- *  Used to approximate the phase to the nearest multiple of  1/Msize 
+ * Used to approximate the phase to the nearest multiple of  1/Msize
+ * computes floor(double(phase)*Msize+0.5)/Msize mod 1
  */
 EXPORT Torus32 approxPhase(Torus32 phase, int32_t Msize);
 
 /**
  *  computes rountToNearestInteger(Msize*phase)
+ *  computes floor(double(phase)*Msize+0.5)
  */
 EXPORT int32_t modSwitchFromTorus32(Torus32 phase, int32_t Msize);
 
 /**
  *  converts mu/Msize to a Torus32 for mu in [0,Msize[
+ *  computes mu/Msize mod 1
  */
 EXPORT Torus32 modSwitchToTorus32(int32_t mu, int32_t Msize);
 
